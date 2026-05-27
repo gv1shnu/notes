@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <h2>Introduction</h2>
+
+    <p>
+        The human brain's memory capacity in the average adult can store 2.5PB. [1]
+        However, the efficiency of the stored information is often clumsy, because people forget intentionally,
+        unintentionally, accidentally, and possibly.
+        So, we started writing in books.<br>
+        <img src="./assets/books.png" width="700px" height="250px" /><br>
+        It's still considered the best and most private way to keep information stored someplace, but not optimal.
+        Books were good for storing information, but bad for managing large amounts of it.
+        <strong>Problem:</strong> However, they can get lost, burned, wet, torn, thrown, stolen, etc.
+    </p>
+    <p>
+        When computers came into existence, people started to outsource storing information to the machine and replaced
+        books with disks.<br>
+        <strong>Solution</strong>: Disks introduced faster reading and writing, easier copying, easier searching,
+        cheaper long-term
+        storage, information could be shared quickly.<br>
+        <img src="./assets/disk1.webp" width="250px" height="250px" /><br>
+        <img src="./assets/disk2.jpg" width="250px" height="250px" /><br>
+
+        One way to keep information on a computer is to store it in permanent files. [2]
+        The system for saving, editing, and deleting the files was called file-based system, named appropriately.
+    </p>
+    <p>
+        Organisations used the flat-file with
+        <strong>structs</strong> dumping to and reading from the file. Structs would not have pointers, and contain real
+        data.
+        Example, Employee struct:
+    <table border="1" cellpadding="15">
+        <tr>
+            <th>Data Type</th>
+            <th>Variable</th>
+        </tr>
+        <tr>
+            <td>int</td>
+            <td>id</td>
+        </tr>
+        <tr>
+            <td>char</td>
+            <td>name[50]</td>
+        </tr>
+        <tr>
+            <td>unsigned int</td>
+            <td>salary</td>
+        </tr>
+        <tr>
+            <td>char</td>
+            <td>dept[20]</td>
+        </tr>
+    </table>
+
+    <br>
+
+    Flat file on floppy disk
+
+    <table border="1" cellpadding="15">
+        <tr>
+            <td>101</td>
+            <td>Akanksha</td>
+            <td>75000</td>
+            <td>Sales</td>
+        </tr>
+        <tr>
+            <td>102</td>
+            <td>Bharat</td>
+            <td>65000</td>
+            <td>HR</td>
+        </tr>
+        <tr>
+            <td>103</td>
+            <td>Charan</td>
+            <td>82000</td>
+            <td>Engg</td>
+        </tr>
+        <tr>
+            <td>104</td>
+            <td>David</td>
+            <td>71000</td>
+            <td>Finance</td>
+        </tr>
+    </table>
+    <br>
+
+    Operation: Read 101
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <td>id</td>
+            <td>101</td>
+        </tr>
+        <tr>
+            <td>char</td>
+            <td>Akanksha</td>
+        </tr>
+        <tr>
+            <td>unsigned int</td>
+            <td>75000</td>
+        </tr>
+        <tr>
+            <td>char</td>
+            <td>Sales</td>
+        </tr>
+    </table>
+
+    <br>
+
+    This meant that writing was easy: dump complete struct to disk. This also meant that reading was easy: do file
+    seek and read struct. [3]
+    The hard parts were searching, size enforcement (when number exceeded range), upgrades (when structs were
+    changed), os incompatibilities (linux/windows).
+    <p>
+        File systems worked for small data, but failed as data and users increased.
+        This didn't last longer than it was expected to.
+    </p>
+
+    <p>The structs in files, conceptually evolved to tables in DBMS.</p>
+    <p>The following challenges in file-based system were noted, and consequently DBMS was introduced solving them.</p>
+    <ol>
+        <li>
+            <strong>Data redundancy.</strong>
+            <p>The same information being kept in several different places, as different individuals may required to
+                keep copy of certain data.
+            </p>
+            Customers.dat
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                    <th>Phone</th>
+                </tr>
+
+                <tr>
+                    <td bgcolor="lightgrey">C101</td>
+                    <td bgcolor="lightgrey">Rahul Sharma</td>
+                    <td bgcolor="lightgrey">Mumbai</td>
+                    <td>9876543210</td>
+                </tr>
+
+                <tr>
+                    <td>C102</td>
+                    <td>Priya Verma</td>
+                    <td>Pune</td>
+                    <td>9811122233</td>
+                </tr>
+
+                <tr>
+                    <td>C103</td>
+                    <td>Arjun Nair</td>
+                    <td>Kochi</td>
+                    <td>9898989898</td>
+                </tr>
+
+            </table>
+
+            Orders.dat
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>OrderID</th>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                </tr>
+
+                <tr>
+                    <td>O501</td>
+                    <td bgcolor="lightgrey">C101</td>
+                    <td bgcolor="lightgrey">Rahul Sharma</td>
+                    <td bgcolor="lightgrey">Mumbai</td>
+                </tr>
+
+                <tr>
+                    <td>O502</td>
+                    <td>C103</td>
+                    <td>Arjun Nair</td>
+                    <td>Kochi</td>
+                </tr>
+
+                <tr>
+                    <td>O503</td>
+                    <td>C101</td>
+                    <td>Rahul Sharma</td>
+                    <td>Mumbai</td>
+                </tr>
+
+            </table>
+
+            Invoices.dat
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>InvoiceID</th>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                </tr>
+
+                <tr>
+                    <td>I901</td>
+                    <td bgcolor="lightgrey">C101</td>
+                    <td bgcolor="lightgrey">Rahul Sharma</td>
+                    <td bgcolor="lightgrey">Mumbai</td>
+                </tr>
+
+                <tr>
+                    <td>I902</td>
+                    <td>C102</td>
+                    <td>Priya Verma</td>
+                    <td>Pune</td>
+                </tr>
+
+                <tr>
+                    <td>I903</td>
+                    <td bgcolor="lightgrey">C101</td>
+                    <td bgcolor="lightgrey">Rahul Sharma</td>
+                    <td bgcolor="lightgrey">Mumbai</td>
+                </tr>
+
+            </table>
+            <br>
+            <strong>DBMS Solution</strong>
+
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Customers</th>
+                </tr>
+
+                <tr>
+                    <td>C101, Rahul Sharma, Mumbai</td>
+                </tr>
+            </table>
+
+            <br>
+
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Orders</th>
+                    <th>Invoices</th>
+                </tr>
+
+                <tr>
+                    <td>O501, C101</td>
+                    <td>I901, C101</td>
+                </tr>
+            </table>
+
+            <p>
+                Customer data is stored once and referenced using CustID.
+            </p>
+            <br>
+
+        </li>
+        <li>
+            Data inconsistency.
+            <p>
+                A situation where various copies of the same data are conflicting, wastes storage space and duplicates
+                effort.
+            </p>
+            Updated customers.dat
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                </tr>
+
+                <tr>
+                    <td>C101</td>
+                    <td>Rahul Sharma</td>
+                    <td bgcolor="green">Bengaluru</td>
+                </tr>
+
+                <tr>
+                    <td>C102</td>
+                    <td>Priya Verma</td>
+                    <td>Pune</td>
+                </tr>
+
+            </table>
+            Old invoices.dat
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>InvoiceID</th>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                </tr>
+
+                <tr>
+                    <td>I901</td>
+                    <td>C101</td>
+                    <td>Rahul Sharma</td>
+                    <td bgcolor="red">Mumbai</td>
+                </tr>
+
+                <tr>
+                    <td>I902</td>
+                    <td>C102</td>
+                    <td>Priya Verma</td>
+                    <td>Pune</td>
+                </tr>
+
+            </table>
+            Old orders.dat
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>OrderID</th>
+                    <th>CustID</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                </tr>
+
+                <tr>
+                    <td>O501</td>
+                    <td>C101</td>
+                    <td>Rahul Sharma</td>
+                    <td bgcolor="red">Mumbai</td>
+                </tr>
+
+                <tr>
+                    <td>O502</td>
+                    <td>C102</td>
+                    <td>Priya Verma</td>
+                    <td>Pune</td>
+                </tr>
+
+            </table>
+            <br>
+            <strong>DBMS Solution</strong>
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>Customers</th>
+                </tr>
+
+                <tr>
+                    <td>Rahul, Bengaluru</td>
+                </tr>
+
+            </table>
+
+            <p>
+                Data is updated once, so all users see the same information.
+            </p>
+            <br>
+        </li>
+        <li>
+            Integrity problems.
+            <p>It is difficult to make changes to the application programs in order to enforce new constraints.</p>
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>EmpID</th>
+                    <th>EmployeeName</th>
+                    <th>Phone</th>
+                    <th>Salary</th>
+                </tr>
+
+                <tr>
+                    <td>E101</td>
+                    <td>Amit Singh</td>
+                    <td>9876543210</td>
+                    <td>45000</td>
+                </tr>
+
+                <tr>
+                    <td>E102</td>
+                    <td>Neha Joshi</td>
+                    <td bgcolor="orange">98AB112233</td>
+                    <td>52000</td>
+                </tr>
+
+                <tr>
+                    <td bgcolor="orange">E101</td>
+                    <td>Vikram Rao</td>
+                    <td>9898989898</td>
+                    <td>47000</td>
+                </tr>
+
+                <tr>
+                    <td>E104</td>
+                    <td>Sneha Iyer</td>
+                    <td>9812345678</td>
+                    <td bgcolor="orange">-15000</td>
+                </tr>
+
+            </table>
+            <br>
+            <strong>DBMS Solution</strong>
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>Constraint</th>
+                    <th>Purpose</th>
+                </tr>
+
+                <tr>
+                    <td>PRIMARY KEY</td>
+                    <td>No duplicate EmpID</td>
+                </tr>
+
+                <tr>
+                    <td>CHECK</td>
+                    <td>No negative salary</td>
+                </tr>
+
+            </table>
+
+            <p>
+                DBMS enforces rules automatically.
+            </p>
+            <br>
+        </li>
+        <li>
+            Slower search.<br>
+            Employees.dat
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>EmpID</th>
+                    <th>EmployeeName</th>
+                    <th>Department</th>
+                </tr>
+
+                <tr>
+                    <td>E101</td>
+                    <td>Amit Singh</td>
+                    <td>HR</td>
+                </tr>
+
+                <tr>
+                    <td>E102</td>
+                    <td>Neha Joshi</td>
+                    <td>Sales</td>
+                </tr>
+
+                <tr>
+                    <td>E103</td>
+                    <td>Vikram Rao</td>
+                    <td>Finance</td>
+                </tr>
+
+                <tr>
+                    <td>E104</td>
+                    <td>Sneha Iyer</td>
+                    <td>IT</td>
+                </tr>
+
+                <tr>
+                    <td>E105</td>
+                    <td>Karan Mehta</td>
+                    <td>Marketing</td>
+                </tr>
+
+            </table>
+
+            Search for E105.<br>
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>Step</th>
+                    <th>Record Checked</th>
+                    <th>Result</th>
+                </tr>
+
+                <tr>
+                    <td>1</td>
+                    <td>E101</td>
+                    <td>Not Found</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>E102</td>
+                    <td>Not Found</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>E103</td>
+                    <td>Not Found</td>
+                </tr>
+
+                <tr>
+                    <td>4</td>
+                    <td>E104</td>
+                    <td>Not Found</td>
+                </tr>
+
+                <tr>
+                    <td>5</td>
+                    <td>E105</td>
+                    <td bgcolor="lightblue">Found</td>
+                </tr>
+
+            </table>
+            <p>
+                System checks records one by one. More records = slower sequential search. (Recall Time complexity from
+                Algorithms)
+            </p>
+            <br>
+            <strong>DBMS Solution</strong>
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>Index</th>
+                    <th>Record</th>
+                </tr>
+
+                <tr>
+                    <td>E105</td>
+                    <td>Direct access</td>
+                </tr>
+
+            </table>
+
+            <p>
+                Indexes reduce unnecessary searching.
+            </p>
+            <br>
+        </li>
+        <li>
+            Concurrency problems.
+            <p>Typically, in a file-based system, when an application opens a file, that file is locked. This means that
+                no one else has access to the file at the same time.
+            </p>
+            <br>
+
+            <strong>DBMS Solution</strong>
+
+            <table border="1" cellpadding="10">
+
+                <tr>
+                    <th>User</th>
+                    <th>Operation</th>
+                </tr>
+
+                <tr>
+                    <td>User A</td>
+                    <td>Update salary</td>
+                </tr>
+
+                <tr>
+                    <td>User B</td>
+                    <td>Read employee data</td>
+                </tr>
+
+            </table>
+
+            <p>
+                DBMS manages multiple users safely using transactions and locks.
+            </p>
+            <br>
+        </li>
+    </ol>
+    </p>
+    <p>
+        The difficulties that arise from using the file-based system have prompted the development of a new approach in
+        managing large amounts of organizational information called the database approach.
+        The software built to manage this database is called, Database management system (DBMS).
+    </p>
+
+    <p>
+        Formally, a database is a collection of related data. [4]
+        The database definition or descriptive information is stored by the DBMS in the form of a database catalog or
+        dictionary; it is called <italic>meta-data</italic>.
+        DBMS handles concurrent accesses to the database, enforces constraints, manages permissions, maintains
+        consistency across all changes.
+        A DBMS can also handle several databases, keep secure backups, insulate actual data from programs, and so much.
+    </p>
+
+    <p>
+    <h4>Summary</h4>
+    <ul>
+        <li>Problem: Unrealiable record keeping on books.
+            Solution: Computer. Files.</li>
+        <li>Problem: Inefficient file handling.
+            Solution: Databases. DBMS.</li>
+    </ul>
+    </p>
+
+    <p>
+        Next <a href="./2-dbms.html">>></a>
+    </p>
+
+    <p>References:
+    <ol>
+        <li>https://www.cnsnevada.com/what-is-the-memory-capacity-of-a-human-brain/</li>
+        <li>https://opentextbc.ca/dbdesign01/chapter/chapter-1-before-the-advent-of-database-systems/</li>
+        <li>https://www.reddit.com/r/Database/comments/1026the/life_before_sql_how_did_it_all_work/</li>
+        <li>Fundamentals of Database Systems (6th Edition) by Ramez Elmasri and Shamkant B. Navathe</li>
+    </ol>
+    </p>
+
+</body>
