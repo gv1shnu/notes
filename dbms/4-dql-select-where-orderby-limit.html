@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <h2>DQL — Data Query Language</h2>
+
+    <p>
+        DQL commands query data from tables.
+    </p>
+    <hr>
+    <h3>SELECT</h3>
+
+    <p>
+        SELECT reads data from a table.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>aspas</td>
+            <td>Immortal</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>yay</td>
+            <td>Ascendant</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, rank
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rank</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>Radiant</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>Immortal</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>Ascendant</td>
+        </tr>
+
+    </table>
+<p>Note: SELECT * returns everything, which is wasteful on large tables and couples your query to the table's
+        structure. </p>
+    <hr>
+
+    <h3>WHERE</h3>
+
+    <p>
+        WHERE filters rows.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>aspas</td>
+            <td>Immortal</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>yay</td>
+            <td>Ascendant</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> *
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rank = 'Radiant';
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+    </table>
+
+    
+    <h3>ORDER BY</h3>
+
+    <p>
+        ORDER BY sorts rows.<br>
+        DESC = descending order.<br>
+        ASC = ascending order.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> *
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">ORDER BY</span> rr DESC;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>LIMIT</h3>
+
+    <p>
+        LIMIT restricts the number of rows returned.
+        Problem: A players table in production might have 5 million rows. SELECT * FROM players would return all 5
+        million. That crashes slow clients, wastes bandwidth, and locks the database longer.
+        <br>Solution: LIMIT returns only the first N rows. This is also used for pagination.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> *
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">LIMIT</span> 2;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+    </table>
+
+
+    <p>
+        Prev, DML. <a href="./3-dml.html">&lt;&lt;<</a>
+    </p>
+    <p>
+        Next, we're going through common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&gt;&gt;</a>
+    </p>
+
+
+</body>
+
+</html>

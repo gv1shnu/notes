@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -7,10 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
 
+
     <title>DBMS Notes - Vishnu Gandarapu</title>
+
+
 </head>
 
 <body>
+
 
     <p>
         <strong>What exactly is a DBMS?</strong><br>
@@ -21,7 +26,9 @@
     </p>
 
     <h3>DBMS Terminology</h3>
-
+    <p>
+        The introduction showed us WHY these concepts exist. Here's the vocabulary we'll use going forward.
+    </p>
     <table border="1" cellpadding="12">
 
         <tr>
@@ -63,7 +70,7 @@
         <tr>
             <td>Schema</td>
             <td>Structure of the database</td>
-            <td>Tables + columns + constraints</td>
+            <td>Tables + Columns + Constraints</td>
         </tr>
 
         <tr>
@@ -162,25 +169,53 @@
 
     <h3>How do we create a database?</h3>
 
+
     <pre>
 <code>
 MySQL / PostgreSQL
+
 <span style="color:lightgreen;">
 CREATE DATABASE company;
 </span>
 </code>
 </pre>
 
-    <h3>How do we use the database?</h3>
 
-    <p>
-        We need to mention which database we are going to be storing the table in. For that, we use the following
-        statements:
-    </p>
+    <h3>List the databases</h3>
+
 
     <pre>
 <code>
 MySQL
+
+<span style="color:lightgreen;">
+SHOW DATABASES;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:lightgreen;">
+\l
+</span>
+</code>
+</pre>
+
+
+    <h3>How do we use the database?</h3>
+
+    <p>
+        We need to specify which database we are working with.
+    </p>
+
+
+    <pre>
+<code>
+MySQL
+
 <span style="color:lightgreen;">
 USE company;
 </span>
@@ -190,28 +225,183 @@ USE company;
     <pre>
 <code>
 PostgreSQL
+
 <span style="color:lightgreen;">
-\c company;
+\c company
 </span>
 </code>
 </pre>
 
-    <h3>How do we create a table?</h3>
-    <p>A table stores related data in rows and columns. Now, let's create a table.</p>
-    <p>MySQL / PostgreSQL</p>
+
+    <h3>Types of Datatypes</h3>
+
+    <p>
+        Without type enforcement, nothing stops someone from inserting "hello" into a salary column, or "abc" into a
+        player ID.
+        Each column is assigned a datatype. The DBMS rejects values that don't match.
+        This is called domain constraint, essential to solve integrity problems.
+    </p>
+    <p>
+        Choosing proper datatypes also improves storage efficiency and data validation.
+    </p>
+
+    <h4>Common Datatypes (MySQL + PostgreSQL)</h4>
+
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>Datatype</th>
+            <th>Purpose</th>
+            <th>Example</th>
+        </tr>
+
+        <tr>
+            <td>INT</td>
+            <td>Stores integers</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>FLOAT</td>
+            <td>Stores decimal numbers</td>
+            <td>1.27</td>
+        </tr>
+
+        <tr>
+            <td>CHAR(5)</td>
+            <td>Fixed-length text</td>
+            <td>A1234</td>
+        </tr>
+
+        <tr>
+            <td>VARCHAR(30)</td>
+            <td>Variable-length text</td>
+            <td>TenZ</td>
+        </tr>
+
+        <tr>
+            <td>BOOLEAN</td>
+            <td>Stores true or false</td>
+            <td>true</td>
+        </tr>
+
+        <tr>
+            <td>DATE</td>
+            <td>Stores dates</td>
+            <td>2026-05-27</td>
+        </tr>
+
+    </table>
+
+    <h4>MySQL Specific Datatypes</h4>
+
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>Datatype</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>TINYINT</td>
+            <td>Small integer values</td>
+        </tr>
+
+        <tr>
+            <td>MEDIUMINT</td>
+            <td>Medium-sized integer values</td>
+        </tr>
+
+        <tr>
+            <td>ENUM</td>
+            <td>Restricts values to a predefined list</td>
+        </tr>
+
+        <tr>
+            <td>AUTO_INCREMENT</td>
+            <td>Automatically generates IDs</td>
+        </tr>
+
+    </table>
+
 
     <pre>
 <code>
-    <span style="color:violet;">
+<span style="color:violet;">
+rank ENUM('Iron', 'Bronze', 'Silver')
+</span>
+</code>
+</pre>
+
+
+    <h4>PostgreSQL Specific Datatypes</h4>
+
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>Datatype</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>SERIAL</td>
+            <td>Automatically generates IDs</td>
+        </tr>
+
+        <tr>
+            <td>BIGSERIAL</td>
+            <td>Large auto-generated IDs</td>
+        </tr>
+
+        <tr>
+            <td>UUID</td>
+            <td>Universally unique identifiers</td>
+        </tr>
+
+        <tr>
+            <td>JSONB</td>
+            <td>Efficient JSON storage</td>
+        </tr>
+
+        <tr>
+            <td>ARRAY</td>
+            <td>Stores arrays of values</td>
+        </tr>
+
+    </table>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+player_id SERIAL PRIMARY KEY
+</span>
+</code>
+</pre>
+
+
+    <h3>How do we create a table?</h3>
+
+    <p>
+        A table stores related data in rows and columns.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
 CREATE TABLE players (
-    player_id INT,
-    username VARCHAR(30),
-    rank VARCHAR(20),
-    rr INT
+    player_id INT PRIMARY KEY,   -- no duplicates
+    username  VARCHAR(30) NOT NULL,  -- every player must have a name
+    rank      VARCHAR(20),
+    rr        INT CHECK (rr >= 0)  -- rr can't be negative
 );
 </span>
 </code>
 </pre>
+
 
     <p>
         This creates a table named <strong>players</strong>.
@@ -235,59 +425,66 @@ CREATE TABLE players (
 
     </table>
 
+    <h3>List the tables present in the selected database</h3>
+
+
+    <pre>
+<code>
+MySQL
+
+<span style="color:lightgreen;">
+SHOW TABLES;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:lightgreen;">
+\dt
+</span>
+</code>
+</pre>
+
+
+    <h3>Show description of a table</h3>
+
+
+    <pre>
+<code>
+MySQL
+
+<span style="color:lightgreen;">
+DESCRIBE players;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:lightgreen;">
+\d players
+</span>
+</code>
+</pre>
+
+<p>Note: ALTER and DROP are covered after we have data to work with.</p>
+
     <p>
-        Each column has a datatype.
-        <strong>What datatypes are there?</strong>
-        Let's discuss.
+        Previous: Introduction
+        <a href="./1-introduction.html">&lt;&lt;</a>
     </p>
-    <table border="1" cellpadding="12">
-
-        <tr>
-            <th>Datatype</th>
-            <th>Purpose</th>
-            <th>Example</th>
-        </tr>
-
-        <tr>
-            <td>INT</td>
-            <td>Stores integers</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>VARCHAR(30)</td>
-            <td>Stores variable-length text</td>
-            <td>TenZ</td>
-        </tr>
-
-        <tr>
-            <td>BOOLEAN</td>
-            <td>Stores true or false</td>
-            <td>true</td>
-        </tr>
-
-        <tr>
-            <td>FLOAT</td>
-            <td>Stores decimal numbers</td>
-            <td>1.27</td>
-        </tr>
-
-        <tr>
-            <td>DATE</td>
-            <td>Stores dates</td>
-            <td>2026-05-27</td>
-        </tr>
-
-    </table>
 
     <p>
-        Choosing proper datatypes improves storage efficiency and data validation.
+        Next: DML (Data Manipulation Language)
+        <a href="./3-dml.html">&gt;&gt;</a>
     </p>
 
 
-    <p>
-        Next <a href="./3-dml.html">>></a>
-    </p>
 </body>
 
 </html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <h3>Aggregate Functions</h3>
+
+    <p>
+        Aggregate functions perform calculations on multiple rows.
+        You can always fetch the complete data and write custom aggregate functions on that data.
+        However, there are two problems that come with it.
+        1. Fetching complete wastes bandwidth and slows the application.
+        2. Writing custom aggregation function needs manual validation according to the schema.
+        Solution: Let the DBMS do the computation close to the data, return one number instead of a million rows.
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Function</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>COUNT()</td>
+            <td>Counts rows</td>
+        </tr>
+
+        <tr>
+            <td>AVG()</td>
+            <td>Average value</td>
+        </tr>
+
+        <tr>
+            <td>MAX()</td>
+            <td>Largest value</td>
+        </tr>
+
+        <tr>
+            <td>MIN()</td>
+            <td>Smallest value</td>
+        </tr>
+
+        <tr>
+            <td>SUM()</td>
+            <td>Total value</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>Immortal</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>Radiant</td>
+            <td>790</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> AVG(rr)
+<span style="color:#0099ff;">AS</span> average_rr
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        AS renames the output column.
+    </p>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>average_rr</th>
+        </tr>
+
+        <tr>
+            <td>747.67</td>
+        </tr>
+
+    </table>
+    <h3>GROUP BY</h3>
+
+    <p>
+        GROUP BY creates groups of similar rows.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>Immortal</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>Radiant</td>
+            <td>790</td>
+        </tr>
+
+    </table>
+
+    <br>
+    <p>
+        AVG(rr) gives you one average across all players. But what if you want the average per rank? You'd have to run a
+        separate query for each rank. With 10 ranks that's 10 queries. With 100 ranks, 100 queries.
+        GROUP BY solves this: one query, one result per group.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> rank, COUNT(*)
+<span style="color:#0099ff;">AS</span> total_players
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">GROUP BY</span> rank;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>rank</th>
+            <th>total_players</th>
+        </tr>
+
+        <tr>
+            <td>Radiant</td>
+            <td>2</td>
+        </tr>
+
+        <tr>
+            <td>Immortal</td>
+            <td>1</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>HAVING</h3>
+
+    <p>
+        HAVING filters grouped data.
+    </p>
+
+    <p>Current grouped result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>rank</th>
+            <th>total_players</th>
+        </tr>
+
+        <tr>
+            <td>Radiant</td>
+            <td>2</td>
+        </tr>
+
+        <tr>
+            <td>Immortal</td>
+            <td>1</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> rank, COUNT(*)
+<span style="color:#0099ff;">AS</span> total_players
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">GROUP BY</span> rank
+<span style="color:#0099ff;">HAVING</span> COUNT(*) > 1;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>rank</th>
+            <th>total_players</th>
+        </tr>
+
+        <tr>
+            <td>Radiant</td>
+            <td>2</td>
+        </tr>
+
+    </table>
+
+    <p>
+        WHERE filters rows before grouping.<br>
+        HAVING filters groups after grouping.
+    </p>
+    <p>
+        This may feel unusual if you're coming from languages like C, C++, Java, or Python, where statements typically
+        execute from top to bottom.
+        SQL follows its own logical execution order, which is not the same as the order in which the clauses are
+        written.
+        We'll study the SQL execution flow shortly.
+    </p>
+
+    <p>
+        Prev, common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&lt;&lt;<</a>
+    </p>
+    <p>
+        Next, SQL Execution flow. <a href="./7-sql_execution_flow.html">&gt;&gt;</a>
+    </p>
+
+
+</body>
+
+</html>
