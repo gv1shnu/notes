@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+
+<h2>SQL Execution Flow</h2>
+
+<p>
+    SQL queries are not executed from top to bottom.
+    Although we write SELECT first, the DBMS processes clauses in a different order.
+</p>
+
+<p>Example Query:</p>
+
+
+<pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> rank, AVG(rr)
+<span style="color:#0099ff;">AS</span> average_rr
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rr > 500
+<span style="color:#0099ff;">GROUP BY</span> rank
+<span style="color:#0099ff;">HAVING</span> AVG(rr) > 700
+<span style="color:#0099ff;">ORDER BY</span> average_rr DESC
+<span style="color:#0099ff;">LIMIT</span> 1;
+</code>
+</pre>
+
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>Execution Order</th>
+        <th>Clause</th>
+        <th>Purpose</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>FROM</td>
+        <td>Load table(s)</td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>WHERE</td>
+        <td>Filter rows</td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td>GROUP BY</td>
+        <td>Create groups</td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td>HAVING</td>
+        <td>Filter groups</td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td>SELECT</td>
+        <td>Choose columns</td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td>ORDER BY</td>
+        <td>Sort results</td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td>LIMIT</td>
+        <td>Restrict output rows</td>
+    </tr>
+
+</table>
+
+<p>
+    This execution order explains why aggregate functions cannot be used in a WHERE clause.
+    At the time WHERE executes, groups have not been created yet.
+</p>
+
+<hr>
+
+<h2>Complete Execution Trace</h2>
+
+<p>
+    Let us observe how a DBMS executes a query step-by-step.
+</p>
+
+<p>Current table:</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>player</th>
+        <th>kills</th>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>TenZ</td>
+        <td>24</td>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>Zekken</td>
+        <td>19</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>something</td>
+        <td>27</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>f0rsakeN</td>
+        <td>17</td>
+    </tr>
+
+</table>
+
+<br>
+
+<p>Query:</p>
+
+
+<pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> team, AVG(kills)
+<span style="color:#0099ff;">AS</span> avg_kills
+<span style="color:#0099ff;">FROM</span> match_stats
+<span style="color:#0099ff;">WHERE</span> kills > 15
+<span style="color:#0099ff;">GROUP BY</span> team
+<span style="color:#0099ff;">HAVING</span> AVG(kills) > 20
+<span style="color:#0099ff;">ORDER BY</span> avg_kills DESC
+<span style="color:#0099ff;">LIMIT</span> 1;
+</code>
+</pre>
+
+
+<hr>
+
+<h3>Step 1 — FROM</h3>
+
+<p>
+    DBMS loads the table <strong>match_stats</strong>.
+</p>
+
+<hr>
+
+<h3>Step 2 — WHERE</h3>
+
+<p>
+    Apply: <strong>kills > 15</strong>
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>player</th>
+        <th>kills</th>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>TenZ</td>
+        <td>24</td>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>Zekken</td>
+        <td>19</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>something</td>
+        <td>27</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>f0rsakeN</td>
+        <td>17</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>Step 3 — GROUP BY</h3>
+
+<p>
+    Rows are grouped by team.
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>Group</th>
+        <th>Kills</th>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>24, 19</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>27, 17</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>Step 4 — HAVING</h3>
+
+<p>
+    Apply: <strong>AVG(kills) > 20</strong>
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>average kills</th>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>21.5</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>22</td>
+    </tr>
+
+</table>
+
+<p>
+    Both groups satisfy the condition and remain.
+</p>
+
+<hr>
+
+<h3>Step 5 — SELECT</h3>
+
+<p>
+    Only the requested columns are returned.
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>avg_kills</th>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>21.5</td>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>22</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>Step 6 — ORDER BY</h3>
+
+<p>
+    Apply: <strong>ORDER BY avg_kills DESC</strong>
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>avg_kills</th>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>22</td>
+    </tr>
+
+    <tr>
+        <td>Sentinels</td>
+        <td>21.5</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>Step 7 — LIMIT</h3>
+
+<p>
+    Apply: <strong>LIMIT 1</strong>
+</p>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>avg_kills</th>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>22</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>Final Output</h3>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>team</th>
+        <th>avg_kills</th>
+    </tr>
+
+    <tr>
+        <td>PRX</td>
+        <td>22</td>
+    </tr>
+
+</table>
+
+<p>
+    Understanding SQL execution order is essential before learning joins.
+    Joins rely heavily on the FROM phase, where SQL combines rows from multiple tables before applying filters, grouping, and sorting.
+</p>
+
+<p>
+    Next, Joins.
+    <a href="./8-joins.html">&gt;&gt;</a>
+</p>
+
+<p>
+    Prev, Aggregates DQL.
+    <a href="./6-dql-aggregates-groupby-having.html">&lt;&lt;</a>
+</p>
+
+</body>
+
+</html>

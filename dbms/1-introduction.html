@@ -9,6 +9,7 @@
 
     <!-- Page title shown in browser tab -->
     <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
 </head>
 
 <body>
@@ -16,13 +17,12 @@
 
     <p>
         The human brain's memory capacity in the average adult can store 2.5PB. [1]
-        However, the efficiency of the stored information is often clumsy, because people forget intentionally,
-        unintentionally, accidentally, and possibly.
+        However, the efficiency of the stored information for analysis is often clumsy, because people forget.
         So, we started writing in books.<br>
         <img src="./assets/books.png" width="700px" height="250px" /><br>
         It's still considered the best and most private way to keep information stored someplace, but not optimal.
         Books were good for storing information, but bad for managing large amounts of it.
-        <strong>Problem:</strong> However, they can get lost, burned, wet, torn, thrown, stolen, etc.
+        <strong>Problem:</strong> They can get lost, burned, wet, torn, thrown, stolen, etc.
     </p>
     <p>
         When computers came into existence, people started to outsource storing information to the machine and replaced
@@ -30,16 +30,16 @@
         <strong>Solution</strong>: Disks introduced faster reading and writing, easier copying, easier searching,
         cheaper long-term
         storage, information could be shared quickly.<br>
-        <img src="./assets/disk1.webp" width="250px" height="250px" /><br>
-        <img src="./assets/disk2.jpg" width="250px" height="250px" /><br>
+        <img src="./assets/disk1.webp" width="700px" height="250px" /><br>
+        <img src="./assets/disk2.jpg" width="700px" height="250px" /><br>
 
         One way to keep information on a computer is to store it in permanent files. [2]
         The system for saving, editing, and deleting the files was called file-based system, named appropriately.
     </p>
     <p>
         Organisations used the flat-file with
-        <strong>structs</strong> dumping to and reading from the file. Structs would not have pointers, and contain real
-        data.
+        <strong>structs</strong> dumping to and reading from the file. Structs written directly to disk usually avoided
+        pointers because memory addresses are not portable across program executions.
         Example, Employee struct:
     <table border="1" cellpadding="15">
         <tr>
@@ -119,20 +119,18 @@
 
     <br>
 
-    This meant that writing was easy: dump complete struct to disk. This also meant that reading was easy: do file
-    seek and read struct. [3]
+    This meant that writing was easy: dump complete struct to disk. Reading could be simple when record locations were
+    known and records had fixed sizes. [3]
     The hard parts were searching, size enforcement (when number exceeded range), upgrades (when structs were
-    changed), os incompatibilities (linux/windows).
+    changed), OS incompatibilities (linux/windows).
     <p>
-        File systems worked for small data, but failed as data and users increased.
-        This didn't last longer than it was expected to.
+        File-based systems became difficult to manage as data volume, complexity, and concurrent users increased.
     </p>
 
-    <p>The structs in files, conceptually evolved to tables in DBMS.</p>
     <p>The following challenges in file-based system were noted, and consequently DBMS was introduced solving them.</p>
     <ol>
         <li>
-            <strong>Data redundancy.</strong>
+            Data redundancy.
             <p>The same information being kept in several different places, as different individuals may required to
                 keep copy of certain data.
             </p>
@@ -265,7 +263,26 @@
             <p>
                 Customer data is stored once and referenced using CustID.
             </p>
-            <br>
+
+            <p>
+                One other thing DBMS introduced is the Centralisation of handling all operations on the database, analogous to The Accountants from John Wick franchise.
+            </p>
+            <table>
+                <tr>
+                    <td>
+                        <img src="./assets/0.webp">
+                    </td>
+                    <td>
+                        <img src="./assets/1.webp">
+                    </td>
+                    <td>
+                        <img src="./assets/2.webp">
+                    </td>
+                    <td>
+                        <img src="./assets/3.webp">
+                    </td>
+                </tr>
+            </table>
 
         </li>
         <li>
@@ -427,6 +444,26 @@
                     <td>No negative salary</td>
                 </tr>
 
+                <tr>
+                    <td>NOT NULL</td>
+                    <td>Mandatory value required</td>
+                </tr>
+
+                <tr>
+                    <td>UNIQUE</td>
+                    <td>No duplicate values allowed</td>
+                </tr>
+
+                <tr>
+                    <td>FOREIGN KEY</td>
+                    <td>Maintains valid references between tables</td>
+                </tr>
+
+                <tr>
+                    <td>DEFAULT</td>
+                    <td>Assigns a value when none is provided</td>
+                </tr>
+
             </table>
 
             <p>
@@ -579,13 +616,26 @@
     </ol>
     </p>
     <p>
-        The difficulties that arise from using the file-based system have prompted the development of a new approach in
-        managing large amounts of organizational information called the database approach.
+        The difficulties that arise from using the file-based system prompted the development of a new approach for
+        managing information, called the database approach. Interestingly, databases are still stored as files on disk
+        in most systems. What changed is not the storage medium itself, but the way data is organized and managed.
+
         The software built to manage this database is called, Database management system (DBMS).
+
+        A DBMS sits between the user and the files, providing structure, security, consistency, and efficient access to
+        the stored data.
     </p>
 
     <p>
+        Storage technology evolved from paper records to magnetic tapes, hard disks, solid-state drives, and cloud
+        storage. Modern DBMS software sits on top of these storage devices and provides an organized way to store,
+        retrieve, and manage data.
+    </p>
+    <p>
         Formally, a database is a collection of related data. [4]
+        Conceptually, a database table can be viewed as an organized collection of records similar to data stored in
+        file-based systems.</p>
+    <p>
         The database definition or descriptive information is stored by the DBMS in the form of a database catalog or
         dictionary; it is called <italic>meta-data</italic>.
         DBMS handles concurrent accesses to the database, enforces constraints, manages permissions, maintains
@@ -594,7 +644,24 @@
     </p>
 
     <p>
-    <h4>Summary</h4>
+    <p>
+        With modern technology, data is no longer confined to local files on a single computer.
+        Cloud-based services allow us to store documents securely, access them from anywhere,
+        and analyse large amounts of information in real time.
+    </p>
+
+    <p>
+        For example, platforms such as DigiLocker enable users to store and retrieve important
+        documents online, while analytics services can track and visualise detailed statistics
+        and performance metrics.
+    </p>
+
+    <img src="./assets/digilocker.png" alt="DigiLocker document storage service" /><br>
+    <img src="./assets/trackergg.png" alt="Tracker.gg analytics dashboard" />
+    </p>
+
+    <p>
+    <h2>Summary</h2>
     <ul>
         <li>Problem: Unrealiable record keeping on books.
             Solution: Computer. Files.</li>
@@ -604,7 +671,7 @@
     </p>
 
     <p>
-        Next <a href="./2-dbms.html">>></a>
+        Next, starting with DDL. <a href="./2-dbms-ddl.html">&gt;&gt;</a>
     </p>
 
     <p>References:

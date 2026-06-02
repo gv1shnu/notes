@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="./assets/style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+
+    <p>
+        <strong>We've been working with one table at a time.</strong><br>
+        Every query so far — SELECT, WHERE, GROUP BY, aggregates — touched a single table.
+        <br><br>
+        But real databases never store everything in one table. That's the whole point of the
+        introduction: splitting data across tables eliminates redundancy.
+        <br><br>
+        The problem now is: <strong>how do we query data that lives in multiple tables?</strong>
+    </p>
+
+    <h3>The Problem — Data is Split</h3>
+
+    <p>
+        In PUBG, a match involves players. Each player belongs to a squad.
+        If we stored everything in one table, it would look like this:
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>kills</th>
+            <th>squad_id</th>
+            <th>squad_name</th>
+            <th>squad_region</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>Clocky</td>
+            <td>8</td>
+            <td>101</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>Grongat</td>
+            <td>5</td>
+            <td>101</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>Mitr0</td>
+            <td>12</td>
+            <td>101</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>4</td>
+            <td>Ubah</td>
+            <td>3</td>
+            <td>101</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>5</td>
+            <td>Pio</td>
+            <td>7</td>
+            <td>102</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>6</td>
+            <td>Esportsnation</td>
+            <td>9</td>
+            <td>102</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+    </table>
+
+    <p>
+        <strong>Problem:</strong> squad_name and squad_region are repeated for every single player on that squad.
+        If Team Liquid changes their region, you'd have to update four rows — and risk inconsistency
+        if you miss one. This is exactly the redundancy problem from the introduction.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Split into two tables. Store squad data once.
+        Reference it from the players table using a foreign key.
+    </p>
+
+    <h3>Two Tables — players and squads</h3>
+
+    <p><strong>squads</strong></p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>squad_id</th>
+            <th>squad_name</th>
+            <th>region</th>
+        </tr>
+
+        <tr>
+            <td>101</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>102</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>103</td>
+            <td>Gen.G</td>
+            <td>AS</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <p><strong>players</strong></p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>squad_id</th>
+            <th>kills</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>Clocky</td>
+            <td>101</td>
+            <td>8</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>Grongat</td>
+            <td>101</td>
+            <td>5</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>Mitr0</td>
+            <td>101</td>
+            <td>12</td>
+        </tr>
+
+        <tr>
+            <td>4</td>
+            <td>Ubah</td>
+            <td>101</td>
+            <td>3</td>
+        </tr>
+
+        <tr>
+            <td>5</td>
+            <td>Pio</td>
+            <td>102</td>
+            <td>7</td>
+        </tr>
+
+        <tr>
+            <td>6</td>
+            <td>Esportsnation</td>
+            <td>102</td>
+            <td>9</td>
+        </tr>
+
+        <tr>
+            <td>7</td>
+            <td>FaZe_suk</td>
+            <td>NULL</td>
+            <td>2</td>
+        </tr>
+
+    </table>
+
+    <p>
+        squad_id in the players table is a <strong>foreign key</strong> — it references squad_id in squads.
+        Note that player FaZe_suk has no squad_id (NULL). He's a solo player. We'll see why this matters soon.
+        Also note Gen.G (squad 103) has no players yet in our table.
+    </p>
+
+    <p>
+        The redundancy is gone. But now there's a new problem: if you want to see each player's username
+        alongside their squad name, the data is in two separate tables.
+        <strong>How do you combine them in one query?</strong>
+    </p>
+
+    <h3>JOINs — The Solution</h3>
+
+    <p>
+        A JOIN combines rows from two tables based on a related column — usually a foreign key.
+        The result is a temporary combined table that exists only for the duration of your query.
+    </p>
+
+    <p>
+        The column we join on is the link between the two tables.
+        Here, that link is <strong>squad_id</strong>.
+    </p>
+
+    <h3>INNER JOIN</h3>
+
+    <p>
+        Returns only the rows where there is a match in <strong>both</strong> tables.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show each player's username and their squad name.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+INNER JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Notice: FaZe_suk is <strong>missing</strong>. His squad_id is NULL — there's no match in squads.
+        INNER JOIN discards any row that doesn't have a match on both sides.
+        <br><br>
+        Gen.G is also missing. It exists in squads, but has no matching players. Same reason.
+    </p>
+
+    <h3>LEFT JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from the left table</strong>, plus matching rows from the right table.
+        If there's no match on the right side, the result shows NULL for those columns.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all players, even those without a squad.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+LEFT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>FaZe_suk</td>
+            <td>NULL</td>
+        </tr>
+
+    </table>
+
+    <p>
+        FaZe_suk appears now — with NULL for squad_name because he has no squad.
+        The left table is <strong>players</strong>. Every player is preserved.
+        <br><br>
+        Gen.G is still missing. The right table (squads) is not fully preserved in a LEFT JOIN.
+    </p>
+
+    <h3>RIGHT JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from the right table</strong>, plus matching rows from the left table.
+        If there's no match on the left side, the result shows NULL for those columns.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all squads, even those with no players registered yet.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+RIGHT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>NULL</td>
+            <td>Gen.G</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Gen.G now appears — with NULL for username because no players are linked to them yet.
+        The right table is <strong>squads</strong>. Every squad is preserved.
+        <br><br>
+        FaZe_suk is gone again. He exists in the left table (players) with no match in squads.
+        RIGHT JOIN does not preserve the left table.
+    </p>
+    <p>
+        <strong>Note</strong>: Usually developers don't use right join often, and just switch the tables and use left join as usual. 
+        Right join was added to the features of SQL for the sake of completeness.
+    </p>
+
+    <h3>FULL OUTER JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from both tables</strong>.
+        Where there's no match, NULL fills the gap on whichever side is missing.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all players and all squads — matched where possible,
+        NULL where not.
+    </p>
+
+
+    <pre>
+<code>
+MySQL — not supported natively. Simulate with UNION:
+
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+LEFT JOIN squads ON players.squad_id = squads.squad_id
+
+UNION
+
+SELECT players.username, squads.squad_name
+FROM players
+RIGHT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+FULL OUTER JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>FaZe_suk</td>
+            <td>NULL</td>
+        </tr>
+
+        <tr>
+            <td>NULL</td>
+            <td>Gen.G</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Everyone appears. FaZe_suk (no squad) and Gen.G (no players) both show up with NULL on the missing side.
+    </p>
+
+    <h3>Summary — Which JOIN to use?</h3>
+
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>JOIN Type</th>
+            <th>Returns</th>
+            <th>Use when</th>
+        </tr>
+
+        <tr>
+            <td>INNER JOIN</td>
+            <td>Only matching rows from both tables</td>
+            <td>You only want data that is fully linked on both sides</td>
+        </tr>
+
+        <tr>
+            <td>LEFT JOIN</td>
+            <td>All rows from left + matches from right</td>
+            <td>You want to keep all records from the left table, even unmatched ones</td>
+        </tr>
+
+        <tr>
+            <td>RIGHT JOIN</td>
+            <td>All rows from right + matches from left</td>
+            <td>You want to keep all records from the right table, even unmatched ones</td>
+        </tr>
+
+        <tr>
+            <td>FULL OUTER JOIN</td>
+            <td>All rows from both tables</td>
+            <td>You want a complete picture — no row from either side should be dropped</td>
+        </tr>
+
+    </table>
+
+    <h3>Using Aliases to Write Cleaner JOINs</h3>
+
+    <p>
+        Writing <code>players.username</code> and <code>squads.squad_name</code> repeatedly gets verbose.
+        Aliases let you shorten table names for the duration of the query.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT p.username, s.squad_name
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id;
+</span>
+</code>
+</pre>
+
+
+    <p>
+        <code>p</code> is now shorthand for <code>players</code>.
+        <code>s</code> is shorthand for <code>squads</code>.
+        The query does the same thing — it just reads faster.
+    </p>
+
+    <h3>JOINs with WHERE, ORDER BY, and Aggregates</h3>
+
+    <p>
+        A JOIN gives you a combined table. Everything you already know — WHERE, ORDER BY, GROUP BY,
+        aggregate functions — works on top of it.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Which squad has the highest total kills?
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT s.squad_name, SUM(p.kills) AS total_kills
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id
+GROUP BY s.squad_name
+ORDER BY total_kills DESC;
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>squad_name</th>
+            <th>total_kills</th>
+        </tr>
+
+        <tr>
+            <td>Team Liquid</td>
+            <td>28</td>
+        </tr>
+
+        <tr>
+            <td>Natus Vincere</td>
+            <td>16</td>
+        </tr>
+
+    </table>
+
+    <p>
+        The query joins the two tables first, then groups the combined result by squad, 
+        then sums kills per group, then orders by total.
+        This is the execution order you studied in the SQL execution flow chapter.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show players from the EU region only.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT p.username, s.squad_name, s.region
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id
+WHERE s.region = 'EU';
+</span>
+</code>
+</pre>
+
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+            <th>region</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+    </table>
+
+    <p>
+        The WHERE filter runs after the JOIN. The combined table is built first, then filtered.
+    </p>
+
+    <p>
+        <strong>Note:</strong> Joining more than two tables is possible — just chain additional
+        JOIN clauses. Each one links the new table to the running result using a shared column.
+    </p>
+
+    <p>
+        Next: Subqueries
+        <a href="./9-subqueries.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: SQL Execution Flow
+        <a href="./7-sql_execution_flow.html">&lt;&lt;</a>
+    </p> 
+
+</body>
+
+</html>

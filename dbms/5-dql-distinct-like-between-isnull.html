@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - DBMS Notes">
+
+    <title>DQL Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+    <h3>Current Table: players</h3>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>region</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>NA</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>aspas</td>
+            <td>Radiant</td>
+            <td>BR</td>
+            <td>811</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>yay</td>
+            <td>Immortal</td>
+            <td>NA</td>
+            <td>620</td>
+        </tr>
+
+        <tr>
+            <td>4</td>
+            <td>something</td>
+            <td>Immortal</td>
+            <td>APAC</td>
+            <td>590</td>
+        </tr>
+
+        <tr>
+            <td>5</td>
+            <td>leaf</td>
+            <td>NULL</td>
+            <td>NA</td>
+            <td>NULL</td>
+        </tr>
+
+    </table>
+    <p>
+        Note: NULL means the value is absent — not zero, not an empty string, but genuinely unknown or missing. For
+        example, a player who is unranked has no rank to record. Storing 0 would be wrong (0 might mean something else).
+        Storing an empty string would be imprecise. NULL is the correct representation of "no value."
+    </p>
+    <hr>
+
+    <h3>DISTINCT</h3>
+
+    <p>
+        DISTINCT removes duplicate values.
+        Without DISTINCT, querying SELECT rank FROM players returns one row per player — you'd see "Radiant" twice and
+        "Immortal" twice. DISTINCT collapses duplicates so you get each value once.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT DISTINCT</span> rank
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>rank</th>
+        </tr>
+
+        <tr>
+            <td>Radiant</td>
+        </tr>
+
+        <tr>
+            <td>Immortal</td>
+        </tr>
+
+        <tr>
+            <td>NULL</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>LIKE</h3>
+
+    <p>
+        LIKE performs pattern matching.
+    </p>
+
+    <p>
+        % means any number of characters.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> username <span style="color:#0099ff;">LIKE</span> 'a%';
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>IN</h3>
+
+    <p>
+        IN checks multiple possible values.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE region = 'NA' OR region = 'BR' OR region = 'EU'</span>;
+</code>
+</pre>
+    <p>We can write a much cleaner code using the IN operator.</p>
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> region <span style="color:#0099ff;">IN</span> ('NA', 'BR', 'EU');
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>region</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>NA</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>BR</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>NA</td>
+        </tr>
+
+        <tr>
+            <td>leaf</td>
+            <td>NA</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>BETWEEN</h3>
+
+    <p>
+        BETWEEN filters values inside a range.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rr >= 600 AND rr <= 850;
+</code>
+</pre>
+    <p>
+        Similar to what we did above, we can write a much readable code using the BETWEEN operator.
+    </p>
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rr <span style="color:#0099ff;">BETWEEN</span> 600 <span style="color:#0099ff;">AND</span> 850;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>811</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>620</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>IS NULL</h3>
+
+    <p>
+        IS NULL checks missing values.
+
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rr = NULL;
+</code>
+</pre>
+    <p>NULL = NULL is not TRUE in SQL — it's NULL. NULL is not equal to anything, not even itself. So = NULL will never
+        match any row. You must use IS NULL.</p>
+
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> rr <span style="color:#0099ff;">IS NULL</span>;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>leaf</td>
+            <td>NULL</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Command</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>DISTINCT</td>
+            <td>Remove duplicates</td>
+        </tr>
+
+        <tr>
+            <td>LIKE</td>
+            <td>Pattern matching</td>
+        </tr>
+
+        <tr>
+            <td>IN</td>
+            <td>Multiple matching values</td>
+        </tr>
+
+        <tr>
+            <td>BETWEEN</td>
+            <td>Range filtering</td>
+        </tr>
+
+        <tr>
+            <td>IS NULL</td>
+            <td>Find missing values</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Next, Aggregates DQL. <a href="./6-dql-aggregates-groupby-having.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, basic DQL. <a href="./4-dql-select-where-orderby-limit.html">&lt;&lt;</a>
+    </p>
+</body>
+
+</html>

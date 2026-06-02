@@ -10,8 +10,144 @@
 
     <!-- Page title shown in browser tab -->
     <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
 </head>
 
 <body>
 
+    <h2>DML — Data Manipulation Language</h2>
+
+    <p>
+        DML commands manipulate data inside tables.
+    </p>
+
+    <hr>
+
+    <h3>INSERT</h3>
+
+    <p>
+        INSERT adds new rows into a table.
+        The DBMS controls all writes so it can enforce constraints, maintain indexes, and log changes. 
+        You can't write directly to the storage file/database.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">INSERT INTO</span> players
+<span style="color:#0099ff;">VALUES</span> (1, 'TenZ', 'Radiant', 842);
+</code>
+</pre>
+
+    <p>After insertion:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>UPDATE</h3>
+
+    <p>
+        UPDATE modifies existing rows.
+        You could always remove the existing row and add the updated row as a separate. 
+        However, UPDATE is atomic, it preserves row position for indexes, and it's less verbose. 
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">UPDATE</span> players
+<span style="color:#0099ff;">SET</span> rr = 900
+<span style="color:#0099ff;">WHERE</span> player_id = 1;
+</code>
+</pre>
+
+    <p>After update:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>900</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>DELETE</h3>
+
+    <p>
+        DELETE removes one or more rows.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">DELETE FROM</span> players
+<span style="color:#0099ff;">WHERE</span> player_id = 1;
+</code>
+</pre>
+
+    <p>After deletion:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>rank</th>
+            <th>rr</th>
+        </tr>
+
+    </table>
+
+    <p>
+        <strong>Note:</strong><br>
+        Running DELETE without WHERE removes all rows from the table.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">DELETE FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        Next, DQL <a href="./4-dql-select-where-orderby-limit.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, basic DDL commands <a href="./2-dbms-ddl.html">&lt;&lt;</a>
+    </p>
 </body>
+
+</html>
