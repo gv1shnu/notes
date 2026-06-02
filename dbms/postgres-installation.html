@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="./assets/style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <h2>Installing PostgreSQL on macOS</h2>
+
+    <p>
+        In this guide, PostgreSQL is installed and accessed through the terminal using
+        the <code>psql</code> client.
+    </p>
+
+    <h3>Step 1: Verify Homebrew Installation</h3>
+
+    <p>
+        Check whether Homebrew is installed:
+    </p>
+
+    <pre><code>brew --version</code></pre>
+
+    <p>
+        If Homebrew is not installed, install it using:
+    </p>
+
+    <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+
+    <h3>Step 2: Install PostgreSQL</h3>
+
+    <p>
+        Install PostgreSQL using Homebrew:
+    </p>
+
+    <pre><code>brew install postgresql@18</code></pre>
+
+    <p>
+        Verify the installation:
+    </p>
+
+    <pre><code>psql --version</code></pre>
+
+    <p>
+        Example output:
+    </p>
+
+    <pre><code>psql (PostgreSQL) 18.4</code></pre>
+
+    <h3>Step 3: Start PostgreSQL Service</h3>
+
+    <p>
+        Start PostgreSQL as a background service:
+    </p>
+
+    <pre><code>brew services start postgresql@18</code></pre>
+
+    <p>
+        Check the service status:
+    </p>
+
+    <pre><code>brew services list</code></pre>
+
+    <p>
+        Expected output:
+    </p>
+
+    <pre><code>postgresql@18 started</code></pre>
+
+    <h3>Step 4: Connect to PostgreSQL</h3>
+
+    <p>
+        Connect using:
+    </p>
+
+    <pre><code>psql -h localhost -U &lt;username&gt; -d postgres</code></pre>
+
+    <p>
+        Example:
+    </p>
+
+    <pre><code>psql -h localhost -U vishnu -d postgres</code></pre>
+
+    <p>
+        If the connection succeeds, the prompt changes to:
+    </p>
+
+    <pre><code>postgres=&gt;</code></pre>
+
+    <h3>Step 5: View Existing Databases</h3>
+
+    <pre><code>\l</code></pre>
+
+    <p>
+        This command lists all available databases.
+    </p>
+
+    <h3>Step 6: View Existing Roles</h3>
+
+    <pre><code>\du</code></pre>
+
+    <p>
+        This command lists all database users (roles).
+    </p>
+
+    <h3>Step 7: Create a New Database</h3>
+
+    <pre><code>CREATE DATABASE company;</code></pre>
+
+    <p>
+        Connect to the newly created database:
+    </p>
+
+    <pre><code>\c company</code></pre>
+
+    <h3>Step 8: Verify the Current Database</h3>
+
+    <pre><code>SELECT current_database();</code></pre>
+
+    <h3>Step 9: Exit PostgreSQL</h3>
+
+    <pre><code>\q</code></pre>
+
+    <h3>Important Note</h3>
+
+    <p>
+        PostgreSQL requires both a valid user (role) and a valid database.
+    </p>
+
+    <pre><code>psql -U vishnu -d company</code></pre>
+
+    <p>
+        Here:
+    </p>
+
+    <ul>
+        <li><strong>vishnu</strong> is the user (role).</li>
+        <li><strong>company</strong> is the database.</li>
+    </ul>
+
+    <p>
+        If the database name is omitted, PostgreSQL automatically attempts to connect
+        to a database with the same name as the user.
+    </p>
+
+    <hr>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Problem 1: PostgreSQL Service Fails to Start</h3>
+
+    <p>
+        The service status may show:
+    </p>
+
+    <pre><code>postgresql@18 error 1</code></pre>
+
+    <p>
+        Check the service details:
+    </p>
+
+    <pre><code>brew services info postgresql@18</code></pre>
+
+    <p>
+        Attempt to start PostgreSQL manually:
+    </p>
+
+    <pre><code>/opt/homebrew/opt/postgresql@18/bin/postgres -D /opt/homebrew/var/postgresql@18</code></pre>
+
+    <h3>Problem 2: Port 5432 Already in Use</h3>
+
+    <p>
+        PostgreSQL may display:
+    </p>
+
+    <pre><code>could not bind IPv4 address "127.0.0.1": Address already in use
+could not bind IPv6 address "::1": Address already in use
+FATAL: could not create any TCP/IP sockets</code></pre>
+
+    <p>
+        This indicates that another PostgreSQL server is already running on port 5432.
+    </p>
+
+    <p>
+        Check which process is using the port:
+    </p>
+
+    <pre><code>sudo lsof -i :5432</code></pre>
+
+    <p>
+        Example output:
+    </p>
+
+    <pre><code>postgres 3989 postgres ... TCP *:postgresql (LISTEN)</code></pre>
+
+    <p>
+        Identify the PostgreSQL installation:
+    </p>
+
+    <pre><code>sudo ps -fp 3989</code></pre>
+
+    <h3>Problem 3: Role Does Not Exist</h3>
+
+    <p>
+        Attempting to connect may produce:
+    </p>
+
+    <pre><code>psql -h localhost -U postgres</code></pre>
+
+    <pre><code>FATAL: role "postgres" does not exist</code></pre>
+
+    <p>
+        This means the PostgreSQL cluster does not contain a role named
+        <code>postgres</code>.
+    </p>
+
+    <p>
+        Use an existing role instead:
+    </p>
+
+    <pre><code>psql -h localhost -U vishnu -d postgres</code></pre>
+
+    <h3>Problem 4: Database Does Not Exist</h3>
+
+    <p>
+        Attempting to connect may produce:
+    </p>
+
+    <pre><code>psql -h localhost -U vishnu</code></pre>
+
+    <pre><code>FATAL: database "vishnu" does not exist</code></pre>
+
+    <p>
+        PostgreSQL assumes:
+    </p>
+
+    <pre><code>Database Name = User Name</code></pre>
+
+    <p>
+        when the database is not specified.
+    </p>
+
+    <p>
+        Specify an existing database explicitly:
+    </p>
+
+    <pre><code>psql -h localhost -U vishnu -d postgres</code></pre>
+</body>
+
+</html>
