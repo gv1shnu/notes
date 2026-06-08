@@ -27,7 +27,7 @@
 
     <p>
         INSERT adds new rows into a table.
-        The DBMS controls all writes so it can enforce constraints, maintain indexes, and log changes. 
+        The DBMS controls all writes so it can enforce constraints, maintain indexes, and log changes.
         You can't write directly to the storage file/database.
     </p>
 
@@ -47,8 +47,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -66,8 +66,9 @@
 
     <p>
         UPDATE modifies existing rows.
-        You could always remove the existing row and add the updated row as a separate. 
-        However, UPDATE is atomic, it preserves row position for indexes, and it's less verbose. 
+        You could always remove the existing row and add the updated row as a separate (That's what Postgre's internal
+        systems do).
+        However, UPDATE is atomic and less verbose.
     </p>
 
     <p>MySQL / PostgreSQL</p>
@@ -75,7 +76,7 @@
     <pre>
 <code>
 <span style="color:#0099ff;">UPDATE</span> players
-<span style="color:#0099ff;">SET</span> rr = 900
+<span style="color:#0099ff;">SET</span> score = 900
 <span style="color:#0099ff;">WHERE</span> player_id = 1;
 </code>
 </pre>
@@ -87,8 +88,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -129,8 +130,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
     </table>
@@ -151,26 +152,11 @@
     </p>
 
     <p>
-        Prev, basic DDL commands <a href="./2-dbms-ddl.html">&lt;&lt;</a>
+        Prev, basic DDL commands <a href="./2-create-table.html">&lt;&lt;</a>
     </p>
 
-    <footer>
-        <hr>
-
-        <p>
-            &copy; 2026 Vishnu Gandarapu
-
-            <a href="https://github.com/gv1shnu/notes" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
-                    style="vertical-align: middle; margin-left: 8px;">
-                    <path
-                        d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.01c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.17a11.1 11.1 0 0 1 5.79 0c2.21-1.48 3.18-1.17 3.18-1.17.62 1.59.23 2.76.11 3.05.73.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.08.78 2.18v3.23c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z" />
-                </svg>
-            </a>
-        </p>
-    </footer>
-
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
 </body>
 
 </html>

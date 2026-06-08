@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+    <h2>Summary of transition from file-based system to DBMS.</h2>
+
+    <p>
+        The difficulties that arise from using the file-based system prompted the development of a new approach for
+        managing information, called the database approach. Interestingly, databases are still stored as files on disk
+        in most systems. What changed is not the storage medium itself, but the way data is organized and managed.
+
+        The software built to manage this database is called, Database management system (DBMS).
+
+        A DBMS sits between the user and the files, providing structure, security, consistency, and efficient access to
+        the stored data.
+    </p>
+
+    <p>
+        Storage technology evolved from paper records to magnetic tapes, hard disks, solid-state drives, and cloud
+        storage. Modern DBMS software sits on top of these storage devices and provides an organized way to store,
+        retrieve, and manage data.
+    </p>
+
+    <p>
+        Formally, a database is a collection of related data in the form of tables.
+        Conceptually, a database table can be viewed as an organized collection of records similar to data stored in
+        file-based systems.
+    </p>
+
+    <p>
+        The database definition or descriptive information is stored by the DBMS in the form of a database catalog or
+        dictionary; it is called <i>meta-data</i>.
+        DBMS handles concurrent accesses to the database, enforces constraints, manages permissions, maintains
+        consistency across all changes.
+        A DBMS can also handle several databases, keep secure backups, insulate actual data from programs, and so much more.
+    </p>
+
+    <p>
+        With modern technology, data is no longer confined to local files on a single computer.
+        Cloud-based services allow us to store documents securely in distributed systems, access them from anywhere,
+        and analyse large amounts of information in real time.
+    </p>
+
+    <p>
+        For example, platforms such as DigiLocker enable users to store and retrieve important
+        documents online, while analytics services can track and visualise detailed statistics
+        and performance metrics.
+    </p>
+
+    <table>
+        <tr>
+            <td> <img src="./assets/digilocker.png" alt="DigiLocker document storage service" /></td>
+            <td> <img src="./assets/trackergg.png" alt="Tracker.gg analytics dashboard" /></td>
+        </tr>
+    </table>
+
+    <h2>Summary</h2>
+    <ul>
+        <li><i>Problem</i>: Unreliable record keeping on books.
+            <br><i>Solution</i>: Computer. Files.
+        </li>
+        <li><i>Problem</i>: Inefficient file handling.
+            <br><i>Solution</i>: Databases. DBMS.
+        </li>
+    </ul>
+
+    <p>
+        Next, moving on to DBMS. <a href="./2-dbms.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, integrity problems in file-based systems. <a href="./1-data-integrity.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+</html>

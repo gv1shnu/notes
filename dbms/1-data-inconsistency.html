@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+    <h2>Demerits of file-based system contd.</h2>
+
+    <h3>2. Data inconsistency. </h3>
+    <p>
+        A situation where various copies of the same data are conflicting, redundant copies that now disagree because only some were updated.
+    </p>
+    Updated customers.dat
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+        </tr>
+
+        <tr>
+            <td>C101</td>
+            <td>Rahul Sharma</td>
+            <td bgcolor="green">Bengaluru</td>
+        </tr>
+
+        <tr>
+            <td>C102</td>
+            <td>Priya Verma</td>
+            <td>Pune</td>
+        </tr>
+
+    </table>
+    Old invoices.dat
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>InvoiceID</th>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+        </tr>
+
+        <tr>
+            <td>I901</td>
+            <td>C101</td>
+            <td>Rahul Sharma</td>
+            <td bgcolor="red">Mumbai</td>
+        </tr>
+
+        <tr>
+            <td>I902</td>
+            <td>C102</td>
+            <td>Priya Verma</td>
+            <td>Pune</td>
+        </tr>
+
+    </table>
+    Old orders.dat
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>OrderID</th>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+        </tr>
+
+        <tr>
+            <td>O501</td>
+            <td>C101</td>
+            <td>Rahul Sharma</td>
+            <td bgcolor="red">Mumbai</td>
+        </tr>
+
+        <tr>
+            <td>O502</td>
+            <td>C102</td>
+            <td>Priya Verma</td>
+            <td>Pune</td>
+        </tr>
+
+    </table>
+    <br>
+    <strong>DBMS Solution</strong>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Customers</th>
+        </tr>
+
+        <tr>
+            <td>Rahul, Bengaluru</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Data is updated once, so all users see the same information.
+    </p>
+
+    <p>
+        Next, continuing with limitations of file-based systems. <a href="./1-data-integrity.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, data redundancy problem. <a href="./1-data-redundancy.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+
+    <h2>Subqueries</h2>
+
+    <p>
+        By now you can SELECT, filter with WHERE, and summarise with aggregates. But some
+        questions need an answer <em>before</em> the main question can even run.
+    </p>
+
+    <p>We'll use two tables for the rest of this page.</p>
+
+    <p>teams</p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>team_id</th>
+            <th>team_name</th>
+            <th>region</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Sentinels</td>
+            <td>NA</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Fnatic</td>
+            <td>EMEA</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>PRX</td>
+            <td>APAC</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>DRX</td>
+            <td>APAC</td>
+        </tr>
+    </table>
+
+    <br>
+
+    <p>players</p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>region</th>
+            <th>team_id</th>
+            <th>score</th>
+            <th>level</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>NA</td>
+            <td>1</td>
+            <td>842</td>
+            <td>Radiant</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Zekken</td>
+            <td>NA</td>
+            <td>1</td>
+            <td>788</td>
+            <td>Radiant</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Boaster</td>
+            <td>EMEA</td>
+            <td>2</td>
+            <td>710</td>
+            <td>Immortal</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Derke</td>
+            <td>EMEA</td>
+            <td>2</td>
+            <td>710</td>
+            <td>Immortal</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>f0rsakeN</td>
+            <td>APAC</td>
+            <td>3</td>
+            <td>905</td>
+            <td>Radiant</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>something</td>
+            <td>APAC</td>
+            <td>4</td>
+            <td>720</td>
+            <td>Immortal</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Rb</td>
+            <td>APAC</td>
+            <td>4</td>
+            <td>540</td>
+            <td>Diamond</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <p>
+        <strong>Problem:</strong> List every player who has more score than the average score.
+    </p>
+
+    <p>The obvious attempt fails:</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> score &gt; AVG(score);   -- error
+</code>
+</pre>
+
+    <p>
+        Recall the execution order: WHERE runs <em>before</em> aggregation. At the moment WHERE
+        is deciding which rows to keep, <code>AVG(score)</code> does not exist yet. The DBMS rejects
+        it.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Compute the average first, in its own little query, and feed
+        the single result into the outer one. That inner query is a <strong>subquery</strong>.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> score &gt; (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players);
+</code>
+</pre>
+
+    <p>
+        The inner query runs first, returns <code>745</code>, and the outer query then reads
+        <code>WHERE score &gt; 745</code>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+        <tr>
+            <td>Zekken</td>
+            <td>788</td>
+        </tr>
+        <tr>
+            <td>f0rsakeN</td>
+            <td>905</td>
+        </tr>
+    </table>
+
+    <p>
+        A subquery is just a query wrapped in parentheses, used wherever a value, a list, or a
+        table is expected.
+    </p>
+
+    <hr>
+
+    <h3>Scalar subqueries</h3>
+
+    <p>
+        A scalar subquery returns exactly one value, so it can sit anywhere a single value can,
+        including the SELECT list.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score,
+       score - (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players) <span style="color:#0099ff;">AS</span> diff
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        Each row now carries how far it sits from the overall average. If the inner query ever
+        returns more than one row here, the DBMS errors out, because one value was promised.
+    </p>
+
+    <hr>
+
+    <h3>Subqueries that return a list (IN)</h3>
+
+    <p>
+        When the subquery returns a whole column, pair it with <code>IN</code>.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Show players who belong to an APAC team. The region lives on
+        the <em>teams</em> table, not on <em>players</em>.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'APAC');
+</code>
+</pre>
+
+    <p>
+        The inner query returns <code>(3, 4)</code>, and the outer query keeps players whose
+        <code>team_id</code> is in that list.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>username</th>
+        </tr>
+        <tr>
+            <td>f0rsakeN</td>
+        </tr>
+        <tr>
+            <td>something</td>
+        </tr>
+        <tr>
+            <td>Rb</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h3>Subqueries in FROM (derived tables)</h3>
+
+    <p>
+        A subquery can also stand in for a whole table. This is how you filter on an aggregate
+        that you had to compute first.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Show only regions whose average score is above 750.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> region, avg_rr
+<span style="color:#0099ff;">FROM</span> (
+    <span style="color:#0099ff;">SELECT</span> region, AVG(score) <span style="color:#0099ff;">AS</span> avg_rr
+    <span style="color:#0099ff;">FROM</span> players
+    <span style="color:#0099ff;">GROUP BY</span> region
+) <span style="color:#0099ff;">AS</span> r
+<span style="color:#0099ff;">WHERE</span> avg_rr &gt; 750;
+</code>
+</pre>
+
+    <p>
+        The inner query builds a temporary table of per-region averages; the outer query treats
+        it like any other table and filters it.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>region</th>
+            <th>avg_rr</th>
+        </tr>
+        <tr>
+            <td>NA</td>
+            <td>815</td>
+        </tr>
+    </table>
+
+    <p>The <code>AS r</code> matters: a derived table must be given a name.</p>
+
+    <hr>
+
+    <h3>Correlated subqueries</h3>
+
+    <p>
+        So far the inner query ran once and was done. A <strong>correlated</strong> subquery is
+        different: it references the outer row, so it re-runs once for every row the outer query
+        looks at.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Show the highest-score player in each region.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region, score
+<span style="color:#0099ff;">FROM</span> players p
+<span style="color:#0099ff;">WHERE</span> score = (<span style="color:#0099ff;">SELECT</span> MAX(score) <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> region = p.region);
+</code>
+</pre>
+
+    <p>
+        For each outer player <code>p</code>, the inner query computes the max score <em>of that
+            player's region</em>. Keep the player only if their score equals it.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>username</th>
+            <th>region</th>
+            <th>score</th>
+        </tr>
+        <tr>
+            <td>TenZ</td>
+            <td>NA</td>
+            <td>842</td>
+        </tr>
+        <tr>
+            <td>Boaster</td>
+            <td>EMEA</td>
+            <td>710</td>
+        </tr>
+        <tr>
+            <td>Derke</td>
+            <td>EMEA</td>
+            <td>710</td>
+        </tr>
+        <tr>
+            <td>f0rsakeN</td>
+            <td>APAC</td>
+            <td>905</td>
+        </tr>
+    </table>
+
+    <p>
+        EMEA returns two rows because Boaster and Derke are tied. That is honest behaviour, not a
+        bug, and it is worth remembering when you expect "the top one" and get two.
+    </p>
+
+    <hr>
+
+    <h3>EXISTS and the NOT IN trap</h3>
+
+    <p>
+        <code>EXISTS</code> asks a yes/no question: does the inner query return at least one row?
+        It stops at the first match, so it never bothers building a full list.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Which teams have at least one Radiant player?
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> team_name
+<span style="color:#0099ff;">FROM</span> teams t
+<span style="color:#0099ff;">WHERE</span> <span style="color:#0099ff;">EXISTS</span> (
+    <span style="color:#0099ff;">SELECT</span> 1 <span style="color:#0099ff;">FROM</span> players
+    <span style="color:#0099ff;">WHERE</span> team_id = t.team_id <span style="color:#0099ff;">AND</span> level = 'Radiant'
+);
+</code>
+</pre>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>team_name</th>
+        </tr>
+        <tr>
+            <td>Sentinels</td>
+        </tr>
+        <tr>
+            <td>PRX</td>
+        </tr>
+    </table>
+
+    <p>
+        Now the trap. <code>NOT IN</code> looks like the natural opposite of <code>IN</code>, but
+        it breaks the moment the inner list contains a NULL.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">NOT IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'EU');
+</code>
+</pre>
+
+    <p>
+        If any value in that list is NULL, SQL cannot prove that a given <code>team_id</code> is
+        <em>not</em> equal to an unknown value, so the whole condition collapses to "unknown" and
+        the query returns <strong>zero rows</strong>. This is three-valued logic: a comparison
+        with NULL is neither true nor false. The safe habit is <code>NOT EXISTS</code>, which is
+        immune to it:
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username
+<span style="color:#0099ff;">FROM</span> players p
+<span style="color:#0099ff;">WHERE</span> <span style="color:#0099ff;">NOT EXISTS</span> (
+    <span style="color:#0099ff;">SELECT</span> 1 <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> team_id = p.team_id <span style="color:#0099ff;">AND</span> region = 'EU'
+);
+</code>
+</pre>
+
+    <hr>
+
+    <h3>Optimisation</h3>
+
+    <p>
+        Many subqueries can be rewritten as JOINs, and the planner often does exactly that behind
+        the scenes. But not always, and a correlated subquery is the one to watch: it re-runs for
+        every outer row, so a 10,000-row table can mean 10,000 inner executions. When a query
+        feels slow, run <code>EXPLAIN</code> in front of it and read whether the database chose a
+        per-row loop or a single pass. Prefer <code>EXISTS</code> / <code>NOT EXISTS</code> over
+        <code>IN</code> / <code>NOT IN</code> once NULLs are in play, both for correctness and
+        because the engine can short-circuit on the first match.
+    </p>
+
+    <hr>
+
+    <h2>Summary</h2>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> A query needs a value that can only be known after another
+            query runs.
+            <br>
+            <strong>Solution:</strong> Nest that query as a subquery; the inner one runs first.
+        </li>
+        <li>
+            <strong>Problem:</strong> The opposite of IN silently returns nothing.
+            <br>
+            <strong>Solution:</strong> NULLs poison NOT IN; use NOT EXISTS.
+        </li>
+    </ul>
+
+    <hr>
+
+    <p>
+        Next, the rest of DDL — ALTER and DROP.
+        <a href="./10-ddl-alter-drop.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, SQL Joins.
+        <a href="./8-joins.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>
