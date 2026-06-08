@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+    <h2>Window Functions</h2>
+
+    <p>
+        GROUP BY taught us to summarise. But it summarises by <em>destroying</em>: a query that
+        groups players by region returns one row per region, and the individual players vanish.
+    </p>
+
+    <p>We use the familiar players table.</p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>region</th>
+            <th>score</th>
+            <th>level</th>
+        </tr>
+        <tr><td>1</td><td>TenZ</td><td>NA</td><td>842</td><td>Radiant</td></tr>
+        <tr><td>2</td><td>Zekken</td><td>NA</td><td>788</td><td>Radiant</td></tr>
+        <tr><td>3</td><td>Boaster</td><td>EMEA</td><td>710</td><td>Immortal</td></tr>
+        <tr><td>4</td><td>Derke</td><td>EMEA</td><td>710</td><td>Immortal</td></tr>
+        <tr><td>5</td><td>f0rsakeN</td><td>APAC</td><td>905</td><td>Radiant</td></tr>
+        <tr><td>6</td><td>something</td><td>APAC</td><td>720</td><td>Immortal</td></tr>
+        <tr><td>7</td><td>Rb</td><td>APAC</td><td>540</td><td>Diamond</td></tr>
+    </table>
+
+    <hr>
+
+    <p>
+        <strong>Problem:</strong> Show every player alongside their region's average score, so you
+        can see who is above and below it. GROUP BY can give you the averages or the players, but
+        not both in one result — grouping collapses the very rows you want to keep.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> A window function computes a value <em>across a set of related
+        rows</em> without collapsing them. Every input row survives and gains an extra column.
+    </p>
+
+    <p>The set of rows it looks at is called the window, declared with <code>OVER</code>.</p>
+
+    <hr>
+
+    <h3>OVER and PARTITION BY</h3>
+
+    <p>
+        <code>PARTITION BY</code> is GROUP BY's non-destructive twin. It splits rows into groups
+        for the calculation, then hands every row back.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region, score,
+       AVG(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region) <span style="color:#0099ff;">AS</span> region_avg
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <table border="1" cellpadding="10">
+        <tr><th>username</th><th>region</th><th>score</th><th>region_avg</th></tr>
+        <tr><td>TenZ</td><td>NA</td><td>842</td><td>815</td></tr>
+        <tr><td>Zekken</td><td>NA</td><td>788</td><td>815</td></tr>
+        <tr><td>Boaster</td><td>EMEA</td><td>710</td><td>710</td></tr>
+        <tr><td>Derke</td><td>EMEA</td><td>710</td><td>710</td></tr>
+        <tr><td>f0rsakeN</td><td>APAC</td><td>905</td><td>721.67</td></tr>
+        <tr><td>something</td><td>APAC</td><td>720</td><td>721.67</td></tr>
+        <tr><td>Rb</td><td>APAC</td><td>540</td><td>721.67</td></tr>
+    </table>
+
+    <p>
+        Seven rows in, seven rows out — but each now carries its region's average. The same query
+        with GROUP BY would have returned three rows and lost the usernames.
+    </p>
+
+    <hr>
+
+    <h3>Ranking — ROW_NUMBER, RANK, DENSE_RANK</h3>
+
+    <p>
+        The headline use of windows is ranking. All three need an <code>ORDER BY</code>
+        <em>inside</em> the window to define the order being ranked.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region, score,
+       ROW_NUMBER() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> row_num,
+       RANK()       <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rnk,
+       DENSE_RANK() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> dense
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        Watch what happens in EMEA, where Boaster and Derke are tied at 710 — this is the whole
+        reason three ranking functions exist.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>username</th><th>region</th><th>score</th><th>row_num</th><th>rnk</th><th>dense</th></tr>
+        <tr><td>TenZ</td><td>NA</td><td>842</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>Zekken</td><td>NA</td><td>788</td><td>2</td><td>2</td><td>2</td></tr>
+        <tr><td>f0rsakeN</td><td>APAC</td><td>905</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>something</td><td>APAC</td><td>720</td><td>2</td><td>2</td><td>2</td></tr>
+        <tr><td>Rb</td><td>APAC</td><td>540</td><td>3</td><td>3</td><td>3</td></tr>
+        <tr><td>Boaster</td><td>EMEA</td><td>710</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>Derke</td><td>EMEA</td><td>710</td><td>2</td><td>1</td><td>1</td></tr>
+    </table>
+
+    <ul>
+        <li>ROW_NUMBER always gives distinct numbers, so the tie is broken arbitrarily (1, 2).</li>
+        <li>RANK gives ties the same number, then <em>skips</em> — two firsts would be followed by a 3.</li>
+        <li>DENSE_RANK gives ties the same number and <em>doesn't skip</em> — two firsts followed by a 2.</li>
+    </ul>
+
+    <p>
+        Choosing wrong is a classic bug: "the top 3" built on ROW_NUMBER silently drops a
+        genuinely tied player.
+    </p>
+
+    <hr>
+
+    <h3>Running totals and moving views</h3>
+
+    <p>
+        Add an <code>ORDER BY</code> to an aggregate window and it accumulates as it goes, giving
+        a running total.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score,
+       SUM(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score) <span style="color:#0099ff;">AS</span> running_rr
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        Each row's <code>running_rr</code> is the sum of every score up to and including it, in score
+        order. This is the engine behind leaderboards, cumulative revenue, and "balance after each
+        transaction".
+    </p>
+
+    <hr>
+
+    <h3>LAG and LEAD</h3>
+
+    <p>
+        These reach to the previous or next row in the window — perfect for comparing a row to its
+        neighbour.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score,
+       LAG(score)  <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rr_above,
+       LEAD(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rr_below
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>
+        For each player you now see the score of the player ranked just above and just below them.
+        Subtract to get the gap to the next player up the ladder. The top row's
+        <code>rr_above</code> is NULL — there's nobody above it.
+    </p>
+
+    <hr>
+
+    <h3>NTILE</h3>
+
+    <p>
+        <code>NTILE(n)</code> slices the ordered rows into n roughly equal buckets — useful for
+        percentiles and tiering.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, score,
+       NTILE(3) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> tier
+<span style="color:#0099ff;">FROM</span> players;
+</code>
+</pre>
+
+    <p>The top third land in tier 1, the middle in 2, the bottom in 3.</p>
+
+    <hr>
+
+    <h3>The pattern: top-N per group</h3>
+
+    <p>
+        Window functions can't go in WHERE (same execution-order reason aggregates can't — the
+        window is computed at SELECT time, after WHERE). So to keep only the top player per
+        region, you compute the level in a subquery, then filter the result — tying together this
+        page and the subqueries chapter:
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> username, region, score
+<span style="color:#0099ff;">FROM</span> (
+    <span style="color:#0099ff;">SELECT</span> username, region, score,
+           ROW_NUMBER() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rn
+    <span style="color:#0099ff;">FROM</span> players
+) ranked
+<span style="color:#0099ff;">WHERE</span> rn = 1;
+</code>
+</pre>
+
+    <hr>
+
+    <h3>Optimisation</h3>
+
+    <p>
+        The window's <code>ORDER BY</code> decides the work: ranking and running totals force the
+        database to sort each partition, so an index on the partitioning and ordering columns can
+        turn a sort into a cheap scan. The frame clause (<code>ROWS BETWEEN ...</code>) lets you
+        control exactly how many surrounding rows a moving calculation sees, instead of the
+        default of "everything up to the current row" — reach for it once running totals and
+        moving averages get heavy. Window functions exist in PostgreSQL and in MySQL 8.0 and
+        later; on older MySQL you're back to correlated subqueries doing the same job, slower.
+    </p>
+
+    <hr>
+
+    <h2>Summary</h2>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> GROUP BY summarises by collapsing rows, but you often want
+            the summary <em>and</em> the rows.
+            <br>
+            <strong>Solution:</strong> Window functions compute across a window with OVER, keeping
+            every row.
+        </li>
+        <li>
+            <strong>Problem:</strong> Ties make "level" ambiguous.
+            <br>
+            <strong>Solution:</strong> ROW_NUMBER, RANK, and DENSE_RANK each handle ties
+            differently — pick on purpose.
+        </li>
+    </ul>
+
+    <hr>
+
+    <p>
+        Prev, Constraints and Actions.
+        <a href="./11-constraints-and-actions.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

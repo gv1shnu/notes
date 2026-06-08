@@ -27,7 +27,7 @@
 
     <p>
         INSERT adds new rows into a table.
-        The DBMS controls all writes so it can enforce constraints, maintain indexes, and log changes. 
+        The DBMS controls all writes so it can enforce constraints, maintain indexes, and log changes.
         You can't write directly to the storage file/database.
     </p>
 
@@ -47,8 +47,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -66,8 +66,9 @@
 
     <p>
         UPDATE modifies existing rows.
-        You could always remove the existing row and add the updated row as a separate. 
-        However, UPDATE is atomic, it preserves row position for indexes, and it's less verbose. 
+        You could always remove the existing row and add the updated row as a separate (That's what Postgre's internal
+        systems do).
+        However, UPDATE is atomic and less verbose.
     </p>
 
     <p>MySQL / PostgreSQL</p>
@@ -75,7 +76,7 @@
     <pre>
 <code>
 <span style="color:#0099ff;">UPDATE</span> players
-<span style="color:#0099ff;">SET</span> rr = 900
+<span style="color:#0099ff;">SET</span> score = 900
 <span style="color:#0099ff;">WHERE</span> player_id = 1;
 </code>
 </pre>
@@ -87,8 +88,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -99,6 +100,11 @@
         </tr>
 
     </table>
+
+    <p>
+        <strong>Note:</strong><br>
+        Running UPDATE without WHERE updates all rows from the table.
+    </p>
 
     <hr>
 
@@ -124,8 +130,8 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
     </table>
@@ -146,8 +152,11 @@
     </p>
 
     <p>
-        Prev, basic DDL commands <a href="./2-dbms-ddl.html">&lt;&lt;</a>
+        Prev, basic DDL commands <a href="./2-create-table.html">&lt;&lt;</a>
     </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
 </body>
 
 </html>

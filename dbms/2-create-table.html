@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+    <h3>How do we create a table?</h3>
+
+    <p>
+        A table stores related data in rows and columns.
+    </p>
+
+    <em>Standard version</em>
+    <p>MySQL / PostgreSQL</p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+CREATE TABLE players (
+    player_id INT,
+    username  VARCHAR(30),
+    level      VARCHAR(20),
+    score        INT
+);
+</span>
+</code>
+</pre>
+
+    <em>Best Practice</em>
+    <p>MySQL / PostgreSQL</p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+CREATE TABLE players (
+    player_id INT PRIMARY KEY,   -- no duplicates
+    username  VARCHAR(30) NOT NULL,  -- every player must have a name
+    level      VARCHAR(20),
+    score        INT CHECK (score >= 0)  -- score can't be negative
+);
+</span>
+</code>
+</pre>
+
+
+    <p>
+        This creates a table named <strong>players</strong>.
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>level</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>Radiant</td>
+            <td>842</td>
+        </tr>
+
+    </table>
+
+    <h3>List the tables present in the selected database</h3>
+
+
+    <pre>
+<code>
+MySQL
+
+<span style="color:lightgreen;">
+SHOW TABLES;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:lightgreen;">
+\dt
+</span>
+</code>
+</pre>
+
+
+    <h3>Show description of a table</h3>
+
+
+    <pre>
+<code>
+MySQL
+
+<span style="color:lightgreen;">
+DESCRIBE players;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:lightgreen;">
+\d players
+</span>
+</code>
+</pre>
+
+    <p>Note: ALTER and DROP will be covered after we have data to work with.</p>
+
+    <p>
+        Next: DML (Data Manipulation Language)
+        <a href="./3-dml.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Datatypes
+        <a href="./2-datatypes.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+</html>

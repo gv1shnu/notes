@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+    <h2>Constraints and Actions</h2>
+
+    <p>
+        In the introduction we listed integrity problems as one of the reasons file-based systems
+        gave way to the DBMS. Constraints are how that promise is kept. We've already used one of
+        them without naming it as a family member: the datatype.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Left to itself, the database will faithfully store nonsense — a
+        negative score, two players sharing one id, a <code>team_id</code> pointing at a team that
+        doesn't exist, a row with no username at all. The datatype stops "hello" going into an
+        integer column, but it can't stop any of those.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Constraints are rules attached to the table that the DBMS
+        enforces automatically, on every insert and update, forever. You declare the rule once;
+        you never have to remember to check it again.
+    </p>
+
+    <p>We'll build the <code>players</code> and <code>teams</code> tables properly this time.</p>
+
+    <hr>
+
+    <h3>The constraints</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Constraint</th>
+            <th>Rule it enforces</th>
+        </tr>
+        <tr><td>PRIMARY KEY</td><td>Uniquely identifies a row (unique + not null)</td></tr>
+        <tr><td>NOT NULL</td><td>A value must be present</td></tr>
+        <tr><td>UNIQUE</td><td>No two rows share this value</td></tr>
+        <tr><td>CHECK</td><td>A value must satisfy a condition</td></tr>
+        <tr><td>DEFAULT</td><td>Supplies a value when none is given</td></tr>
+        <tr><td>FOREIGN KEY</td><td>A value must reference a real row elsewhere</td></tr>
+    </table>
+
+    <p>Here they are at work.</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE TABLE</span> teams (
+    team_id   INT <span style="color:#0099ff;">PRIMARY KEY</span>,
+    team_name VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>,
+    region    VARCHAR(10) <span style="color:#0099ff;">NOT NULL</span>
+);
+
+<span style="color:#0099ff;">CREATE TABLE</span> players (
+    player_id INT <span style="color:#0099ff;">PRIMARY KEY</span>,
+    username  VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>,
+    score        INT <span style="color:#0099ff;">DEFAULT</span> 0 <span style="color:#0099ff;">CHECK</span> (score &gt;= 0),
+    level      VARCHAR(20) <span style="color:#0099ff;">DEFAULT</span> 'Unranked',
+    team_id   INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
+);
+</code>
+</pre>
+
+    <p>
+        Reading that second table top to bottom: every player must have a unique id and a unique,
+        present username; score can't be negative and starts at 0 if you don't supply it; level
+        defaults to 'Unranked'; and <code>team_id</code>, if given, must match a real team.
+    </p>
+
+    <p>A few now fail by design:</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, score) <span style="color:#0099ff;">VALUES</span> (1, 'TenZ', -50);
+-- rejected: CHECK (score &gt;= 0)
+
+<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username) <span style="color:#0099ff;">VALUES</span> (2, 'TenZ');
+-- rejected: UNIQUE on username
+
+<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, team_id) <span style="color:#0099ff;">VALUES</span> (3, 'Derke', 99);
+-- rejected: no team 99 exists
+</code>
+</pre>
+
+    <hr>
+
+    <h3>The foreign key, properly</h3>
+
+    <p>
+        The FOREIGN KEY is the constraint that makes a relational database relational. It says a
+        column's values must already exist as keys in another table. <code>players.team_id</code>
+        references <code>teams.team_id</code>, so a player can only belong to a team that has
+        actually been created. This is <strong>referential integrity</strong> — no orphans, no
+        dangling pointers.
+    </p>
+
+    <p>
+        But it raises a question the other constraints don't. A player depends on a team. So what
+        happens to the players when that team is deleted, or when its <code>team_id</code>
+        changes?
+    </p>
+
+    <hr>
+
+    <h3>Actions — ON DELETE and ON UPDATE</h3>
+
+    <p>
+        This is the part most people skip and later regret. When you declare a foreign key, you
+        also decide what the database should <em>do</em> to the child rows when the parent row is
+        deleted or updated.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Action</th>
+            <th>When the parent row is deleted/updated...</th>
+        </tr>
+        <tr><td>RESTRICT</td><td>Refuse the operation while children still reference it</td></tr>
+        <tr><td>NO ACTION</td><td>Same effect as RESTRICT (the default if unspecified)</td></tr>
+        <tr><td>CASCADE</td><td>Delete or update the children to match</td></tr>
+        <tr><td>SET NULL</td><td>Set the children's foreign key to NULL</td></tr>
+        <tr><td>SET DEFAULT</td><td>Set the children's foreign key to its default value</td></tr>
+    </table>
+
+    <br>
+
+    <p>You attach the action when defining the key:</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE TABLE</span> players (
+    player_id INT <span style="color:#0099ff;">PRIMARY KEY</span>,
+    username  VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>,
+    team_id   INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
+              <span style="color:#0099ff;">ON DELETE</span> <span style="color:#0099ff;">SET NULL</span>
+              <span style="color:#0099ff;">ON UPDATE</span> <span style="color:#0099ff;">CASCADE</span>
+);
+</code>
+</pre>
+
+    <p>
+        With this, deleting Sentinels doesn't delete TenZ — his <code>team_id</code> simply
+        becomes NULL, a free agent. And if Sentinels' <code>team_id</code> is renumbered, TenZ's
+        row follows it automatically.
+    </p>
+
+    <p>
+        Pick the action by asking what the data <em>means</em>. If a player is meaningless without
+        a team, <code>ON DELETE CASCADE</code> is honest. If a player outlives their team,
+        <code>SET NULL</code> is honest. If deleting a team that still has players is a mistake you
+        want to catch, <code>RESTRICT</code> is honest. The default, NO ACTION, quietly blocks the
+        delete — which surprises people who never chose it.
+    </p>
+
+    <hr>
+
+    <h3>Adding constraints later</h3>
+
+    <p>
+        Constraints aren't locked in at creation. Using ALTER from the previous chapter, you can
+        add or drop them as the schema matures, and it's good practice to name them so the error
+        messages mean something.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">ADD CONSTRAINT</span> chk_rr <span style="color:#0099ff;">CHECK</span> (score <span style="color:#0099ff;">BETWEEN</span> 0 <span style="color:#0099ff;">AND</span> 1000);
+
+<span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">DROP CONSTRAINT</span> chk_rr;
+</code>
+</pre>
+
+    <hr>
+
+    <h2>Summary</h2>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> The database will store invalid and orphaned data unless
+            told the rules.
+            <br>
+            <strong>Solution:</strong> Constraints enforce those rules automatically, on every
+            write.
+        </li>
+        <li>
+            <strong>Problem:</strong> Deleting a parent row leaves its children in an undefined
+            state.
+            <br>
+            <strong>Solution:</strong> Referential actions (CASCADE, SET NULL, RESTRICT) decide
+            what happens, and the right one depends on what the data means.
+        </li>
+    </ul>
+
+    <hr>
+
+    <p>
+        Next, keeping every row while still summarising — Window Functions.
+        <a href="./12-window-functions.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, DDL — ALTER and DROP.
+        <a href="./10-ddl-alter-drop.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

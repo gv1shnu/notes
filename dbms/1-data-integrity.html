@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+    <h2>Demerits of file-based system contd.</h2>
+
+    <h3> 3. Integrity problems. </h3>
+    <p>It is difficult to make changes to the application programs in order to enforce new constraints.</p>
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>EmpID</th>
+            <th>EmployeeName</th>
+            <th>Phone</th>
+            <th>Salary</th>
+        </tr>
+
+        <tr>
+            <td>E101</td>
+            <td>Amit Singh</td>
+            <td>9876543210</td>
+            <td>45000</td>
+        </tr>
+
+        <tr>
+            <td>E102</td>
+            <td>Neha Joshi</td>
+            <td bgcolor="orange">98AB112233</td>
+            <td>52000</td>
+        </tr>
+
+        <tr>
+            <td bgcolor="orange">E101</td>
+            <td>Vikram Rao</td>
+            <td>9898989898</td>
+            <td>47000</td>
+        </tr>
+
+        <tr>
+            <td>E104</td>
+            <td>Sneha Iyer</td>
+            <td>9812345678</td>
+            <td bgcolor="orange">-15000</td>
+        </tr>
+
+    </table>
+    <br>
+    <strong>DBMS Solution</strong>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Constraint</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>PRIMARY KEY</td>
+            <td>No duplicate EmpID</td>
+        </tr>
+
+        <tr>
+            <td>CHECK</td>
+            <td>No negative salary</td>
+        </tr>
+
+        <tr>
+            <td>NOT NULL</td>
+            <td>Mandatory value required</td>
+        </tr>
+
+        <tr>
+            <td>UNIQUE</td>
+            <td>No duplicate values allowed</td>
+        </tr>
+
+        <tr>
+            <td>FOREIGN KEY</td>
+            <td>Maintains valid references between tables</td>
+        </tr>
+
+        <tr>
+            <td>DEFAULT</td>
+            <td>Assigns a value when none is provided</td>
+        </tr>
+
+    </table>
+
+    <p>
+        DBMS enforces rules automatically.
+    </p>
+
+    <h3>4. Slower search.</h3>
+
+    Employees.dat
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>EmpID</th>
+            <th>EmployeeName</th>
+            <th>Department</th>
+        </tr>
+
+        <tr>
+            <td>E101</td>
+            <td>Amit Singh</td>
+            <td>HR</td>
+        </tr>
+
+        <tr>
+            <td>E102</td>
+            <td>Neha Joshi</td>
+            <td>Sales</td>
+        </tr>
+
+        <tr>
+            <td>E103</td>
+            <td>Vikram Rao</td>
+            <td>Finance</td>
+        </tr>
+
+        <tr>
+            <td>E104</td>
+            <td>Sneha Iyer</td>
+            <td>IT</td>
+        </tr>
+
+        <tr>
+            <td>E105</td>
+            <td>Karan Mehta</td>
+            <td>Marketing</td>
+        </tr>
+
+    </table>
+
+    Search for E105.<br>
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Step</th>
+            <th>Record Checked</th>
+            <th>Result</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>E101</td>
+            <td>Not Found</td>
+        </tr>
+
+        <tr>
+            <td>2</td>
+            <td>E102</td>
+            <td>Not Found</td>
+        </tr>
+
+        <tr>
+            <td>3</td>
+            <td>E103</td>
+            <td>Not Found</td>
+        </tr>
+
+        <tr>
+            <td>4</td>
+            <td>E104</td>
+            <td>Not Found</td>
+        </tr>
+
+        <tr>
+            <td>5</td>
+            <td>E105</td>
+            <td bgcolor="lightblue">Found</td>
+        </tr>
+
+    </table>
+    <p>
+        System checks records one by one. More records = slower sequential search. 
+        (Recall Time complexity from Algorithms)
+    </p>
+
+    <br>
+    <strong>DBMS Solution</strong>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Index</th>
+            <th>Record</th>
+        </tr>
+
+        <tr>
+            <td>E105</td>
+            <td>Faster Access (Log(n)) via B-Trees</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Indexes reduce unnecessary searching.
+    </p>
+    <br>
+
+    <h3> 5. Concurrency problems.</h3>
+    <p>
+        Typically, in a file-based system, when an application opens a file, that file is locked. This means that
+        no one else has access to the file at the same time.
+    </p>
+    <br>
+
+    <strong>DBMS Solution</strong>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>User</th>
+            <th>Operation</th>
+        </tr>
+
+        <tr>
+            <td>User A</td>
+            <td>Update salary</td>
+        </tr>
+
+        <tr>
+            <td>User B</td>
+            <td>Read employee data</td>
+        </tr>
+
+    </table>
+
+    <p>
+        DBMS manages multiple users safely using transactions and locks.
+    </p>
+
+    <p>
+        Next, moving on to summary. <a href="./1-summary.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, data inconsistency in file-based systems. <a href="./1-data-inconsistency.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

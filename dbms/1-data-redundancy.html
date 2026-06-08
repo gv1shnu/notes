@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+    <h2>Demerits of file-based system</h2>
+    <p>
+        File-based systems became difficult to manage as data volume, complexity, and concurrent users increased.
+        The following challenges in file-based system were noted, and consequently DBMS was introduced solving them.
+    </p>
+
+    <h3>1. Data redundancy. </h3>
+
+    <p>The same information being kept in several different places, as different individuals may required to
+        keep copy of certain data.
+    </p>
+    Customers.dat
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+            <th>Phone</th>
+        </tr>
+
+        <tr>
+            <td bgcolor="lightgrey">C101</td>
+            <td bgcolor="lightgrey">Rahul Sharma</td>
+            <td bgcolor="lightgrey">Mumbai</td>
+            <td>9876543210</td>
+        </tr>
+
+        <tr>
+            <td>C102</td>
+            <td>Priya Verma</td>
+            <td>Pune</td>
+            <td>9811122233</td>
+        </tr>
+
+        <tr>
+            <td>C103</td>
+            <td>Arjun Nair</td>
+            <td>Kochi</td>
+            <td>9898989898</td>
+        </tr>
+
+    </table>
+
+    Orders.dat
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>OrderID</th>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+        </tr>
+
+        <tr>
+            <td>O501</td>
+            <td bgcolor="lightgrey">C101</td>
+            <td bgcolor="lightgrey">Rahul Sharma</td>
+            <td bgcolor="lightgrey">Mumbai</td>
+        </tr>
+
+        <tr>
+            <td>O502</td>
+            <td>C103</td>
+            <td>Arjun Nair</td>
+            <td>Kochi</td>
+        </tr>
+
+        <tr>
+            <td>O503</td>
+            <td>C101</td>
+            <td>Rahul Sharma</td>
+            <td>Mumbai</td>
+        </tr>
+
+    </table>
+
+    Invoices.dat
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>InvoiceID</th>
+            <th>CustID</th>
+            <th>CustomerName</th>
+            <th>City</th>
+        </tr>
+
+        <tr>
+            <td>I901</td>
+            <td bgcolor="lightgrey">C101</td>
+            <td bgcolor="lightgrey">Rahul Sharma</td>
+            <td bgcolor="lightgrey">Mumbai</td>
+        </tr>
+
+        <tr>
+            <td>I902</td>
+            <td>C102</td>
+            <td>Priya Verma</td>
+            <td>Pune</td>
+        </tr>
+
+        <tr>
+            <td>I903</td>
+            <td bgcolor="lightgrey">C101</td>
+            <td bgcolor="lightgrey">Rahul Sharma</td>
+            <td bgcolor="lightgrey">Mumbai</td>
+        </tr>
+
+    </table>
+    
+    <strong>DBMS Solution</strong>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Customers</th>
+        </tr>
+
+        <tr>
+            <td>C101, Rahul Sharma, Mumbai</td>
+        </tr>
+    </table>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Orders</th>
+            <th>Invoices</th>
+        </tr>
+
+        <tr>
+            <td>O501, C101</td>
+            <td>I901, C101</td>
+        </tr>
+    </table>
+
+    <p>
+        Customer data is stored once and referenced using CustID.
+    </p>
+
+    <p>
+        DBMS introduced is the Centralisation of handling all operations on the database,
+        analogous to The Accountants from John Wick franchise.
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <img src="./assets/0.webp">
+            </td>
+            <td>
+                <img src="./assets/1.webp">
+            </td>
+            <td>
+                <img src="./assets/2.webp">
+            </td>
+            <td>
+                <img src="./assets/3.webp">
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Next, continuing with limitations of file-based systems. <a href="./1-data-inconsistency.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, starting with introduction to file-based system. <a href="./1-introduction.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+</html>

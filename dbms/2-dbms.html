@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="./assets/style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+
+    <p>
+        <strong>What exactly is a DBMS?</strong><br>
+        A Database Management System (DBMS) is dedicated software for managing databases.
+        <br><br>
+        As mentioned previously, the conceptual evolution from structs to tables
+        was natural and was brought forward by the popular relational model in 1970s.
+
+        What is relational model?
+        <br>It's a model that represents data as relations (tables), with a mathematical foundation (set theory,
+        predicate logic) that lets you query declaratively.
+    </p>
+
+    <h3>DBMS Terminology</h3>
+    <p>
+        The introduction showed us WHY these concepts exist. Here's the vocabulary we'll use going forward.
+    </p>
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>Term</th>
+            <th>Meaning</th>
+            <th>Example</th>
+        </tr>
+
+        <tr>
+            <td>Table / Relation</td>
+            <td>Collection of related data</td>
+            <td>Employees</td>
+        </tr>
+
+        <tr>
+            <td>Row / Record / Tuple</td>
+            <td>One complete entry</td>
+            <td>E101, Rahul, HR</td>
+        </tr>
+
+        <tr>
+            <td>Column / Attribute</td>
+            <td>One property of data</td>
+            <td>EmployeeName</td>
+        </tr>
+
+        <tr>
+            <td>Primary Key</td>
+            <td>Uniquely identifies a row</td>
+            <td>EmpID</td>
+        </tr>
+
+        <tr>
+            <td>Foreign Key</td>
+            <td>References another table</td>
+            <td>DeptID</td>
+        </tr>
+
+        <tr>
+            <td>Schema</td>
+            <td>Structure of the database</td>
+            <td>Tables + Columns + Constraints</td>
+        </tr>
+
+        <tr>
+            <td>Constraint</td>
+            <td>Rule enforced on data</td>
+            <td>Salary > 0</td>
+        </tr>
+
+        <tr>
+            <td>Index</td>
+            <td>Speeds up searching</td>
+            <td>Search EmpID quickly using B-Trees and Hashes.</td>
+        </tr>
+
+        <tr>
+            <td>Query</td>
+            <td>Request for data</td>
+            <td>Find all employees in HR</td>
+        </tr>
+
+    </table>
+
+    <img src="./assets/terminology.png" />
+
+    <p>
+        As tables are also called relations, databases that store data using tables are called
+        <strong>Relational Databases</strong>.
+    </p>
+
+    <p>
+        An <strong>Relational Database Management System (RDBMS)</strong>
+        manages relational databases.
+    </p>
+
+    <p>
+        The most common language used to interact with an RDBMS is:
+        <strong>SQL (Structured Query Language)</strong>.
+    </p>
+
+    <p>Popular SQL DBMS:</p>
+
+    <ul>
+        <li>MySQL: open-source by Oracle, fast and scalable</li>
+        <li>PostgreSQL: 100% open source, feature-rich</li>
+        <li>SQLite: used in small projects</li>
+    </ul>
+
+    <p>
+        Please install MySQL locally using this <a href="mysql-installation.html">article</a>, and PostgreSQL using
+        <a href="postgres-installation.html">this</a>. Everyone has a preference on GUI vs Terminal based choice of
+        interface with DBMS, you can pick either.
+        <br>
+        GUI examples: MySQL Workbench, PostgreSQL PgAdmin.
+    </p>
+
+    <p>
+        Next: SQL command categories
+        <a href="./2-sql-command-categories.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Introduction
+        <a href="./1-summary.html">&lt;&lt;</a>
+    </p>
+
+   <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

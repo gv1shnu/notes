@@ -65,8 +65,8 @@
 
         <tr>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -95,7 +95,7 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> AVG(rr)
+<span style="color:#0099ff;">SELECT</span> AVG(score)
 <span style="color:#0099ff;">AS</span> average_rr
 <span style="color:#0099ff;">FROM</span> players;
 </code>
@@ -130,8 +130,8 @@
 
         <tr>
             <th>username</th>
-            <th>rank</th>
-            <th>rr</th>
+            <th>level</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -156,8 +156,8 @@
 
     <br>
     <p>
-        AVG(rr) gives you one average across all players. But what if you want the average per rank? You'd have to run a
-        separate query for each rank. With 10 ranks that's 10 queries. With 100 ranks, 100 queries.
+        AVG(score) gives you one average across all players. But what if you want the average per level? You'd have to run a
+        separate query for each level. With 10 ranks that's 10 queries. With 100 ranks, 100 queries.
         GROUP BY solves this: one query, one result per group.
     </p>
 
@@ -165,10 +165,10 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> rank, COUNT(*)
+<span style="color:#0099ff;">SELECT</span> level, COUNT(*)
 <span style="color:#0099ff;">AS</span> total_players
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">GROUP BY</span> rank;
+<span style="color:#0099ff;">GROUP BY</span> level;
 </code>
 </pre>
 
@@ -177,7 +177,7 @@
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>rank</th>
+            <th>level</th>
             <th>total_players</th>
         </tr>
 
@@ -206,7 +206,7 @@
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>rank</th>
+            <th>level</th>
             <th>total_players</th>
         </tr>
 
@@ -228,10 +228,10 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> rank, COUNT(*)
+<span style="color:#0099ff;">SELECT</span> level, COUNT(*)
 <span style="color:#0099ff;">AS</span> total_players
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">GROUP BY</span> rank
+<span style="color:#0099ff;">GROUP BY</span> level
 <span style="color:#0099ff;">HAVING</span> COUNT(*) > 1;
 </code>
 </pre>
@@ -241,7 +241,7 @@
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>rank</th>
+            <th>level</th>
             <th>total_players</th>
         </tr>
 
@@ -271,6 +271,9 @@
     <p>
         Prev, common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&lt;&lt;</a>
     </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+
+<body>
+
+
+    <h2>DDL, continued — ALTER and DROP</h2>
+
+    <p>
+        Back in the DDL chapter we created tables and deliberately put ALTER and DROP aside,
+        because changing or removing a structure only makes sense once there is data and a schema
+        worth changing. Now there is.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> A schema is never finished. A new column is needed, a type was
+        chosen badly, a table has outlived its purpose. You could drop everything and recreate it
+        from your CREATE script, but that throws away every row you've stored. You need to change
+        the structure <em>in place</em>, without losing the data inside it.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> ALTER edits the definition of an existing object; DROP removes
+        the object entirely.
+    </p>
+
+    <p>We continue with the <code>players</code> table.</p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>region</th>
+            <th>team_id</th>
+            <th>score</th>
+            <th>level</th>
+        </tr>
+        <tr><td>1</td><td>TenZ</td><td>NA</td><td>1</td><td>842</td><td>Radiant</td></tr>
+        <tr><td>2</td><td>Zekken</td><td>NA</td><td>1</td><td>788</td><td>Radiant</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>ALTER TABLE — add a column</h3>
+
+    <p>Say we now want to record each player's role.</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">ADD COLUMN</span> role VARCHAR(20);
+</code>
+</pre>
+
+    <p>
+        The column appears on every existing row with a value of NULL, because no role was known
+        when those rows were written. Existing data is untouched.
+    </p>
+
+    <hr>
+
+    <h3>ALTER TABLE — change a type</h3>
+
+    <p><code>score</code> was created as INT. Suppose we later need decimals.</p>
+
+    <p>PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">ALTER COLUMN</span> score <span style="color:#0099ff;">TYPE</span> NUMERIC(6,2);
+</code>
+</pre>
+
+    <p>MySQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">MODIFY COLUMN</span> score DECIMAL(6,2);
+</code>
+</pre>
+
+    <p>
+        This is the first real split between the two dialects you'll meet often: PostgreSQL says
+        <code>ALTER COLUMN ... TYPE</code>, MySQL says <code>MODIFY COLUMN</code>. The database
+        will refuse the change if the existing values can't be converted into the new type, which
+        is the integrity promise doing its job.
+    </p>
+
+    <hr>
+
+    <h3>ALTER TABLE — rename</h3>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME COLUMN</span> role <span style="color:#0099ff;">TO</span> position;
+
+<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME TO</span> pro_players;
+</code>
+</pre>
+
+    <hr>
+
+    <h3>ALTER TABLE — drop a column</h3>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">DROP COLUMN</span> position;
+</code>
+</pre>
+
+    <p>
+        The column and all the values stored in it are gone. There is no per-row confirmation, so
+        read the statement twice before running it.
+    </p>
+
+    <hr>
+
+    <h3>DROP — removing whole objects</h3>
+
+    <p>DROP operates on the object itself, not the rows.</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">DROP TABLE</span> players;
+
+<span style="color:#0099ff;">DROP DATABASE</span> company;
+</code>
+</pre>
+
+    <p>
+        Both are destructive and final. To avoid an error when you're not sure the object exists,
+        guard it:
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">DROP TABLE</span> <span style="color:#0099ff;">IF EXISTS</span> players;
+</code>
+</pre>
+
+    <hr>
+
+    <h3>DELETE vs TRUNCATE vs DROP</h3>
+
+    <p>
+        These three feel similar and are constantly confused, so it's worth lining them up. We met
+        DELETE in the DML chapter.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Command</th>
+            <th>What it removes</th>
+            <th>Structure survives?</th>
+            <th>Can be rolled back?</th>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>Rows (optionally some)</td>
+            <td>Yes</td>
+            <td>Yes, inside a transaction</td>
+        </tr>
+        <tr>
+            <td>TRUNCATE</td>
+            <td>All rows, fast</td>
+            <td>Yes</td>
+            <td>Depends on the database</td>
+        </tr>
+        <tr>
+            <td>DROP</td>
+            <td>The table itself</td>
+            <td>No</td>
+            <td>No</td>
+        </tr>
+    </table>
+
+    <p>
+        DELETE walks the table row by row, logging each removal, which is why it is slower but
+        also why <code>DELETE FROM players WHERE score &lt; 600</code> can target a subset and be
+        undone.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">DELETE FROM</span> players <span style="color:#0099ff;">WHERE</span> score &lt; 600;
+</code>
+</pre>
+
+    <p>
+        TRUNCATE empties the entire table in one stroke without logging individual rows. It is far
+        faster, but it is all-or-nothing — there is no WHERE.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">TRUNCATE TABLE</span> players;
+</code>
+</pre>
+
+    <p>
+        DROP doesn't empty the table; it deletes the table from the database. After a DROP, even
+        <code>SELECT * FROM players</code> is an error, because there is no players anymore.
+    </p>
+
+    <p>
+        <strong>Note:</strong> A useful mental model — DELETE removes some books from the shelf,
+        TRUNCATE clears the whole shelf, DROP throws away the shelf. Reach for the gentlest one
+        that does the job.
+    </p>
+
+    <hr>
+
+    <h2>Summary</h2>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> Structures change after creation, but recreating loses data.
+            <br>
+            <strong>Solution:</strong> ALTER edits the definition in place.
+        </li>
+        <li>
+            <strong>Problem:</strong> Three different ways to "get rid of" data behave very
+            differently.
+            <br>
+            <strong>Solution:</strong> DELETE for some rows, TRUNCATE to empty fast, DROP to
+            remove the object.
+        </li>
+    </ul>
+
+    <hr>
+
+    <p>
+        Next, the rules that keep data honest — Constraints and Actions.
+        <a href="./11-constraints-and-actions.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Subqueries.
+        <a href="./9-subqueries.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

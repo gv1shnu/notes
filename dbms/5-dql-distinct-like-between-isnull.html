@@ -20,9 +20,9 @@
         <tr>
             <th>player_id</th>
             <th>username</th>
-            <th>rank</th>
+            <th>level</th>
             <th>region</th>
-            <th>rr</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -68,7 +68,8 @@
     </table>
     <p>
         Note: NULL means the value is absent — not zero, not an empty string, but genuinely unknown or missing. For
-        example, a player who is unranked has no rank to record. Storing 0 would be wrong (0 might mean something else).
+        example, a player who is unranked has no level to record. Storing 0 would be wrong (0 might mean something
+        else).
         Storing an empty string would be imprecise. NULL is the correct representation of "no value."
     </p>
     <hr>
@@ -77,7 +78,7 @@
 
     <p>
         DISTINCT removes duplicate values.
-        Without DISTINCT, querying SELECT rank FROM players returns one row per player — you'd see "Radiant" twice and
+        Without DISTINCT, querying SELECT level FROM players returns one row per player — you'd see "Radiant" twice and
         "Immortal" twice. DISTINCT collapses duplicates so you get each value once.
     </p>
 
@@ -85,7 +86,7 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT DISTINCT</span> rank
+<span style="color:#0099ff;">SELECT DISTINCT</span> level
 <span style="color:#0099ff;">FROM</span> players;
 </code>
 </pre>
@@ -95,7 +96,7 @@
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>rank</th>
+            <th>level</th>
         </tr>
 
         <tr>
@@ -212,9 +213,9 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> rr >= 600 AND rr <= 850;
+<span style="color:#0099ff;">WHERE</span> score >= 600 AND score &lt;= 850;
 </code>
 </pre>
     <p>
@@ -222,9 +223,9 @@
     </p>
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> rr <span style="color:#0099ff;">BETWEEN</span> 600 <span style="color:#0099ff;">AND</span> 850;
+<span style="color:#0099ff;">WHERE</span> score <span style="color:#0099ff;">BETWEEN</span> 600 <span style="color:#0099ff;">AND</span> 850;
 </code>
 </pre>
 
@@ -234,7 +235,7 @@
 
         <tr>
             <th>username</th>
-            <th>rr</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -265,9 +266,9 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> rr = NULL;
+<span style="color:#0099ff;">WHERE</span> score = NULL;
 </code>
 </pre>
     <p>NULL = NULL is not TRUE in SQL — it's NULL. NULL is not equal to anything, not even itself. So = NULL will never
@@ -276,9 +277,9 @@
 
     <pre>
 <code>
-<span style="color:#0099ff;">SELECT</span> username, rr
+<span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> rr <span style="color:#0099ff;">IS NULL</span>;
+<span style="color:#0099ff;">WHERE</span> score <span style="color:#0099ff;">IS NULL</span>;
 </code>
 </pre>
 
@@ -288,7 +289,7 @@
 
         <tr>
             <th>username</th>
-            <th>rr</th>
+            <th>score</th>
         </tr>
 
         <tr>
@@ -343,6 +344,9 @@
     <p>
         Prev, basic DQL. <a href="./4-dql-select-where-orderby-limit.html">&lt;&lt;</a>
     </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
 </body>
 
 </html>

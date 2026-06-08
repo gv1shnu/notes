@@ -69,6 +69,31 @@ a{
     text-decoration:none;
 }
 
+.home-link{
+    position:fixed;
+    top:1rem;
+    left:1rem;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:2.6rem;
+    height:2.6rem;
+    border-radius:0.85rem;
+    background:var(--header);
+    box-shadow:0 14px 30px rgba(0,0,0,0.08);
+    color:var(--accent);
+    z-index:10;
+}
+
+.home-link:hover{
+    background:#f5f8ff;
+}
+
+.home-link svg{
+    width:1.3rem;
+    height:1.3rem;
+}
+
 a:hover{
     text-decoration:underline;
 }
