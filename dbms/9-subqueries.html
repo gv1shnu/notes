@@ -55,8 +55,6 @@
         </tr>
     </table>
 
-    <br>
-
     <p>players</p>
 
     <table border="1" cellpadding="10">
@@ -136,6 +134,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score &gt; AVG(score);   -- error
@@ -155,6 +154,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score &gt; (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players);
@@ -201,6 +201,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score,
        score - (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players) <span style="color:#0099ff;">AS</span> diff
 <span style="color:#0099ff;">FROM</span> players;
@@ -227,6 +228,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'APAC');
@@ -268,6 +270,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> region, avg_rr
 <span style="color:#0099ff;">FROM</span> (
     <span style="color:#0099ff;">SELECT</span> region, AVG(score) <span style="color:#0099ff;">AS</span> avg_rr
@@ -312,6 +315,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, region, score
 <span style="color:#0099ff;">FROM</span> players p
 <span style="color:#0099ff;">WHERE</span> score = (<span style="color:#0099ff;">SELECT</span> MAX(score) <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> region = p.region);
@@ -371,6 +375,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> team_name
 <span style="color:#0099ff;">FROM</span> teams t
 <span style="color:#0099ff;">WHERE</span> <span style="color:#0099ff;">EXISTS</span> (

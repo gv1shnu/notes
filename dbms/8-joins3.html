@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="./assets/style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <h3>Summary — Which JOIN to use?</h3>
+
+    <table border="1" cellpadding="12">
+
+        <tr>
+            <th>JOIN Type</th>
+            <th>Returns</th>
+            <th>Use when</th>
+        </tr>
+
+        <tr>
+            <td>INNER JOIN</td>
+            <td>Only matching rows from both tables</td>
+            <td>You only want data that is fully linked on both sides</td>
+        </tr>
+
+        <tr>
+            <td>LEFT JOIN</td>
+            <td>All rows from left + matches from right</td>
+            <td>You want to keep all records from the left table, even unmatched ones</td>
+        </tr>
+
+        <tr>
+            <td>RIGHT JOIN</td>
+            <td>All rows from right + matches from left</td>
+            <td>You want to keep all records from the right table, even unmatched ones</td>
+        </tr>
+
+        <tr>
+            <td>FULL OUTER JOIN</td>
+            <td>All rows from both tables</td>
+            <td>You want a complete picture — no row from either side should be dropped</td>
+        </tr>
+
+    </table>
+
+    <h3>Using Aliases to Write Cleaner JOINs</h3>
+
+    <p>
+        Writing <code>players.username</code> and <code>squads.squad_name</code> repeatedly gets verbose.
+        Aliases let you shorten table names for the duration of the query.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT p.username, s.squad_name
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id;
+</span>
+</code>
+</pre>
+
+    <p>
+        <code>p</code> is now shorthand for <code>players</code>.
+        <code>s</code> is shorthand for <code>squads</code>.
+        The query does the same thing — it just reads faster.
+    </p>
+
+    <h3>JOINs with WHERE, ORDER BY, and Aggregates</h3>
+
+    <p>
+        A JOIN gives you a combined table. Everything you already know — WHERE, ORDER BY, GROUP BY,
+        aggregate functions — works on top of it.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Which squad has the highest total kills?
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT s.squad_name, SUM(p.kills) AS total_kills
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id
+GROUP BY s.squad_name
+ORDER BY total_kills DESC;
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>squad_name</th>
+            <th>total_kills</th>
+        </tr>
+
+        <tr>
+            <td>Team Liquid</td>
+            <td>28</td>
+        </tr>
+
+        <tr>
+            <td>Natus Vincere</td>
+            <td>16</td>
+        </tr>
+
+    </table>
+
+    <p>
+        The query joins the two tables first, then groups the combined result by squad,
+        then sums kills per group, then orders by total.
+        This is the execution order you studied in the SQL execution flow chapter.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show players from the EU region only.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT p.username, s.squad_name, s.region
+FROM players p
+INNER JOIN squads s ON p.squad_id = s.squad_id
+WHERE s.region = 'EU';
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+            <th>region</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+            <td>EU</td>
+        </tr>
+
+    </table>
+
+    <p>
+        The WHERE filter runs after the JOIN. The combined table is built first, then filtered.
+    </p>
+
+    <p>
+        <strong>Note:</strong> Joining more than two tables is possible — just chain additional
+        JOIN clauses. Each one links the new table to the running result using a shared column.
+    </p>
+
+    <p>
+        Previous: Joins contd
+        <a href="./8-joins2.html">&lt;&lt;</a>
+    </p> 
+    
+    <p>
+        Next: Subqueries
+        <a href="./9-subqueries.html">&gt;&gt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>
+
+</html>

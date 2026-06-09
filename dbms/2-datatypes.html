@@ -19,7 +19,8 @@
         Without type enforcement, nothing stops someone from inserting "hello" into a salary
         column, or "abc" into a player ID. Each column is assigned a datatype, and the DBMS
         rejects any value that doesn't match. This is called a <strong>domain constraint</strong>,
-        and it is the first line of defence for the integrity problems we saw earlier.
+        and it is the first line of defence for the integrity problems we saw earlier in <a
+            href="1-data-integrity.html">intro</a>.
     </p>
 
     <p>
@@ -73,6 +74,12 @@
         </tr>
 
         <tr>
+            <td>JSON</td>
+            <td>Structured JSON documents</td>
+            <td>{"player":"Alice","score":42}</td>
+        </tr>
+
+        <tr>
             <td>BOOLEAN</td>
             <td>Stores true or false</td>
             <td>true</td>
@@ -89,7 +96,10 @@
     <p>
         <strong>Note:</strong> FLOAT stores numbers as approximate binary floating point, so two
         values that look equal may not compare as equal. For money, rates, or anything you compare
-        or sum exactly, use <strong>DECIMAL</strong> (also called NUMERIC) instead. BOOLEAN is
+        or sum exactly, use <strong>DECIMAL</strong> (also called NUMERIC) instead.
+    </p>
+    <p>
+        BOOLEAN is
         worth one caveat too: PostgreSQL has a true boolean type, while MySQL stores it as
         TINYINT(1) under the hood.
     </p>
@@ -181,9 +191,17 @@ player_id <span style="color:#0099ff;">SERIAL</span> <span style="color:#0099ff;
 
     <p>
         <strong>Note:</strong> SERIAL isn't a real stored type — it's shorthand that creates an
-        integer column backed by an auto-incrementing sequence. Also, both MySQL and PostgreSQL
+        integer column backed by an auto-incrementing sequence.
+    </p>
+    <p>
+        Also, both MySQL and PostgreSQL
         have a JSON type; only PostgreSQL adds the binary <strong>JSONB</strong> variant, which is
         faster to query.
+    </p>
+
+    <p>
+        Now, we have our database created and we know what kind of data we want to store, we can create tables to hold
+        that data.
     </p>
 
     <p>

@@ -17,12 +17,13 @@
     <p>
         <strong>What exactly is a DBMS?</strong><br>
         A Database Management System (DBMS) is dedicated software for managing databases.
-        <br><br>
+        <br>
         As mentioned previously, the conceptual evolution from structs to tables
-        was natural and was brought forward by the popular relational model in 1970s.
-
+        was natural. It was brought forward by the popular relational model in 1970s.
+    </p>
+    <p>
         What is relational model?
-        <br>It's a model that represents data as relations (tables), with a mathematical foundation (set theory,
+        <br>It's a model that represents data as relations (tables), on a mathematical foundation (set theory,
         predicate logic) that lets you query declaratively.
     </p>
 
@@ -102,16 +103,29 @@
     </p>
 
     <p>
-        An <strong>Relational Database Management System (RDBMS)</strong>
-        manages relational databases.
+        However, in today's times, relational databases are synonymous with structured databases.
+        Databases which can only store structured data are called relational databases, and databases that can store
+        both structured and unstructured data are called <strong>Non-Relational Databases</strong>.
     </p>
 
     <p>
-        The most common language used to interact with an RDBMS is:
+        Popuplar non-relational DBMS include:
+    <ul>
+        <li>MongoDB</li>
+        <li>Cassandra</li>
+        <li>Redis</li>
+    </ul>
+    They are often used for big data and real-time chat applications. We shall cover them in a future article.
+    </p>
+    <hr>
+    <p>
+        A <strong>Relational Database Management System (RDBMS)</strong>
+        manages relational databases.<br>The most common language used to interact with an RDBMS is:
         <strong>SQL (Structured Query Language)</strong>.
     </p>
 
-    <p>Popular SQL DBMS:</p>
+    <p>
+        Popular SQL DBMS:
 
     <ul>
         <li>MySQL: open-source by Oracle, fast and scalable</li>
@@ -119,12 +133,16 @@
         <li>SQLite: used in small projects</li>
     </ul>
 
+    </p>
+
     <p>
-        Please install MySQL locally using this <a href="mysql-installation.html">article</a>, and PostgreSQL using
+        Please install MySQL locally following <a href="mysql-installation.html">this</a>, and PostgreSQL using
         <a href="postgres-installation.html">this</a>. Everyone has a preference on GUI vs Terminal based choice of
-        interface with DBMS, you can pick either.
-        <br>
+        interface with DBMS, you can pick either. I will pick terminal-based as I'm biased towards it.
+    </p>
+    <p>
         GUI examples: MySQL Workbench, PostgreSQL PgAdmin.
+        <img src="./assets/gui.png" />
     </p>
 
     <p>
@@ -137,7 +155,7 @@
         <a href="./1-summary.html">&lt;&lt;</a>
     </p>
 
-   <script src="../footer.js"></script>
+    <script src="../footer.js"></script>
     <script src="./assets/home.js"></script>
 </body>
 

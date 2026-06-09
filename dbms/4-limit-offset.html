@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+    <h3>LIMIT</h3>
+
+    <p>
+        LIMIT restricts the number of rows returned.
+        Problem: A players table in production might have 5 million rows. SELECT * FROM players would return all 5
+        million. That crashes slow clients, wastes bandwidth, and locks the database longer.
+        <br>Solution: LIMIT returns only the first N rows. This is also used for pagination.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <pre>
+<code>
+<p>MySQL / PostgreSQL</p>
+<span style="color:#0099ff;">SELECT</span> *
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">LIMIT</span> 2;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+    </table>
+    <p>
+        <strong>Note:</strong> LIMIT without ORDER BY returns arbitrary rows.
+    </p>
+
+<hr>
+
+    <h3>OFFSET</h3>
+
+    <p>
+        OFFSET skips a number of rows before LIMIT starts counting.
+        Problem: LIMIT alone always returns the first N rows — but to show page 2, page 3, and so
+        on, you need to skip the rows already shown.
+        <br>Solution: OFFSET skips the first M rows and LIMIT takes the next N. Together they
+        paginate: page 1 is LIMIT 2 OFFSET 0, page 2 is LIMIT 2 OFFSET 2, and so on.
+    </p>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SELECT</span> *
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>
+<span style="color:#0099ff;">LIMIT</span> 2 <span style="color:#0099ff;">OFFSET</span> 1;
+</code>
+</pre>
+
+    <p>Output:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <p>
+        OFFSET 1 skips TenZ; LIMIT 2 then returns the next two rows.
+    </p>
+
+    <p>
+        <strong>Note:</strong> OFFSET only makes sense with ORDER BY — without a fixed order,
+        "skip the first one" has no defined meaning.
+    </p>
+
+    <p>
+        <strong>Note:</strong> A large OFFSET is slow: the database still reads and discards every
+        skipped row, so OFFSET 1000000 scans a million rows just to throw them away. For deep
+        pagination, keyset pagination (WHERE score &lt; last_seen_score ... LIMIT N) is faster.
+    </p>
+
+    <p>
+        Prev, DQL. <a href="./4-dql-select-where-orderby-limit.html">&lt;&lt;</a>
+    </p>
+
+    <p>
+        Next, we're going through common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&gt;&gt;</a>
+    </p>
+
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+</body>

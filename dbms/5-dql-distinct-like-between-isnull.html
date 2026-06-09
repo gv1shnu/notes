@@ -82,10 +82,9 @@
         "Immortal" twice. DISTINCT collapses duplicates so you get each value once.
     </p>
 
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT DISTINCT</span> level
 <span style="color:#0099ff;">FROM</span> players;
 </code>
@@ -127,6 +126,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> username <span style="color:#0099ff;">LIKE</span> 'a%';
@@ -158,14 +158,17 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, region
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE region = 'NA' OR region = 'BR' OR region = 'EU'</span>;
 </code>
 </pre>
+
     <p>We can write a much cleaner code using the IN operator.</p>
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, region
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> region <span style="color:#0099ff;">IN</span> ('NA', 'BR', 'EU');
@@ -213,16 +216,19 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score >= 600 AND score &lt;= 850;
 </code>
 </pre>
+
     <p>
         Similar to what we did above, we can write a much readable code using the BETWEEN operator.
     </p>
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score <span style="color:#0099ff;">BETWEEN</span> 600 <span style="color:#0099ff;">AND</span> 850;
@@ -266,17 +272,19 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score = NULL;
 </code>
 </pre>
+
     <p>NULL = NULL is not TRUE in SQL — it's NULL. NULL is not equal to anything, not even itself. So = NULL will never
         match any row. You must use IS NULL.</p>
 
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> score <span style="color:#0099ff;">IS NULL</span>;
