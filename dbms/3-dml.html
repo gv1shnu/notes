@@ -31,10 +31,9 @@
         You can't write directly to the storage file/database.
     </p>
 
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">INSERT INTO</span> players
 <span style="color:#0099ff;">VALUES</span> (1, 'TenZ', 'Radiant', 842);
 </code>
@@ -71,10 +70,9 @@
         However, UPDATE is atomic and less verbose.
     </p>
 
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">UPDATE</span> players
 <span style="color:#0099ff;">SET</span> score = 900
 <span style="color:#0099ff;">WHERE</span> player_id = 1;
@@ -114,10 +112,9 @@
         DELETE removes one or more rows.
     </p>
 
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">DELETE FROM</span> players
 <span style="color:#0099ff;">WHERE</span> player_id = 1;
 </code>
@@ -136,6 +133,17 @@
 
     </table>
 
+    <table>
+        <tr>
+            <td>
+                <img src="./assets/mysql_dml.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_dml.png" />
+            </td>
+        </tr>
+    </table>
+
     <p>
         <strong>Note:</strong><br>
         Running DELETE without WHERE removes all rows from the table.
@@ -148,7 +156,7 @@
 </pre>
 
     <p>
-        Next, DQL <a href="./4-dql-select-where-orderby-limit.html">&gt;&gt;</a>
+        Next, DQL <a href="./4-dql-select-where-orderby.html">&gt;&gt;</a>
     </p>
 
     <p>

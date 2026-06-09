@@ -64,6 +64,7 @@
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, level
 <span style="color:#0099ff;">FROM</span> players;
 </code>
@@ -138,12 +139,9 @@
 
     </table>
 
-    <br>
-
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> *
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">WHERE</span> level = 'Radiant';
@@ -205,12 +203,9 @@
 
     </table>
 
-    <br>
-
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> *
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">ORDER BY</span> score DESC;
@@ -245,80 +240,11 @@
 
     <hr>
 
-    <h3>LIMIT</h3>
-
-    <p>
-        LIMIT restricts the number of rows returned.
-        Problem: A players table in production might have 5 million rows. SELECT * FROM players would return all 5
-        million. That crashes slow clients, wastes bandwidth, and locks the database longer.
-        <br>Solution: LIMIT returns only the first N rows. This is also used for pagination.
-    </p>
-
-    <p>Current table:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>username</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>402</td>
-        </tr>
-
-    </table>
-
-    <br>
-
-    <p>MySQL / PostgreSQL</p>
-
-    <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> *
-<span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">LIMIT</span> 2;
-</code>
-</pre>
-
-    <p>Output:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>username</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-    </table>
-    <p>
-        <strong>Note:</strong> LIMIT without ORDER BY returns arbitrary rows.
-    </p>
+    
     <p>We covered the basic CRUD operations using SQL till now.</p>
 
     <p>
-        Next, we're going through common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&gt;&gt;</a>
+        Next, Limit and Offset. <a href="./4-limit-offset.html">&gt;&gt;</a>
     </p>
 
     <p>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="./assets/style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+<body>
+    <h3>INNER JOIN</h3>
+
+    <p>
+        Returns only the rows where there is a match in <strong>both</strong> tables.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show each player's username and their squad name.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+INNER JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Notice: FaZe_suk is <strong>missing</strong>. His squad_id is NULL — there's no match in squads.
+        INNER JOIN discards any row that doesn't have a match on both sides.
+        <br><br>
+        Gen.G is also missing. It exists in squads, but has no matching players. Same reason.
+    </p>
+
+    <h3>LEFT JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from the left table</strong>, plus matching rows from the right table.
+        If there's no match on the right side, the result shows NULL for those columns.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all players, even those without a squad.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+LEFT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>FaZe_suk</td>
+            <td>NULL</td>
+        </tr>
+
+    </table>
+
+    <p>
+        FaZe_suk appears now — with NULL for squad_name because he has no squad.
+        The left table is <strong>players</strong>. Every player is preserved.
+        <br><br>
+        Gen.G is still missing. The right table (squads) is not fully preserved in a LEFT JOIN.
+    </p>
+
+    <h3>RIGHT JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from the right table</strong>, plus matching rows from the left table.
+        If there's no match on the left side, the result shows NULL for those columns.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all squads, even those with no players registered yet.
+    </p>
+
+
+    <pre>
+<code>
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+RIGHT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>NULL</td>
+            <td>Gen.G</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Gen.G now appears — with NULL for username because no players are linked to them yet.
+        The right table is <strong>squads</strong>. Every squad is preserved.
+        <br><br>
+        FaZe_suk is gone again. He exists in the left table (players) with no match in squads.
+        RIGHT JOIN does not preserve the left table.
+    </p>
+    <p>
+        <strong>Note</strong>: Usually developers don't use right join often, and just switch the tables and use left join as usual. 
+        Right join was added to the features of SQL for the sake of completeness.
+    </p>
+
+    <h3>FULL OUTER JOIN</h3>
+
+    <p>
+        Returns <strong>all rows from both tables</strong>.
+        Where there's no match, NULL fills the gap on whichever side is missing.
+    </p>
+
+    <p>
+        <strong>Question:</strong> Show all players and all squads — matched where possible,
+        NULL where not.
+    </p>
+
+
+    <pre>
+<code>
+MySQL — not supported natively. Simulate with UNION:
+
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+LEFT JOIN squads ON players.squad_id = squads.squad_id
+
+UNION
+
+SELECT players.username, squads.squad_name
+FROM players
+RIGHT JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <pre>
+<code>
+PostgreSQL
+
+<span style="color:violet;">
+SELECT players.username, squads.squad_name
+FROM players
+FULL OUTER JOIN squads ON players.squad_id = squads.squad_id;
+</span>
+</code>
+</pre>
+
+    <p>Result:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>squad_name</th>
+        </tr>
+
+        <tr>
+            <td>Clocky</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Grongat</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Mitr0</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Ubah</td>
+            <td>Team Liquid</td>
+        </tr>
+
+        <tr>
+            <td>Pio</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>Esportsnation</td>
+            <td>Natus Vincere</td>
+        </tr>
+
+        <tr>
+            <td>FaZe_suk</td>
+            <td>NULL</td>
+        </tr>
+
+        <tr>
+            <td>NULL</td>
+            <td>Gen.G</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Everyone appears. FaZe_suk (no squad) and Gen.G (no players) both show up with NULL on the missing side.
+    </p>
+
+    <p>
+        FULL OUTER JOIN is the most inclusive join type. It preserves all rows from both tables, matching where possible and filling in NULLs where not.
+        It's less commonly used than INNER or LEFT JOIN, but can be useful for certain types of analysis.
+    </p>
+
+    <p>
+        Next: Joins contd.
+        <a href="./8-joins3.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Joins intro
+        <a href="./8-joins.html">&lt;&lt;</a>
+    </p> 
+
+    <script src="../footer.js"></script>
+    <script src="./assets/home.js"></script>
+    
+</body>
+</html>

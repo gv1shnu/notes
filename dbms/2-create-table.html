@@ -13,18 +13,17 @@
 </head>
 
 <body>
-    <h3>How do we create a table?</h3>
+    <p>We know relational database is organized using tables.</p>
+    <h2>How do we create a table?</h2>
 
     <p>
-        A table stores related data in rows and columns.
+        A table stores related (aka relevant) data in rows and columns.
     </p>
-
-    <em>Standard version</em>
-    <p>MySQL / PostgreSQL</p>
-
 
     <pre>
 <code>
+<p>Standard version</p>
+<em>MySQL / PostgreSQL</em>
 <span style="color:violet;">
 CREATE TABLE players (
     player_id INT,
@@ -36,12 +35,10 @@ CREATE TABLE players (
 </code>
 </pre>
 
-    <em>Best Practice</em>
-    <p>MySQL / PostgreSQL</p>
-
-
     <pre>
 <code>
+<p>Best Practice using Constraints</p>
+<em>MySQL / PostgreSQL</em>
 <span style="color:violet;">
 CREATE TABLE players (
     player_id INT PRIMARY KEY,   -- no duplicates
@@ -53,9 +50,11 @@ CREATE TABLE players (
 </code>
 </pre>
 
-
+    <em>Constraints and actions when they are violated, will be discussed <a
+            href="./11-constraints-and-actions.html">later</a>.</em>
     <p>
         This creates a table named <strong>players</strong>.
+        And the header of the table (ref below), along with its datatypes and constraints is called the <strong>schema</strong> of the table.
     </p>
 
     <table border="1" cellpadding="10">
@@ -68,21 +67,19 @@ CREATE TABLE players (
         </tr>
 
         <tr>
-            <td>1</td>
-            <td>TenZ</td>
-            <td>Radiant</td>
-            <td>842</td>
+            <td>INT</td>
+            <td>VARCHAR(30)</td>
+            <td>VARCHAR(20)</td>
+            <td>INT</td>
         </tr>
 
     </table>
 
     <h3>List the tables present in the selected database</h3>
 
-
     <pre>
 <code>
 MySQL
-
 <span style="color:lightgreen;">
 SHOW TABLES;
 </span>
@@ -92,21 +89,28 @@ SHOW TABLES;
     <pre>
 <code>
 PostgreSQL
-
 <span style="color:lightgreen;">
 \dt
 </span>
 </code>
 </pre>
 
+<table>
+    <tr>
+        <td>
+            <img src="./assets/mysql_createtable.png" />
+        </td>
+        <td>
+            <img src="./assets/postgre_createtable.png" />
+        </td>
+    </tr>
+</table>
 
     <h3>Show description of a table</h3>
 
-
-    <pre>
+<pre>
 <code>
 MySQL
-
 <span style="color:lightgreen;">
 DESCRIBE players;
 </span>
@@ -116,12 +120,24 @@ DESCRIBE players;
     <pre>
 <code>
 PostgreSQL
-
 <span style="color:lightgreen;">
 \d players
 </span>
 </code>
 </pre>
+
+<table>
+    <tr>
+        <td>
+            <img src="./assets/mysql_describe.png" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="./assets/postgre_describe.png" />
+        </td>
+    </tr>
+</table>
 
     <p>Note: ALTER and DROP will be covered after we have data to work with.</p>
 

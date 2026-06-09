@@ -13,75 +13,62 @@
 </head>
 
 <body>
-    <h3>How do we create a database?</h3>
+    <h2>How do we create a database?</h2>
 
     <p>
-        In MySQL, a database can be created directly using the following command:
-    </p>
-    <pre>
-<code>
-MySQL
-
-<span style="color:lightgreen;">
-
-CREATE DATABASE company;
-
-</span>
-</code>
-</pre>
-
-    <p>
-        PostgreSQL also allows a superuser to create a database directly:
+        In both MySQL and PostgreSQL, a database can be created directly using the following command:
     </p>
 
     <pre>
 <code>
-PostgreSQL (Superuser)
-
+MySQL / PostgreSQL
 <span style="color:lightgreen;">
-
 CREATE DATABASE company;
 </span>
 </code>
 </pre>
 
     <p>
-        In larger systems, it is common to create a dedicated user who will own and manage the database instead of using
-        the superuser account for day-to-day operations.
+        <strong>Note: </strong>PostgreSQL also allows a superuser to create a database directly without specifying an
+        owner, in which case the superuser will be the default owner of the database, using the above command.
+    </p>
+    <p>However, in larger systems, it is common to create a dedicated user who will own and manage the database
+        instead, using the following commands:
     </p>
 
     <pre>
 <code>
 PostgreSQL
-
 <span style="color:lightgreen;">
-
 CREATE USER rambo
-
 WITH PASSWORD 'jumbo';
-
 </span>
 </code>
 </pre>
 
+    <pre>
+<code>
+PostgreSQL
+<span style="color:lightgreen;">
+CREATE DATABASE company
+WITH OWNER rambo;
+</span>
+</code>
+</pre>
 
     <pre>
 <code>
+Prompt
+    <span style="color:lightblue;">
 
-PostgreSQL
-<span style="color:lightgreen;">
-
-CREATE DATABASE company
-
-WITH OWNER rambo;
-
+Postgre command for creating a new database named 'company' <br>and assign ownership to user 'rambo'.
 </span>
 </code>
 </pre>
 
     <p>
         The database owner is responsible for managing objects inside the database and can grant access to other users
-        when required.
+        when required (DCL), will be covered in detail later.
     </p>
     <p>
         <strong>Note:</strong>
@@ -90,13 +77,11 @@ WITH OWNER rambo;
         production environments.
     </p>
 
-
     <h3>List the databases</h3>
 
     <pre>
 <code>
 MySQL
-
 <span style="color:lightgreen;">
 SHOW DATABASES;
 </span>
@@ -106,12 +91,26 @@ SHOW DATABASES;
     <pre>
 <code>
 PostgreSQL
-
 <span style="color:lightgreen;">
 \l
 </span>
 </code>
 </pre>
+
+    <table>
+        <tr>
+            <td>
+                <img src="./assets/mysql_createdb.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_createdb.png" />
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>Note: </strong>PostgreSQL prints DDL and DML log messages in the terminal, unlike MySQL.
+    </p>
 
     <p>
         <strong style="color: red;"> Important</strong>: PostgreSQL shorthand commands such as <code>\l</code>,
@@ -120,6 +119,8 @@ PostgreSQL
         client (<code>psql</code>). They are not part of standard SQL and therefore
         cannot be used in graphical tools such as DBeaver, pgAdmin, or other database clients.
     </p>
+
+    <p>There can be many databases, choosing the database to work with is essential to begin with.</p>
 
     <h3>How do we use the database?</h3>
 
@@ -131,7 +132,6 @@ PostgreSQL
     <pre>
 <code>
 MySQL
-
 <span style="color:lightgreen;">
 USE company;
 </span>
@@ -141,14 +141,18 @@ USE company;
     <pre>
 <code>
 PostgreSQL
-
 <span style="color:lightgreen;">
 \c company
 </span>
 </code>
 </pre>
 
-<p><strong>Note:</strong> PostgreSQL has no USE statement.</p>
+    <p><strong>Note:</strong> PostgreSQL has no USE statement.</p>
+
+    <p>
+        Now, that we have created and selected the database, we can start creating tables and inserting data into it.
+        Before that, let's go through the datatypes in SQL first.
+    </p>
 
     <p>
         Next: SQL datatypes
@@ -159,8 +163,9 @@ PostgreSQL
         Previous: Introduction
         <a href="./2-dbms.html">&lt;&lt;</a>
     </p>
-    
+
     <script src="../footer.js"></script>
     <script src="./assets/home.js"></script>
 </body>
+
 </html>
