@@ -8,10 +8,10 @@
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
 
     <title>DBMS Notes - Vishnu Gandarapu</title>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-    <h3>LIMIT</h3>
+    <h2>LIMIT</h2>
 
     <p>
         LIMIT restricts the number of rows returned.
@@ -55,26 +55,19 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>username</th>
-            <th>score</th>
+            <td>
+                <img src="./assets/postgre_limit1.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_limit2.png" />
+            </td>
         </tr>
 
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-    </table>
+    </table>    
+    
     <p>
         <strong>Note:</strong> LIMIT without ORDER BY returns arbitrary rows.
     </p>
@@ -91,36 +84,10 @@
         paginate: page 1 is LIMIT 2 OFFSET 0, page 2 is LIMIT 2 OFFSET 2, and so on.
     </p>
 
-    <p>Current table:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>username</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>402</td>
-        </tr>
-
-    </table>
-
-    <p>MySQL / PostgreSQL</p>
 
     <pre>
 <code>
+<p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> *
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>
@@ -128,26 +95,16 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>username</th>
-            <th>score</th>
+            <td>
+                <img src="./assets/postgre_offset.png" />
+            </td>
         </tr>
 
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>402</td>
-        </tr>
-
-    </table>
+    </table>    
+    
 
     <p>
         OFFSET 1 skips TenZ; LIMIT 2 then returns the next two rows.
@@ -165,7 +122,7 @@
     </p>
 
     <p>
-        Prev, DQL. <a href="./4-dql-select-where-orderby-limit.html">&lt;&lt;</a>
+        Prev, DQL. <a href="./4-dql-select-where-orderby.html">&lt;&lt;</a>
     </p>
 
     <p>
@@ -174,5 +131,5 @@
 
 
     <script src="../footer.js"></script>
-    <script src="./assets/home.js"></script>
+    <script src="../home.js"></script>
 </body>

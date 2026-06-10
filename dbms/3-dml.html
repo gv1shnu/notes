@@ -10,7 +10,7 @@
 
     <!-- Page title shown in browser tab -->
     <title>DBMS Notes - Vishnu Gandarapu</title>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
@@ -65,8 +65,8 @@
 
     <p>
         UPDATE modifies existing rows.
-        You could always remove the existing row and add the updated row as a separate (That's what Postgre's internal
-        systems do).
+        You could always remove the existing row and add the updated row as a separate 
+        (That's what Postgre's internal systems do).
         However, UPDATE is atomic and less verbose.
     </p>
 
@@ -76,6 +76,15 @@
 <span style="color:#0099ff;">UPDATE</span> players
 <span style="color:#0099ff;">SET</span> score = 900
 <span style="color:#0099ff;">WHERE</span> player_id = 1;
+</code>
+</pre>
+
+  <pre>
+<code>
+Prompt
+    <span style="color:lightblue;">
+Update the score of player_id 1 to 900 in the players table.
+</span>
 </code>
 </pre>
 
@@ -120,6 +129,15 @@
 </code>
 </pre>
 
+ <pre>
+<code>
+Prompt
+    <span style="color:lightblue;">
+Delete the player with player_id 1 from the players table.
+</span>
+</code>
+</pre>
+
     <p>After deletion:</p>
 
     <table border="1" cellpadding="10">
@@ -146,7 +164,8 @@
 
     <p>
         <strong>Note:</strong><br>
-        Running DELETE without WHERE removes all rows from the table.
+        Running DELETE without WHERE clause removes all rows from the table, 
+        similar to TRUNCATE, to be discussed <a href="./10-ddl-alter-drop.html">later</a>.
     </p>
 
     <pre>
@@ -154,6 +173,15 @@
 <span style="color:#0099ff;">DELETE FROM</span> players;
 </code>
 </pre>
+
+<table border="1" cellpadding="10">
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>level</th>
+            <th>score</th>
+        </tr>
+</table>
 
     <p>
         Next, DQL <a href="./4-dql-select-where-orderby.html">&gt;&gt;</a>
@@ -164,7 +192,7 @@
     </p>
 
     <script src="../footer.js"></script>
-    <script src="./assets/home.js"></script>
+    <script src="../home.js"></script>
 </body>
 
 </html>

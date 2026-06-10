@@ -8,7 +8,7 @@
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
 
     <title>DBMS Notes - Vishnu Gandarapu</title>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
@@ -16,11 +16,19 @@
 
     <p>
         Aggregate functions perform calculations on multiple rows.
-        You can always fetch the complete data and write custom aggregate functions on that data.
+        You could always fetch the complete data and write custom aggregate functions on that data.
         However, there are two problems that come with it.
-        1. Fetching complete wastes bandwidth and slows the application.
-        2. Writing custom aggregation function needs manual validation according to the schema.
-        Solution: Let the DBMS do the computation close to the data, return one number instead of a million rows.
+    <ol>
+        <li>
+            Fetching all rows wastes bandwidth and slows the application.
+        </li>
+        <li>
+            Writing custom aggregation function needs manual validation according to the schema.
+        </li>
+    </ol>
+    <strong>Solution</strong>: Let the DBMS do the computation close to the data, return one number instead of a million
+    rows.
+
     </p>
 
     <table border="1" cellpadding="10">
@@ -52,12 +60,10 @@
 
         <tr>
             <td>SUM()</td>
-            <td>Total value</td>
+            <td>Total sum</td>
         </tr>
 
     </table>
-
-    <br>
 
     <p>Current table:</p>
 
@@ -93,67 +99,40 @@
 <code>
 <p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> AVG(score)
-<span style="color:#0099ff;">AS</span> average_rr
+<span style="color:#0099ff;">AS</span> avg_score
 <span style="color:#0099ff;">FROM</span> players;
 </code>
 </pre>
 
     <p>
-        AS renames the output column.
+        AS renames the output column. It's optional, but it makes the output more readable.<br>
+        Use ROUND() to round the output to a specific number of decimal places. 
+        By default, it rounds to the nearest integer.
     </p>
-
-    <p>Output:</p>
 
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>average_rr</th>
+            <td>
+                <img src="./assets/avg_wo_round.png" />
+            </td>
+            <td>
+                <img src="./assets/avg_rounded.png" />
+            </td>
         </tr>
 
-        <tr>
-            <td>747.67</td>
-        </tr>
+    </table> 
 
-    </table>
+    
     <h3>GROUP BY</h3>
 
     <p>
         GROUP BY creates groups of similar rows.
     </p>
 
-    <p>Current table:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>username</th>
-            <th>level</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>Radiant</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>Immortal</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>Radiant</td>
-            <td>790</td>
-        </tr>
-
-    </table>
-
-    <br>
     <p>
-        AVG(score) gives you one average across all players. But what if you want the average per level? You'd have to run a
+        AVG(score) gives you one average across all players. But what if you want the average per level? You'd have to
+        run a
         separate query for each level. With 10 ranks that's 10 queries. With 100 ranks, 100 queries.
         GROUP BY solves this: one query, one result per group.
     </p>
@@ -168,26 +147,15 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>level</th>
-            <th>total_players</th>
+            <td>
+                <img src="./assets/groupby.png" />
+            </td>
         </tr>
 
-        <tr>
-            <td>Radiant</td>
-            <td>2</td>
-        </tr>
-
-        <tr>
-            <td>Immortal</td>
-            <td>1</td>
-        </tr>
-
-    </table>
+    </table> 
 
     <hr>
 
@@ -229,26 +197,44 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>level</th>
-            <th>total_players</th>
+            <td>
+                <img src="./assets/having.png" />
+            </td>
         </tr>
 
-        <tr>
-            <td>Radiant</td>
-            <td>2</td>
-        </tr>
+    </table> 
 
-    </table>
 
     <p>
         WHERE filters rows before grouping.<br>
         HAVING filters groups after grouping.
     </p>
+
+    <p>
+        Why do we need to write these clauses in this particular order, when it doesn't make sense compared to what we have learned in previous programming languuages.
+        Couple of annoying examples:
+        <table>
+            <tr>
+                <td>
+                    <img src="./assets/wrongflowex1.png" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="./assets/wrongflowex2.png" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="./assets/wrongflowex3.png" />
+                </td>
+            </tr>
+        </table>
+    </p>
+
     <p>
         This may feel unusual if you're coming from languages like C, C++, Java, or Python, where statements typically
         execute from top to bottom.
@@ -266,7 +252,7 @@
     </p>
 
     <script src="../footer.js"></script>
-    <script src="./assets/home.js"></script>
+    <script src="../home.js"></script>
 </body>
 
 </html>

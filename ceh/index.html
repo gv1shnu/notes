@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
-
+    <link rel="stylesheet" href="../style.css">
     <title>CEH Notes - Vishnu Gandarapu</title>
 </head>
 
@@ -27,32 +27,29 @@
         However, if you disclose the discovery to malicious third party or act maliciously (black-hat) using the
         obtained information, you're eligible to be in jail.
 
-        White-hats turning on their employer for personal vendetta are called grey-hats. These guys are worse than
-        black-hats, atleast
-        they're honest.
+        Between those two extremes sit the grey-hats: they hack without permission — which is still illegal — but without
+        a black-hat's malice, often disclosing the flaw afterwards (sometimes only after asking for a fee). Good
+        intentions don't make unauthorised access legal, and that's what keeps them grey rather than white.
     </p>
+
     <p>
-        On the other hand, large organisations often operate this process of pentesting and defence using various
-        teams.<br>
-        Types of teams:
+        On the other hand, large organisations often operate this process of pentesting and defence using various teams.
+    </p>
+
+    <p>Types of teams:</p>
+
     <ul>
-        <li>
-            Red team - offense. Team responsible for finding holes and reporting to Blue team.
-        </li>
-        <li>
-            Blue team - defence. Team responsible for fixing these holes as reported by Red team.
-        </li>
-        <li>
-            Purple team - all rounders/hybrid. Team responsible assisting both teams for immediate fixes.
-        </li>
+        <li>Red team - offense. Team responsible for finding holes and reporting to Blue team.</li>
+        <li>Blue team - defence. Team responsible for fixing these holes as reported by Red team.</li>
+        <li>Purple team - all rounders/hybrid. Team responsible for assisting both teams for immediate fixes.</li>
     </ul>
-    </p>
-    <p>
-        Types of participants:
+
+    <p>Types of participants:</p>
+
     <ul>
         <li>
-            Black hats - Criminals. E.g., Kevin Mitnick.<br>
-            Common activities
+            Black hats - Criminals. E.g., Kevin Mitnick.
+            <br>Common activities
             <ul>
                 <li>Ransomware</li>
                 <li>Phishing</li>
@@ -62,29 +59,54 @@
             </ul>
         </li>
         <li>White hats - Professionals. E.g., Bug hunters, Red team, Consultant.</li>
-        <li>Grey hats - White hats turned Black. E.g., Disgruntled employee, Mercenaries.</li>
-        <li>State-Sponsored / APT Groups. E.g. Lazarus Group.</li>
-        Common activities
-        <ul>
-            <li>Disruption of enemy's national infrastructure</li>
-            <li>Spying, and Surveillance</li>
-            <li>Selling stolen databases</li>
-        </ul>
+        <li>
+            Grey hats - Hack without authorisation but without malicious intent, and usually disclose what they find
+            afterwards (sometimes for a fee). E.g., an uninvited bug-finder who reports the hole later. (A disgruntled
+            employee acting maliciously isn't a grey-hat — that's a black-hat insider by another name.)
+        </li>
+        <li>
+            State-Sponsored / APT Groups. E.g. Lazarus Group.
+            <br>Common activities
+            <ul>
+                <li>Disruption of enemy's national infrastructure</li>
+                <li>Spying, and Surveillance</li>
+                <li>Selling stolen databases</li>
+            </ul>
+        </li>
         <li>Red hats - Vigilantes.</li>
-        <li>Hackitivists - Individuals bent on exposing scandals and thwarting dictatorship. E.g., Anonymous. </li>
-        Common activities
-        <ul>
-            <li>
-                DDoS attacks </li>
-            <li>Leaks</li>
-            <li>Protest campaigns</li>
-        </ul>
-        <li>Script Kiddie / Green hat - Beginners/ Amatuers - Us.</li>
+        <li>
+            Hacktivists - Individuals bent on exposing scandals and thwarting dictatorship. E.g., Anonymous.
+            <br>Common activities
+            <ul>
+                <li>DDoS attacks</li>
+                <li>Leaks</li>
+                <li>Protest campaigns</li>
+            </ul>
+        </li>
+        <li>Script Kiddie / Green hat - Beginners / Amateurs - Us.</li>
     </ul>
-    </p>
+
     <p>
-        Next <a href="./recon.html">>></a>
+        Adding to the above, there are 3 types of penetration testing (pentesting) — classified not by the hacker's
+        intent but by how much the tester is told up front:
     </p>
+
+    <ul>
+        <li>White-box - the tester gets full internal knowledge: source code, architecture, credentials.</li>
+        <li>Black-box - the tester is given nothing, simulating an outside attacker working from scratch.</li>
+        <li>Grey-box - the tester gets partial knowledge, e.g., a normal user account, simulating a logged-in user or an insider.</li>
+    </ul>
+
+    <p>
+        <strong>Note:</strong> these are "box", not "hat". A hat describes the hacker's intent and legality; a box
+        describes how much the tester knows going in. Mixing the two up is a common slip.
+    </p>
+
+    <p>
+        Next <a href="./recon.html">&gt;&gt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
 </body>
 
 </html>

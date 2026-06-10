@@ -8,7 +8,7 @@
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
 
     <title>DBMS Notes - Vishnu Gandarapu</title>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
@@ -58,10 +58,6 @@
 
     </table>
 
-    <br>
-
-    <p>MySQL / PostgreSQL</p>
-
     <pre>
 <code>
 <p>MySQL / PostgreSQL</p>
@@ -70,33 +66,26 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>username</th>
-            <th>level</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>Radiant</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>Immortal</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>Ascendant</td>
+            <td>
+                <img src="./assets/mysql_select.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_select.png" />
+            </td>
         </tr>
 
     </table>
-    <p>Note: SELECT * returns everything, which is wasteful on large tables and couples your query to the table's
-        structure. </p>
+
+    <p>
+        If you want to select all columns, you can use SELECT *. <br>
+    
+        Note: SELECT * returns everything, which is wasteful on large tables and couples your query to the table's
+        structure, preferred to be used only during development and debugging. 
+        In production, it's better to specify the columns you need.
+    </p>
     <hr>
 
     <h3>WHERE</h3>
@@ -104,40 +93,6 @@
     <p>
         WHERE filters rows.
     </p>
-
-    <p>Current table:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>player_id</th>
-            <th>username</th>
-            <th>level</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>1</td>
-            <td>TenZ</td>
-            <td>Radiant</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>2</td>
-            <td>aspas</td>
-            <td>Immortal</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>3</td>
-            <td>yay</td>
-            <td>Ascendant</td>
-            <td>402</td>
-        </tr>
-
-    </table>
 
     <pre>
 <code>
@@ -148,22 +103,15 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>player_id</th>
-            <th>username</th>
-            <th>level</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>1</td>
-            <td>TenZ</td>
-            <td>Radiant</td>
-            <td>842</td>
+            <td>
+                <img src="./assets/mysql_where.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_where.png" />
+            </td>
         </tr>
 
     </table>
@@ -177,32 +125,6 @@
         ASC = ascending order.
     </p>
 
-    <p>Current table:</p>
-
-    <table border="1" cellpadding="10">
-
-        <tr>
-            <th>username</th>
-            <th>score</th>
-        </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>402</td>
-        </tr>
-
-    </table>
-
     <pre>
 <code>
 <p>MySQL / PostgreSQL</p>
@@ -212,28 +134,23 @@
 </code>
 </pre>
 
-    <p>Output:</p>
-
     <table border="1" cellpadding="10">
 
         <tr>
-            <th>username</th>
-            <th>score</th>
+            <td>
+                <img src="./assets/mysql_orderby1.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_orderby1.png" />
+            </td>
         </tr>
-
-        <tr>
-            <td>TenZ</td>
-            <td>842</td>
-        </tr>
-
-        <tr>
-            <td>aspas</td>
-            <td>611</td>
-        </tr>
-
-        <tr>
-            <td>yay</td>
-            <td>402</td>
+         <tr>
+            <td>
+                <img src="./assets/mysql_orderby2.png" />
+            </td>
+            <td>
+                <img src="./assets/postgre_orderby2.png" />
+            </td>
         </tr>
 
     </table>
@@ -252,7 +169,7 @@
     </p>
 
     <script src="../footer.js"></script>
-    <script src="./assets/home.js"></script>
+    <script src="../home.js"></script>
 </body>
 
 </html>

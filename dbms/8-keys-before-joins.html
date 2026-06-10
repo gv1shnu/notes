@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <link rel="stylesheet" href="../style.css">
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+</head>
+
+<body>
+    <p>
+        Before we move to dealing with multiple tables, we need to understand
+        the concept of <strong>keys</strong>,
+        which was briefly mentioned <a href="2-dbms.html">before</a>.
+    </p>
+
+    <h2>Keys</h2>
+
+    <p>
+        <strong>Problem:</strong> A table is just rows of data, and data repeats. Two players can
+        share a score, a region, even a name. So how do you point at <em>exactly one</em> row —
+        the row you want to update, delete, or link to from another table — and be sure you'll
+        never hit the wrong one?
+    </p>
+
+    <p>
+        <strong>Solution:</strong> A <strong>key</strong> is one or more columns whose value is
+        guaranteed to identify a row uniquely. That guarantee is what UPDATE, DELETE, and
+        especially joins rely on. The seven "types" of keys below are not seven different things —
+        they are seven roles the same idea plays.
+    </p>
+
+    <ol>
+        <li>Super Key</li>
+        <li>Candidate Key</li>
+        <li>Primary Key</li>
+        <li>Unique Key</li>
+        <li>Composite Key</li>
+        <li>Foreign Key</li>
+        <li>Logical Key</li>
+    </ol>
+
+    <p>We'll use this players table throughout.</p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>player_id</th>
+            <th>username</th>
+            <th>region</th>
+            <th>team_id</th>
+            <th>score</th>
+        </tr>
+        <tr><td>1</td><td>TenZ</td><td>NA</td><td>1</td><td>842</td></tr>
+        <tr><td>2</td><td>Zekken</td><td>NA</td><td>1</td><td>788</td></tr>
+        <tr><td>3</td><td>Boaster</td><td>EMEA</td><td>2</td><td>710</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>1. Super Key</h3>
+
+    <p>
+        A super key is any set of columns that identifies a row uniquely. "Any set" is the
+        operative phrase — it is allowed to carry extra, useless columns, as long as the whole set
+        stays unique.
+    </p>
+
+    <p>
+        Since <code>player_id</code> is unique on its own, every one of these is a super key:
+    </p>
+
+    <ul>
+        <li>{ player_id }</li>
+        <li>{ player_id, score }</li>
+        <li>{ player_id, username, region }</li>
+        <li>{ username }  (usernames are unique here too)</li>
+    </ul>
+
+    <p>
+        The middle two work only because <code>player_id</code> is already unique;
+        <code>score</code> and <code>region</code> are dead weight. That dead weight is exactly what
+        the next key removes.
+    </p>
+
+    <hr>
+
+    <h3>2. Candidate Key</h3>
+
+    <p>
+        A candidate key is a super key with nothing to spare — a <em>minimal</em> one. Remove any
+        column and it stops being unique. A table can have several.
+    </p>
+
+    <p>
+        In players, both <code>{ player_id }</code> and <code>{ username }</code> are candidate
+        keys: each is unique, and neither has a column you could drop.
+        <code>{ player_id, score }</code> is <em>not</em> a candidate key — it's a super key, but
+        <code>player_id</code> alone already does the job, so <code>score</code> is spare.
+    </p>
+
+    <p>
+        Candidate keys are the shortlist. From them, you pick one to be the row's official identity.
+    </p>
+
+    <hr>
+
+    <h3>3. Primary Key</h3>
+
+    <p>
+        The primary key is the candidate key you elect as <em>the</em> identifier for the table.
+        There is exactly one, it cannot be NULL, and no two rows may share it.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE TABLE</span> players (
+    player_id INT <span style="color:#0099ff;">PRIMARY KEY</span>,
+    username  VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>
+);
+</code>
+</pre>
+
+    <p>
+        The candidate keys you <em>didn't</em> choose don't disappear — they become
+        <strong>alternate keys</strong>. Here <code>username</code> is an alternate key, still
+        unique, just not the chosen identity. (That's the eighth term people often count
+        separately; it's really just "a candidate key that lost the election.")
+    </p>
+
+    <hr>
+
+    <h3>4. Unique Key</h3>
+
+    <p>
+        A unique key enforces "no duplicates" on a column without making it the primary key. The
+        difference matters:
+    </p>
+
+    <ul>
+        <li>A table has <strong>one</strong> primary key but can have <strong>many</strong> unique keys.</li>
+        <li>A primary key forbids NULL; a unique key allows it — and in most databases, more than one NULL, since NULL is never equal to NULL.</li>
+    </ul>
+
+    <p>
+        In the table above, <code>username</code> is declared <code>UNIQUE</code> — every player's
+        name stays distinct, but it isn't carrying the table's identity. Primary key = unique + not
+        null + chosen. Unique key = just unique.
+    </p>
+
+    <hr>
+
+    <h3>5. Composite Key</h3>
+
+    <p>
+        Sometimes no single column is unique, but a combination is. A key built from two or more
+        columns is a composite key.
+    </p>
+
+    <p>Consider a table recording each player's stats per match:</p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>match_id</th><th>player_id</th><th>kills</th></tr>
+        <tr><td>M1</td><td>1</td><td>24</td></tr>
+        <tr><td>M1</td><td>2</td><td>19</td></tr>
+        <tr><td>M2</td><td>1</td><td>30</td></tr>
+    </table>
+
+    <p>
+        <code>match_id</code> repeats (one match, many players) and <code>player_id</code> repeats
+        (one player, many matches). Neither alone identifies a row. Together,
+        <code>(match_id, player_id)</code> does — one player appears once per match.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE TABLE</span> match_stats (
+    match_id  INT,
+    player_id INT,
+    kills     INT,
+    <span style="color:#0099ff;">PRIMARY KEY</span> (match_id, player_id)
+);
+</code>
+</pre>
+
+    <hr>
+
+    <h3>6. Foreign Key</h3>
+
+    <p>
+        Everything so far identifies a row <em>within one table</em>. A foreign key reaches
+        <em>across</em> tables: it's a column whose values must match a key in another table.
+    </p>
+
+    <p>
+        <code>players.team_id</code> is a foreign key referencing <code>teams.team_id</code>. A
+        player can only sit on a team that exists — no orphans. This is the bridge between the two
+        tables, and it's the reason the next chapter on joins is even possible.
+    </p>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+team_id INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
+</code>
+</pre>
+
+    <p>
+        We met foreign keys as a constraint earlier; here the point is narrower — a foreign key is
+        how one table <em>points at</em> another's primary key.
+    </p>
+
+    <hr>
+
+    <h3>7. Logical Key</h3>
+
+    <p>
+        Two players are never the same person, even if a botched import happens to hand them the
+        same auto-generated <code>player_id</code>. A <strong>logical key</strong> (also called a
+        natural or business key) is an identifier that comes from the real world and carries
+        meaning — a Riot ID, an email, a username.
+    </p>
+
+    <p>
+        Contrast it with a <strong>surrogate key</strong>: an artificial number the database invents
+        purely to have a stable handle, with no meaning of its own.
+    </p>
+
+    <pre>
+<code>
+player_id <span style="color:#0099ff;">SERIAL</span> <span style="color:#0099ff;">PRIMARY KEY</span>   -- surrogate: meaningless, but stable
+</code>
+</pre>
+
+    <p>
+        The trade-off: a natural key is meaningful but can change — a player renames themselves and
+        every reference to the old name breaks — while a surrogate key never changes but tells you
+        nothing. A common design uses a surrogate as the primary key and keeps the logical key as a
+        UNIQUE column: stability and meaning, both.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Key</th>
+            <th>What it is</th>
+        </tr>
+        <tr><td>Super Key</td><td>Any column set that identifies a row uniquely (extras allowed)</td></tr>
+        <tr><td>Candidate Key</td><td>A super key with nothing to spare (minimal)</td></tr>
+        <tr><td>Primary Key</td><td>The candidate key chosen as identity (unique + not null, one per table)</td></tr>
+        <tr><td>Unique Key</td><td>Enforces uniqueness, allows NULLs, many per table</td></tr>
+        <tr><td>Composite Key</td><td>A key built from two or more columns together</td></tr>
+        <tr><td>Foreign Key</td><td>A column that must match a key in another table</td></tr>
+        <tr><td>Logical Key</td><td>A real-world identifier (natural), as opposed to a surrogate id</td></tr>
+    </table>
+
+    <p>
+        With keys understood — and foreign keys in particular — we can finally connect tables to
+        each other.
+    </p>
+
+    <p>
+        Previous: SQL Execution Flow
+        <a href="./7-sql_execution_flow.html">&lt;&lt;</a>
+    </p>
+
+    <p>
+        Next, Joins.
+        <a href="./8-joins.html">&gt;&gt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

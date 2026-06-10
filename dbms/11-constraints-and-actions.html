@@ -10,7 +10,7 @@
 
 
     <title>DBMS Notes - Vishnu Gandarapu</title>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
@@ -101,7 +101,7 @@
     <h3>The foreign key, properly</h3>
 
     <p>
-        The FOREIGN KEY is the constraint that makes a relational database relational. It says a
+        The FOREIGN KEY is the constraint that makes a relational database "relational". It says a
         column's values must already exist as keys in another table. <code>players.team_id</code>
         references <code>teams.team_id</code>, so a player can only belong to a team that has
         actually been created. This is <strong>referential integrity</strong> — no orphans, no
@@ -135,8 +135,6 @@
         <tr><td>SET NULL</td><td>Set the children's foreign key to NULL</td></tr>
         <tr><td>SET DEFAULT</td><td>Set the children's foreign key to its default value</td></tr>
     </table>
-
-    <br>
 
     <p>You attach the action when defining the key:</p>
 
@@ -220,7 +218,7 @@
     </p>
 
     <script src="../footer.js"></script>
-    <script src="./assets/home.js"></script>
+    <script src="../home.js"></script>
 </body>
 
 </html>
