@@ -6,59 +6,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
-
+    <link rel="stylesheet" href="../style.css">
     <title>CEH Notes - Vishnu Gandarapu</title>
 </head>
 
 <body>
     Reconnaisance aka Footprinting is the first step of the process of pentesting,
-     where we need to find as much <em>relevant</em> information as possible on the target 
-     organisation and network. Relevance in this context, is information should be related to personnel or infrastructure.
+    where we need to find as much <em>relevant</em> information as possible on the target
+    organisation and network. Relevance in this context, is information should be related to personnel or
+    infrastructure.
 
-     <p>I would recommend against surveilling the personnel for finding <em>their</em> vulnerability.
-         That ain't pentesting at all, and if you ain't a PI, it's outright creepy and criminal.</p>
+    <p>
+        I would recommend against surveilling the personnel for finding <em>their</em> vulnerability.
+        That ain't pentesting at all, and if you ain't a PI, it's outright creepy and criminal.
+    </p>
 
     <h2>Passive Recon</h2>
 
-        <p>
-            Gathering information that can be collected without direct contact with the organisation or their network.
-            No direct contact here intends no detection.
-        </p>
-        <p>One of the common tools for this are the Search Engines.</p>
+    <p>
+        Gathering information that can be collected without direct contact with the organisation or their network or
+        their personnel. No direct contact here intends no detection. Sources:
         <ul>
-            <li>
-                Google
-            </li>
-            <li>
-                Bing
-            </li>
-            <li>Yahoo</li>
-            <li>Brave</li>
-            <li>Yandex</li>
-            <li>Duckduckgo</li>
-            <li>SearXNG - an open source metasearch engine which collects Search Engine Result Pages (SERPs) from various search engines, functional but not optimal.</li>
+            <li>Organisation website</li>
+            <li>Social media profiles</li>
+            <li>Paid Services</li>
         </ul>
+    </p>
+    <p>
+        Open source intelligence (OSINT) is the process of collecting and analyzing information about the target from 
+        publicly available sources, one of the most common phase of Passive recon.
+    </p>
+    <p>
+        One of the common tools for this are the Search Engines.:
+        Google, Microsoft Bing, Yahoo, Brave, Yandex, Duckduckgo,
+        SearXNG - an open source metasearch engine which collects
+        Search Engine Result Pages (SERPs) from various
+        search engines, functional but not optimal.
+    </p>
 
-        <h3>Google dorks</h3>
-
-        <p>
-            Search on Google for pdf files with resume keyword from newtonschool.co website. <br>
-            <img src="assets/dork1.png" width="700px" height="500px">
-        </p>
-
-        <p>
-            Search on Google for resumes of employees of google. <br>
-            <img src="assets/dork2.png" width="700px" height="500px">
-        </p>
-
-    <h2>Active Recon</h3>
+    <h3>Google dorks</h3>
 
     <p>
-        Gathering information that can be only collected after direct contact with organisation or their network.
+        Search on Google for pdf files with resume keyword from newtonschool.co website. <br>
+        <img src="assets/dork1.png" width="700px" height="500px">
     </p>
 
     <p>
-        Prev <a href="./index.html">>></a>
+        Search on Google for resumes of employees of google. <br>
+        <img src="assets/dork2.png" width="700px" height="500px">
     </p>
-    </body>
-    </html>
+
+    <h3>What are we looking for in Passive Recon?</h3>
+    <ul>
+        <li>Owner information</li>
+        <li>Subdomains</li>
+        <li>IP addresses</li>
+        <li>Employee names and emails</li>
+        <li>Technologies used</li>
+        <li>Physical locations</li>
+        <li>Company news and events, and so on.</li>
+    </ul>
+
+    <h3>Domains and subdomains</h3>
+    <p>
+        Subdomains are the domains that are part of the main domain. For example, if the main domain is
+        <code>example.com</code>, then <code>mail.example.com</code> and <code>blog.example.com</code> are subdomains.
+    </p>
+
+    <p>
+        Finding the IP address of the main domain and subdomains can be useful for finding the location of the servers and
+        the technologies used. 
+    </p>
+
+    <h3>Site Report</h3>
+
+    <table>
+        <p>Third party free websites like Netcraft can be used to obtain site information such as Subdomains, Trackers,
+            background information, technologies used, Operating system used by servers, etc. <br>Refer <a href="https://sitereport.netcraft.com/">here</a>.
+        </p>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_input.png"
+                    >
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_bg_nw.png"
+                    >
+            </td>
+            <p>
+                Information we could retrieve: Offical description, and DNS administrated using AWS.
+            </p>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_ip.png"
+                    >
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_trackers.png"
+                    >
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_siteTech.png"
+                    >
+            </td>
+            <p>
+                Information we could retrieve: Cloudflare CDN.
+            </p>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_siteTech2.png"
+                    >
+            </td>
+                <p>
+                    Information we could retrieve: JS, Node.js.
+                </p>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_cdn_stats.png"
+                    >
+            </td>
+            <p>
+                Information we could retrieve: CDN and stats.
+            </p>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/netcraft_subdomains.png"
+                    >
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <p>DNSDumpster</p>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumspter_input.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumpster_locations.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumpster_record1.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumpster_record2.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumpster_record3.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dnsdumpster.png"
+                    >       
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="./assets/dns_dump_xlsx.png"
+                    >       
+            </td>
+        </tr>
+        <p>We found: Locations of servers, and A, MX records along with IP address of each subdomain, along with detailed tech specs running on server.</p>
+    </table>
+
+
+    <h2>Active Recon</h2>
+
+    <p>
+        Gathering information that can be only collected after direct contact with
+        organisation or their personnel.
+    </p>
+    <ul>
+        <li>Social engineering</li>
+        <li>DNS interrogation</li>
+    </ul>
+
+    <p>
+        Prev <a href="./index.html">&lt;&lt;</a>
+    </p>
+    <p>
+        Next <a href="./scanning.html">&gt;&gt;</a>
+    </p>
+
+
+    <script src="../home.js"></script>
+    <script src="../footer.js"></script>
+</body>
+
+</html>
