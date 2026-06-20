@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Parallel syntax &mdash; Python 3</h2>
+
+    <h3>18. asyncio.</h3>
+    <p>
+        For code that waits on something slow (a network reply) without freezing the whole program.
+        Mark a function <code>async</code>; the library guarantees it eventually completes.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Keyword / call</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td>async def</td>
+            <td>marks a coroutine that may run asynchronously</td>
+        </tr>
+        <tr>
+            <td>asyncio.run(coro)</td>
+            <td>run the coroutine</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">await</td>
+            <td>wait here for a result before continuing</td>
+        </tr>
+        <tr>
+            <td>create_task(coro)</td>
+            <td>run it and return a task object you can read the result from</td>
+        </tr>
+        <tr>
+            <td>gather(...)</td>
+            <td>run several tasks in parallel</td>
+        </tr>
+        <tr>
+            <td>sleep(t)</td>
+            <td>pause a coroutine for <code>t</code> seconds</td>
+        </tr>
+    </table>
+
+    <p>
+        Before this, Python 2 web code either blocked or was monkey-patched &mdash; not pretty.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+<span style="color:#0099ff;">import</span> asyncio
+
+<span style="color:#0099ff;">async def</span> fetch(n):
+    <span style="color:#0099ff;">await</span> asyncio.sleep(1)       <span style="color:#888;"># pretend network wait</span>
+    <span style="color:#0099ff;">return</span> n * 2
+
+<span style="color:#0099ff;">async def</span> main():
+    results = <span style="color:#0099ff;">await</span> asyncio.gather(fetch(1), fetch(2), fetch(3))
+    print(results)              <span style="color:#888;"># [2, 4, 6] in ~1s, not 3s</span>
+
+asyncio.run(main())
+</code></pre>
+
+    <p>
+        Next, multiprocessing. <a href="./19-python-multiprocessing.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, threading. <a href="./17-python-threading.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

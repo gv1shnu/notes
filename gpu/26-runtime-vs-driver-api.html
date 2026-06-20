@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>CUDA</h2>
+
+    <h3>26. Runtime vs driver API.</h3>
+    <p>
+        The two ways your app reaches the GPU. Pick by how much low-level control you need.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Runtime API</th>
+            <th>Driver API</th>
+        </tr>
+        <tr>
+            <td>Level</td>
+            <td bgcolor="lightgreen">high &mdash; an abstraction over the driver</td>
+            <td>low &mdash; direct control</td>
+        </tr>
+        <tr>
+            <td>Setup</td>
+            <td>automatic (modules, context)</td>
+            <td bgcolor="orange">manual: init, device, context, module</td>
+        </tr>
+        <tr>
+            <td>GPU code</td>
+            <td>embed inside host code</td>
+            <td>compiled separately, loaded as cubin/fatbin</td>
+        </tr>
+        <tr>
+            <td>Written in</td>
+            <td>C++</td>
+            <td>even assembly, or any language that links cubin</td>
+        </tr>
+        <tr>
+            <td>Use when</td>
+            <td>most cases (course default)</td>
+            <td>you truly need the control</td>
+        </tr>
+    </table>
+
+    <p>
+        Rule of thumb: start with the runtime API; reach for the driver API only when the extra power is worth the extra work.
+    </p>
+
+    <p>
+        Next, the CUDA execution model. <a href="./27-cuda-execution-model.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, compilation with nvcc. <a href="./25-cuda-compilation.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

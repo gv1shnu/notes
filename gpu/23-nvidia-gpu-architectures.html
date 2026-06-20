@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>GPUs</h2>
+
+    <h3>23. Nvidia architectures.</h3>
+    <p>
+        Seven generations of CUDA-capable hardware, each roughly two years. The pattern: more cores, less power &mdash;
+        so performance per watt keeps doubling.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Generation</th>
+            <th>Years</th>
+            <th>Notable</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Tesla</td>
+            <td>2008</td>
+            <td>first CUDA architecture</td>
+        </tr>
+        <tr>
+            <td>Fermi</td>
+            <td>2010</td>
+            <td>4&times; cores vs Tesla</td>
+        </tr>
+        <tr>
+            <td>Kepler</td>
+            <td>2012</td>
+            <td>more programmable, lower power</td>
+        </tr>
+        <tr>
+            <td>Maxwell</td>
+            <td>2014</td>
+            <td>~2&times; cores, better bandwidth</td>
+        </tr>
+        <tr>
+            <td>Pascal</td>
+            <td>2016</td>
+            <td>unified memory, NVLink (fast host&harr;device)</td>
+        </tr>
+        <tr>
+            <td>Turing</td>
+            <td>2018</td>
+            <td>ray tracing</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Ampere</td>
+            <td>2020</td>
+            <td>tensor cores; ~4&times; performance per watt</td>
+        </tr>
+    </table>
+
+    <p>
+        Next, the CUDA software layers. <a href="./24-cuda-software-layers.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, integrated vs dedicated. <a href="./22-integrated-vs-dedicated-gpus.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

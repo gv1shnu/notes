@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>GPUs</h2>
+    <p>
+        Flynn's taxonomy pointed at SIMD hardware. That hardware is the GPU. First, which kind you have.
+    </p>
+
+    <h3>22. Integrated vs dedicated.</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Integrated</th>
+            <th>Dedicated</th>
+        </tr>
+        <tr>
+            <td>Where</td>
+            <td>on the CPU chip, shares system memory</td>
+            <td>separate card, own memory</td>
+        </tr>
+        <tr>
+            <td>Power / heat</td>
+            <td bgcolor="lightgreen">low &mdash; good for battery</td>
+            <td>high</td>
+        </tr>
+        <tr>
+            <td>Compute</td>
+            <td>weak</td>
+            <td bgcolor="lightgreen">strong</td>
+        </tr>
+        <tr>
+            <td>CUDA?</td>
+            <td bgcolor="red">no (use OpenCL / OpenACC)</td>
+            <td>yes, on Nvidia</td>
+        </tr>
+    </table>
+
+    <p>
+        Frameworks for talking to a GPU:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Framework</th>
+            <th>Scope</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">CUDA</td>
+            <td>Nvidia only; most widely adopted, deepest access</td>
+        </tr>
+        <tr>
+            <td>OpenCL</td>
+            <td>many hardware platforms</td>
+        </tr>
+        <tr>
+            <td>OpenACC</td>
+            <td>macros around code to offload to accelerators</td>
+        </tr>
+        <tr>
+            <td>Metal</td>
+            <td>Apple's own (Macs ship AMD, not Nvidia)</td>
+        </tr>
+    </table>
+
+    <p>
+        Heavy users: crypto mining, NLP, computer vision &mdash; neural nets map well to "many cores, each doing a little".
+    </p>
+
+    <p>
+        Next, Nvidia architectures. <a href="./23-nvidia-gpu-architectures.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, C++ atomic &amp; future. <a href="./21-cpp-atomic-and-future.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

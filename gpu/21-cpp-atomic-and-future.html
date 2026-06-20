@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Parallel syntax &mdash; C++</h2>
+
+    <h3>21. atomic &amp; future.</h3>
+    <p>
+        <strong>Atomic</strong> variables fix the lost-increment problem: a variable cannot be touched until the current
+        operation on it finishes. Incrementing is really read + add + write &mdash; without atomicity, two increments can
+        collapse into one.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Tool</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">std::atomic</td>
+            <td>read-modify-write happens as one indivisible step</td>
+        </tr>
+        <tr>
+            <td>atomic_thread_fence</td>
+            <td>acquire / release barrier so threads reach a point before proceeding</td>
+        </tr>
+    </table>
+
+    <p>
+        Don't make every variable atomic &mdash; only the ones two threads truly share.
+    </p>
+
+    <p>
+        <strong>Futures</strong> let a thread keep working while a result is still pending (think: a network call).
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Tool</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td>std::async</td>
+            <td>run a function outside the caller; returns a future</td>
+        </tr>
+        <tr>
+            <td>future.wait()</td>
+            <td>block until the result is ready</td>
+        </tr>
+        <tr>
+            <td>future.get()</td>
+            <td>retrieve the result when it arrives</td>
+        </tr>
+    </table>
+
+    <strong>In code</strong>
+    <pre><code>C++
+
+<span style="color:#0099ff;">#include</span> &lt;atomic&gt;
+<span style="color:#0099ff;">#include</span> &lt;future&gt;
+
+std::atomic&lt;<span style="color:#0099ff;">int</span>&gt; count{0};
+
+<span style="color:#0099ff;">int</span> compute() { <span style="color:#0099ff;">return</span> 42; }
+
+<span style="color:#0099ff;">int</span> main() {
+    count++;                          <span style="color:#888;">// atomic, safe</span>
+    std::future&lt;<span style="color:#0099ff;">int</span>&gt; f = std::async(compute);
+    <span style="color:#0099ff;">int</span> result = f.get();             <span style="color:#888;">// wait + retrieve</span>
+}
+</code></pre>
+
+    <p>
+        Next, integrated vs dedicated GPUs. <a href="./22-integrated-vs-dedicated-gpus.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, C++ thread &amp; mutex. <a href="./20-cpp-thread-and-mutex.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
