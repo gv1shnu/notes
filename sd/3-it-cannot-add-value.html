@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The disease: functional decomposition</h2>
+
+    <h3>3. It cannot add value.</h3>
+    <p>
+        The first law of thermodynamics, in layman's terms: <strong>you cannot add value without sweating.</strong>
+        Architecture is high-value work. Hand someone a spec that says "do A, do B, do C" and they say "no sweat &mdash;
+        A block, B block, C block." They just tried to add value without sweating. The universe forbids it.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>House by function</th>
+            <th>What it costs</th>
+        </tr>
+        <tr>
+            <td>build the kitchen first</td>
+            <td>foundation, walls, plumbing, roof &mdash; "done"</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">now add a bedroom</td>
+            <td>jackhammer the foundation, lift the kitchen, rebuild it next to the bedroom</td>
+        </tr>
+    </table>
+
+    <p>
+        You'd fire any builder who worked this way &mdash; yet it's how software gets built. And naming the rooms doesn't
+        save you: <strong>domain decomposition</strong> (kitchen = cooking, bedroom = sleeping) is just functional
+        decomposition in disguise. A rose by any other name.
+    </p>
+
+    <p>
+        Next, the testing trap. <a href="./4-the-testing-trap.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, why it fails. <a href="./2-why-it-fails.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

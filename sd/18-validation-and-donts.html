@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Validating the design</h2>
+
+    <h3>18. Call chains &amp; design don'ts.</h3>
+    <p>
+        Validate with <strong>call-chain diagrams</strong>: for each use case, draw how the client, managers, engines,
+        and resource-access interact (solid arrows = synchronous, dashed = queued). If every use case has a valid call
+        chain, the design holds water &mdash; before a line of code. (Sequence diagrams add time/order but are slower to
+        draw.)
+    </p>
+
+    <p>
+        Then scrub against the <strong>design don'ts</strong>. Each one, if violated, means functional decomposition is
+        hiding &mdash; go find it.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Don't</th>
+            <th>Because</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">Client calls multiple managers in one use case</td>
+            <td>the client is stitching them &rarr; functional managers</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">Manager queues calls to &gt;1 manager</td>
+            <td>law of 0/1/&infin; &mdash; "one" really means "all", so use Pub/Sub</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">Queue a call to an engine or resource access</td>
+            <td>they're utilitarian; they have no life of their own in isolation</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">Engines / clients / resources publish events</td>
+            <td>publishing is a managerial decision (state changed)</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">Engines subscribe to events</td>
+            <td>a subscription triggers a use case &rarr; that's a manager/client job</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">Engines call engines; resource-access call each other</td>
+            <td>sideways = coupling; and a real atomic verb never needs another</td>
+        </tr>
+    </table>
+
+    <p>
+        That's the Method end to end: stop designing against requirements, decompose by volatility, lay it out as
+        Clients &rarr; Managers/Engines &rarr; ResourceAccess &rarr; Resources, and compose the few core use cases from
+        ~10 reusable blocks. Then change becomes cheap &mdash; which is the whole point.
+    </p>
+
+    <p>
+        Prev, closed architecture. <a href="./17-closed-architecture.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

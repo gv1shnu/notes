@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The cure: volatility-based decomposition</h2>
+
+    <h3>6. Decompose by volatility.</h3>
+    <p>
+        Four words are the whole of software architecture: <strong>decompose based on volatility.</strong> Find the
+        areas of <em>change</em>, encapsulate each in a building block, and implement behavior as interactions
+        between them.
+    </p>
+
+    <p>
+        Think of each block as a <strong>vault</strong>. A change is a hand grenade: open the right vault, toss it in,
+        shut the door. Inside may be destroyed &mdash; but no shrapnel flies through the rest of the system. The change
+        is <em>contained</em>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Volatility</th>
+            <th>Encapsulated behind</th>
+        </tr>
+        <tr>
+            <td>AC/DC, 110/220V, grid/solar/battery</td>
+            <td>the wall receptacle &mdash; you just plug in</td>
+        </tr>
+        <tr>
+            <td>blood pressure, pulse, adrenaline</td>
+            <td>the heart</td>
+        </tr>
+        <tr>
+            <td>every difference between two laptops</td>
+            <td>the HDMI plug</td>
+        </tr>
+    </table>
+
+    <p>
+        Contrast functional decomposition: the change isn't in any one place, so (Murphy) it's in <em>all</em> places.
+        It <strong>maximizes</strong> the impact of change &mdash; the real nail in the coffin. Volatility doesn't
+        announce itself, though; customers talk features, not change. You have to sweat to find it (which is exactly
+        why it can add value).
+    </p>
+
+    <p>
+        Next, how to find volatility &mdash; the axis. <a href="./7-axis-of-volatility.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, solutions as requirements. <a href="./5-solutions-as-requirements.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

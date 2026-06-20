@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Composing the system</h2>
+
+    <h3>14. The design mission.</h3>
+    <p>
+        The bar: your architecture must satisfy <strong>all use cases &mdash; present and future, known and unknown.</strong>
+        If a future use case can invalidate your architecture, you failed. Nothing less will do.
+    </p>
+
+    <p>
+        That sounds impossible &mdash; you can't know the future. But you don't design <em>against</em> the use cases;
+        you design the small set of blocks that can be <em>composed</em> into any of them. A spec of 300 use cases is
+        untrustworthy anyway:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>A "complete" 300-use-case spec is&hellip;</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">missing some (nobody ever specs them all)</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">full of duplicates (different teams, different words)</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">contradictory (cooking AND dieting), and full of solutions-as-requirements</td>
+        </tr>
+    </table>
+
+    <p>
+        So the one rule that eludes whole careers: <strong>never design against the requirements.</strong> Garbage in,
+        garbage out &mdash; you've always known the requirements are garbage, yet treated them as gospel. And requirements
+        <em>will</em> change &mdash; which is good: change is the hand that feeds us. Don't fight it.
+    </p>
+
+    <p>
+        Next, containing change. <a href="./15-containing-change.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, composable design. <a href="./13-composable-design.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

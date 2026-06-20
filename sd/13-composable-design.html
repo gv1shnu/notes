@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Composing the system</h2>
+
+    <h3>13. Composable design.</h3>
+    <p>
+        Most use cases are variations of a few. Split them:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Core use cases</th>
+            <th>Fluff</th>
+        </tr>
+        <tr>
+            <td>the essence of the business &mdash; "bring the customer to the door"</td>
+            <td>everything else (variations, edge cases)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">very few: usually 1&ndash;3, never &gt;6</td>
+            <td>near-infinite</td>
+        </tr>
+    </table>
+
+    <p>
+        Your mission: find the <strong>smallest set of building blocks</strong> you can compose to satisfy each core use
+        case. Because all other use cases are just different <em>interactions</em> of those same blocks &mdash; a change
+        in requirements becomes a change in composition, <strong>not in decomposition</strong>. The design doesn't move.
+    </p>
+
+    <p>
+        That smallest set lands at about <strong>~10 components</strong> (a couple of clients, managers, engines, a few
+        resource-accesses/resources, half a dozen utilities). 10! combinations is enough for anything. Same as a car
+        (~10 parts), a laptop (~10), a body (~10 organs). Humans run on the same components as a 160,000-year-old
+        hunter-gatherer &mdash; one core use case: <em>survive</em>; everything else is composition.
+    </p>
+
+    <p>
+        The universal rule that follows: <strong>features are aspects of integration, not implementation.</strong> No
+        single part holds "the feature" &mdash; it emerges from integrating parts (true all the way down to the screw).
+    </p>
+
+    <p>
+        Next, the design mission. <a href="./14-the-design-mission.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, required behaviour. <a href="./12-required-behavior.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

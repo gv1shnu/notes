@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The structure: The Method</h2>
+    <p>
+        Software isn't a house or a jet &mdash; the volatile areas repeat across systems. So there's a reusable
+        template: four layers, each encapsulating what's below it, plus utilities to the side.
+    </p>
+
+    <h3>9. The layered taxonomy.</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Layer</th>
+            <th>Encapsulates</th>
+            <th>Question</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Clients</td>
+            <td>how the system is consumed (UI, mobile, another system)</td>
+            <td>who</td>
+        </tr>
+        <tr>
+            <td>Managers</td>
+            <td>volatility in the <em>sequence</em> of a use case</td>
+            <td>what</td>
+        </tr>
+        <tr>
+            <td>Engines</td>
+            <td>volatility in the <em>activities</em> / business rules</td>
+            <td>how</td>
+        </tr>
+        <tr>
+            <td>ResourceAccess</td>
+            <td>how resources are accessed</td>
+            <td>how (access)</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Resources</td>
+            <td>the actual stores (DB, queue, other systems)</td>
+            <td>where</td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>Utilities</strong> (security, logging, pub/sub, message bus, diagnostics) sit in a vertical bar to the
+        side, usable by every layer. "Client" beats "presentation" &mdash; a consumer may be another system, nothing is
+        presented. Equalising all clients gives you a shot at a <em>single point of entry</em>.
+    </p>
+
+    <p>
+        It's abstract on purpose: a mouse and an elephant have the same architecture; a mouse and a grasshopper do not.
+    </p>
+
+    <p>
+        Next, managers &amp; engines in detail. <a href="./10-managers-and-engines.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, don't encapsulate the business. <a href="./8-nature-of-the-business.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
