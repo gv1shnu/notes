@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>12. DataFrame joins.</h3>
+    <p>
+        <code>df.join</code> takes three things: the right DataFrame, the column(s) to join on, and the join type.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+tableA.join(tableB,
+            tableA.id == tableB.id,
+            <span style="color:#0099ff;">"inner"</span>).show()
+</code></pre>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Type</th>
+            <th>Keeps</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">inner</td>
+            <td>only rows that match on both sides</td>
+        </tr>
+        <tr>
+            <td>outer</td>
+            <td>all rows; nulls where there's no match</td>
+        </tr>
+        <tr>
+            <td>left</td>
+            <td>all left rows (+ matches)</td>
+        </tr>
+        <tr>
+            <td>right</td>
+            <td>all right rows (+ matches)</td>
+        </tr>
+        <tr>
+            <td>left-semi</td>
+            <td>left rows that have a match (left columns only)</td>
+        </tr>
+    </table>
+
+    <p>
+        When both tables share a column name, <strong>alias</strong> them so you can tell the columns apart:
+    </p>
+
+    <pre><code>Python
+
+ta = tableA.alias(<span style="color:#0099ff;">"ta"</span>)
+tb = tableB.alias(<span style="color:#0099ff;">"tb"</span>)
+<span style="color:#888;"># now refer to ta.name vs tb.name</span>
+</code></pre>
+
+    <p>
+        Next, MySQL connectivity. <a href="./13-mysql-connectivity.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, cache &amp; persist. <a href="./11-cache-persist.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

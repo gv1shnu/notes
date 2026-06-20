@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>14. Word count.</h3>
+    <p>
+        The "hello world" of big data &mdash; and it stitches together everything so far: a transformation chain ending
+        in one action.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+lines = sc.textFile(<span style="color:#0099ff;">"input.txt"</span>)
+
+counts = (lines
+          .flatMap(<span style="color:#0099ff;">lambda</span> line: line.split(<span style="color:#0099ff;">" "</span>))   <span style="color:#888;"># line &rarr; words</span>
+          .map(<span style="color:#0099ff;">lambda</span> w: (w, 1))                    <span style="color:#888;"># word &rarr; (word, 1)</span>
+          .reduceByKey(<span style="color:#0099ff;">lambda</span> a, b: a + b))        <span style="color:#888;"># sum per word</span>
+
+counts.collect()        <span style="color:#888;"># [('spark', 2), ('hadoop', 2), ...]</span>
+</code></pre>
+
+    <p>
+        For a quick tally without the chain, <code>countByValue</code> does the same for small data:
+    </p>
+
+    <pre><code>Python
+
+words.countByValue()    <span style="color:#888;"># {'Spark': 2, 'Hadoop': 2, 'Pig': 1}</span>
+</code></pre>
+
+    <p>
+        Watch out: PySpark is <strong>case-sensitive</strong> &mdash; <code>"Spark"</code> and <code>"spark"</code> count
+        as different words.
+    </p>
+
+    <p>
+        Prev, MySQL connectivity. <a href="./13-mysql-connectivity.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

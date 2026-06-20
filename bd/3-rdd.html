@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>3. RDD.</h3>
+    <p>
+        <strong>Resilient Distributed Dataset</strong> &mdash; Spark's core data structure. An immutable collection of
+        objects, split into partitions that live on different nodes of the cluster.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Property</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Resilient</td>
+            <td>remembers how it was built (lineage); can rebuild a lost partition after a failure</td>
+        </tr>
+        <tr>
+            <td>Distributed</td>
+            <td>partitioned across many nodes, computed in parallel</td>
+        </tr>
+        <tr>
+            <td>Immutable</td>
+            <td>never changed in place &mdash; every operation makes a new RDD</td>
+        </tr>
+    </table>
+
+    <p>
+        Because each RDD knows the one it came from, Spark can recreate it at any point if something breaks. That lineage
+        is what "resilient" buys you.
+    </p>
+
+    <p>
+        Next, SparkSession &amp; SparkContext. <a href="./4-sparksession-sparkcontext.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, the architecture. <a href="./2-spark-architecture.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

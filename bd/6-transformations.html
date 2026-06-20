@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>6. Transformations.</h3>
+    <p>
+        A transformation takes an RDD and returns a <em>new</em> one. They are <strong>lazy</strong> &mdash; nothing
+        actually runs until an action asks for a result. Spark just records the recipe.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Transformation</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td>map(f)</td>
+            <td>one element &rarr; one element</td>
+        </tr>
+        <tr>
+            <td>filter(f)</td>
+            <td>keep elements where <code>f</code> is true</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">flatMap(f)</td>
+            <td>one element &rarr; many (then flattened)</td>
+        </tr>
+    </table>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+words = sc.parallelize([<span style="color:#0099ff;">"scala"</span>, <span style="color:#0099ff;">"spark"</span>, <span style="color:#0099ff;">"pyspark"</span>])
+
+words.map(<span style="color:#0099ff;">lambda</span> w: (w, 1))             <span style="color:#888;"># ('scala',1), ('spark',1), ...</span>
+words.filter(<span style="color:#0099ff;">lambda</span> w: <span style="color:#0099ff;">"spark"</span> <span style="color:#0099ff;">in</span> w)    <span style="color:#888;"># 'spark', 'pyspark'</span>
+lines.flatMap(<span style="color:#0099ff;">lambda</span> line: line.split(<span style="color:#0099ff;">" "</span>))   <span style="color:#888;"># each line &rarr; its words</span>
+</code></pre>
+
+    <p>
+        None of these have run yet. They just build the lineage.
+    </p>
+
+    <p>
+        Next, actions. <a href="./7-actions.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, creating data. <a href="./5-creating-data.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

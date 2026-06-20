@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>11. cache &amp; persist.</h3>
+    <p>
+        By default an RDD is recomputed from its lineage every time you run an action on it. If you reuse it, that's
+        wasteful &mdash; <code>cache</code> / <code>persist</code> keep it in memory for next time.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+words.cache()           <span style="color:#888;"># keep in memory</span>
+words.persist()         <span style="color:#888;"># same, but you can pick the storage level</span>
+words.is_cached         <span style="color:#888;"># True</span>
+</code></pre>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Call</th>
+            <th>Difference</th>
+        </tr>
+        <tr>
+            <td>cache()</td>
+            <td>memory only</td>
+        </tr>
+        <tr>
+            <td>persist(level)</td>
+            <td>choose where: memory, disk, or both</td>
+        </tr>
+    </table>
+
+    <p>
+        Cache an RDD you'll hit more than once; skip it for a one-shot.
+    </p>
+
+    <p>
+        Next, DataFrame joins. <a href="./12-dataframe-joins.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, join. <a href="./10-join.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
