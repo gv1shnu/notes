@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Linked Lists</h2>
+    <p>
+        Nodes chained by pointers. Each node holds a <strong>key</strong> and a <strong>next</strong> pointer; a
+        <code>head</code> points to the first. No contiguous memory &mdash; so no O(1) random access, but cheap
+        insert/remove at the ends.
+    </p>
+
+    <h3>Singly-linked</h3>
+    <p>
+        Only forward pointers. A <code>tail</code> pointer makes appending cheap, but you still can't cheaply reach the
+        <em>second-to-last</em> node (no back-pointer), so popping the back stays O(n).
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>No tail</th>
+            <th>With tail</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">PushFront / TopFront / PopFront</td>
+            <td>O(1)</td>
+            <td>O(1)</td>
+        </tr>
+        <tr>
+            <td>PushBack / TopBack</td>
+            <td>O(n)</td>
+            <td bgcolor="lightgreen">O(1)</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">PopBack</td>
+            <td>O(n)</td>
+            <td>O(n)</td>
+        </tr>
+        <tr>
+            <td>Find / Erase / AddBefore</td>
+            <td>O(n)</td>
+            <td>O(n)</td>
+        </tr>
+        <tr>
+            <td>AddAfter(node)</td>
+            <td>O(1)</td>
+            <td>O(1)</td>
+        </tr>
+    </table>
+
+    <h3>Doubly-linked</h3>
+    <p>
+        Each node also has a <strong>prev</strong> pointer. Now you can walk backwards, so <strong>PopBack and AddBefore
+        become O(1)</strong> &mdash; at the cost of one extra pointer per node.
+    </p>
+
+    <h3>Array vs linked list</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Array</th>
+            <th>Linked list</th>
+        </tr>
+        <tr>
+            <td>Random access A[i]</td>
+            <td bgcolor="lightgreen">O(1)</td>
+            <td bgcolor="orange">O(n)</td>
+        </tr>
+        <tr>
+            <td>Insert/remove at front</td>
+            <td>O(n)</td>
+            <td bgcolor="lightgreen">O(1)</td>
+        </tr>
+        <tr>
+            <td>Size</td>
+            <td>fixed / amortized resize</td>
+            <td>grows freely</td>
+        </tr>
+        <tr>
+            <td>Overhead</td>
+            <td>may over-allocate</td>
+            <td>a pointer per node</td>
+        </tr>
+    </table>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

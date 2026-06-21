@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Trees</h2>
+    <p>
+        A root with children, each a subtree. A <strong>binary</strong> tree has &le; 2 children per node. In CS, trees
+        grow downward.
+    </p>
+
+    <h3>Traversals</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Traversal</th>
+            <th>Order</th>
+            <th>Uses</th>
+        </tr>
+        <tr>
+            <td>Pre-order (DFS)</td>
+            <td>node, left, right</td>
+            <td>copy a tree</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">In-order (DFS)</td>
+            <td>left, node, right</td>
+            <td>BST &rarr; sorted output</td>
+        </tr>
+        <tr>
+            <td>Post-order (DFS)</td>
+            <td>left, right, node</td>
+            <td>evaluate / delete bottom-up</td>
+        </tr>
+        <tr>
+            <td>Level-order (BFS)</td>
+            <td>level by level</td>
+            <td>shortest paths</td>
+        </tr>
+    </table>
+    <p>
+        Depth-first is naturally recursive (it rides the call <em>stack</em>); breadth-first uses an explicit
+        <em>queue</em>: enqueue the root, then repeatedly dequeue a node and enqueue its children.
+    </p>
+
+    <h3>Binary search trees</h3>
+    <p>
+        A <strong>BST</strong> keeps everything in the left subtree &le; the node &le; everything in the right. So Find,
+        Insert, and Delete just walk down comparing &mdash; cost = <strong>O(depth)</strong>. (In-order traversal yields
+        sorted order, by definition.)
+    </p>
+    <p>
+        The catch: depth can be terrible. Insert 1,2,3,4,5 in order and the tree degenerates into a chain &rarr; O(n).
+        We need it <strong>balanced</strong> (each node's two subtrees ~equal size) for O(log n).
+    </p>
+
+    <h3>Rotations</h3>
+    <p>
+        A <strong>rotation</strong> locally rearranges a parent/child pair (and re-hangs one subtree) to change the
+        shape <em>while preserving the sort order</em>. It's O(1), and it's the tool every self-balancing tree uses to
+        fix imbalance.
+    </p>
+
+    <h3>AVL trees</h3>
+    <p>
+        A BST that stores each node's <strong>height</strong> and maintains the <strong>AVL property</strong>: at every
+        node, |height(left) - height(right)| &le; 1. That bound forces height = O(log n) (proof: an AVL tree of height
+        h has at least F<sub>h</sub> nodes &mdash; Fibonacci, which grows exponentially). After each insert/delete, walk
+        back up and rotate to restore the property.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Find / Insert / Delete</td>
+            <td>O(log n)</td>
+        </tr>
+    </table>
+
+    <h3>Splay trees</h3>
+    <p>
+        Self-adjusting: every time you access a node, <strong>splay</strong> it to the root via rotations (the
+        <em>zig</em>, <em>zig-zig</em>, and <em>zig-zag</em> cases). Frequently-used items drift near the top, so they're
+        cheap to reach &mdash; <strong>O(log n) amortized</strong>, often faster on skewed access patterns. (Naively
+        rotating straight to the root doesn't work &mdash; it can stay unbalanced and hit O(n); the zig-zig/zig-zag cases
+        are what make it work.)
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

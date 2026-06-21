@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Searching Algorithms</h2>
+    <p>
+        Find a key in a collection. The whole story is whether the data is sorted &mdash; that one fact is the
+        difference between O(n) and O(log n).
+    </p>
+
+    <h3>Linear search &mdash; O(n)</h3>
+    <p>
+        Walk the array front to back; return the index on a match, else <code>NOT_FOUND</code>. Works on any array
+        (sorted or not) and on linked lists. Worst case (key absent) checks all n elements.
+    </p>
+
+    <pre><code>for i = low .. high:
+    if A[i] == key: return i
+return NOT_FOUND
+</code></pre>
+
+    <p>
+        Recurrence: <code>T(n) = T(n-1) + O(1) = O(n)</code> &mdash; technically a (degenerate) divide-and-conquer:
+        the subproblem shrinks by just one each step.
+    </p>
+
+    <h3>Binary search &mdash; O(log n)</h3>
+    <p>
+        On a <strong>sorted</strong> array, halve the search space each step: compare the key to the midpoint and discard
+        the half it can't be in.
+    </p>
+
+    <pre><code>while low &le; high:
+    mid = low + (high - low) / 2
+    if A[mid] == key: return mid
+    elif key &lt; A[mid]: high = mid - 1
+    else:              low  = mid + 1
+return low - 1          # not found &rarr; insertion point
+</code></pre>
+
+    <p>
+        Recurrence: <code>T(n) = T(n/2) + O(1) = O(log n)</code>. The iterative form (above) avoids the recursion stack.
+        Return <code>low - 1</code> when absent so callers learn where it <em>would</em> go.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Search</th>
+            <th>Needs sorted?</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td>Linear</td>
+            <td>no</td>
+            <td bgcolor="orange">O(n)</td>
+        </tr>
+        <tr>
+            <td>Binary</td>
+            <td>yes</td>
+            <td bgcolor="lightgreen">O(log n)</td>
+        </tr>
+    </table>
+
+    <p>
+        Why it matters: a 50,000-word dictionary lookup drops from ~50,000 comparisons to ~16 &mdash; "ten seconds" to
+        "instant". The catch is keeping data sorted; if sorting breaks a needed correspondence, store a sorted array of
+        <em>indices</em> (a space-for-time trade) instead.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

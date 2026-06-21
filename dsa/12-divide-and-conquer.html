@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Divide and Conquer</h2>
+    <p>
+        A design <em>paradigm</em>, not one algorithm. Break a problem into smaller subproblems of the same kind, solve
+        each recursively, then combine the results.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Move</th>
+            <th>What</th>
+        </tr>
+        <tr>
+            <td>Divide</td>
+            <td>split into subproblems (ideally each a fraction of n)</td>
+        </tr>
+        <tr>
+            <td>Conquer</td>
+            <td>solve the subproblems recursively</td>
+        </tr>
+        <tr>
+            <td>Combine</td>
+            <td>stitch their answers into the full answer</td>
+        </tr>
+    </table>
+
+    <p>
+        You've already met the two classics under their own topics:
+        <a href="./3-searching-algorithms.html">binary search</a> (one half-size subproblem &rarr; O(log n)) and
+        <a href="./4-sorting-algorithms.html">merge sort / quicksort</a> (two half-size subproblems &rarr; O(n log n)).
+        This page is about how to <em>analyze</em> any such algorithm.
+    </p>
+
+    <h3>Recurrence relations</h3>
+    <p>
+        The cost of a D&amp;C algorithm is written as a recurrence: the work of the subproblems plus the divide/combine
+        work.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Algorithm</th>
+            <th>Recurrence</th>
+            <th>Solves to</th>
+        </tr>
+        <tr>
+            <td>Binary search</td>
+            <td>T(n) = T(n/2) + O(1)</td>
+            <td>O(log n)</td>
+        </tr>
+        <tr>
+            <td>Merge sort</td>
+            <td>T(n) = 2T(n/2) + O(n)</td>
+            <td>O(n log n)</td>
+        </tr>
+    </table>
+
+    <h3>A faster algorithm hides in the split: Karatsuba</h3>
+    <p>
+        Multiplying two n-digit numbers the schoolbook way is O(n&sup2;). Naive D&amp;C splits each number in half and
+        does <strong>4</strong> half-size multiplications &mdash; still O(n&sup2;). Karatsuba's trick rewrites it to use
+        only <strong>3</strong>:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Subproblems</th>
+            <th>Recurrence</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">4</td>
+            <td>T(n) = 4T(n/2) + O(n)</td>
+            <td>O(n&sup2;)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">3</td>
+            <td>T(n) = 3T(n/2) + O(n)</td>
+            <td>O(n<sup>log&sup2;3</sup>) &asymp; O(n<sup>1.58</sup>)</td>
+        </tr>
+    </table>
+    <p>
+        One fewer recursive call changes the whole growth rate &mdash; the heart of clever D&amp;C.
+    </p>
+
+    <h3>The Master Theorem</h3>
+    <p>
+        A formula for <code>T(n) = a&middot;T(n/b) + O(n<sup>d</sup>)</code> &mdash; no recursion tree needed. Compare
+        <code>d</code> with <code>log<sub>b</sub>a</code>:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Condition</th>
+            <th>T(n)</th>
+            <th>Who dominates</th>
+        </tr>
+        <tr>
+            <td>d &gt; log<sub>b</sub>a</td>
+            <td>O(n<sup>d</sup>)</td>
+            <td>the divide/combine work (top)</td>
+        </tr>
+        <tr>
+            <td>d = log<sub>b</sub>a</td>
+            <td>O(n<sup>d</sup> log n)</td>
+            <td>balanced across levels</td>
+        </tr>
+        <tr>
+            <td>d &lt; log<sub>b</sub>a</td>
+            <td>O(n<sup>log<sub>b</sub>a</sup>)</td>
+            <td>the leaves (subproblems)</td>
+        </tr>
+    </table>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Algorithm</th>
+            <th>a, b, d</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>Binary search</td>
+            <td>1, 2, 0</td>
+            <td>case 2 &rarr; O(log n)</td>
+        </tr>
+        <tr>
+            <td>Merge sort</td>
+            <td>2, 2, 1</td>
+            <td>case 2 &rarr; O(n log n)</td>
+        </tr>
+        <tr>
+            <td>Karatsuba</td>
+            <td>3, 2, 1</td>
+            <td>case 3 &rarr; O(n<sup>log&sup2;3</sup>)</td>
+        </tr>
+    </table>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

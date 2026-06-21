@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Disjoint Sets (Union-Find)</h2>
+    <p>
+        Track a collection of non-overlapping groups, with two questions: "are these two in the same group?" and "merge
+        these two groups." Three operations:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>MakeSet(x)</td>
+            <td>new group containing just x</td>
+        </tr>
+        <tr>
+            <td>Find(x)</td>
+            <td>return x's group id (its root)</td>
+        </tr>
+        <tr>
+            <td>Union(x, y)</td>
+            <td>merge the two groups</td>
+        </tr>
+    </table>
+
+    <h3>Forest of trees</h3>
+    <p>
+        Represent each group as a tree; each node points to a parent, the root is the group id. <code>Find</code> walks
+        to the root; <code>Union</code> hangs one root under the other. Done carelessly, trees become long chains and
+        everything is O(n). Two heuristics fix that.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Heuristic</th>
+            <th>Idea</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Union by rank</td>
+            <td>always hang the <em>shorter</em> tree under the taller one &rarr; height stays O(log n)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Path compression</td>
+            <td>during Find, re-attach every node on the path directly to the root</td>
+        </tr>
+    </table>
+
+    <h3>Near-constant time</h3>
+    <p>
+        With union by rank alone, every operation is O(log n). Add path compression and the amortized cost drops to
+        <strong>O(log* n)</strong> &mdash; the iterated logarithm, which is &le; 5 for any input that fits in the
+        universe. So in practice, <strong>effectively constant</strong> per operation.
+    </p>
+    <p>
+        (Used for: connected components, Kruskal's MST, "are these networked together?")
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

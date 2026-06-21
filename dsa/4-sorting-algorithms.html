@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Sorting Algorithms</h2>
+    <p>
+        Put a sequence in order. The quadratic ones are simple; the O(n log n) ones win at scale &mdash; and n log n is
+        as good as comparison sorting can get.
+    </p>
+
+    <h3>Selection sort &mdash; O(n&sup2;)</h3>
+    <p>
+        Grow a sorted prefix: find the minimum of the unsorted part, swap it to the front, repeat.
+    </p>
+
+    <pre><code>for i = 1 .. n:
+    m = index of min in A[i .. n]
+    swap A[i], A[m]
+</code></pre>
+
+    <p>
+        Two nested loops &rarr; (n-1)+(n-2)+&hellip;+1 = n(n+1)/2 = O(n&sup2;), regardless of input. Sorts
+        <strong>in place</strong> (no extra memory). Insertion sort and bubble sort are the same O(n&sup2;) class.
+    </p>
+
+    <h3>Merge sort &mdash; O(n log n)</h3>
+    <p>
+        Divide and conquer: split in half, sort each half recursively, then <strong>merge</strong> the two sorted halves
+        in one linear pass.
+    </p>
+    <p>
+        <code>T(n) = 2T(n/2) + O(n) = O(n log n)</code> &mdash; log n levels, O(n) work each. Fast enough to sort a
+        million items on a laptop (where O(n&sup2;) would need ~10<sup>12</sup> ops). Needs O(n) extra space for the
+        merge. <em>(Full walk-through under <a href="./12-divide-and-conquer.html">Divide &amp; Conquer</a>.)</em>
+    </p>
+
+    <h3>Quicksort &mdash; O(n log n) average</h3>
+    <p>
+        Pick a <strong>pivot</strong>, <strong>partition</strong> the array so smaller elements go left and larger go
+        right (pivot lands in its final spot), then recurse on each side. Sorts in place, no merge.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Case</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">average (random pivot)</td>
+            <td>O(n log n)</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">worst (already sorted, bad pivot)</td>
+            <td>O(n&sup2;)</td>
+        </tr>
+    </table>
+    <p>
+        A random pivot makes the worst case practically impossible; in practice quicksort is the fastest general sort
+        (cache-friendly, in place).
+    </p>
+
+    <h3>The n log n wall</h3>
+    <p>
+        Any <strong>comparison-based</strong> sort must take &Omega;(n log n) in the worst case. Picture its decision
+        tree: each comparison is a node, each leaf an output ordering. There are <strong>n!</strong> possible orderings,
+        so &ge; n! leaves; a binary tree with n! leaves has depth &ge; log(n!) = &Omega;(n log n). So merge sort is
+        asymptotically optimal &mdash; you can't beat it by comparing.
+    </p>
+
+    <h3>Beating the wall: counting sort &mdash; O(n + M)</h3>
+    <p>
+        If you <em>don't</em> compare &mdash; possible when keys are small integers in 1..M &mdash; you can go linear.
+        Count occurrences of each value in one pass, then write them out in order.
+    </p>
+
+    <pre><code>count[1..M] = 0
+for x in A: count[x] += 1          # one pass
+write each value v, count[v] times # in order
+</code></pre>
+
+    <p>
+        O(n + M); linear when M = O(n). Radix sort extends this to larger keys digit by digit. The lower bound doesn't
+        apply &mdash; no comparisons were made.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Sort</th>
+            <th>Time</th>
+            <th>In place?</th>
+        </tr>
+        <tr>
+            <td>Selection</td>
+            <td>O(n&sup2;)</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <td>Merge</td>
+            <td>O(n log n)</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <td>Quick</td>
+            <td>O(n log n) avg</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Counting / Radix</td>
+            <td>O(n + M)</td>
+            <td>no</td>
+        </tr>
+    </table>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

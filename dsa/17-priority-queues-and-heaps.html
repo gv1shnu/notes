@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Priority Queues &amp; Heaps</h2>
+    <p>
+        A <strong>priority queue</strong> serves the highest-priority item next (not the oldest, like a queue). The
+        efficient implementation is a <strong>binary heap</strong>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Naive (array)</th>
+            <th>Heap</th>
+        </tr>
+        <tr>
+            <td>Insert</td>
+            <td>O(1)</td>
+            <td bgcolor="lightgreen">O(log n)</td>
+        </tr>
+        <tr>
+            <td>ExtractMax</td>
+            <td>O(n)</td>
+            <td bgcolor="lightgreen">O(log n)</td>
+        </tr>
+        <tr>
+            <td>GetMax</td>
+            <td>O(n)</td>
+            <td>O(1)</td>
+        </tr>
+    </table>
+
+    <h3>The heap property</h3>
+    <p>
+        A <strong>binary max-heap</strong> is a binary tree where every parent &ge; its children. So the max sits at the
+        root. Two operations fix violations, each costing O(tree height):
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Op</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>SiftUp</td>
+            <td>after Insert: swap a too-big node upward until parent &ge; it</td>
+        </tr>
+        <tr>
+            <td>SiftDown</td>
+            <td>after ExtractMax: swap a too-small node down past its larger child</td>
+        </tr>
+    </table>
+
+    <h3>Keep it shallow + array-backed</h3>
+    <p>
+        Force a <strong>complete binary tree</strong> (all levels full, last level filled left-to-right) so height is
+        always O(log n). The payoff: no pointers needed &mdash; store it in a plain array, indices computed on the fly.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Node i</th>
+            <th>Index</th>
+        </tr>
+        <tr>
+            <td>parent</td>
+            <td>&lfloor;i / 2&rfloor;</td>
+        </tr>
+        <tr>
+            <td>left child</td>
+            <td>2i</td>
+        </tr>
+        <tr>
+            <td>right child</td>
+            <td>2i + 1</td>
+        </tr>
+    </table>
+    <p>
+        Insert at the last position then SiftUp; ExtractMax swaps root with the last leaf then SiftDown &mdash; both keep
+        the tree complete.
+    </p>
+
+    <h3>BuildHeap &amp; HeapSort</h3>
+    <p>
+        SiftDown every internal node bottom-up to turn an array into a heap. Naively that looks like O(n log n), but most
+        nodes are near the leaves &mdash; the sum works out to <strong>O(n)</strong>. <strong>HeapSort</strong> = build
+        the heap (O(n)), then ExtractMax n times (O(n log n)) &rarr; <strong>O(n log n), in place</strong>. Also great
+        for "top k": build-heap + k extracts = O(n) when k &le; n/log n.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

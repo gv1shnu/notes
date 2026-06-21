@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Dynamic Programming</h2>
+    <p>
+        When a problem breaks into <strong>overlapping</strong> subproblems, plain recursion recomputes the same answers
+        a trillion times. DP solves each subproblem <em>once</em>, stores it in a table, and builds up &mdash; usually
+        bottom-up, smallest first.
+    </p>
+    <p>
+        (The name is a smokescreen: Richard Bellman picked "dynamic programming" so his maths would sound impressive to
+        a defense budget committee. It has nothing to do with programming.)
+    </p>
+
+    <h3>Change problem &mdash; the table idea</h3>
+    <p>
+        Fewest coins to make <code>m</code> from given denominations. Greedy fails for some coin systems; recursion is
+        correct but exponential (it re-solves the same amounts endlessly). DP fills a table
+        <strong>left to right</strong>:
+    </p>
+
+    <pre><code>minCoins[0] = 0
+for amount = 1 .. m:
+    minCoins[amount] = 1 + min( minCoins[amount - c] for each coin c &le; amount )
+</code></pre>
+
+    <p>
+        Each amount is solved once by looking up smaller amounts already computed. O(m &middot; #coins).
+    </p>
+
+    <h3>Edit distance &mdash; a 2D grid</h3>
+    <p>
+        Fewest insert/delete/substitute edits to turn string A into string B. Let <code>D(i,j)</code> = edit distance of
+        the first <code>i</code> of A and first <code>j</code> of B. Each cell looks at three neighbours:
+    </p>
+
+    <pre><code>D(i,j) = min(
+    D(i-1, j)   + 1,                 # deletion
+    D(i,   j-1) + 1,                 # insertion
+    D(i-1, j-1) + (A[i] != B[j])     # match (0) or substitution (1)
+)
+</code></pre>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Base</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>D(i, 0)</td>
+            <td>i (delete all)</td>
+        </tr>
+        <tr>
+            <td>D(0, j)</td>
+            <td>j (insert all)</td>
+        </tr>
+    </table>
+    <p>
+        Fill the grid row by row; the answer is <code>D(n,m)</code>. O(n&middot;m). Trace the chosen arrows back to
+        reconstruct the actual alignment.
+    </p>
+
+    <h3>Knapsack (0/1 and unbounded)</h3>
+    <p>
+        Items with weights and values, a sack of capacity W, maximize value. The greedy value-per-weight trick
+        <em>doesn't</em> work for whole items &mdash; this needs DP.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Variant</th>
+            <th>Recurrence</th>
+        </tr>
+        <tr>
+            <td>With repetitions</td>
+            <td>V(w) = max over items i of [ V(w - w<sub>i</sub>) + v<sub>i</sub> ]</td>
+        </tr>
+        <tr>
+            <td>Without (0/1)</td>
+            <td>V(w, i) = max( V(w, i-1), &nbsp; V(w - w<sub>i</sub>, i-1) + v<sub>i</sub> )</td>
+        </tr>
+    </table>
+    <p>
+        The 0/1 version adds a second axis (which items are allowed) so each item is used at most once. Both run in
+        O(n &middot; W) &mdash; the "cut-and-paste" argument proves an optimal sack minus one item is still optimal for
+        the smaller capacity.
+    </p>
+
+    <h3>Placing parentheses &mdash; optimal order</h3>
+    <p>
+        Maximize an arithmetic expression like <code>1 + 2 - 3 &times; 4 - 5</code> by choosing the order of operations.
+        Brute force is <strong>n!</strong> orders (20 digits &gt; a year). DP instead solves every
+        <em>sub-expression</em> once, tracking both the <strong>max and min</strong> of each (a minus times a min can
+        become the max), and combines them &mdash; O(n&sup3;).
+    </p>
+
+    <p>
+        The pattern every time: define the subproblem, write the recurrence, fill the table in dependency order, then
+        read back the solution.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

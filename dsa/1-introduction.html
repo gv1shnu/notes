@@ -32,6 +32,105 @@
     </p>
 
     <h3>Time and Space Complexity</h3>
+
+    <p>
+        The same problem can have two correct algorithms a lifetime apart. Take Fibonacci. The naive recursion is just
+        the definition: <code>fib(n) = fib(n-1) + fib(n-2)</code>. It's correct &mdash; and useless. It rebuilds the same
+        sub-results over and over (a giant tree of repeated calls), so its work grows like the Fibonacci numbers
+        themselves.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Compute F(100)</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">naive recursion</td>
+            <td>~1.77 &times; 10<sup>21</sup> steps &rarr; ~56,000 years at 1 GHz</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">fill an array left&rarr;right</td>
+            <td>~200 steps &rarr; instant</td>
+        </tr>
+    </table>
+
+    <p>
+        So we don't measure wall-clock seconds &mdash; those depend on the machine, compiler, and architecture, which
+        only change the answer by a <em>constant</em>. We measure how runtime <strong>scales with input size</strong>,
+        and ignore constants. That's <strong>Big-O</strong>:
+    </p>
+
+    <p>
+        <code>f(n) = O(g(n))</code> &nbsp;means&nbsp; <code>f(n) &le; c &middot; g(n)</code> for some constant
+        <code>c</code> and all large <code>n</code>. A few rules cover most cases:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Rule</th>
+            <th>Example</th>
+        </tr>
+        <tr>
+            <td>drop constant factors</td>
+            <td>7n&sup3; = O(n&sup3;)</td>
+        </tr>
+        <tr>
+            <td>drop lower-order terms</td>
+            <td>3n&sup2; + 5n + 2 = O(n&sup2;)</td>
+        </tr>
+        <tr>
+            <td>any exponential beats any polynomial</td>
+            <td>n<sup>100</sup> = O(1.1<sup>n</sup>)</td>
+        </tr>
+        <tr>
+            <td>any polynomial beats any power of log</td>
+            <td>(log n)&sup3; = O(&radic;n)</td>
+        </tr>
+    </table>
+
+    <p>
+        Why the growth rate is everything &mdash; what you can finish in <strong>one second</strong> at ~1 GHz:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Runtime</th>
+            <th>Max input n</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">n</td>
+            <td>~1,000,000,000</td>
+        </tr>
+        <tr>
+            <td>n log n</td>
+            <td>~30,000,000</td>
+        </tr>
+        <tr>
+            <td>n&sup2;</td>
+            <td>~30,000</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">2<sup>n</sup></td>
+            <td>~30</td>
+        </tr>
+    </table>
+
+    <p>
+        Growth order, best to worst: <code>1 &lt; log n &lt; &radic;n &lt; n &lt; n log n &lt; n&sup2; &lt; 2<sup>n</sup> &lt; n!</code>.
+        Related notation: <strong>&Omega;</strong> is a lower bound (grows no slower), <strong>&Theta;</strong> is tight
+        (same rate both ways), little-<strong>o</strong> is strictly slower. Big-O is the one we'll use for almost
+        everything &mdash; just remember it hides constants, so the last factor-of-2 still needs real measurement.
+    </p>
+
+    <p>
+        With that, the three great algorithm-design paradigms: <a href="./13-greedy-algorithms.html">Greedy</a>,
+        <a href="./12-divide-and-conquer.html">Divide &amp; Conquer</a>, and
+        <a href="./15-dynamic-programming.html">Dynamic Programming</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
 </body>
 
 </html>

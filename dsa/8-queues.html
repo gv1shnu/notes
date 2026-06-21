@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Queues</h2>
+    <p>
+        A <strong>FIFO</strong> collection &mdash; First In, First Out. Like a line at a checkout: longest-waiting is
+        served next.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>Enqueue(key)</td>
+            <td>add to the back</td>
+        </tr>
+        <tr>
+            <td>Dequeue()</td>
+            <td>remove + return the front (oldest)</td>
+        </tr>
+        <tr>
+            <td>Empty()</td>
+            <td>any elements?</td>
+        </tr>
+    </table>
+    <p>
+        All <strong>O(1)</strong>. Two implementations:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Built on</th>
+            <th>How</th>
+        </tr>
+        <tr>
+            <td>Linked list (head + tail)</td>
+            <td>Enqueue = PushBack, Dequeue = PopFront; grows freely</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Circular array</td>
+            <td>read + write indices that wrap around; fixed size</td>
+        </tr>
+    </table>
+
+    <p>
+        The circular array keeps a <code>read</code> and <code>write</code> index; both wrap to 0 at the end. One slot is
+        always left unused so <code>read == write</code> unambiguously means "empty" (not "full"). That's what keeps both
+        Enqueue and Dequeue O(1) instead of an O(n) shift.
+    </p>
+    <p>
+        Stacks are LIFO, queues are FIFO &mdash; that one difference is why a queue is right for servers, scheduling, and
+        breadth-first search, while a stack fits undo and depth-first search.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

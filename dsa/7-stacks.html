@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Stacks</h2>
+    <p>
+        A <strong>LIFO</strong> collection &mdash; Last In, First Out. Like a stack of books: you only touch the top.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>Push(key)</td>
+            <td>add to the top</td>
+        </tr>
+        <tr>
+            <td>Top()</td>
+            <td>peek at the most recent</td>
+        </tr>
+        <tr>
+            <td>Pop()</td>
+            <td>remove + return the most recent</td>
+        </tr>
+        <tr>
+            <td>Empty()</td>
+            <td>any elements?</td>
+        </tr>
+    </table>
+    <p>
+        Every operation is <strong>O(1)</strong>, on either implementation:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Built on</th>
+            <th>Trade-off</th>
+        </tr>
+        <tr>
+            <td>Array (+ count)</td>
+            <td>fixed max size; may waste allocated space</td>
+        </tr>
+        <tr>
+            <td>Linked list (Push = PushFront)</td>
+            <td>unbounded; one pointer of overhead per element</td>
+        </tr>
+    </table>
+
+    <h3>Classic use: balanced brackets</h3>
+    <p>
+        Check that <code>([])()</code> is balanced. Scan left to right: push every opening bracket; on a closing
+        bracket, pop and check it matches. At the end the stack must be empty.
+    </p>
+    <pre><code>for ch in string:
+    if ch is opening: push(ch)
+    else:                          # closing
+        if empty(): return False   # nothing to match
+        if not matches(pop(), ch): return False
+return empty()                     # leftover opens = unbalanced
+</code></pre>
+    <p>
+        The stack naturally remembers the still-open brackets in the exact order they must close &mdash; that's what
+        LIFO is for. (Also: function call stacks, expression parsing, undo.)
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
