@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Why concurrency</h2>
+    <p>
+        A modern CPU has many cores, and each core runs several threads. Serial code uses one &mdash; the rest sit idle.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Consumer CPU</th>
+            <th>Count</th>
+        </tr>
+        <tr>
+            <td>Cores</td>
+            <td>4 &ndash; 8</td>
+        </tr>
+        <tr>
+            <td>Threads per core</td>
+            <td>1 &ndash; 4</td>
+        </tr>
+    </table>
+
+    <p>
+        A <strong>thread</strong> is an independent sequence of steps. Think of train tracks: apart, trains run at full
+        speed; merged, each is limited by the train ahead. Independent work is free speed; shared work is where problems begin.
+    </p>
+
+    <p>
+        The OS <strong>scheduler</strong> decides which thread runs on which core. When a thread waits on data
+        (a <strong>cache miss</strong>), the scheduler parks it and runs another. Switching costs time too, so
+        constant switching is its own waste.
+    </p>
+
+    <p>
+        Memory is layered. Closer is faster.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Level</th>
+            <th>Speed</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Registers / L1</td>
+            <td>fastest, closest to core</td>
+        </tr>
+        <tr>
+            <td>L2 / L3 cache</td>
+            <td>shared between cores</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">RAM &rarr; Disk</td>
+            <td>slowest, farthest</td>
+        </tr>
+    </table>
+
+    <p>
+        Next, the cost of sharing. <a href="./1-race-condition.html">&gt;&gt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

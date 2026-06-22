@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Concurrency patterns</h2>
+
+    <h3>13. Pipelines and workflows.</h3>
+    <p>
+        Both are directed graphs of steps. A pipeline is the straight-line case; a workflow can branch and rejoin.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Pipeline</th>
+            <th>Workflow</th>
+        </tr>
+        <tr>
+            <td>Shape</td>
+            <td>each step &rarr; one next step</td>
+            <td>fan-out / fan-in, may cycle</td>
+        </tr>
+        <tr>
+            <td>Example</td>
+            <td>step1 &rarr; step2 &rarr; step3</td>
+            <td>split work, run in parallel, merge</td>
+        </tr>
+    </table>
+
+    <p>
+        Divide-and-conquer and map-reduce can both be built as workflows.
+    </p>
+
+    <p>
+        Next, recursion. <a href="./14-recursion.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, the repository. <a href="./12-repository.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

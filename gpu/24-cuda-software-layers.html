@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>CUDA</h2>
+
+    <h3>24. Software layers.</h3>
+    <p>
+        Your application talks to the GPU through one of two APIs. That single choice shapes how your code looks and compiles.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <td>Your application</td>
+        </tr>
+        <tr>
+            <td>&darr;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Runtime API &nbsp;|&nbsp; Driver API</td>
+        </tr>
+        <tr>
+            <td>&darr;</td>
+        </tr>
+        <tr>
+            <td>GPU hardware</td>
+        </tr>
+    </table>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Detail</th>
+            <th>Note</th>
+        </tr>
+        <tr>
+            <td>File types</td>
+            <td>CUDA code lives in <code>.cu</code> / <code>.cuh</code></td>
+        </tr>
+        <tr>
+            <td>Compiler</td>
+            <td><code>nvcc</code> compiles device + host code together</td>
+        </tr>
+        <tr>
+            <td>Other languages</td>
+            <td>pyCUDA, jCUDA; TensorFlow / PyTorch use CUDA under the hood</td>
+        </tr>
+        <tr>
+            <td>Libraries</td>
+            <td>Nvidia toolkit ships ready-made CUDA libraries</td>
+        </tr>
+    </table>
+
+    <p>
+        Next, compilation with nvcc. <a href="./25-cuda-compilation.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Nvidia architectures. <a href="./23-nvidia-gpu-architectures.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

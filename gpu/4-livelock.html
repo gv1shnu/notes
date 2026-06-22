@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Pitfalls of shared state</h2>
+
+    <h3>4. Livelock.</h3>
+    <p>
+        Like deadlock, but the threads are busy &mdash; constantly reacting to each other, never actually progressing.
+    </p>
+
+    <p>
+        Two people in a hallway step aside to let the other pass, both the same way, again and again.
+        A retry loop does the same: test, fail, sleep, retry, forever.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Deadlock</th>
+            <th>Livelock</th>
+        </tr>
+        <tr>
+            <td>Threads</td>
+            <td>frozen</td>
+            <td bgcolor="orange">busy</td>
+        </tr>
+        <tr>
+            <td>Progress</td>
+            <td>none</td>
+            <td>none</td>
+        </tr>
+        <tr>
+            <td>Risk</td>
+            <td>stuck</td>
+            <td>stack/buffer overflow, infinite loop</td>
+        </tr>
+    </table>
+
+    <br>
+    <strong>Solution</strong>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Mechanism</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td>Random backoff</td>
+            <td>Threads retry after different waits &rarr; break the symmetry</td>
+        </tr>
+    </table>
+
+    <p>
+        Misusing a language's async features can also cause it &mdash; be careful.
+    </p>
+
+    <p>
+        Next, utilization. <a href="./5-utilization.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, deadlock. <a href="./3-deadlock.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

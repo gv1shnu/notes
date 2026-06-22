@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>CUDA programming</h2>
+
+    <h3>28. Keywords.</h3>
+    <p>
+        Three groups. First, <strong>where code runs</strong> &mdash; part of the function signature, not the call.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Qualifier</th>
+            <th>Runs on</th>
+            <th>Called from</th>
+        </tr>
+        <tr>
+            <td>__host__</td>
+            <td>CPU</td>
+            <td>CPU</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">__global__</td>
+            <td>GPU (a kernel)</td>
+            <td>CPU</td>
+        </tr>
+        <tr>
+            <td>__device__</td>
+            <td>GPU</td>
+            <td>GPU (called by other GPU code)</td>
+        </tr>
+    </table>
+
+    <p>
+        Second, the <strong>launch config</strong> &mdash; how the work is divided:
+    </p>
+
+    <pre><code>kernel&lt;&lt;&lt; blocksPerGrid, threadsPerBlock, sharedMem, stream &gt;&gt;&gt;(args);</code></pre>
+
+    <p>
+        Third, <strong>where data lives</strong>:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Memory</th>
+            <th>Scope</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">registers</td>
+            <td>fastest, per-thread (limited)</td>
+        </tr>
+        <tr>
+            <td>__constant__</td>
+            <td>read-only, shared</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">__shared__</td>
+            <td>per-block; not guaranteed &mdash; may spill to global</td>
+        </tr>
+        <tr>
+            <td>__device__</td>
+            <td>device global memory</td>
+        </tr>
+    </table>
+
+    <strong>In code</strong> &mdash; a kernel: <code>y = a*x + y</code>, one thread per element.
+    <pre><code>CUDA
+
+<span style="color:#0099ff;">__global__</span> <span style="color:#0099ff;">void</span> saxpy(<span style="color:#0099ff;">int</span> n, <span style="color:#0099ff;">float</span> a, <span style="color:#0099ff;">float</span> *x, <span style="color:#0099ff;">float</span> *y) {
+    <span style="color:#0099ff;">int</span> i = blockIdx.x * blockDim.x + threadIdx.x;   <span style="color:#888;">// this thread's index</span>
+    <span style="color:#0099ff;">if</span> (i &lt; n) y[i] = a * x[i] + y[i];
+}
+
+<span style="color:#888;">// launch: 256 threads per block, enough blocks to cover n</span>
+saxpy&lt;&lt;&lt;(n + 255) / 256, 256&gt;&gt;&gt;(n, 2.0f, d_x, d_y);
+</code></pre>
+
+    <p>
+        Next, the tooling. <a href="./29-cuda-tooling.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, the execution model. <a href="./27-cuda-execution-model.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

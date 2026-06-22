@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Concurrency patterns</h2>
+
+    <h3>11. Map-reduce.</h3>
+    <p>
+        A subset of divide and conquer. Break the data into single points, apply the same operation to each
+        (<strong>map</strong>), then fold the results into one value (<strong>reduce</strong>).
+    </p>
+
+    Example: is <code>X</code> in the set? Each mapper returns 1 on a match, else 0. The reducer sums them.
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Element</th>
+            <th>Mapper (X = 7)</th>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td bgcolor="lightgreen">1</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td><strong>reduce (sum)</strong></td>
+            <td><strong>1 &rarr; true</strong></td>
+        </tr>
+    </table>
+
+    <p>
+        Scales well at any data size, as long as the system is well built and communication is not slow.
+        Jobs can be chained together.
+    </p>
+
+    <p>
+        Next, the repository. <a href="./12-repository.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, divide and conquer. <a href="./10-divide-and-conquer.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

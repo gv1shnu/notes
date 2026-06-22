@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Canonical problems</h2>
+    <p>
+        A few classic problems show up again and again. Solve the canonical form and you solve every look-alike.
+    </p>
+
+    <h3>6. Dining philosophers.</h3>
+    <p>
+        Philosophers sit around a table. Each needs <strong>two forks</strong> to eat, shares each fork with a neighbour,
+        and can do only one thing at a time.
+    </p>
+
+    Naive plan: pick up left fork, then right, eat, put both down.
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Everyone, at once</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>grab left fork</td>
+            <td>holds 1 fork</td>
+        </tr>
+        <tr>
+            <td>reach for right fork</td>
+            <td bgcolor="red">taken by neighbour &rarr; all starve</td>
+        </tr>
+    </table>
+
+    <p>
+        It is just the earlier pitfalls in disguise:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Behaviour</th>
+            <th>Pitfall</th>
+        </tr>
+        <tr>
+            <td>politely competing for a fork</td>
+            <td>resource contention</td>
+        </tr>
+        <tr>
+            <td>never dropping a held fork</td>
+            <td>deadlock</td>
+        </tr>
+        <tr>
+            <td>all drop and re-grab together</td>
+            <td>livelock</td>
+        </tr>
+    </table>
+
+    <br>
+    <strong>Solution</strong>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Idea</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td>Central authority</td>
+            <td>decides who eats and when</td>
+        </tr>
+        <tr>
+            <td>Fork order</td>
+            <td>break the symmetry so no full circle of waiting</td>
+        </tr>
+    </table>
+
+    <p>
+        No fix is trivially easy &mdash; think before you write the code.
+    </p>
+
+    <p>
+        Next, producer&ndash;consumer. <a href="./7-producer-consumer.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, utilization. <a href="./5-utilization.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

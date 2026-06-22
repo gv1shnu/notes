@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Canonical problems</h2>
+
+    <h3>7. Producer&ndash;consumer.</h3>
+    <p>
+        Producers add data to a queue; consumers pull or subscribe. This is how message queues work.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <td>Producers</td>
+            <td>&rarr;</td>
+            <td bgcolor="lightblue">Queue</td>
+            <td>&rarr;</td>
+            <td>Consumers</td>
+        </tr>
+    </table>
+
+    When the queue overflows, the strategy depends on what the data is for:
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>If&hellip;</th>
+            <th>Then</th>
+        </tr>
+        <tr>
+            <td>recent data matters most</td>
+            <td>drop the oldest</td>
+        </tr>
+        <tr>
+            <td>a sample is enough</td>
+            <td>drop at random</td>
+        </tr>
+        <tr>
+            <td>all data matters</td>
+            <td>spill to slower storage, tell producers to slow down</td>
+        </tr>
+    </table>
+
+    <p>
+        Risk: if the producer index runs ahead of the consumer index, you get races and overwritten data.
+    </p>
+
+    <p>
+        Next, the sleeping barber. <a href="./8-sleeping-barber.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, dining philosophers. <a href="./6-dining-philosophers.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

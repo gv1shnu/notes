@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Parallel syntax &mdash; Python 3</h2>
+    <p>
+        Python ships three concurrency libraries out of the box. This page covers the first.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Library</th>
+            <th>For</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">threading / _thread</td>
+            <td>threads (this page)</td>
+        </tr>
+        <tr>
+            <td>asyncio</td>
+            <td>async code</td>
+        </tr>
+        <tr>
+            <td>multiprocessing</td>
+            <td>separate processes</td>
+        </tr>
+    </table>
+
+    <h3>17. threading.</h3>
+    <p>
+        Start a thread by handing it a function plus its arguments. Then guard shared data with locks.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Primitive</th>
+            <th>Use</th>
+        </tr>
+        <tr>
+            <td>start_new_thread(fn, args)</td>
+            <td>run <code>fn</code> in a new thread</td>
+        </tr>
+        <tr>
+            <td>lock.acquire() / release()</td>
+            <td>one thread in the critical section at a time</td>
+        </tr>
+        <tr>
+            <td>Semaphore</td>
+            <td>let a fixed number of threads in at once</td>
+        </tr>
+        <tr>
+            <td>Event</td>
+            <td>signal between threads</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Barrier</td>
+            <td>all threads wait here until everyone arrives</td>
+        </tr>
+    </table>
+
+    <p>
+        A barrier is the clean way to make a value coherent across threads before anyone moves on.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+<span style="color:#0099ff;">import</span> threading
+
+lock = threading.Lock()
+count = 0
+
+<span style="color:#0099ff;">def</span> worker():
+    <span style="color:#0099ff;">global</span> count
+    <span style="color:#0099ff;">with</span> lock:              <span style="color:#888;"># acquire + release</span>
+        count += 1
+
+threads = [threading.Thread(target=worker) <span style="color:#0099ff;">for</span> _ <span style="color:#0099ff;">in</span> range(4)]
+<span style="color:#0099ff;">for</span> t <span style="color:#0099ff;">in</span> threads: t.start()
+<span style="color:#0099ff;">for</span> t <span style="color:#0099ff;">in</span> threads: t.join()
+print(count)                  <span style="color:#888;"># 4, safely</span>
+</code></pre>
+
+    <p>
+        Next, asyncio. <a href="./18-python-asyncio.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Flynn's taxonomy. <a href="./16-flynns-taxonomy.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

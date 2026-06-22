@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Concurrency Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>CUDA</h2>
+
+    <h3>25. Compilation with nvcc.</h3>
+    <p>
+        <code>nvcc</code> compiles GPU and host code into one executable, passing through intermediate forms.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Intermediate</th>
+            <th>What it is</th>
+        </tr>
+        <tr>
+            <td>PTX</td>
+            <td>virtual assembly &mdash; portable across hardware</td>
+        </tr>
+        <tr>
+            <td>cubin</td>
+            <td>real binary for a specific architecture</td>
+        </tr>
+        <tr>
+            <td>fatbin</td>
+            <td>a bundle of the above</td>
+        </tr>
+    </table>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Option</th>
+            <th>Use</th>
+        </tr>
+        <tr>
+            <td>-h</td>
+            <td>help / usage</td>
+        </tr>
+        <tr>
+            <td>-o</td>
+            <td>name the output</td>
+        </tr>
+        <tr>
+            <td>--lib</td>
+            <td>compile into a library for shared projects</td>
+        </tr>
+        <tr>
+            <td>--run</td>
+            <td>compile, link, and execute in one step</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">-arch / -code / -gencode</td>
+            <td>target a hardware architecture (else you get deprecation warnings)</td>
+        </tr>
+    </table>
+
+    <p>
+        Virtual architecture = which features (compute version); real architecture = which physical hardware.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Bash
+
+nvcc -o vector_add vector_add.cu     <span style="color:#888;"># compile</span>
+./vector_add                         <span style="color:#888;"># run</span>
+
+nvcc --run vector_add.cu             <span style="color:#888;"># compile + run in one step</span>
+nvcc -arch=sm_62 -o vector_add vector_add.cu   <span style="color:#888;"># target a specific GPU</span>
+</code></pre>
+
+    <p>
+        Next, runtime vs driver API. <a href="./26-runtime-vs-driver-api.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, software layers. <a href="./24-cuda-software-layers.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
