@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>9. reduce.</h3>
+    <p>
+        Fold every element into a single value using a two-argument function. An action.
+    </p>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+<span style="color:#0099ff;">from</span> operator <span style="color:#0099ff;">import</span> add
+
+nums = sc.parallelize([1, 2, 3, 4, 5])
+
+nums.reduce(add)                     <span style="color:#888;"># 15  (1+2+3+4+5)</span>
+nums.reduce(<span style="color:#0099ff;">lambda</span> x, y: x * y)     <span style="color:#888;"># 120 (1*2*3*4*5)</span>
+</code></pre>
+
+    <p>
+        To tally how often each value appears, <code>countByValue</code> does it in one call:
+    </p>
+
+    <pre><code>Python
+
+words.countByValue()    <span style="color:#888;"># {'spark': 2, 'hadoop': 2, 'pig': 1}</span>
+</code></pre>
+
+    <p>
+        Next, join. <a href="./10-join.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, foreach. <a href="./8-foreach.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

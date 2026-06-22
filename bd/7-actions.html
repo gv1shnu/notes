@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>Big Data Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Apache Spark</h2>
+
+    <h3>7. Actions.</h3>
+    <p>
+        An action is what actually <strong>triggers</strong> the work. It runs the whole lineage and returns a result
+        to the driver.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Action</th>
+            <th>Returns</th>
+        </tr>
+        <tr>
+            <td>show(n)</td>
+            <td>first <code>n</code> rows of a DataFrame, as a table</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">collect()</td>
+            <td>every element, as a list (careful: pulls it all to the driver)</td>
+        </tr>
+        <tr>
+            <td>count()</td>
+            <td>number of elements</td>
+        </tr>
+        <tr>
+            <td>take(n)</td>
+            <td>the first <code>n</code> elements</td>
+        </tr>
+    </table>
+
+    <strong>In code</strong>
+    <pre><code>Python
+
+df.show(5)        <span style="color:#888;"># first 5 rows</span>
+rdd.collect()     <span style="color:#888;"># [whole RDD as a list]</span>
+rdd.count()       <span style="color:#888;"># 8</span>
+rdd.take(3)       <span style="color:#888;"># first 3 elements</span>
+</code></pre>
+
+    <p>
+        The pattern: build with transformations (lazy), then fire one action to make it run.
+    </p>
+
+    <p>
+        Next, foreach. <a href="./8-foreach.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, transformations. <a href="./6-transformations.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
