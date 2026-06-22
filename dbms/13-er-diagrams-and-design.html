@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>ER Diagrams and Database Design</h2>
+
+    <p>
+        So far we've been handed tables and told to query them. But where do the tables come from?
+        Someone has to decide what tables exist, what columns they hold, and how they connect.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> If you open a query tool and start writing <code>CREATE TABLE</code>
+        on instinct, you'll rebuild every flaw from the file-based chapter — the same fact stored in
+        three places, the same update applied to two of them. Bad structure is cheap to fix on paper
+        and brutally expensive to fix once a million rows depend on it.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Model the problem before you build it. An
+        <strong>Entity-Relationship (ER) diagram</strong> describes the real world as <em>entities</em>
+        and the <em>relationships</em> between them, independent of any table syntax. You design it
+        once, argue about it cheaply, then mechanically translate it into tables.
+    </p>
+
+    <hr>
+
+    <h3>Entities and attributes</h3>
+
+    <p>
+        An <strong>entity</strong> is a thing worth storing — a Player, a Team, a Tournament. An
+        <strong>attribute</strong> is a property of that thing. Attributes come in a few flavours,
+        and the flavour decides how it maps to a column later.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Attribute type</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td>Simple</td><td>One indivisible value</td><td>score</td></tr>
+        <tr><td>Composite</td><td>Splits into parts</td><td>full_name → first, last</td></tr>
+        <tr><td>Derived</td><td>Computed from others, not stored</td><td>age from date_of_birth</td></tr>
+        <tr><td>Multivalued</td><td>Holds many values</td><td>a player's past_teams</td></tr>
+        <tr><td>Key</td><td>Uniquely identifies the entity</td><td>player_id</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>Relationships and cardinality</h3>
+
+    <p>
+        A <strong>relationship</strong> links entities — a player <em>belongs to</em> a team, a team
+        <em>plays in</em> a tournament. <strong>Cardinality</strong> answers "how many of each side?"
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Cardinality</th><th>Reads as</th><th>Example</th></tr>
+        <tr><td>1 : 1</td><td>one to one</td><td>a team has one captain</td></tr>
+        <tr><td>1 : N</td><td>one to many</td><td>a team has many players</td></tr>
+        <tr><td>M : N</td><td>many to many</td><td>teams play in many tournaments, tournaments host many teams</td></tr>
+    </table>
+
+    <p>
+        Getting cardinality right is the whole game, because it decides where the foreign key goes —
+        or whether you need a third table entirely.
+    </p>
+
+    <hr>
+
+    <h3>Participation</h3>
+
+    <p>
+        Participation asks whether <em>every</em> entity must take part in the relationship.
+    </p>
+
+    <ul>
+        <li><strong>Total:</strong> every row must participate — a player must be on a team.</li>
+        <li><strong>Partial:</strong> participation is optional — a team need not be in any tournament yet.</li>
+    </ul>
+
+    <p>
+        Total participation usually becomes a <code>NOT NULL</code> foreign key; partial becomes a
+        nullable one.
+    </p>
+
+    <hr>
+
+    <h3>Weak entities</h3>
+
+    <p>
+        Some entities can't be identified on their own. A row in <code>match_stats</code> means
+        nothing without the match and the player it belongs to — "27 kills" is only meaningful as
+        "27 kills, by this player, in that match." A <strong>weak entity</strong> borrows part of its
+        identity from a stronger one, and its key is a composite of its own partial key plus the
+        owner's key.
+    </p>
+
+    <hr>
+
+    <h3>From ER diagram to tables</h3>
+
+    <p>
+        The translation is mechanical once the model is right. These rules are the bridge between the
+        whiteboard and <code>CREATE TABLE</code>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>In the ER model</th><th>Becomes in tables</th></tr>
+        <tr><td>Strong entity</td><td>A table, its key as PRIMARY KEY</td></tr>
+        <tr><td>1 : N relationship</td><td>A foreign key on the "many" side</td></tr>
+        <tr><td>M : N relationship</td><td>A new junction table holding both keys as a composite key</td></tr>
+        <tr><td>Multivalued attribute</td><td>A separate table, one row per value</td></tr>
+        <tr><td>Composite attribute</td><td>One column per part</td></tr>
+        <tr><td>Weak entity</td><td>A table whose key includes the owner's key</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>A worked model</h3>
+
+    <p>
+        Take the esports domain. The entities and how they relate:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Relationship</th><th>Cardinality</th></tr>
+        <tr><td>Player belongs to Team</td><td>N : 1</td></tr>
+        <tr><td>Team plays in Tournament</td><td>M : N</td></tr>
+    </table>
+
+    <p>Applying the rules gives:</p>
+
+    <ul>
+        <li><code>players</code> with a <code>team_id</code> foreign key (the N:1 lands here).</li>
+        <li><code>teams</code> and <code>tournaments</code> as their own tables.</li>
+        <li><code>team_tournament</code>, a junction table of <code>(team_id, tournament_id)</code>, for the M:N.</li>
+    </ul>
+
+    <p>
+        That junction table is the part beginners forget. A many-to-many relationship can never be a
+        single foreign key — there is no "many" side to put it on — so it always becomes its own table.
+    </p>
+
+    <hr>
+
+    <h3>Notation</h3>
+
+    <p>
+        Two notations dominate. <strong>Chen</strong> draws entities as rectangles, relationships as
+        diamonds, attributes as ovals — good for teaching. <strong>Crow's Foot</strong> draws the
+        cardinality as little branching lines at the ends of a connector — what you'll actually see in
+        tools like dbdiagram and most real schemas. They say the same thing; pick whichever your team
+        reads faster.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> Designing tables by instinct rebuilds the redundancy and
+            anomalies of file systems.
+            <br>
+            <strong>Solution:</strong> Model entities and relationships first; translate to tables by
+            fixed rules.
+        </li>
+        <li>
+            <strong>Problem:</strong> A many-to-many relationship has no side to hold a foreign key.
+            <br>
+            <strong>Solution:</strong> It becomes a junction table with a composite key.
+        </li>
+    </ul>
+
+    <p>
+        A clean model removes redundancy by hand. The next chapter makes that process formal and
+        provable.
+    </p>
+
+    <p>
+        Next, Normalization.
+        <a href="./14-normalization.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Window Functions
+        <a href="./12-window-functions.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

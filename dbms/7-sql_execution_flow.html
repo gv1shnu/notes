@@ -25,8 +25,7 @@
 
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> level, AVG(score)
 <span style="color:#0099ff;">AS</span> average_rr
 <span style="color:#0099ff;">FROM</span> players
@@ -34,8 +33,7 @@
 <span style="color:#0099ff;">GROUP BY</span> level
 <span style="color:#0099ff;">HAVING</span> AVG(score) > 700
 <span style="color:#0099ff;">ORDER BY</span> average_rr DESC
-<span style="color:#0099ff;">LIMIT</span> 1;
-</code>
+<span style="color:#0099ff;">LIMIT</span> 1;</code>
 </pre>
 
     <table border="1" cellpadding="10">
@@ -142,8 +140,7 @@
     <p>Query:</p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> team, AVG(kills)
 <span style="color:#0099ff;">AS</span> avg_kills
 <span style="color:#0099ff;">FROM</span> match_stats
@@ -151,8 +148,7 @@
 <span style="color:#0099ff;">GROUP BY</span> team
 <span style="color:#0099ff;">HAVING</span> AVG(kills) > 20
 <span style="color:#0099ff;">ORDER BY</span> avg_kills DESC
-<span style="color:#0099ff;">LIMIT</span> 1;
-</code>
+<span style="color:#0099ff;">LIMIT</span> 1;</code>
 </pre>
 
     <hr>
@@ -378,6 +374,68 @@
         syntax, known as its <strong>parsing order</strong>, which determines how queries must be written. The database
         first parses the query according to this structure and then internally evaluates it using its logical execution
         order.
+    </p>
+
+    <p>
+        Placing the two orders next to each other makes the mismatch obvious:
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Clause</th>
+            <th>Parsing order (how you write it)</th>
+            <th>Execution order (how it runs)</th>
+        </tr>
+
+        <tr>
+            <td>SELECT</td>
+            <td>1</td>
+            <td>5</td>
+        </tr>
+
+        <tr>
+            <td>FROM</td>
+            <td>2</td>
+            <td>1</td>
+        </tr>
+
+        <tr>
+            <td>WHERE</td>
+            <td>3</td>
+            <td>2</td>
+        </tr>
+
+        <tr>
+            <td>GROUP BY</td>
+            <td>4</td>
+            <td>3</td>
+        </tr>
+
+        <tr>
+            <td>HAVING</td>
+            <td>5</td>
+            <td>4</td>
+        </tr>
+
+        <tr>
+            <td>ORDER BY</td>
+            <td>6</td>
+            <td>6</td>
+        </tr>
+
+        <tr>
+            <td>LIMIT</td>
+            <td>7</td>
+            <td>7</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Notice <code>SELECT</code> is written first but runs fifth, while <code>FROM</code> is written second but runs
+        first. Only <code>ORDER BY</code> and <code>LIMIT</code> happen to sit in the same position in both orders &mdash;
+        which is exactly why they read so naturally at the end of a query.
     </p>
 
     <p>

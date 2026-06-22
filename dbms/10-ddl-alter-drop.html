@@ -58,10 +58,8 @@
     <p>Say we now want to record each player's role.</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players
-<span style="color:#0099ff;">ADD COLUMN</span> role VARCHAR(20);
-</code>
+<code><span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">ADD COLUMN</span> role VARCHAR(20);</code>
 </pre>
 
     <p>
@@ -78,19 +76,15 @@
     <p>PostgreSQL</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players
-<span style="color:#0099ff;">ALTER COLUMN</span> score <span style="color:#0099ff;">TYPE</span> NUMERIC(6,2);
-</code>
+<code><span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">ALTER COLUMN</span> score <span style="color:#0099ff;">TYPE</span> NUMERIC(6,2);</code>
 </pre>
 
     <p>MySQL</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players
-<span style="color:#0099ff;">MODIFY COLUMN</span> score DECIMAL(6,2);
-</code>
+<code><span style="color:#0099ff;">ALTER TABLE</span> players
+<span style="color:#0099ff;">MODIFY COLUMN</span> score DECIMAL(6,2);</code>
 </pre>
 
     <p>
@@ -105,11 +99,9 @@
     <h3>ALTER TABLE — rename</h3>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME COLUMN</span> role <span style="color:#0099ff;">TO</span> position;
+<code><span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME COLUMN</span> role <span style="color:#0099ff;">TO</span> position;
 
-<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME TO</span> pro_players;
-</code>
+<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">RENAME TO</span> pro_players;</code>
 </pre>
 
     <hr>
@@ -117,9 +109,7 @@
     <h3>ALTER TABLE — drop a column</h3>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">DROP COLUMN</span> position;
-</code>
+<code><span style="color:#0099ff;">ALTER TABLE</span> players <span style="color:#0099ff;">DROP COLUMN</span> position;</code>
 </pre>
 
     <p>
@@ -134,11 +124,9 @@
     <p>DROP operates on the object itself, not the rows.</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">DROP TABLE</span> players;
+<code><span style="color:#0099ff;">DROP TABLE</span> players;
 
-<span style="color:#0099ff;">DROP DATABASE</span> company;
-</code>
+<span style="color:#0099ff;">DROP DATABASE</span> company;</code>
 </pre>
 
     <p>
@@ -147,9 +135,7 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">DROP TABLE</span> <span style="color:#0099ff;">IF EXISTS</span> players;
-</code>
+<code><span style="color:#0099ff;">DROP TABLE</span> <span style="color:#0099ff;">IF EXISTS</span> players;</code>
 </pre>
 
     <hr>
@@ -197,9 +183,7 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">DELETE FROM</span> players <span style="color:#0099ff;">WHERE</span> score &lt; 600;
-</code>
+<code><span style="color:#0099ff;">DELETE FROM</span> players <span style="color:#0099ff;">WHERE</span> score &lt; 600;</code>
 </pre>
 
     <p>
@@ -208,9 +192,7 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">TRUNCATE TABLE</span> players;
-</code>
+<code><span style="color:#0099ff;">TRUNCATE TABLE</span> players;</code>
 </pre>
 
     <p>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>SQL Execution Flow (so far)</h2>
+
+    <p>
+        We have now met every clause of a basic query &mdash; <code>SELECT</code>, <code>FROM</code>,
+        <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code> and <code>OFFSET</code>. Before adding more, it is
+        worth pausing on a subtle point: the order in which we <em>write</em> these clauses is not the order in which the
+        database <em>runs</em> them.
+    </p>
+
+    <p>Example Query:</p>
+
+    <pre>
+<code><p>MySQL / PostgreSQL</p>
+<span style="color:#0099ff;">SELECT</span> username, score
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> score > 400
+<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>
+<span style="color:#0099ff;">LIMIT</span> 2 <span style="color:#0099ff;">OFFSET</span> 1;</code>
+</pre>
+
+    <h3>Parsing Order vs Execution Order</h3>
+
+    <p>
+        SQL is a <strong>declarative</strong> language: we describe the result we want, not the steps to compute it. SQL
+        has a fixed <strong>parsing order</strong> (how a query must be written) which is separate from its logical
+        <strong>execution order</strong> (how the database actually evaluates it). For the clauses covered so far:
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Clause</th>
+            <th>Parsing order (how you write it)</th>
+            <th>Execution order (how it runs)</th>
+        </tr>
+
+        <tr>
+            <td>SELECT</td>
+            <td>1</td>
+            <td>3</td>
+        </tr>
+
+        <tr>
+            <td>FROM</td>
+            <td>2</td>
+            <td>1</td>
+        </tr>
+
+        <tr>
+            <td>WHERE</td>
+            <td>3</td>
+            <td>2</td>
+        </tr>
+
+        <tr>
+            <td>ORDER BY</td>
+            <td>4</td>
+            <td>4</td>
+        </tr>
+
+        <tr>
+            <td>LIMIT / OFFSET</td>
+            <td>5</td>
+            <td>5</td>
+        </tr>
+
+    </table>
+
+    <p>
+        <code>SELECT</code> is written first but runs third &mdash; the database must load and filter rows
+        <em>before</em> it knows which columns to keep. This single fact explains why a column alias defined in
+        <code>SELECT</code> cannot be used in <code>WHERE</code>: when <code>WHERE</code> runs, <code>SELECT</code> has
+        not happened yet.
+    </p>
+
+    <hr>
+
+    <h2>Step-by-step trace</h2>
+
+    <p>Current table:</p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>Derke</td>
+            <td>705</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+        <tr>
+            <td>Boaster</td>
+            <td>388</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>Step 1 &mdash; FROM</h3>
+
+    <p>
+        The database loads the table <strong>players</strong> (all five rows above).
+    </p>
+
+    <hr>
+
+    <h3>Step 2 &mdash; WHERE</h3>
+
+    <p>
+        Apply: <strong>score > 400</strong>. Boaster (388) is removed.
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>Derke</td>
+            <td>705</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>Step 3 &mdash; SELECT</h3>
+
+    <p>
+        Keep only the requested columns, <strong>username</strong> and <strong>score</strong> (here, all of them).
+    </p>
+
+    <hr>
+
+    <h3>Step 4 &mdash; ORDER BY</h3>
+
+    <p>
+        Apply: <strong>ORDER BY score DESC</strong>.
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>TenZ</td>
+            <td>842</td>
+        </tr>
+
+        <tr>
+            <td>Derke</td>
+            <td>705</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+        <tr>
+            <td>yay</td>
+            <td>402</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>Step 5 &mdash; OFFSET, then LIMIT</h3>
+
+    <p>
+        Apply: <strong>OFFSET 1</strong> skips TenZ; <strong>LIMIT 2</strong> then takes the next two rows.
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>Derke</td>
+            <td>705</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>Final Output</h3>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>username</th>
+            <th>score</th>
+        </tr>
+
+        <tr>
+            <td>Derke</td>
+            <td>705</td>
+        </tr>
+
+        <tr>
+            <td>aspas</td>
+            <td>611</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <p>
+        This is the execution flow for everything covered so far. Once <code>GROUP BY</code> and <code>HAVING</code> are
+        added, two more steps slot in between <code>WHERE</code> and <code>SELECT</code> &mdash; the complete picture is
+        revisited in the full <a href="./7-sql_execution_flow.html">SQL Execution Flow</a> page.
+    </p>
+
+    <p>
+        Prev, LIMIT and OFFSET. <a href="./4-limit-offset.html">&lt;&lt;</a>
+    </p>
+
+    <p>
+        Next, common DQL operators. <a href="./5-dql-distinct-like-between-isnull.html">&gt;&gt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

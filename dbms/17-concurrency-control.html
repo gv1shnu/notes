@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Concurrency Control</h2>
+
+    <p>
+        The Isolation in ACID promised that concurrent transactions wouldn't see each other's
+        half-done work. This is the machinery that keeps that promise — and the dials it gives you.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Two transactions touch the same row at the same time. TenZ has 800
+        points; transaction A adds a 50-point bonus, transaction B adds a 30-point bonus. Both read
+        800, both compute from it, both write back. One write lands on top of the other, and 30 (or
+        50) points silently disappear. This is the <strong>lost update</strong>, and it's only the
+        gentlest of the things that go wrong when transactions interleave unmanaged.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Concurrency control schedules concurrent transactions so the final
+        result is the same as if they had run one after another — a <strong>serializable</strong>
+        outcome. Two families of technique deliver it: locking and multi-version concurrency control.
+    </p>
+
+    <hr>
+
+    <h3>What can go wrong: the read phenomena</h3>
+
+    <p>The SQL standard names three ways one transaction can be polluted by another:</p>
+
+    <ul>
+        <li><strong>Dirty read:</strong> A reads a row that B has changed but not committed. B rolls back, and A acted on data that never officially existed.</li>
+        <li><strong>Non-repeatable read:</strong> A reads a row, B updates and commits it, A reads the same row again and gets a different value — within one transaction.</li>
+        <li><strong>Phantom read:</strong> A runs <code>WHERE score &gt; 800</code>, B inserts a new qualifying row and commits, A re-runs the query and a new "phantom" row has appeared.</li>
+    </ul>
+
+    <hr>
+
+    <h3>Isolation levels</h3>
+
+    <p>
+        You choose how much protection you want — and pay for it in concurrency. Each level forbids
+        more phenomena than the last.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Isolation level</th><th>Dirty read</th><th>Non-repeatable read</th><th>Phantom read</th></tr>
+        <tr><td>READ UNCOMMITTED</td><td>possible</td><td>possible</td><td>possible</td></tr>
+        <tr><td>READ COMMITTED</td><td>prevented</td><td>possible</td><td>possible</td></tr>
+        <tr><td>REPEATABLE READ</td><td>prevented</td><td>prevented</td><td>possible</td></tr>
+        <tr><td>SERIALIZABLE</td><td>prevented</td><td>prevented</td><td>prevented</td></tr>
+    </table>
+
+    <pre>
+<code><span style="color:#0099ff;">SET TRANSACTION ISOLATION LEVEL</span> SERIALIZABLE;</code>
+</pre>
+
+    <p>
+        The defaults differ and catch people out: PostgreSQL defaults to READ COMMITTED, while MySQL's
+        InnoDB defaults to REPEATABLE READ (and, unusually, prevents phantoms at that level too). Know
+        your engine's default before you reason about a bug.
+    </p>
+
+    <hr>
+
+    <h3>Locking</h3>
+
+    <p>
+        The classic mechanism. A transaction takes a <strong>shared (S) lock</strong> to read and an
+        <strong>exclusive (X) lock</strong> to write. Many transactions can share an S lock on the
+        same row, but an X lock blocks everyone else — readers and writers alike.
+    </p>
+
+    <p>
+        To guarantee serializability, databases follow <strong>two-phase locking (2PL)</strong>: a
+        transaction first only <em>acquires</em> locks (the growing phase), then only
+        <em>releases</em> them (the shrinking phase), never reacquiring once it has let go. Strict 2PL
+        — holding every lock until commit — is what most engines actually use.
+    </p>
+
+    <p>You can also lock explicitly when you know a read-modify-write is coming:</p>
+
+    <pre>
+<code><span style="color:#0099ff;">SELECT</span> score <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ' <span style="color:#0099ff;">FOR UPDATE</span>;</code>
+</pre>
+
+    <p>
+        <code>FOR UPDATE</code> takes the exclusive lock now, so transaction B in our lost-update
+        story has to wait its turn instead of overwriting A.
+    </p>
+
+    <hr>
+
+    <h3>Deadlocks</h3>
+
+    <p>
+        Locking has a price. Transaction A holds a lock B wants, and B holds a lock A wants — neither
+        can proceed, forever. That's a <strong>deadlock</strong>. Databases resolve it by detecting
+        the cycle (a wait-for graph) or by timing out, then aborting one transaction as the
+        <em>victim</em> and rolling it back so the other can finish. You avoid them by acquiring locks
+        in a consistent order everywhere in your code.
+    </p>
+
+    <hr>
+
+    <h3>MVCC</h3>
+
+    <p>
+        Locking makes readers and writers block each other, which hurts. <strong>Multi-Version
+        Concurrency Control</strong> avoids most of that: instead of overwriting a row, the database
+        keeps multiple versions of it, and each transaction reads a consistent <em>snapshot</em> as of
+        the moment it started. Readers never block writers and writers never block readers — they just
+        see different versions.
+    </p>
+
+    <p>
+        This is why, back in the transactions chapter, a PostgreSQL UPDATE was described as writing a
+        new row version rather than editing in place: that old version is still there for any
+        transaction that began before the change. PostgreSQL and InnoDB both lean on MVCC.
+    </p>
+
+    <hr>
+
+    <h3>The trade-off</h3>
+
+    <p>
+        Stronger isolation buys correctness with throughput. SERIALIZABLE is the safest and the
+        slowest, because it must serialize conflicting work; READ COMMITTED lets far more run in
+        parallel but admits non-repeatable and phantom reads. The right level is the weakest one your
+        operation can tolerate — not the strongest you can name.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> Interleaved transactions corrupt each other — lost updates, dirty, non-repeatable, and phantom reads.
+            <br>
+            <strong>Solution:</strong> Concurrency control schedules them to a serializable outcome via locking or MVCC.
+        </li>
+        <li>
+            <strong>Problem:</strong> How much isolation is enough?
+            <br>
+            <strong>Solution:</strong> Pick an isolation level — the weakest that still keeps your operation correct.
+        </li>
+    </ul>
+
+    <p>
+        Next, Database Recovery.
+        <a href="./18-database-recovery.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Transactions and ACID Properties
+        <a href="./16-transactions-and-acid.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>
