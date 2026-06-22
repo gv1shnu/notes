@@ -381,6 +381,68 @@
     </p>
 
     <p>
+        Placing the two orders next to each other makes the mismatch obvious:
+    </p>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Clause</th>
+            <th>Parsing order (how you write it)</th>
+            <th>Execution order (how it runs)</th>
+        </tr>
+
+        <tr>
+            <td>SELECT</td>
+            <td>1</td>
+            <td>5</td>
+        </tr>
+
+        <tr>
+            <td>FROM</td>
+            <td>2</td>
+            <td>1</td>
+        </tr>
+
+        <tr>
+            <td>WHERE</td>
+            <td>3</td>
+            <td>2</td>
+        </tr>
+
+        <tr>
+            <td>GROUP BY</td>
+            <td>4</td>
+            <td>3</td>
+        </tr>
+
+        <tr>
+            <td>HAVING</td>
+            <td>5</td>
+            <td>4</td>
+        </tr>
+
+        <tr>
+            <td>ORDER BY</td>
+            <td>6</td>
+            <td>6</td>
+        </tr>
+
+        <tr>
+            <td>LIMIT</td>
+            <td>7</td>
+            <td>7</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Notice <code>SELECT</code> is written first but runs fifth, while <code>FROM</code> is written second but runs
+        first. Only <code>ORDER BY</code> and <code>LIMIT</code> happen to sit in the same position in both orders &mdash;
+        which is exactly why they read so naturally at the end of a query.
+    </p>
+
+    <p>
         For example, although <code>FROM</code> is logically processed before <code>SELECT</code>, writing a query as
         <code>FROM Cars SELECT *</code> would be invalid because SQL expects the <code>SELECT</code> clause to appear
         first. Understanding the difference between parsing order and logical execution order helps explain many SQL

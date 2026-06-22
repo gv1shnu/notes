@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Database Recovery</h2>
+
+    <p>
+        Durability promised that a committed transaction survives a crash, and Atomicity promised an
+        uncommitted one leaves no trace. Recovery is how the database keeps both promises across the
+        worst moment in its life — the instant the power dies.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> A crash can strike at the cruelest time. It might hit
+        <em>mid</em>-transaction, after some changed pages have already been flushed to disk — so the
+        disk now holds half of a transfer that must never half-exist. Or it might hit just
+        <em>after</em> a commit returned but before the changes reached disk — so committed work is
+        about to be lost. In both cases the on-disk state, taken alone, is wrong.
+    </p>
+
+    <p>
+        <strong>Solution:</strong> Never trust the data pages alone. Before any change is considered
+        safe, write a record of it to a durable, append-only <strong>log</strong>. On restart, the log
+        tells the database exactly what to redo and what to undo to reach a correct state.
+    </p>
+
+    <hr>
+
+    <h3>Kinds of failure</h3>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Failure</th><th>What it is</th><th>Handled by</th></tr>
+        <tr><td>Transaction failure</td><td>One transaction errors or is aborted</td><td>Rollback via the undo log</td></tr>
+        <tr><td>System crash</td><td>Power loss, OS panic — memory is gone, disk survives</td><td>Log-based redo and undo on restart</td></tr>
+        <tr><td>Media failure</td><td>The disk itself dies</td><td>Backups plus log replay</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>Write-ahead logging</h3>
+
+    <p>
+        The single rule the whole system rests on: <strong>the log record for a change must reach
+        durable storage before the change itself is allowed to.</strong> That's write-ahead logging
+        (WAL). Each log record carries enough to reconstruct the change both ways — a before-image to
+        undo it, an after-image to redo it.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>LSN</th><th>Transaction</th><th>Row</th><th>Old value</th><th>New value</th></tr>
+        <tr><td>101</td><td>T1</td><td>TenZ.score</td><td>800</td><td>700</td></tr>
+        <tr><td>102</td><td>T1</td><td>Zekken.score</td><td>500</td><td>600</td></tr>
+        <tr><td>103</td><td>T1</td><td>COMMIT</td><td>—</td><td>—</td></tr>
+    </table>
+
+    <p>
+        Because the log records the COMMIT, the database can always tell which transactions finished
+        and which didn't — and that single fact drives everything that follows.
+    </p>
+
+    <hr>
+
+    <h3>Redo and undo</h3>
+
+    <p>
+        Two operations rebuild a correct state from the log:
+    </p>
+
+    <ul>
+        <li><strong>Redo</strong> re-applies the after-images of <em>committed</em> transactions whose changes may not have reached disk — keeping the Durability promise.</li>
+        <li><strong>Undo</strong> reverses the before-images of <em>uncommitted</em> transactions whose changes <em>did</em> reach disk — keeping the Atomicity promise.</li>
+    </ul>
+
+    <p>
+        Both are needed because real engines are greedy: they let a transaction's dirty pages drift to
+        disk before it commits (so undo is needed), and they don't force a transaction's pages to disk
+        at commit time (so redo is needed). The log makes that freedom safe.
+    </p>
+
+    <hr>
+
+    <h3>Checkpoints</h3>
+
+    <p>
+        Replaying the entire log from the beginning of time would make restarts unbearable. Every so
+        often the database takes a <strong>checkpoint</strong>: it flushes outstanding changes and
+        writes a marker recording which transactions were still active. Recovery can then start from
+        the last checkpoint instead of the dawn of the database, replaying only recent history.
+    </p>
+
+    <hr>
+
+    <h3>Recovery on restart</h3>
+
+    <p>
+        When the database comes back up it walks the log in three passes, the shape made famous by the
+        ARIES algorithm:
+    </p>
+
+    <ol>
+        <li><strong>Analysis</strong> — read forward from the last checkpoint to find which transactions were in flight and which pages were dirty.</li>
+        <li><strong>Redo</strong> — repeat history, re-applying every logged change so the database matches its state at the moment of the crash.</li>
+        <li><strong>Undo</strong> — roll back the transactions that never committed, leaving only durable, committed work.</li>
+    </ol>
+
+    <hr>
+
+    <h3>When the disk itself dies</h3>
+
+    <p>
+        WAL handles a crash, but not a melted drive — the log lives on that drive too. Media failure is
+        survived with <strong>backups</strong>: take a periodic base backup, keep shipping the log, and
+        to recover you restore the backup and replay the log up to any chosen moment. That last ability
+        is <strong>point-in-time recovery</strong> — rewinding the database to one second before
+        someone ran <code>DELETE</code> without a <code>WHERE</code>.
+    </p>
+
+    <p>
+        And one bonus: if you can ship the log to a backup machine to replay, you can ship it to a live
+        second server that replays continuously — which is exactly how replication, in the scaling
+        chapter, is built.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> A crash leaves uncommitted changes on disk and committed changes off it.
+            <br>
+            <strong>Solution:</strong> Write-ahead logging records every change durably first; restart redoes committed work and undoes the rest.
+        </li>
+        <li>
+            <strong>Problem:</strong> Replaying the whole log is too slow, and a dead disk takes the log with it.
+            <br>
+            <strong>Solution:</strong> Checkpoints bound the replay; backups plus log replay survive media failure and enable point-in-time recovery.
+        </li>
+    </ul>
+
+    <p>
+        Next, Views.
+        <a href="./19-views.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Concurrency Control
+        <a href="./17-concurrency-control.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Normalization</h2>
+
+    <p>
+        ER design removed redundancy by good judgement. Normalization is the same goal made formal —
+        a set of rules that tell you, provably, whether a table still hides duplicated facts.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Picture one wide table holding players and their team details.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>player_id</th><th>username</th><th>team_id</th><th>team_name</th><th>team_region</th></tr>
+        <tr><td>1</td><td>TenZ</td><td>1</td><td>Sentinels</td><td>NA</td></tr>
+        <tr><td>2</td><td>Zekken</td><td>1</td><td>Sentinels</td><td>NA</td></tr>
+        <tr><td>5</td><td>f0rsakeN</td><td>3</td><td>PRX</td><td>APAC</td></tr>
+    </table>
+
+    <p>"Sentinels, NA" is written once per player. That single duplication causes three anomalies:</p>
+
+    <ul>
+        <li><strong>Update anomaly:</strong> rename Sentinels and you must edit every player's row; miss one and the data now disagrees with itself — the exact inconsistency from the intro.</li>
+        <li><strong>Insertion anomaly:</strong> you can't record a brand-new team until it has at least one player to hang the row on.</li>
+        <li><strong>Deletion anomaly:</strong> delete a team's last player and the team's name and region vanish with them.</li>
+    </ul>
+
+    <p>
+        <strong>Solution:</strong> Split the table so every fact lives in exactly one place. The split
+        is guided by <strong>functional dependencies</strong> and measured by <strong>normal forms</strong>.
+    </p>
+
+    <hr>
+
+    <h3>Functional dependencies</h3>
+
+    <p>
+        A functional dependency <code>X → Y</code> means: if you know X, you know Y. In the table above,
+        <code>player_id → username</code> and <code>team_id → team_name, team_region</code>. That second
+        dependency — a non-key column determining other columns — is the redundancy, written in
+        algebra. Normalization is mostly the act of giving every dependency its own table.
+    </p>
+
+    <hr>
+
+    <h3>First Normal Form (1NF)</h3>
+
+    <p>
+        Every value is atomic — no lists, no repeating groups inside one cell. A
+        <code>past_teams</code> column holding "Sentinels, Cloud9" breaks 1NF; you split it into
+        separate rows (and usually a separate table). The fix: one value per cell, one fact per row.
+    </p>
+
+    <hr>
+
+    <h3>Second Normal Form (2NF)</h3>
+
+    <p>
+        1NF, plus no <em>partial</em> dependency — a non-key column may not depend on only <em>part</em>
+        of a composite key. This only ever applies when the key is composite.
+    </p>
+
+    <p>
+        Consider <code>match_roster(match_id, player_id, kills, username)</code> keyed on
+        <code>(match_id, player_id)</code>. <code>kills</code> needs both halves of the key, but
+        <code>username</code> depends on <code>player_id</code> alone — a partial dependency. Move
+        <code>username</code> out to the <code>players</code> table, and 2NF is restored.
+    </p>
+
+    <hr>
+
+    <h3>Third Normal Form (3NF)</h3>
+
+    <p>
+        2NF, plus no <em>transitive</em> dependency — a non-key column may not depend on another
+        non-key column. In <code>players(player_id, team_id, team_region)</code>, the chain is
+        <code>player_id → team_id → team_region</code>: region depends on the team, not directly on the
+        player. Move <code>team_region</code> to <code>teams</code>, where <code>team_id</code> is the
+        key, and the transitive link is gone.
+    </p>
+
+    <p>
+        The classic one-line summary of all three: every non-key column must depend on
+        <strong>the key, the whole key, and nothing but the key</strong>. Atomic (1NF) → the whole key
+        (2NF) → nothing but the key (3NF).
+    </p>
+
+    <hr>
+
+    <h3>Boyce-Codd Normal Form (BCNF)</h3>
+
+    <p>
+        A stricter 3NF: <em>every</em> determinant must be a candidate key. 3NF can still allow a
+        non-key column to determine part of a key when candidate keys overlap; BCNF closes that gap.
+        In practice, reaching 3NF handles almost everything, and BCNF is the edge case you fix when a
+        non-prime attribute turns out to determine a prime one. Most production schemas aim for 3NF or
+        BCNF and stop there.
+    </p>
+
+    <hr>
+
+    <h3>Denormalization</h3>
+
+    <p>
+        Normalization optimises for correctness and writes, but every fact in one place means
+        reassembling it with joins on every read. When a read-heavy query joins five tables a million
+        times a second, you may deliberately put redundancy back — store a copy of <code>team_name</code>
+        next to the player, or keep a precomputed summary table.
+    </p>
+
+    <p>
+        This is the <em>Repeat</em> in our loop: denormalization is a conscious trade, faster reads
+        bought with the duty to keep the copies in sync. You only earn the right to denormalize once
+        you understand exactly which anomaly you're choosing to reintroduce.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> A wide table duplicates facts, causing update, insertion, and deletion anomalies.
+            <br>
+            <strong>Solution:</strong> Decompose by functional dependencies; 1NF → 2NF → 3NF → BCNF each removes one kind of duplication.
+        </li>
+        <li>
+            <strong>Problem:</strong> Fully normalized schemas can be slow to read.
+            <br>
+            <strong>Solution:</strong> Denormalize deliberately, accepting sync cost for read speed.
+        </li>
+    </ul>
+
+    <p>
+        Next, Indexes.
+        <a href="./15-indexes.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: ER Diagrams and Database Design
+        <a href="./13-er-diagrams-and-design.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

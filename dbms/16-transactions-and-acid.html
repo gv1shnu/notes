@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Transactions and ACID Properties</h2>
+
+    <p>
+        A single UPDATE is safe — it either happens or it doesn't. But real operations are rarely a
+        single statement.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> Moving 100 points from TenZ to Zekken is two writes: subtract from
+        one, add to the other. If the server crashes between them, the points have left TenZ and never
+        arrived — 100 points vanish, and the database is in a state your rules say is impossible.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score - 100 <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
+-- crash here, and the points are gone
+<span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 100 <span style="color:#0099ff;">WHERE</span> username = 'Zekken';
+</code>
+</pre>
+
+    <p>
+        <strong>Solution:</strong> Wrap the steps in a <strong>transaction</strong> — a single unit of
+        work that the database treats as indivisible. Either both updates land, or neither does.
+    </p>
+
+    <hr>
+
+    <h3>Using transactions</h3>
+
+    <p>PostgreSQL ( <code>START TRANSACTION</code> in MySQL )</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">BEGIN</span>;
+    <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score - 100 <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
+    <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 100 <span style="color:#0099ff;">WHERE</span> username = 'Zekken';
+<span style="color:#0099ff;">COMMIT</span>;
+</code>
+</pre>
+
+    <p>
+        <code>COMMIT</code> makes every change permanent at once. If anything goes wrong before it,
+        <code>ROLLBACK</code> throws the whole transaction away and the database is exactly as it was
+        before <code>BEGIN</code> — as though the half-finished transfer never happened.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">ROLLBACK</span>;   -- undo everything since BEGIN
+</code>
+</pre>
+
+    <hr>
+
+    <h3>ACID</h3>
+
+    <p>The guarantee a transaction makes has four parts, abbreviated ACID.</p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Property</th><th>Promise</th></tr>
+        <tr><td>Atomicity</td><td>All steps happen, or none do</td></tr>
+        <tr><td>Consistency</td><td>The database moves from one valid state to another</td></tr>
+        <tr><td>Isolation</td><td>Concurrent transactions don't see each other's half-done work</td></tr>
+        <tr><td>Durability</td><td>Once committed, it survives a crash</td></tr>
+    </table>
+
+    <p>
+        <strong>Atomicity</strong> is what saved the transfer above — the crash triggers a rollback,
+        and the missing 100 points reappear. The database keeps an undo log so it can always walk a
+        failed transaction backwards.
+    </p>
+
+    <p>
+        <strong>Consistency</strong> means every constraint you declared still holds after the
+        transaction. If a <code>CHECK (score &gt;= 0)</code> would be violated, the transaction is
+        refused, not half-applied.
+    </p>
+
+    <p>
+        <strong>Isolation</strong> means a second transaction reading the players table mid-transfer
+        never sees the state where the points have left TenZ but not reached Zekken. How strongly the
+        database enforces this is the subject of the next chapter, concurrency control.
+    </p>
+
+    <p>
+        <strong>Durability</strong> means once <code>COMMIT</code> returns, the data is safe even if
+        the power dies one millisecond later. This is delivered by a <strong>write-ahead log</strong>:
+        the change is written to a durable log <em>before</em> the commit is acknowledged, so a crash
+        can always replay it. That log is the heart of the recovery chapter.
+    </p>
+
+    <hr>
+
+    <h3>Partial rollback with SAVEPOINT</h3>
+
+    <p>
+        Inside a long transaction you can set a <strong>savepoint</strong> and roll back to it without
+        discarding everything before it.
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">SAVEPOINT</span> before_bonus;
+    <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 50 <span style="color:#0099ff;">WHERE</span> team_id = 1;
+<span style="color:#0099ff;">ROLLBACK TO</span> before_bonus;   -- undo just the bonus, keep the rest
+</code>
+</pre>
+
+    <hr>
+
+    <h3>One word of caution</h3>
+
+    <p>
+        The C in ACID is not the C in CAP. ACID's <strong>Consistency</strong> means "the data obeys
+        its constraints." CAP's Consistency — which you'll meet in the scaling chapter — means "every
+        node in a distributed system shows the same value at the same time." Same word, different
+        promise; mixing them up is a classic trap.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> A multi-step operation can be left half-finished by a crash.
+            <br>
+            <strong>Solution:</strong> A transaction makes the steps atomic — all or nothing — via BEGIN / COMMIT / ROLLBACK.
+        </li>
+        <li>
+            <strong>Problem:</strong> What exactly does the database promise?
+            <br>
+            <strong>Solution:</strong> ACID — Atomicity, Consistency, Isolation, Durability.
+        </li>
+    </ul>
+
+    <p>
+        Next, Concurrency Control.
+        <a href="./17-concurrency-control.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Indexes
+        <a href="./15-indexes.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

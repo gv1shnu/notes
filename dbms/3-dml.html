@@ -59,6 +59,109 @@
 
     </table>
 
+    <p>
+        The form above lists <em>every</em> column's value in table order. It works, but it's fragile: add or reorder a
+        column later and the statement breaks silently. There are several other ways to insert, each solving a different
+        problem.
+    </p>
+
+    <p>
+        <strong>1. Named columns</strong> &mdash; list the target columns explicitly. Order no longer matters, and any
+        omitted column takes its <code>DEFAULT</code> (or <code>NULL</code>). This is the form you should prefer.
+    </p>
+
+    <pre>
+<code>
+<p>MySQL / PostgreSQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> players (username, level, score)
+<span style="color:#0099ff;">VALUES</span> ('TenZ', 'Radiant', 842);
+</code>
+</pre>
+
+    <p>
+        <strong>2. Multiple rows in one statement</strong> &mdash; one trip to the database instead of many, far faster
+        for bulk loads.
+    </p>
+
+    <pre>
+<code>
+<p>MySQL / PostgreSQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> players (username, level, score)
+<span style="color:#0099ff;">VALUES</span>
+    ('TenZ', 'Radiant', 842),
+    ('aspas', 'Immortal', 611),
+    ('yay', 'Immortal', 402);
+</code>
+</pre>
+
+    <p>
+        <strong>3. INSERT &hellip; SELECT</strong> &mdash; fill a table from the result of a query instead of literal
+        values. Handy for copying or archiving rows.
+    </p>
+
+    <pre>
+<code>
+<p>MySQL / PostgreSQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> top_players (username, score)
+<span style="color:#0099ff;">SELECT</span> username, score
+<span style="color:#0099ff;">FROM</span> players
+<span style="color:#0099ff;">WHERE</span> score > 800;
+</code>
+</pre>
+
+    <p>
+        <strong>4. Returning the inserted rows</strong> &mdash; get the new rows (including auto-generated ids) back in
+        the same round trip. The two dialects differ here.
+    </p>
+
+    <pre>
+<code>
+<p>PostgreSQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> players (username, level, score)
+<span style="color:#0099ff;">VALUES</span> ('TenZ', 'Radiant', 842)
+<span style="color:#0099ff;">RETURNING</span> player_id;
+</code>
+</pre>
+
+    <pre>
+<code>
+<p>MySQL</p>
+<span style="color:#999;">-- no RETURNING; fetch the generated id separately</span>
+<span style="color:#0099ff;">INSERT INTO</span> players (username, level, score)
+<span style="color:#0099ff;">VALUES</span> ('TenZ', 'Radiant', 842);
+<span style="color:#0099ff;">SELECT</span> LAST_INSERT_ID();
+</code>
+</pre>
+
+    <p>
+        <strong>5. Upsert</strong> (insert, or update if the key already exists) &mdash; avoids a duplicate-key error.
+        Same idea, different syntax in each database.
+    </p>
+
+    <pre>
+<code>
+<p>PostgreSQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, score)
+<span style="color:#0099ff;">VALUES</span> (1, 'TenZ', 842)
+<span style="color:#0099ff;">ON CONFLICT</span> (player_id)
+<span style="color:#0099ff;">DO UPDATE SET</span> score = EXCLUDED.score;
+</code>
+</pre>
+
+    <pre>
+<code>
+<p>MySQL</p>
+<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, score)
+<span style="color:#0099ff;">VALUES</span> (1, 'TenZ', 842)
+<span style="color:#0099ff;">ON DUPLICATE KEY UPDATE</span> score = VALUES(score);
+</code>
+</pre>
+
+    <p>
+        To <em>skip</em> conflicting rows instead of updating them, PostgreSQL uses
+        <code>ON CONFLICT DO NOTHING</code> and MySQL uses <code>INSERT IGNORE</code>.
+    </p>
+
     <hr>
 
     <h3>UPDATE</h3>

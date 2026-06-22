@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>DBMS Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Indexes</h2>
+
+    <p>
+        Back in the introduction, "slower search" was one of the reasons file systems lost to the
+        DBMS — scanning records one by one to find E105. That same problem returns the moment your
+        table is large, and the index is its answer.
+    </p>
+
+    <p>
+        <strong>Problem:</strong> <code>SELECT * FROM players WHERE username = 'TenZ'</code> on a
+        table with no help has to check every row, because nothing tells the database where 'TenZ'
+        lives. A million rows means a million comparisons — a <strong>full table scan</strong>, O(n).
+    </p>
+
+    <p>
+        <strong>Solution:</strong> An <strong>index</strong> is a separate, ordered structure that
+        maps a column's values to the rows that hold them — like the index at the back of a book. The
+        database searches the index instead of the table, turning O(n) into roughly O(log n).
+    </p>
+
+    <hr>
+
+    <h3>How it works</h3>
+
+    <p>
+        Most indexes are <strong>B-trees</strong>: a balanced tree kept in sorted order. Because it's
+        sorted, the database can binary-search down a handful of levels to find any value, and because
+        it's a tree of ranges, it serves <code>=</code>, <code>&lt;</code>, <code>&gt;</code>,
+        <code>BETWEEN</code>, and <code>ORDER BY</code> equally well. The leaf it lands on points at
+        the actual row.
+    </p>
+
+    <hr>
+
+    <h3>Creating an index</h3>
+
+    <p>MySQL / PostgreSQL</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE INDEX</span> idx_username <span style="color:#0099ff;">ON</span> players(username);
+</code>
+</pre>
+
+    <p>
+        Now the username lookup walks the index. A <code>UNIQUE</code> index does the same job while
+        also enforcing no duplicates — which is exactly how a <code>UNIQUE</code> or
+        <code>PRIMARY KEY</code> constraint is implemented under the hood. <br><strong>Note: </strong>The primary key is always
+        indexed; you never need to add that yourself.
+    </p>
+
+    <hr>
+
+    <h3>B-tree vs Hash</h3>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Index type</th><th>Good for</th><th>Useless for</th></tr>
+        <tr><td>B-tree</td><td>equality and ranges, sorting</td><td>—</td></tr>
+        <tr><td>Hash</td><td>exact equality only, very fast</td><td>ranges, ORDER BY, prefix matches</td></tr>
+    </table>
+
+    <p>
+        B-tree is the default and the right answer almost always. Reach for a hash index only when you
+        do nothing but exact-match lookups and have measured that it helps.
+    </p>
+
+    <hr>
+
+    <h3>Clustered vs non-clustered</h3>
+
+    <p>
+        A <strong>clustered</strong> index <em>is</em> the table — the rows are physically stored in the
+        index's order, so there's at most one per table. In MySQL's InnoDB, the primary key is the
+        clustered index. A <strong>non-clustered</strong> (secondary) index is a separate structure
+        that points back to the row. PostgreSQL stores all rows in a heap and treats every index as
+        secondary; there is no permanent clustered index. <br>Knowing which engine does which explains why
+        "look up by primary key" is often the fastest query you can write.
+    </p>
+
+    <hr>
+
+    <h3>Composite indexes and the leftmost-prefix rule</h3>
+
+    <p>An index can span several columns, in order:</p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">CREATE INDEX</span> idx_team_score <span style="color:#0099ff;">ON</span> players(team_id, score);
+</code>
+</pre>
+
+    <p>
+        This index helps queries that filter on <code>team_id</code>, or on
+        <code>team_id</code> <em>and</em> <code>score</code> — but <strong>not</strong> on
+        <code>score</code> alone. A composite index is only usable from its leftmost column inward,
+        like a phone book sorted by surname then first name: useless if you only know the first name.
+        So column order in a composite index is a design decision, not a detail.
+    </p>
+
+    <hr>
+
+    <h3>Covering index</h3>
+
+    <p>
+        If an index already contains every column a query needs, the database can answer from the
+        index alone and never touch the table — an <strong>index-only scan</strong>. The
+        <code>idx_team_score</code> index above fully answers
+        <code>SELECT score FROM players WHERE team_id = 1</code> without reading a single table row.
+    </p>
+
+    <hr>
+
+    <h3>The cost</h3>
+
+    <p>
+        Indexes are not free, which is why you don't index every column:
+    </p>
+
+    <ul>
+        <li><strong>Writes slow down.</strong> Every INSERT, UPDATE, or DELETE must also update every affected index. Five indexes mean five extra structures to maintain on every write.</li>
+        <li><strong>Storage grows.</strong> Each index is a copy of its columns plus row pointers.</li>
+        <li><strong>Low selectivity wastes effort.</strong> Indexing a column with two values (a boolean, a region with three options) barely narrows the search — the scan was nearly as fast.</li>
+    </ul>
+
+    <p>
+        The rule of thumb: index the columns you filter, join, and sort on; leave the rest alone; and
+        let the workload, not instinct, decide.
+    </p>
+
+    <hr>
+
+    <h3>Checking your work</h3>
+
+    <p>
+        Never assume an index is used — ask. <code>EXPLAIN</code> shows the plan the database chose:
+    </p>
+
+    <pre>
+<code>
+<span style="color:#0099ff;">EXPLAIN</span> <span style="color:#0099ff;">SELECT</span> * <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
+</code>
+</pre>
+
+    <p>
+        A plan that says "index scan" or "index seek" means your index is working; one that still says
+        "seq scan" or "full table scan" means it isn't — wrong column, wrong order, or a query the
+        index can't serve.
+    </p>
+
+    <hr>
+
+    <h3>Summary</h3>
+
+    <ul>
+        <li>
+            <strong>Problem:</strong> Filtering on an unindexed column scans the whole table, O(n).
+            <br>
+            <strong>Solution:</strong> A B-tree index makes lookups, ranges, and sorts roughly O(log n).
+        </li>
+        <li>
+            <strong>Problem:</strong> Indexes cost writes and storage, and a composite index only works left-to-right.
+            <br>
+            <strong>Solution:</strong> Index selectively, order composite columns deliberately, and verify with EXPLAIN.
+        </li>
+    </ul>
+
+    <p>
+        Next, Transactions and ACID Properties.
+        <a href="./16-transactions-and-acid.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Normalization
+        <a href="./14-normalization.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>
