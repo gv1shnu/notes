@@ -112,6 +112,11 @@
         % means any number of characters.
     </p>
 
+    <p>
+        In MySQL, LIKE is case-insensitive by default, so <code>LIKE 'a%'</code> matches both <code>'a'</code> and <code>'A'</code> prefixes.
+        However, in PostgreSQL, quoted patterns are case-sensitive, so <code>LIKE 'a%'</code> matches only lowercase <code>'a'</code> prefixes unless you use a case-insensitive operator such as <code>ILIKE</code>.
+    </p>
+
     <pre>
 <code>
 <p>MySQL / PostgreSQL</p>
