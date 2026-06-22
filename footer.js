@@ -1,4 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // ---- Lay the prev/next links side by side (Prev left, Next right) ----
+    // Markers are the arrow links: Next = an <a> reading ">>", Prev = "<<".
+    // Restricting to <a> avoids matching "<<"/">>" inside code blocks.
+    const arrowLink = (mark) =>
+        Array.from(document.querySelectorAll("a"))
+            .find((a) => a.textContent.indexOf(mark) !== -1);
+    const nextLink = arrowLink(">>");
+    const prevLink = arrowLink("<<");
+    const nextP = nextLink && nextLink.closest("p");
+    const prevP = prevLink && prevLink.closest("p");
+    if (nextP || prevP) {
+        // Insert the wrapper where the earliest of the two paragraphs sits.
+        const ref = prevP && nextP
+            ? (prevP.compareDocumentPosition(nextP) & Node.DOCUMENT_POSITION_FOLLOWING ? prevP : nextP)
+            : (prevP || nextP);
+        const nav = document.createElement("div");
+        nav.className = "page-nav";
+        ref.parentNode.insertBefore(nav, ref);
+        if (prevP) { prevP.classList.add("page-nav-prev"); nav.appendChild(prevP); }
+        if (nextP) { nextP.classList.add("page-nav-next"); nav.appendChild(nextP); }
+    }
+
     const footer = document.createElement("footer");
 
     footer.innerHTML = `
