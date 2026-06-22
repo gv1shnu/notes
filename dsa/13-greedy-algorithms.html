@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Greedy Algorithms</h2>
+    <p>
+        Make the choice that looks best right now, shrink the problem, repeat. It's fast and simple &mdash; but only
+        correct when the greedy choice is provably <em>safe</em>.
+    </p>
+
+    <h3>The recipe</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>What</th>
+        </tr>
+        <tr>
+            <td>1. Greedy choice</td>
+            <td>commit to a first choice that looks best</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">2. Prove it's safe</td>
+            <td>show some optimal solution is consistent with that choice</td>
+        </tr>
+        <tr>
+            <td>3. Reduce</td>
+            <td>the choice leaves a smaller <strong>subproblem</strong> of the same kind</td>
+        </tr>
+        <tr>
+            <td>4. Repeat</td>
+            <td>solve the subproblem the same way, until nothing's left</td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>Safe</strong> is the whole game: a greedy choice is safe if there's an optimal solution that includes it.
+        Many tempting greedy choices are <em>not</em> safe &mdash; you must prove it before trusting it.
+    </p>
+
+    <h3>Where greedy works: fractional knapsack</h3>
+    <p>
+        A burglar with a 15&nbsp;kg sack and divisible goods (spices) wants maximum value. Safe choice: take as much as
+        possible of the item with the highest <strong>value per kg</strong>, then the next, and so on.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Item</th>
+            <th>Value / weight</th>
+            <th>Take order</th>
+        </tr>
+        <tr>
+            <td>spice C</td>
+            <td bgcolor="lightgreen">$8/kg</td>
+            <td>1st (all)</td>
+        </tr>
+        <tr>
+            <td>spice B</td>
+            <td>$7/kg</td>
+            <td>2nd (all)</td>
+        </tr>
+        <tr>
+            <td>spice A</td>
+            <td>$6/kg</td>
+            <td>3rd (fill the rest)</td>
+        </tr>
+    </table>
+
+    <p>
+        Proof sketch: if an optimal solution skips some of the best-per-kg item, swap an equal weight of a worse item
+        for it &mdash; value goes up (or stays), so it was never worse to be greedy. (Note: this is the
+        <em>fractional</em> knapsack. The 0/1 version &mdash; whole items only &mdash; is <strong>not</strong> greedy-safe
+        and needs dynamic programming.)
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> fractional_knapsack(items, capacity):  <span style="color:#999"># items = [(value, weight)]</span>
+    items.sort(key=<span style="color:#0099ff">lambda</span> it: it[0] / it[1], reverse=<span style="color:#0099ff">True</span>)  <span style="color:#999"># best $/kg first</span>
+    total = 0.0
+    <span style="color:#0099ff">for</span> value, weight <span style="color:#0099ff">in</span> items:
+        <span style="color:#0099ff">if</span> capacity &lt;= 0: <span style="color:#0099ff">break</span>
+        take = min(weight, capacity)         <span style="color:#999"># take as much as fits</span>
+        total += value * (take / weight)
+        capacity -= take
+    <span style="color:#0099ff">return</span> total
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">double</span> fractional_knapsack(vector&lt;pair&lt;<span style="color:#0099ff">double</span>,<span style="color:#0099ff">double</span>&gt;&gt; items, <span style="color:#0099ff">double</span> capacity) {
+    <span style="color:#999">// items = {value, weight}; sort by value/weight descending</span>
+    sort(items.begin(), items.end(), [](<span style="color:#0099ff">auto</span>&amp; a, <span style="color:#0099ff">auto</span>&amp; b) {
+        <span style="color:#0099ff">return</span> a.first / a.second &gt; b.first / b.second;
+    });
+    <span style="color:#0099ff">double</span> total = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; [value, weight] : items) {
+        <span style="color:#0099ff">if</span> (capacity &lt;= 0) <span style="color:#0099ff">break</span>;
+        <span style="color:#0099ff">double</span> take = min(weight, capacity);   <span style="color:#999">// take as much as fits</span>
+        total += value * (take / weight);
+        capacity -= take;
+    }
+    <span style="color:#0099ff">return</span> total;
+}
+</code></pre>
+    </div>
+
+    <h3>Where greedy beats brute force</h3>
+    <p>
+        The <strong>celebration party</strong> problem: split children into the fewest groups so any two in a group
+        differ by &le; 2 years. Brute force tries every split &mdash; &Omega;(2<sup>n</sup>), hopeless past ~50 kids.
+        Greedy (sort by age, start a group at the youngest ungrouped child, sweep up everyone within 2 years, repeat) is
+        near-linear and provably optimal.
+    </p>
+
+    <p>
+        <strong>Watch out:</strong> greedy isn't universal. The coin-change problem is greedy-safe with US coins but
+        <em>fails</em> in Tanzania (a 20&cent; coin makes 40&cent; = 20+20 beat the greedy 25+10+5). When greedy isn't
+        safe, reach for dynamic programming.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>The greedy step is usually just a sort by a key &mdash; <code>sorted(items, key=...)</code> /
+                    <code>list.sort(key=...)</code>, stable, O(n log n).</li>
+                <li><code>functools.cmp_to_key</code> wraps an old-style two-argument comparator when the order isn't a
+                    simple key.</li>
+                <li>"Repeatedly take the best" without a full sort &rarr; <code>heapq</code> (a heap).</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Pass a comparator lambda to <code>std::sort</code>; structured bindings
+                    <code>auto&amp; [value, weight]</code> unpack the pairs.</li>
+                <li>When you only need a few "best" picks, a <code>std::priority_queue</code> beats sorting everything.</li>
+                <li>Beware floating-point ties in the ratio comparator &mdash; an epsilon or integer cross-multiplication
+                    (<code>a.v*b.w &gt; b.v*a.w</code>) avoids instability.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

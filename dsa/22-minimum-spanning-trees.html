@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Minimum Spanning Trees</h2>
+    <p>
+        Given a connected, undirected, weighted graph, a <strong>minimum spanning tree (MST)</strong> is the cheapest set
+        of edges that connects <em>all</em> vertices &mdash; e.g. wiring up a network with the least total cable. It spans
+        every vertex, has no cycle, and minimizes total weight. Both standard algorithms are
+        <a href="./13-greedy-algorithms.html">greedy</a>, and both are correct for the same reason.
+    </p>
+
+    <h3>The cut property (why greedy is safe)</h3>
+    <p>
+        Split the vertices into any two groups S and V&minus;S such that no edge chosen so far crosses the split. Then the
+        <strong>lightest edge crossing</strong> that cut is <em>safe</em> &mdash; it belongs to some MST. (Proof:
+        swapping it for any heavier crossing edge of an MST keeps the tree connected and no heavier.) Add safe edges
+        repeatedly and you build an MST. Kruskal and Prim just choose the cut differently.
+    </p>
+
+    <h3>Kruskal &mdash; cheapest edge, globally</h3>
+    <p>
+        Sort all edges ascending; add the next lightest edge that <strong>doesn't form a cycle</strong>. The partial
+        solution is a <em>forest</em> that gradually merges into one tree. "Same component?" is exactly the
+        <a href="./18-disjoint-sets.html">disjoint-sets (union-find)</a> query:
+    </p>
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> kruskal(n, edges):              <span style="color:#999"># edges: list of (w, u, v)</span>
+    ds = DisjointSets(n)            <span style="color:#999"># from the disjoint-sets page</span>
+    edges.sort()                    <span style="color:#999"># ascending by weight (w first)</span>
+    mst, total = [], 0
+    <span style="color:#0099ff">for</span> w, u, v <span style="color:#0099ff">in</span> edges:
+        <span style="color:#0099ff">if</span> ds.find(u) != ds.find(v):   <span style="color:#999"># different trees -&gt; no cycle</span>
+            ds.union(u, v)
+            mst.append((u, v)); total += w
+    <span style="color:#0099ff">return</span> mst, total
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> Edge { <span style="color:#0099ff">int</span> w, u, v; };       <span style="color:#999">// weight first for easy sort</span>
+
+<span style="color:#0099ff">long long</span> kruskal(<span style="color:#0099ff">int</span> n, vector&lt;Edge&gt;&amp; edges) {
+    DisjointSets ds(n);             <span style="color:#999">// from the disjoint-sets page</span>
+    sort(edges.begin(), edges.end(),
+         [](<span style="color:#0099ff">auto</span>&amp; a, <span style="color:#0099ff">auto</span>&amp; b){ <span style="color:#0099ff">return</span> a.w &lt; b.w; });
+    <span style="color:#0099ff">long long</span> total = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; e : edges)
+        <span style="color:#0099ff">if</span> (ds.find(e.u) != ds.find(e.v)) {  <span style="color:#999">// no cycle</span>
+            ds.unite(e.u, e.v);
+            total += e.w;
+        }
+    <span style="color:#0099ff">return</span> total;
+}
+</code></pre>
+    </div>
+    <p>
+        Dominated by the sort: <strong>O(|E| log |V|)</strong>. (If edges arrive pre-sorted, the union-find passes run in
+        near-linear O(|E| log* |V|).)
+    </p>
+
+    <h3>Prim &mdash; grow one tree</h3>
+    <p>
+        Pick any root and grow a <em>single</em> tree, each step attaching the new vertex reachable by the
+        <strong>lightest edge</strong>. A <a href="./17-priority-queues-and-heaps.html">priority queue</a> keyed by each
+        outside vertex's cheapest connecting edge gives the next vertex &mdash; structurally
+        <a href="./21-weighted-shortest-paths.html">Dijkstra</a>, but the key is the single edge weight, not the
+        accumulated path length.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">import</span> heapq
+
+<span style="color:#0099ff">def</span> prim(graph, s=0):               <span style="color:#999"># graph: u -&gt; [(v, w), ...]</span>
+    visited = set()
+    pq = [(0, s)]                   <span style="color:#999"># (edge weight, node)</span>
+    total = 0
+    <span style="color:#0099ff">while</span> pq:
+        w, u = heapq.heappop(pq)
+        <span style="color:#0099ff">if</span> u <span style="color:#0099ff">in</span> visited: <span style="color:#0099ff">continue</span>   <span style="color:#999"># already in the tree</span>
+        visited.add(u); total += w
+        <span style="color:#0099ff">for</span> v, wt <span style="color:#0099ff">in</span> graph[u]:
+            <span style="color:#0099ff">if</span> v <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited:
+                heapq.heappush(pq, (wt, v))
+    <span style="color:#0099ff">return</span> total
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;&gt;&gt; graph;   <span style="color:#999">// graph[u] = {(v, w), ...}</span>
+
+<span style="color:#0099ff">long long</span> prim(<span style="color:#0099ff">int</span> n, <span style="color:#0099ff">int</span> s = 0) {
+    vector&lt;<span style="color:#0099ff">bool</span>&gt; visited(n, <span style="color:#0099ff">false</span>);
+    priority_queue&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;,
+        vector&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;&gt;, greater&lt;&gt;&gt; pq;
+    pq.push({0, s});                <span style="color:#999">// (edge weight, node)</span>
+    <span style="color:#0099ff">long long</span> total = 0;
+    <span style="color:#0099ff">while</span> (!pq.empty()) {
+        <span style="color:#0099ff">auto</span> [w, u] = pq.top(); pq.pop();
+        <span style="color:#0099ff">if</span> (visited[u]) <span style="color:#0099ff">continue</span>;   <span style="color:#999">// already in the tree</span>
+        visited[u] = <span style="color:#0099ff">true</span>; total += w;
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span> [v, wt] : graph[u])
+            <span style="color:#0099ff">if</span> (!visited[v]) pq.push({wt, v});
+    }
+    <span style="color:#0099ff">return</span> total;
+}
+</code></pre>
+    </div>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Kruskal</th>
+            <th>Prim</th>
+        </tr>
+        <tr>
+            <td>Grows</td>
+            <td>a forest that merges</td>
+            <td>one tree from a root</td>
+        </tr>
+        <tr>
+            <td>Picks</td>
+            <td>globally lightest safe edge</td>
+            <td>lightest edge leaving the tree</td>
+        </tr>
+        <tr>
+            <td>Helper structure</td>
+            <td bgcolor="lightblue">disjoint sets</td>
+            <td bgcolor="lightblue">priority queue</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td>O(|E| log |V|)</td>
+            <td>O(|E| log |V|) heap &middot; O(|V|&sup2;) array</td>
+        </tr>
+    </table>
+    <p>
+        Same MST, same cost &mdash; both ride the cut property. Kruskal leans on union-find, Prim on a heap; pick by which
+        structure is already at hand and whether the graph is sparse (Kruskal / Prim-heap) or dense (Prim-array).
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>Kruskal reuses the <a href="./18-disjoint-sets.html">union-find</a>; storing edges as
+                    <code>(w, u, v)</code> lets the default <code>sort()</code> order them by weight.</li>
+                <li>Prim reuses <code>heapq</code> with the same lazy-deletion trick as Dijkstra (skip pops for nodes
+                    already in the tree) &mdash; no decrease-key needed.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Kruskal = sort edges + the <code>DisjointSets</code> struct; Prim mirrors Dijkstra with a
+                    <code>greater&lt;&gt;</code> min-heap.</li>
+                <li>Choose by density: Kruskal / heap-Prim for sparse graphs, an O(V&sup2;) array-Prim for dense ones.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

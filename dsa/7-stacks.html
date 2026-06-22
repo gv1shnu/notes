@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Stacks</h2>
+    <p>
+        A <strong>LIFO</strong> collection &mdash; Last In, First Out. Like a stack of books: you only touch the top.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>Push(key)</td>
+            <td>add to the top</td>
+        </tr>
+        <tr>
+            <td>Top()</td>
+            <td>peek at the most recent</td>
+        </tr>
+        <tr>
+            <td>Pop()</td>
+            <td>remove + return the most recent</td>
+        </tr>
+        <tr>
+            <td>Empty()</td>
+            <td>any elements?</td>
+        </tr>
+    </table>
+    <p>
+        Every operation is <strong>O(1)</strong>, on either implementation:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Built on</th>
+            <th>Trade-off</th>
+        </tr>
+        <tr>
+            <td>Array (+ count)</td>
+            <td>fixed max size; may waste allocated space</td>
+        </tr>
+        <tr>
+            <td>Linked list (Push = PushFront)</td>
+            <td>unbounded; one pointer of overhead per element</td>
+        </tr>
+    </table>
+
+    <h3>Classic use: balanced brackets</h3>
+    <p>
+        Check that <code>([])()</code> is balanced. Scan left to right: push every opening bracket; on a closing
+        bracket, pop and check it matches. At the end the stack must be empty.
+    </p>
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> is_balanced(s):
+    pairs = {<span style="color:#cc6600">')'</span>: <span style="color:#cc6600">'('</span>, <span style="color:#cc6600">']'</span>: <span style="color:#cc6600">'['</span>, <span style="color:#cc6600">'}'</span>: <span style="color:#cc6600">'{'</span>}
+    stack = []
+    <span style="color:#0099ff">for</span> ch <span style="color:#0099ff">in</span> s:
+        <span style="color:#0099ff">if</span> ch <span style="color:#0099ff">in</span> <span style="color:#cc6600">'([{'</span>:
+            stack.append(ch)          <span style="color:#999"># opening -&gt; push</span>
+        <span style="color:#0099ff">elif</span> ch <span style="color:#0099ff">in</span> pairs:
+            <span style="color:#0099ff">if</span> <span style="color:#0099ff">not</span> stack <span style="color:#0099ff">or</span> stack.pop() != pairs[ch]:
+                <span style="color:#0099ff">return</span> <span style="color:#0099ff">False</span>      <span style="color:#999"># mismatch / nothing to match</span>
+    <span style="color:#0099ff">return</span> <span style="color:#0099ff">not</span> stack                  <span style="color:#999"># leftover opens = unbalanced</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">bool</span> is_balanced(<span style="color:#0099ff">const</span> string&amp; s) {
+    <span style="color:#0099ff">auto</span> open_of = [](<span style="color:#0099ff">char</span> c){ <span style="color:#0099ff">return</span> c==<span style="color:#cc6600">')'</span>?<span style="color:#cc6600">'('</span> : c==<span style="color:#cc6600">']'</span>?<span style="color:#cc6600">'['</span> : <span style="color:#cc6600">'{'</span>; };
+    stack&lt;<span style="color:#0099ff">char</span>&gt; st;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">char</span> ch : s) {
+        <span style="color:#0099ff">if</span> (ch==<span style="color:#cc6600">'('</span>||ch==<span style="color:#cc6600">'['</span>||ch==<span style="color:#cc6600">'{'</span>) st.push(ch);  <span style="color:#999">// push</span>
+        <span style="color:#0099ff">else if</span> (ch==<span style="color:#cc6600">')'</span>||ch==<span style="color:#cc6600">']'</span>||ch==<span style="color:#cc6600">'}'</span>) {
+            <span style="color:#0099ff">if</span> (st.empty() || st.top() != open_of(ch)) <span style="color:#0099ff">return</span> <span style="color:#0099ff">false</span>;
+            st.pop();
+        }
+    }
+    <span style="color:#0099ff">return</span> st.empty();                <span style="color:#999">// leftover opens = unbalanced</span>
+}
+</code></pre>
+    </div>
+    <p>
+        The stack naturally remembers the still-open brackets in the exact order they must close &mdash; that's what
+        LIFO is for. (Also: function call stacks, expression parsing, undo.)
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>Use a plain <code>list</code> as a stack: <code>append</code> = push, <code>pop()</code> = pop, both
+                    O(1) amortized; <code>list[-1]</code> peeks.</li>
+                <li>Never use <code>insert(0, x)</code> / <code>pop(0)</code> for a stack &mdash; those are O(n).</li>
+                <li>There's no dedicated stack type; the list idiom is what everyone uses.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::stack&lt;T&gt;</code> is an <em>adapter</em> over <code>std::deque</code> by default
+                    (can wrap <code>vector</code>/<code>list</code>); <code>push</code>/<code>pop</code>/<code>top</code>
+                    are O(1).</li>
+                <li><code>pop()</code> returns <code>void</code> &mdash; read <code>top()</code> first, then
+                    <code>pop()</code>.</li>
+                <li>For raw speed, a <code>vector</code> with <code>push_back</code>/<code>back</code>/<code>pop_back</code>
+                    is the same thing with less indirection.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

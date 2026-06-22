@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Graphs</h2>
+    <p>
+        A set <strong>V</strong> of vertices plus a set <strong>E</strong> of edges, each joining a pair of vertices.
+        Models anything that's "connections between things" &mdash; maps (intersections + roads), the web (pages + links),
+        social networks (people + friendships). <strong>Undirected</strong> edges go both ways; <strong>directed</strong>
+        ones have an orientation. A <strong>simple</strong> graph has no self-loops and no parallel edges.
+    </p>
+
+    <h3>Problem: how do you even store one?</h3>
+    <p>
+        Before any algorithm, you need the graph in memory &mdash; and the operation you do <em>most</em> decides the
+        layout. Three options, and they're not interchangeable:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Edge list</th>
+            <th>Adjacency matrix</th>
+            <th>Adjacency list</th>
+        </tr>
+        <tr>
+            <td>Is u&ndash;v an edge?</td>
+            <td>O(|E|)</td>
+            <td bgcolor="lightgreen">O(1)</td>
+            <td>O(deg v)</td>
+        </tr>
+        <tr>
+            <td>List all neighbors of v</td>
+            <td>O(|E|)</td>
+            <td>O(|V|)</td>
+            <td bgcolor="lightgreen">O(deg v)</td>
+        </tr>
+        <tr>
+            <td>List all edges</td>
+            <td bgcolor="lightgreen">O(|E|)</td>
+            <td bgcolor="#ff9999">O(|V|&sup2;)</td>
+            <td>O(|E|)</td>
+        </tr>
+        <tr>
+            <td>Space</td>
+            <td>O(|E|)</td>
+            <td bgcolor="#ff9999">O(|V|&sup2;)</td>
+            <td bgcolor="lightgreen">O(|V| + |E|)</td>
+        </tr>
+    </table>
+    <p>
+        Almost every algorithm repeatedly asks "give me the neighbors of v," and real graphs (maps, web, social) are
+        <strong>sparse</strong> (|E| &asymp; |V|, not |V|&sup2;). Both facts point the same way: use the
+        <strong>adjacency list</strong>. The matrix only earns its O(1) edge test on <em>dense</em> graphs.
+    </p>
+
+    <h3>Problem: what can I reach from here?</h3>
+    <p>
+        Walk as far forward as you can, back up one step at a dead end, and never revisit a marked vertex &mdash; a
+        depth-first walk. The recursion <em>rides the call stack</em>, so the frontier is implicit:
+    </p>
+    <div class="codetabs">
+<pre data-lang="py"><code>graph = {0: [1, 2], 1: [0], 2: [0]}   <span style="color:#999"># adjacency list: dict -&gt; list</span>
+
+<span style="color:#0099ff">def</span> explore(v, visited, comp, label):  <span style="color:#999"># DFS, marks reachable from v</span>
+    visited.add(v); comp[v] = label
+    <span style="color:#0099ff">for</span> w <span style="color:#0099ff">in</span> graph[v]:
+        <span style="color:#0099ff">if</span> w <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited:
+            explore(w, visited, comp, label)
+
+<span style="color:#0099ff">def</span> connected_components(graph):
+    visited, comp, label = set(), {}, 0
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> graph:
+        <span style="color:#0099ff">if</span> v <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited:
+            explore(v, visited, comp, label)
+            label += 1                <span style="color:#999"># bump before the next island</span>
+    <span style="color:#0099ff">return</span> comp
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; graph;            <span style="color:#999">// graph[v] = neighbors of v</span>
+
+<span style="color:#0099ff">void</span> explore(<span style="color:#0099ff">int</span> v, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; comp, <span style="color:#0099ff">int</span> label) {  <span style="color:#999">// DFS</span>
+    comp[v] = label;                  <span style="color:#999">// comp[v] == -1 means unvisited</span>
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> w : graph[v])
+        <span style="color:#0099ff">if</span> (comp[w] == -1) explore(w, comp, label);
+}
+vector&lt;<span style="color:#0099ff">int</span>&gt; connected_components() {
+    <span style="color:#0099ff">int</span> n = graph.size();
+    vector&lt;<span style="color:#0099ff">int</span>&gt; comp(n, -1);
+    <span style="color:#0099ff">int</span> label = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v = 0; v &lt; n; ++v)
+        <span style="color:#0099ff">if</span> (comp[v] == -1) { explore(v, comp, label); ++label; }
+    <span style="color:#0099ff">return</span> comp;
+}
+</code></pre>
+    </div>
+    <p>
+        <code>explore(s)</code> marks <em>exactly</em> the vertices reachable from s. Wrap it &mdash; for every vertex, if
+        unvisited, <code>explore</code> it &mdash; and you get <strong>depth-first search (DFS)</strong>, which sweeps the
+        whole graph (even disconnected pieces). Each vertex is explored once and each edge inspected twice:
+        <strong>O(|V| + |E|)</strong>, linear.
+    </p>
+
+    <h3>Problem: which pieces are disconnected?</h3>
+    <p>
+        In an undirected graph "reachable from" is an equivalence relation, so the graph splits into
+        <strong>connected components</strong> &mdash; islands where any two vertices reach each other and no edge crosses
+        between. You get them from DFS for free: keep a counter, stamp every vertex an <code>explore</code> finds, and
+        bump the counter before each fresh <code>explore</code>. Same O(|V| + |E|). (This is the
+        <strong>repeat</strong>: one tool, <code>explore</code>, reused to answer a bigger question.)
+    </p>
+
+    <h3>Capturing the search order: pre/post numbers</h3>
+    <p>
+        DFS visits vertices in a meaningful order, then throws it away. Capture it: run a clock that ticks on
+        <em>entry</em> to and <em>exit</em> from each <code>explore</code>, recording <strong>pre(v)</strong> and
+        <strong>post(v)</strong>. Every vertex now owns an interval [pre, post] &mdash; and these intervals have one rigid
+        property that later algorithms (<a href="./19-topological-sort-and-scc.html">topological sort, SCCs</a>) lean on:
+    </p>
+
+    <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="DFS intervals are nested or disjoint, never interleaved"
+         style="max-width:100%;height:auto;display:block;margin:1em 0;font-family:system-ui,sans-serif;">
+        <!-- Panel A: Nested -->
+        <text x="110" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#2e8b2e">Nested &#10003;</text>
+        <text x="35"  y="60" font-size="13" fill="#0099ff" font-weight="bold">u</text>
+        <line x1="35" y1="80" x2="185" y2="80" stroke="#0099ff" stroke-width="3"/>
+        <line x1="35" y1="72" x2="35"  y2="88" stroke="#0099ff" stroke-width="3"/>
+        <line x1="185" y1="72" x2="185" y2="88" stroke="#0099ff" stroke-width="3"/>
+        <text x="70"  y="130" font-size="13" fill="#e69500" font-weight="bold">v</text>
+        <line x1="70" y1="110" x2="150" y2="110" stroke="#e69500" stroke-width="3"/>
+        <line x1="70" y1="102" x2="70"  y2="118" stroke="#e69500" stroke-width="3"/>
+        <line x1="150" y1="102" x2="150" y2="118" stroke="#e69500" stroke-width="3"/>
+        <text x="110" y="165" text-anchor="middle" font-size="12" fill="#555">v sits inside u</text>
+
+        <!-- Panel B: Disjoint -->
+        <text x="330" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#2e8b2e">Disjoint &#10003;</text>
+        <text x="255" y="80" font-size="13" fill="#0099ff" font-weight="bold">u</text>
+        <line x1="270" y1="95" x2="335" y2="95" stroke="#0099ff" stroke-width="3"/>
+        <line x1="270" y1="87" x2="270" y2="103" stroke="#0099ff" stroke-width="3"/>
+        <line x1="335" y1="87" x2="335" y2="103" stroke="#0099ff" stroke-width="3"/>
+        <text x="345" y="80" font-size="13" fill="#e69500" font-weight="bold">v</text>
+        <line x1="360" y1="95" x2="425" y2="95" stroke="#e69500" stroke-width="3"/>
+        <line x1="360" y1="87" x2="360" y2="103" stroke="#e69500" stroke-width="3"/>
+        <line x1="425" y1="87" x2="425" y2="103" stroke="#e69500" stroke-width="3"/>
+        <text x="347" y="165" text-anchor="middle" font-size="12" fill="#555">u finishes before v starts</text>
+
+        <!-- Panel C: Interleaved (impossible) -->
+        <text x="550" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#cc0000">Interleaved &#10007;</text>
+        <rect x="520" y="68" width="45" height="56" fill="#ff9999" opacity="0.35"/>
+        <text x="475" y="60" font-size="13" fill="#0099ff" font-weight="bold">u</text>
+        <line x1="475" y1="80" x2="565" y2="80" stroke="#0099ff" stroke-width="3"/>
+        <line x1="475" y1="72" x2="475" y2="88" stroke="#0099ff" stroke-width="3"/>
+        <line x1="565" y1="72" x2="565" y2="88" stroke="#0099ff" stroke-width="3"/>
+        <text x="615" y="130" font-size="13" fill="#e69500" font-weight="bold">v</text>
+        <line x1="520" y1="110" x2="630" y2="110" stroke="#e69500" stroke-width="3"/>
+        <line x1="520" y1="102" x2="520" y2="118" stroke="#e69500" stroke-width="3"/>
+        <line x1="630" y1="102" x2="630" y2="118" stroke="#e69500" stroke-width="3"/>
+        <text x="550" y="165" text-anchor="middle" font-size="12" fill="#cc0000">can't happen</text>
+
+        <!-- shared time axis -->
+        <line x1="20" y1="195" x2="640" y2="195" stroke="#bbb" stroke-width="1"/>
+        <text x="640" y="190" text-anchor="end" font-size="11" fill="#999">DFS clock &rarr;</text>
+    </svg>
+    <p>
+        Two intervals are always <strong>nested</strong> (one explore ran as a subroutine of the other) or
+        <strong>disjoint</strong> (neither was open when the other was found) &mdash; <em>never</em> half-overlapping. That
+        "nested-or-disjoint" guarantee is exactly what makes pre/post numbers a trustworthy read on the search's shape.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>Store the graph as <code>dict[node] -&gt; list</code> (or <code>collections.defaultdict(list)</code>);
+                    nodes can be any hashable label, not just 0..n-1.</li>
+                <li>Recursive DFS hits the ~1000-frame recursion limit on deep/long graphs &mdash; convert to an explicit
+                    <code>list</code> stack, or raise <code>sys.setrecursionlimit</code>.</li>
+                <li>Weighted edges: store <code>(neighbor, weight)</code> tuples in the adjacency lists.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>vector&lt;vector&lt;int&gt;&gt;</code> for vertices 0..n-1;
+                    <code>vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt;</code> when edges carry weights.</li>
+                <li>For sparse or arbitrary labels, <code>unordered_map&lt;int, vector&lt;int&gt;&gt;</code>.</li>
+                <li>Recursive DFS can blow the call stack on huge graphs &mdash; an explicit <code>std::stack</code> is the
+                    safe default at scale.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

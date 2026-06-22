@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Trees</h2>
+    <p>
+        A root with children, each a subtree. A <strong>binary</strong> tree has &le; 2 children per node. In CS, trees
+        grow downward.
+    </p>
+
+    <h3>Traversals</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Traversal</th>
+            <th>Order</th>
+            <th>Uses</th>
+        </tr>
+        <tr>
+            <td>Pre-order (DFS)</td>
+            <td>node, left, right</td>
+            <td>copy a tree</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">In-order (DFS)</td>
+            <td>left, node, right</td>
+            <td>BST &rarr; sorted output</td>
+        </tr>
+        <tr>
+            <td>Post-order (DFS)</td>
+            <td>left, right, node</td>
+            <td>evaluate / delete bottom-up</td>
+        </tr>
+        <tr>
+            <td>Level-order (BFS)</td>
+            <td>level by level</td>
+            <td>shortest paths</td>
+        </tr>
+    </table>
+    <p>
+        Depth-first is naturally recursive (it rides the call <em>stack</em>); breadth-first uses an explicit
+        <em>queue</em>: enqueue the root, then repeatedly dequeue a node and enqueue its children.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> inorder(node, visit):          <span style="color:#999"># left, node, right -&gt; sorted for a BST</span>
+    <span style="color:#0099ff">if</span> node <span style="color:#0099ff">is</span> <span style="color:#0099ff">None</span>: <span style="color:#0099ff">return</span>
+    inorder(node.left, visit)
+    visit(node.key)
+    inorder(node.right, visit)
+
+<span style="color:#0099ff">def</span> level_order(root, visit):      <span style="color:#999"># BFS, uses a queue</span>
+    <span style="color:#0099ff">from</span> collections <span style="color:#0099ff">import</span> deque
+    q = deque([root] <span style="color:#0099ff">if</span> root <span style="color:#0099ff">else</span> [])
+    <span style="color:#0099ff">while</span> q:
+        n = q.popleft(); visit(n.key)
+        <span style="color:#0099ff">if</span> n.left:  q.append(n.left)
+        <span style="color:#0099ff">if</span> n.right: q.append(n.right)
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">void</span> inorder(Node* node, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; out) {  <span style="color:#999">// left, node, right</span>
+    <span style="color:#0099ff">if</span> (!node) <span style="color:#0099ff">return</span>;
+    inorder(node-&gt;left, out);
+    out.push_back(node-&gt;key);
+    inorder(node-&gt;right, out);
+}
+<span style="color:#0099ff">void</span> level_order(Node* root, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; out) {   <span style="color:#999">// BFS</span>
+    queue&lt;Node*&gt; q; <span style="color:#0099ff">if</span> (root) q.push(root);
+    <span style="color:#0099ff">while</span> (!q.empty()) {
+        Node* n = q.front(); q.pop(); out.push_back(n-&gt;key);
+        <span style="color:#0099ff">if</span> (n-&gt;left)  q.push(n-&gt;left);
+        <span style="color:#0099ff">if</span> (n-&gt;right) q.push(n-&gt;right);
+    }
+}
+</code></pre>
+    </div>
+
+    <h3>Binary search trees</h3>
+    <p>
+        A <strong>BST</strong> keeps everything in the left subtree &le; the node &le; everything in the right. So Find,
+        Insert, and Delete just walk down comparing &mdash; cost = <strong>O(depth)</strong>. (In-order traversal yields
+        sorted order, by definition.)
+    </p>
+    <p>
+        The catch: depth can be terrible. Insert 1,2,3,4,5 in order and the tree degenerates into a chain &rarr; O(n).
+        We need it <strong>balanced</strong> (each node's two subtrees ~equal size) for O(log n).
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> find(node, key):               <span style="color:#999"># O(height)</span>
+    <span style="color:#0099ff">while</span> node <span style="color:#0099ff">and</span> node.key != key:
+        node = node.left <span style="color:#0099ff">if</span> key &lt; node.key <span style="color:#0099ff">else</span> node.right
+    <span style="color:#0099ff">return</span> node
+
+<span style="color:#0099ff">def</span> insert(root, key):             <span style="color:#999"># O(height)</span>
+    <span style="color:#0099ff">if</span> root <span style="color:#0099ff">is</span> <span style="color:#0099ff">None</span>: <span style="color:#0099ff">return</span> Node(key)
+    <span style="color:#0099ff">if</span>   key &lt; root.key: root.left  = insert(root.left, key)
+    <span style="color:#0099ff">elif</span> key &gt; root.key: root.right = insert(root.right, key)
+    <span style="color:#0099ff">return</span> root                     <span style="color:#999"># equal key: ignore (no dups)</span>
+</code></pre>
+<pre data-lang="cpp"><code>Node* find(Node* node, <span style="color:#0099ff">int</span> key) {  <span style="color:#999">// O(height)</span>
+    <span style="color:#0099ff">while</span> (node &amp;&amp; node-&gt;key != key)
+        node = key &lt; node-&gt;key ? node-&gt;left : node-&gt;right;
+    <span style="color:#0099ff">return</span> node;
+}
+Node* insert(Node* root, <span style="color:#0099ff">int</span> key) {  <span style="color:#999">// O(height)</span>
+    <span style="color:#0099ff">if</span> (!root) <span style="color:#0099ff">return</span> <span style="color:#0099ff">new</span> Node(key);
+    <span style="color:#0099ff">if</span>      (key &lt; root-&gt;key) root-&gt;left  = insert(root-&gt;left, key);
+    <span style="color:#0099ff">else if</span> (key &gt; root-&gt;key) root-&gt;right = insert(root-&gt;right, key);
+    <span style="color:#0099ff">return</span> root;                    <span style="color:#999">// equal key: ignore (no dups)</span>
+}
+</code></pre>
+    </div>
+
+    <h3>Rotations</h3>
+    <p>
+        A <strong>rotation</strong> locally rearranges a parent/child pair (and re-hangs one subtree) to change the
+        shape <em>while preserving the sort order</em>. It's O(1), and it's the tool every self-balancing tree uses to
+        fix imbalance.
+    </p>
+
+    <h3>AVL trees</h3>
+    <p>
+        A BST that stores each node's <strong>height</strong> and maintains the <strong>AVL property</strong>: at every
+        node, |height(left) - height(right)| &le; 1. That bound forces height = O(log n) (proof: an AVL tree of height
+        h has at least F<sub>h</sub> nodes &mdash; Fibonacci, which grows exponentially). After each insert/delete, walk
+        back up and rotate to restore the property.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Find / Insert / Delete</td>
+            <td>O(log n)</td>
+        </tr>
+    </table>
+
+    <h3>Splay trees</h3>
+    <p>
+        Self-adjusting: every time you access a node, <strong>splay</strong> it to the root via rotations (the
+        <em>zig</em>, <em>zig-zig</em>, and <em>zig-zag</em> cases). Frequently-used items drift near the top, so they're
+        cheap to reach &mdash; <strong>O(log n) amortized</strong>, often faster on skewed access patterns. (Naively
+        rotating straight to the root doesn't work &mdash; it can stay unbalanced and hit O(n); the zig-zig/zig-zag cases
+        are what make it work.)
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>No built-in balanced BST. For sorted/ordered needs reach for the third-party
+                    <code>sortedcontainers</code> (<code>SortedList</code>, <code>SortedDict</code>) &mdash; O(log n)
+                    add/remove, backed by a list of lists, not a tree.</li>
+                <li>Unordered lookups go to <code>dict</code>/<code>set</code> (hashing, O(1) average); priority needs go
+                    to <code>heapq</code>.</li>
+                <li>Recursive traversals risk <code>RecursionError</code> on a skewed (chain-like) tree &mdash; iterate
+                    with an explicit stack for deep inputs.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::set</code> / <code>map</code> (and the <code>multi</code> variants) <em>are</em> balanced
+                    BSTs (red-black trees): O(log n) insert/find/erase, iteration in sorted order.</li>
+                <li><code>lower_bound</code> / <code>upper_bound</code> on them give O(log n) range queries &mdash; the
+                    payoff over a hash map.</li>
+                <li>Tree nodes are scattered in memory, so for pure lookup a <code>unordered_map</code> usually wins;
+                    use the tree when order matters.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

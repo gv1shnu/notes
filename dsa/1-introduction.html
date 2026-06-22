@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Introduction</h2>
+    <p>The weight of this subject has changed from computer science core to MAANG core in the past decade.
+        Literally nobody learns this subject just for the sake of learning or experimenting. The only reason to learn this subject is
+        to get a job, and corporates don't seem to be avoiding this truth either,
+        pushing more and more learners towards this subject, with or without their genuine interest.
+        So now, the reason to learn this subject is more of a survival decision for CS grads.
+    </p>
+
+    <p>
+        The good news is, this subject is not as hard as it seems. It is just a matter of understanding the concepts and practicing them.
+        The bad news is, it is not as easy as it seems. It requires a lot of practice and patience to master this subject.
+    </p>
+
+    <p>
+        The whole subject revolves around how to manipulate and fetch data in the least amount of time using optimal amount of space. So, the main focus of this subject is to understand the trade-offs between time and space complexity, and how to optimize them.
+        So, we shall start with Time and Space complexity, and then move on to the different data structures and algorithms, and how to analyze them.
+    </p>
+
+    <h3>Time and Space Complexity</h3>
+
+    <p>
+        The same problem can have two correct algorithms a lifetime apart. Take Fibonacci. The naive recursion is just
+        the definition: <code>fib(n) = fib(n-1) + fib(n-2)</code>. It's correct &mdash; and useless. It rebuilds the same
+        sub-results over and over (a giant tree of repeated calls), so its work grows like the Fibonacci numbers
+        themselves. Store each answer once and it collapses to linear:
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> fib_naive(n):                 <span style="color:#999"># exponential O(phi^n)</span>
+    <span style="color:#0099ff">if</span> n &lt;= 1: <span style="color:#0099ff">return</span> n
+    <span style="color:#0099ff">return</span> fib_naive(n-1) + fib_naive(n-2)
+
+<span style="color:#0099ff">def</span> fib(n):                       <span style="color:#999"># O(n) time, O(1) space</span>
+    a, b = 0, 1
+    <span style="color:#0099ff">for</span> _ <span style="color:#0099ff">in</span> range(n):
+        a, b = b, a + b
+    <span style="color:#0099ff">return</span> a
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">long long</span> fib_naive(<span style="color:#0099ff">int</span> n) {        <span style="color:#999">// exponential O(phi^n)</span>
+    <span style="color:#0099ff">if</span> (n &lt;= 1) <span style="color:#0099ff">return</span> n;
+    <span style="color:#0099ff">return</span> fib_naive(n-1) + fib_naive(n-2);
+}
+
+<span style="color:#0099ff">long long</span> fib(<span style="color:#0099ff">int</span> n) {              <span style="color:#999">// O(n) time, O(1) space</span>
+    <span style="color:#0099ff">long long</span> a = 0, b = 1;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; n; ++i) { <span style="color:#0099ff">long long</span> t = a + b; a = b; b = t; }
+    <span style="color:#0099ff">return</span> a;
+}
+</code></pre>
+    </div>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Compute F(100)</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">naive recursion</td>
+            <td>~1.77 &times; 10<sup>21</sup> steps &rarr; ~56,000 years at 1 GHz</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">fill an array left&rarr;right</td>
+            <td>~200 steps &rarr; instant</td>
+        </tr>
+    </table>
+
+    <p>
+        So we don't measure wall-clock seconds &mdash; those depend on the machine, compiler, and architecture, which
+        only change the answer by a <em>constant</em>. We measure how runtime <strong>scales with input size</strong>,
+        and ignore constants. That's <strong>Big-O</strong>:
+    </p>
+
+    <p>
+        <code>f(n) = O(g(n))</code> &nbsp;means&nbsp; <code>f(n) &le; c &middot; g(n)</code> for some constant
+        <code>c</code> and all large <code>n</code>. A few rules cover most cases:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Rule</th>
+            <th>Example</th>
+        </tr>
+        <tr>
+            <td>drop constant factors</td>
+            <td>7n&sup3; = O(n&sup3;)</td>
+        </tr>
+        <tr>
+            <td>drop lower-order terms</td>
+            <td>3n&sup2; + 5n + 2 = O(n&sup2;)</td>
+        </tr>
+        <tr>
+            <td>any exponential beats any polynomial</td>
+            <td>n<sup>100</sup> = O(1.1<sup>n</sup>)</td>
+        </tr>
+        <tr>
+            <td>any polynomial beats any power of log</td>
+            <td>(log n)&sup3; = O(&radic;n)</td>
+        </tr>
+    </table>
+
+    <p>
+        Why the growth rate is everything &mdash; what you can finish in <strong>one second</strong> at ~1 GHz:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Runtime</th>
+            <th>Max input n</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">n</td>
+            <td>~1,000,000,000</td>
+        </tr>
+        <tr>
+            <td>n log n</td>
+            <td>~30,000,000</td>
+        </tr>
+        <tr>
+            <td>n&sup2;</td>
+            <td>~30,000</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">2<sup>n</sup></td>
+            <td>~30</td>
+        </tr>
+    </table>
+
+    <p>
+        Growth order, best to worst: <code>1 &lt; log n &lt; &radic;n &lt; n &lt; n log n &lt; n&sup2; &lt; 2<sup>n</sup> &lt; n!</code>.
+        Related notation: <strong>&Omega;</strong> is a lower bound (grows no slower), <strong>&Theta;</strong> is tight
+        (same rate both ways), little-<strong>o</strong> is strictly slower. Big-O is the one we'll use for almost
+        everything &mdash; just remember it hides constants, so the last factor-of-2 still needs real measurement.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>Memoize the naive version for free with <code>@functools.lru_cache(None)</code> &mdash; turns the
+                    exponential tree into O(n) without rewriting the recurrence.</li>
+                <li>Deep recursion hits <code>RecursionError</code> at ~1000 frames; raise it with
+                    <code>sys.setrecursionlimit</code> or (better) go iterative.</li>
+                <li><code>int</code> is arbitrary-precision, so <code>fib(1000)</code> just works &mdash; but big-int
+                    arithmetic is O(digits), not truly O(1).</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>No automatic memoization &mdash; cache by hand in a <code>vector&lt;long long&gt;</code> /
+                    <code>unordered_map</code>.</li>
+                <li><code>long long</code> overflows past <code>fib(92)</code>; use <code>__int128</code> or a big-int
+                    library for more.</li>
+                <li>Recursion rides the real call stack (~1&nbsp;MB) &mdash; deep recursion segfaults silently rather
+                    than throwing.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        With that, the three great algorithm-design paradigms: <a href="./13-greedy-algorithms.html">Greedy</a>,
+        <a href="./12-divide-and-conquer.html">Divide &amp; Conquer</a>, and
+        <a href="./15-dynamic-programming.html">Dynamic Programming</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Sorting Algorithms</h2>
+    <p>
+        Put a sequence in order. The quadratic ones are simple; the O(n log n) ones win at scale &mdash; and n log n is
+        as good as comparison sorting can get.
+    </p>
+
+    <h3>Selection sort &mdash; O(n&sup2;)</h3>
+    <p>
+        Grow a sorted prefix: find the minimum of the unsorted part, swap it to the front, repeat.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> selection_sort(A):
+    n = len(A)
+    <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(n):
+        m = i                      <span style="color:#999"># index of min in A[i:]</span>
+        <span style="color:#0099ff">for</span> j <span style="color:#0099ff">in</span> range(i + 1, n):
+            <span style="color:#0099ff">if</span> A[j] &lt; A[m]: m = j
+        A[i], A[m] = A[m], A[i]    <span style="color:#999"># swap min to front</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">void</span> selection_sort(vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A) {
+    <span style="color:#0099ff">int</span> n = A.size();
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; n; ++i) {
+        <span style="color:#0099ff">int</span> m = i;                 <span style="color:#999">// index of min in A[i..]</span>
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> j = i + 1; j &lt; n; ++j)
+            <span style="color:#0099ff">if</span> (A[j] &lt; A[m]) m = j;
+        swap(A[i], A[m]);          <span style="color:#999">// swap min to front</span>
+    }
+}
+</code></pre>
+    </div>
+
+    <p>
+        Two nested loops &rarr; (n-1)+(n-2)+&hellip;+1 = n(n+1)/2 = O(n&sup2;), regardless of input. Sorts
+        <strong>in place</strong> (no extra memory). Insertion sort and bubble sort are the same O(n&sup2;) class.
+    </p>
+
+    <h3>Merge sort &mdash; O(n log n)</h3>
+    <p>
+        Divide and conquer: split in half, sort each half recursively, then <strong>merge</strong> the two sorted halves
+        in one linear pass.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> merge_sort(A):
+    <span style="color:#0099ff">if</span> len(A) &lt;= 1: <span style="color:#0099ff">return</span> A
+    mid = len(A) // 2
+    L, R = merge_sort(A[:mid]), merge_sort(A[mid:])
+    <span style="color:#0099ff">return</span> merge(L, R)
+
+<span style="color:#0099ff">def</span> merge(L, R):                   <span style="color:#999"># one linear pass</span>
+    out, i, j = [], 0, 0
+    <span style="color:#0099ff">while</span> i &lt; len(L) <span style="color:#0099ff">and</span> j &lt; len(R):
+        <span style="color:#0099ff">if</span> L[i] &lt;= R[j]: out.append(L[i]); i += 1
+        <span style="color:#0099ff">else</span>:            out.append(R[j]); j += 1
+    out.extend(L[i:]); out.extend(R[j:])
+    <span style="color:#0099ff">return</span> out
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">void</span> merge_sort(vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> lo, <span style="color:#0099ff">int</span> hi) {  <span style="color:#999">// [lo, hi)</span>
+    <span style="color:#0099ff">if</span> (hi - lo &lt;= 1) <span style="color:#0099ff">return</span>;
+    <span style="color:#0099ff">int</span> mid = lo + (hi - lo) / 2;
+    merge_sort(A, lo, mid);
+    merge_sort(A, mid, hi);
+    vector&lt;<span style="color:#0099ff">int</span>&gt; tmp; tmp.reserve(hi - lo);
+    <span style="color:#0099ff">int</span> i = lo, j = mid;
+    <span style="color:#0099ff">while</span> (i &lt; mid &amp;&amp; j &lt; hi)            <span style="color:#999">// one linear pass</span>
+        tmp.push_back(A[i] &lt;= A[j] ? A[i++] : A[j++]);
+    <span style="color:#0099ff">while</span> (i &lt; mid) tmp.push_back(A[i++]);
+    <span style="color:#0099ff">while</span> (j &lt; hi)  tmp.push_back(A[j++]);
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> k = 0; k &lt; (<span style="color:#0099ff">int</span>)tmp.size(); ++k) A[lo + k] = tmp[k];
+}
+</code></pre>
+    </div>
+
+    <p>
+        <code>T(n) = 2T(n/2) + O(n) = O(n log n)</code> &mdash; log n levels, O(n) work each. Fast enough to sort a
+        million items on a laptop (where O(n&sup2;) would need ~10<sup>12</sup> ops). Needs O(n) extra space for the
+        merge. <em>(Full walk-through under <a href="./12-divide-and-conquer.html">Divide &amp; Conquer</a>.)</em>
+    </p>
+
+    <h3>Quicksort &mdash; O(n log n) average</h3>
+    <p>
+        Pick a <strong>pivot</strong>, <strong>partition</strong> the array so smaller elements go left and larger go
+        right (pivot lands in its final spot), then recurse on each side. Sorts in place, no merge.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> quicksort(A, lo, hi):          <span style="color:#999"># inclusive bounds</span>
+    <span style="color:#0099ff">if</span> lo &gt;= hi: <span style="color:#0099ff">return</span>
+    p = partition(A, lo, hi)
+    quicksort(A, lo, p - 1)
+    quicksort(A, p + 1, hi)
+
+<span style="color:#0099ff">def</span> partition(A, lo, hi):
+    pivot = A[hi]                  <span style="color:#999"># last element as pivot</span>
+    i = lo
+    <span style="color:#0099ff">for</span> j <span style="color:#0099ff">in</span> range(lo, hi):
+        <span style="color:#0099ff">if</span> A[j] &lt; pivot:
+            A[i], A[j] = A[j], A[i]; i += 1
+    A[i], A[hi] = A[hi], A[i]      <span style="color:#999"># pivot to its spot</span>
+    <span style="color:#0099ff">return</span> i
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">int</span> partition(vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> lo, <span style="color:#0099ff">int</span> hi) {
+    <span style="color:#0099ff">int</span> pivot = A[hi], i = lo;     <span style="color:#999">// last element as pivot</span>
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> j = lo; j &lt; hi; ++j)
+        <span style="color:#0099ff">if</span> (A[j] &lt; pivot) swap(A[i++], A[j]);
+    swap(A[i], A[hi]);             <span style="color:#999">// pivot to its spot</span>
+    <span style="color:#0099ff">return</span> i;
+}
+<span style="color:#0099ff">void</span> quicksort(vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> lo, <span style="color:#0099ff">int</span> hi) {  <span style="color:#999">// inclusive</span>
+    <span style="color:#0099ff">if</span> (lo &gt;= hi) <span style="color:#0099ff">return</span>;
+    <span style="color:#0099ff">int</span> p = partition(A, lo, hi);
+    quicksort(A, lo, p - 1);
+    quicksort(A, p + 1, hi);
+}
+</code></pre>
+    </div>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Case</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">average (random pivot)</td>
+            <td>O(n log n)</td>
+        </tr>
+        <tr>
+            <td bgcolor="red">worst (already sorted, bad pivot)</td>
+            <td>O(n&sup2;)</td>
+        </tr>
+    </table>
+    <p>
+        A random pivot (shuffle, or pick a random index to swap in) makes the worst case practically impossible; in
+        practice quicksort is the fastest general sort (cache-friendly, in place).
+    </p>
+
+    <h3>The n log n wall</h3>
+    <p>
+        Any <strong>comparison-based</strong> sort must take &Omega;(n log n) in the worst case. Picture its decision
+        tree: each comparison is a node, each leaf an output ordering. There are <strong>n!</strong> possible orderings,
+        so &ge; n! leaves; a binary tree with n! leaves has depth &ge; log(n!) = &Omega;(n log n). So merge sort is
+        asymptotically optimal &mdash; you can't beat it by comparing.
+    </p>
+
+    <h3>Beating the wall: counting sort &mdash; O(n + M)</h3>
+    <p>
+        If you <em>don't</em> compare &mdash; possible when keys are small integers in 0..M &mdash; you can go linear.
+        Count occurrences of each value in one pass, then write them out in order.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> counting_sort(A, M):           <span style="color:#999"># keys in 0..M</span>
+    count = [0] * (M + 1)
+    <span style="color:#0099ff">for</span> x <span style="color:#0099ff">in</span> A: count[x] += 1      <span style="color:#999"># one pass</span>
+    out = []
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> range(M + 1):
+        out.extend([v] * count[v]) <span style="color:#999"># write in order</span>
+    <span style="color:#0099ff">return</span> out
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;<span style="color:#0099ff">int</span>&gt; counting_sort(<span style="color:#0099ff">const</span> vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> M) {  <span style="color:#999">// keys 0..M</span>
+    vector&lt;<span style="color:#0099ff">int</span>&gt; count(M + 1, 0);
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> x : A) count[x]++;   <span style="color:#999">// one pass</span>
+    vector&lt;<span style="color:#0099ff">int</span>&gt; out;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v = 0; v &lt;= M; ++v)
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> c = 0; c &lt; count[v]; ++c) out.push_back(v);  <span style="color:#999">// in order</span>
+    <span style="color:#0099ff">return</span> out;
+}
+</code></pre>
+    </div>
+
+    <p>
+        O(n + M); linear when M = O(n). Radix sort extends this to larger keys digit by digit. The lower bound doesn't
+        apply &mdash; no comparisons were made.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Sort</th>
+            <th>Time</th>
+            <th>In place?</th>
+        </tr>
+        <tr>
+            <td>Selection</td>
+            <td bgcolor="red">O(n&sup2;)</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <td>Merge</td>
+            <td bgcolor="lightgreen">O(n log n)</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <td>Quick</td>
+            <td bgcolor="lightgreen">O(n log n) avg</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Counting / Radix</td>
+            <td>O(n + M)</td>
+            <td>no</td>
+        </tr>
+    </table>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>sorted(it)</code> / <code>list.sort()</code> use <strong>Timsort</strong>: stable, adaptive
+                    (O(n) on nearly-sorted data), O(n log n) worst, O(n) extra space.</li>
+                <li><code>key=</code> computes each element's sort key once (decorate&ndash;sort&ndash;undecorate);
+                    <code>reverse=True</code> for descending.</li>
+                <li><code>list.sort()</code> mutates in place and returns <code>None</code>; <code>sorted()</code> returns
+                    a new list and works on any iterable.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::sort</code> = <strong>introsort</strong> (quicksort, heapsort fallback, insertion for
+                    small ranges): O(n log n) worst, in place, but <strong>not stable</strong>.</li>
+                <li><code>std::stable_sort</code> keeps equal elements' order (merge-based, O(n) extra memory);
+                    <code>std::sort(begin, end, cmp)</code> takes a comparator.</li>
+                <li>For partial work: <code>std::partial_sort</code> (top k) and <code>std::nth_element</code> (O(n)
+                    selection) beat a full sort.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Topological Sort &amp; Strongly Connected Components</h2>
+    <p>
+        Two classic uses of DFS on <strong>directed</strong> graphs. DFS works the same as <a href="./11-graphs.html">on
+        undirected graphs</a> &mdash; you just follow each edge only in its arrow's direction.
+    </p>
+
+    <h3>DAGs</h3>
+    <p>
+        A <strong>directed acyclic graph</strong> is a directed graph with no cycle. They model
+        <strong>dependencies</strong>: draw A&rarr;B for "A must come before B" (morning routine, build steps, course
+        prerequisites). Two named vertex roles:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Term</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td><strong>Source</strong></td>
+            <td>no incoming edges</td>
+        </tr>
+        <tr>
+            <td><strong>Sink</strong></td>
+            <td>no outgoing edges</td>
+        </tr>
+    </table>
+
+    <h3>Topological sort</h3>
+    <p>
+        Order the vertices on a line so every edge points <em>forward</em> (left&rarr;right). This is possible
+        <strong>if and only if the graph is a DAG</strong> &mdash; a cycle (chicken&harr;egg) has no valid first element,
+        so it can't be ordered.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Approach</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td bgcolor="#ff9999">Naive</td>
+            <td>repeatedly find a sink, append it, delete it &mdash; re-walks the whole path each time</td>
+            <td>O(|V|&sup2;)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">DFS</td>
+            <td>run DFS, output vertices in <strong>decreasing post number</strong> (reverse post-order)</td>
+            <td>O(|V| + |E|)</td>
+        </tr>
+    </table>
+    <p>
+        <strong>Why reverse post-order works:</strong> for any edge u&rarr;v in a DAG, post(u) &gt; post(v) always &mdash;
+        so listing vertices from highest post to lowest puts every edge's tail before its head. A sink is just the vertex
+        that finishes first (smallest post), and it lands last.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> topological_sort(graph):       <span style="color:#999"># graph: dict v -&gt; successors</span>
+    visited, order = set(), []
+    <span style="color:#0099ff">def</span> dfs(v):
+        visited.add(v)
+        <span style="color:#0099ff">for</span> w <span style="color:#0099ff">in</span> graph[v]:
+            <span style="color:#0099ff">if</span> w <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited: dfs(w)
+        order.append(v)            <span style="color:#999"># post-order: v is finished</span>
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> graph:
+        <span style="color:#0099ff">if</span> v <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited: dfs(v)
+    <span style="color:#0099ff">return</span> order[::-1]              <span style="color:#999"># reverse post-order</span>
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; graph;          <span style="color:#999">// graph[v] = successors</span>
+vector&lt;<span style="color:#0099ff">int</span>&gt; order; vector&lt;<span style="color:#0099ff">bool</span>&gt; visited;
+
+<span style="color:#0099ff">void</span> dfs(<span style="color:#0099ff">int</span> v) {
+    visited[v] = <span style="color:#0099ff">true</span>;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> w : graph[v]) <span style="color:#0099ff">if</span> (!visited[w]) dfs(w);
+    order.push_back(v);             <span style="color:#999">// post-order: v is finished</span>
+}
+vector&lt;<span style="color:#0099ff">int</span>&gt; topological_sort(<span style="color:#0099ff">int</span> n) {
+    visited.assign(n, <span style="color:#0099ff">false</span>); order.clear();
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v = 0; v &lt; n; ++v) <span style="color:#0099ff">if</span> (!visited[v]) dfs(v);
+    reverse(order.begin(), order.end());   <span style="color:#999">// reverse post-order</span>
+    <span style="color:#0099ff">return</span> order;
+}
+</code></pre>
+    </div>
+
+    <h3>Strongly connected components</h3>
+    <p>
+        In a directed graph, two vertices are <strong>connected</strong> only if you can go from each to the other
+        <em>and back</em>. That relation partitions the graph into <strong>SCCs</strong>: inside one, everything reaches
+        everything; leave one and you can't return.
+    </p>
+    <p>
+        Collapse each SCC to a single node and you get the <strong>metagraph</strong> (condensation) &mdash; which is
+        <em>always a DAG</em>. (If it had a cycle, those SCCs would all reach each other and merge into one.) That DAG
+        structure is what the algorithm exploits.
+    </p>
+
+    <h3>Computing SCCs &mdash; two DFS passes (Kosaraju)</h3>
+    <p>
+        <strong>Key fact:</strong> the vertex with the largest post number in the <strong>reverse graph</strong> G<sup>R</sup>
+        (all edges flipped) lies in a <em>sink</em> SCC of G &mdash; and exploring from a sink-SCC vertex finds exactly
+        that one SCC (nothing leaks out). So:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Do</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>DFS on G<sup>R</sup>, record post numbers</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>process vertices of G in <strong>decreasing post number</strong>; each unvisited one you
+                <code>explore</code> peels off exactly one SCC</td>
+        </tr>
+    </table>
+    <p>
+        Two linear DFS passes &mdash; G<sup>R</sup> then G &mdash; so the whole thing is
+        <strong>O(|V| + |E|)</strong>, down from the naive O(|V|&sup2; + |V||E|) of exploring from every vertex.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> kosaraju(graph, n):            <span style="color:#999"># returns comp[v] = SCC id</span>
+    rev = [[] <span style="color:#0099ff">for</span> _ <span style="color:#0099ff">in</span> range(n)]
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> range(n):
+        <span style="color:#0099ff">for</span> w <span style="color:#0099ff">in</span> graph[v]: rev[w].append(v)   <span style="color:#999"># reverse graph</span>
+
+    visited, order = set(), []
+    <span style="color:#0099ff">def</span> dfs1(v):                   <span style="color:#999"># pass 1: finish order on G^R</span>
+        visited.add(v)
+        <span style="color:#0099ff">for</span> w <span style="color:#0099ff">in</span> rev[v]:
+            <span style="color:#0099ff">if</span> w <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited: dfs1(w)
+        order.append(v)
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> range(n):
+        <span style="color:#0099ff">if</span> v <span style="color:#0099ff">not</span> <span style="color:#0099ff">in</span> visited: dfs1(v)
+
+    comp = [-1] * n
+    <span style="color:#0099ff">def</span> dfs2(v, label):            <span style="color:#999"># pass 2: explore G</span>
+        comp[v] = label
+        <span style="color:#0099ff">for</span> w <span style="color:#0099ff">in</span> graph[v]:
+            <span style="color:#0099ff">if</span> comp[w] == -1: dfs2(w, label)
+    label = 0
+    <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> reversed(order):       <span style="color:#999"># decreasing finish time</span>
+        <span style="color:#0099ff">if</span> comp[v] == -1:
+            dfs2(v, label); label += 1
+    <span style="color:#0099ff">return</span> comp
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; graph, rev;
+vector&lt;<span style="color:#0099ff">int</span>&gt; order, comp;
+
+<span style="color:#0099ff">void</span> dfs1(<span style="color:#0099ff">int</span> v, vector&lt;<span style="color:#0099ff">bool</span>&gt;&amp; vis) {     <span style="color:#999">// pass 1 on G^R</span>
+    vis[v] = <span style="color:#0099ff">true</span>;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> w : rev[v]) <span style="color:#0099ff">if</span> (!vis[w]) dfs1(w, vis);
+    order.push_back(v);
+}
+<span style="color:#0099ff">void</span> dfs2(<span style="color:#0099ff">int</span> v, <span style="color:#0099ff">int</span> label) {           <span style="color:#999">// pass 2 on G</span>
+    comp[v] = label;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> w : graph[v]) <span style="color:#0099ff">if</span> (comp[w] == -1) dfs2(w, label);
+}
+<span style="color:#0099ff">void</span> kosaraju(<span style="color:#0099ff">int</span> n) {
+    rev.assign(n, {});
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v = 0; v &lt; n; ++v)
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> w : graph[v]) rev[w].push_back(v);  <span style="color:#999">// reverse graph</span>
+    vector&lt;<span style="color:#0099ff">bool</span>&gt; vis(n, <span style="color:#0099ff">false</span>); order.clear();
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v = 0; v &lt; n; ++v) <span style="color:#0099ff">if</span> (!vis[v]) dfs1(v, vis);
+    comp.assign(n, -1);
+    <span style="color:#0099ff">int</span> label = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = n - 1; i &gt;= 0; --i)      <span style="color:#999">// decreasing finish time</span>
+        <span style="color:#0099ff">if</span> (comp[order[i]] == -1) dfs2(order[i], label++);
+}
+</code></pre>
+    </div>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>graphlib.TopologicalSorter</code> (3.9+) gives a topo order straight from a
+                    <code>{node: {deps}}</code> dict &mdash; no hand-rolled DFS needed.</li>
+                <li>Recursive DFS on a deep graph hits the recursion limit; flip to an explicit stack (the iterative DFS
+                    must push post-order carefully).</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>No stdlib topo/SCC &mdash; hand-roll. <strong>Tarjan's</strong> SCC does it in a <em>single</em> DFS
+                    pass (low-link values) vs Kosaraju's two &mdash; same O(|V|+|E|), often preferred.</li>
+                <li>For topo order you can also use <strong>Kahn's algorithm</strong> (repeatedly remove in-degree-0
+                    nodes via a queue) &mdash; no recursion at all.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

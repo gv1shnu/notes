@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Arrays</h2>
+    <p>
+        A contiguous block of memory, split into <strong>equal-size</strong> elements indexed by contiguous integers.
+        Those three facts buy the superpower: <strong>O(1) random access</strong> &mdash; the address of element
+        <code>i</code> is just arithmetic, <code>base + size &times; (i - first)</code>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">read / write A[i]</td>
+            <td>O(1)</td>
+        </tr>
+        <tr>
+            <td>add / remove at the <strong>end</strong></td>
+            <td>O(1)</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">add / remove at front or middle</td>
+            <td>O(n) (everything after must shift)</td>
+        </tr>
+    </table>
+
+    <h3>Dynamic arrays</h3>
+    <p>
+        A static array's size is fixed at creation. A <strong>dynamic (resizable) array</strong> hides a pointer to a
+        bigger-than-needed block and tracks <code>size</code> + <code>capacity</code>. On <code>pushBack</code>, if full,
+        it allocates a new array of <strong>double</strong> capacity, copies everything over, and swaps. (C++
+        <code>vector</code>, Java <code>ArrayList</code>, Python <code>list</code>.)
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> DynamicArray:
+    <span style="color:#0099ff">def</span> __init__(self):
+        self.cap, self.size = 1, 0
+        self.data = [<span style="color:#0099ff">None</span>] * self.cap
+
+    <span style="color:#0099ff">def</span> push_back(self, x):           <span style="color:#999"># amortized O(1)</span>
+        <span style="color:#0099ff">if</span> self.size == self.cap:     <span style="color:#999"># full -&gt; grow</span>
+            self._resize(2 * self.cap)
+        self.data[self.size] = x
+        self.size += 1
+
+    <span style="color:#0099ff">def</span> _resize(self, new_cap):       <span style="color:#999"># O(n) copy, rare</span>
+        new = [<span style="color:#0099ff">None</span>] * new_cap
+        <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(self.size):
+            new[i] = self.data[i]
+        self.data, self.cap = new, new_cap
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> DynamicArray {
+    <span style="color:#0099ff">int</span>* data; <span style="color:#0099ff">int</span> size = 0, cap = 1;
+    DynamicArray() { data = <span style="color:#0099ff">new</span> <span style="color:#0099ff">int</span>[cap]; }
+
+    <span style="color:#0099ff">void</span> push_back(<span style="color:#0099ff">int</span> x) {           <span style="color:#999">// amortized O(1)</span>
+        <span style="color:#0099ff">if</span> (size == cap) resize(2 * cap);  <span style="color:#999">// full -&gt; grow</span>
+        data[size++] = x;
+    }
+    <span style="color:#0099ff">void</span> resize(<span style="color:#0099ff">int</span> new_cap) {         <span style="color:#999">// O(n) copy, rare</span>
+        <span style="color:#0099ff">int</span>* nw = <span style="color:#0099ff">new</span> <span style="color:#0099ff">int</span>[new_cap];
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; size; ++i) nw[i] = data[i];
+        <span style="color:#0099ff">delete</span>[] data; data = nw; cap = new_cap;
+    }
+};
+</code></pre>
+    </div>
+
+    <h3>Amortized analysis (aggregate method)</h3>
+    <p>
+        A single <code>pushBack</code> is O(n) in the worst case (the copy) &mdash; but those are rare. Doubling means the
+        total copy work across <code>n</code> pushes is <code>1 + 2 + 4 + &hellip; + n &asymp; 2n</code>.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>n pushBacks</th>
+            <th>cost</th>
+        </tr>
+        <tr>
+            <td>total</td>
+            <td>O(n)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">per push (amortized)</td>
+            <td>O(1)</td>
+        </tr>
+    </table>
+    <p>
+        "Amortized O(1)" = averaged over a long run of operations, not worst-case-per-call. Doubling wastes at most half
+        the space; growing by 1.5&times; wastes less, by 3&times; wastes more.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>list</code> <em>is</em> a dynamic array of object pointers; <code>append</code> over-allocates
+                    geometrically &rarr; amortized O(1).</li>
+                <li><code>insert(0, x)</code> and <code>pop(0)</code> are <strong>O(n)</strong> (everything shifts) &mdash;
+                    use <code>collections.deque</code> for O(1) at both ends.</li>
+                <li>Storing pointers means an extra indirection per element; <code>array.array</code> / <code>numpy</code>
+                    pack raw values contiguously for cache-friendliness.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::vector&lt;T&gt;</code> stores <code>T</code> contiguously and grows ~2&times;;
+                    <code>push_back</code> is amortized O(1).</li>
+                <li><code>reserve(n)</code> pre-allocates to skip reallocations; a reallocation
+                    <strong>invalidates</strong> all iterators/pointers into the vector.</li>
+                <li><code>insert</code>/<code>erase</code> in the middle is O(n); <code>shrink_to_fit</code> releases the
+                    spare capacity.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

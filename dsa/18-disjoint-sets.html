@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Disjoint Sets (Union-Find)</h2>
+    <p>
+        Track a collection of non-overlapping groups, with two questions: "are these two in the same group?" and "merge
+        these two groups." Three operations:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td>MakeSet(x)</td>
+            <td>new group containing just x</td>
+        </tr>
+        <tr>
+            <td>Find(x)</td>
+            <td>return x's group id (its root)</td>
+        </tr>
+        <tr>
+            <td>Union(x, y)</td>
+            <td>merge the two groups</td>
+        </tr>
+    </table>
+
+    <h3>Forest of trees</h3>
+    <p>
+        Represent each group as a tree; each node points to a parent, the root is the group id. <code>Find</code> walks
+        to the root; <code>Union</code> hangs one root under the other. Done carelessly, trees become long chains and
+        everything is O(n). Two heuristics fix that.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Heuristic</th>
+            <th>Idea</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Union by rank</td>
+            <td>always hang the <em>shorter</em> tree under the taller one &rarr; height stays O(log n)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Path compression</td>
+            <td>during Find, re-attach every node on the path directly to the root</td>
+        </tr>
+    </table>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> DisjointSets:
+    <span style="color:#0099ff">def</span> __init__(self, n):
+        self.parent = list(range(n))   <span style="color:#999"># each its own root</span>
+        self.rank = [0] * n
+
+    <span style="color:#0099ff">def</span> find(self, x):                 <span style="color:#999"># path compression</span>
+        <span style="color:#0099ff">if</span> self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        <span style="color:#0099ff">return</span> self.parent[x]
+
+    <span style="color:#0099ff">def</span> union(self, x, y):             <span style="color:#999"># union by rank</span>
+        rx, ry = self.find(x), self.find(y)
+        <span style="color:#0099ff">if</span> rx == ry: <span style="color:#0099ff">return</span>
+        <span style="color:#0099ff">if</span> self.rank[rx] &lt; self.rank[ry]: rx, ry = ry, rx
+        self.parent[ry] = rx           <span style="color:#999"># shorter under taller</span>
+        <span style="color:#0099ff">if</span> self.rank[rx] == self.rank[ry]: self.rank[rx] += 1
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> DisjointSets {
+    vector&lt;<span style="color:#0099ff">int</span>&gt; parent, rnk;
+    DisjointSets(<span style="color:#0099ff">int</span> n) : parent(n), rnk(n, 0) {
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; n; ++i) parent[i] = i;   <span style="color:#999">// each its own root</span>
+    }
+    <span style="color:#0099ff">int</span> find(<span style="color:#0099ff">int</span> x) {                  <span style="color:#999">// path compression</span>
+        <span style="color:#0099ff">if</span> (parent[x] != x) parent[x] = find(parent[x]);
+        <span style="color:#0099ff">return</span> parent[x];
+    }
+    <span style="color:#0099ff">void</span> unite(<span style="color:#0099ff">int</span> x, <span style="color:#0099ff">int</span> y) {         <span style="color:#999">// union by rank</span>
+        <span style="color:#0099ff">int</span> rx = find(x), ry = find(y);
+        <span style="color:#0099ff">if</span> (rx == ry) <span style="color:#0099ff">return</span>;
+        <span style="color:#0099ff">if</span> (rnk[rx] &lt; rnk[ry]) swap(rx, ry);
+        parent[ry] = rx;               <span style="color:#999">// shorter under taller</span>
+        <span style="color:#0099ff">if</span> (rnk[rx] == rnk[ry]) rnk[rx]++;
+    }
+};
+</code></pre>
+    </div>
+
+    <h3>Near-constant time</h3>
+    <p>
+        With union by rank alone, every operation is O(log n). Add path compression and the amortized cost drops to
+        <strong>O(log* n)</strong> &mdash; the iterated logarithm, which is &le; 5 for any input that fits in the
+        universe. So in practice, <strong>effectively constant</strong> per operation.
+    </p>
+    <p>
+        (Used for: connected components, Kruskal's MST, "are these networked together?")
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>No stdlib union-find &mdash; hand-roll over a <code>list</code> (it's tiny). This is the backbone of
+                    <a href="./22-minimum-spanning-trees.html">Kruskal's MST</a>.</li>
+                <li>Recursive <code>find</code> can hit the recursion limit on a long chain <em>before</em> compression
+                    flattens it &mdash; an iterative two-pass <code>find</code> is safer for large n.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>No stdlib structure either; a pair of <code>vector&lt;int&gt;</code> (parent + rank) is the standard
+                    pattern. (<code>boost::disjoint_sets</code> exists if you want it.)</li>
+                <li>Prefer iterative <code>find</code> at very large n to avoid deep recursion; some use
+                    <em>union by size</em> instead of rank &mdash; same near-constant bound.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

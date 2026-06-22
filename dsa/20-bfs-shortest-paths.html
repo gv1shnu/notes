@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>BFS &amp; Shortest Paths (unweighted)</h2>
+    <p>
+        The <strong>length</strong> of a path is its number of edges; the <strong>distance</strong> d(s, v) is the length
+        of the <em>shortest</em> path (&infin; if v is unreachable). Breadth-first search computes d(s, &middot;) to
+        <em>every</em> vertex at once &mdash; e.g. fewest flight transfers from one city to all others.
+    </p>
+
+    <h3>Distance layers</h3>
+    <p>
+        Group vertices by distance from s: layer 0 = {s}, layer 1 = s's neighbors, and so on. The structure constrains
+        where edges can go &mdash; an edge that jumped two layers forward would be a shortcut, contradicting the layering:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Edge from layer i can reach&hellip;</th>
+            <th>Undirected</th>
+            <th>Directed</th>
+        </tr>
+        <tr>
+            <td>same or adjacent layer (i, i&plusmn;1)</td>
+            <td bgcolor="lightgreen">yes</td>
+            <td bgcolor="lightgreen">yes</td>
+        </tr>
+        <tr>
+            <td>any earlier layer (&le; i)</td>
+            <td>&mdash;</td>
+            <td bgcolor="lightgreen">yes</td>
+        </tr>
+        <tr>
+            <td>two+ layers forward (&ge; i+2)</td>
+            <td bgcolor="#ff9999">impossible</td>
+            <td bgcolor="#ff9999">impossible</td>
+        </tr>
+    </table>
+
+    <h3>BFS</h3>
+    <p>
+        Visit layer by layer using a <strong>queue</strong> (FIFO) &mdash; that's the one change from
+        <a href="./11-graphs.html">DFS</a>, which rides a stack. Dequeue a vertex, and any neighbor still at distance
+        &infin; is newly discovered: set its distance and enqueue it.
+    </p>
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">from</span> collections <span style="color:#0099ff">import</span> deque
+
+<span style="color:#0099ff">def</span> bfs(graph, s):                  <span style="color:#999"># graph: dict v -&gt; neighbors</span>
+    dist = {v: float(<span style="color:#cc6600">'inf'</span>) <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> graph}
+    prev = {v: <span style="color:#0099ff">None</span> <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> graph}
+    dist[s] = 0
+    q = deque([s])
+    <span style="color:#0099ff">while</span> q:
+        u = q.popleft()
+        <span style="color:#0099ff">for</span> v <span style="color:#0099ff">in</span> graph[u]:
+            <span style="color:#0099ff">if</span> dist[v] == float(<span style="color:#cc6600">'inf'</span>):   <span style="color:#999"># newly discovered</span>
+                dist[v] = dist[u] + 1
+                prev[v] = u
+                q.append(v)
+    <span style="color:#0099ff">return</span> dist, prev
+
+<span style="color:#0099ff">def</span> reconstruct(prev, s, t):        <span style="color:#999"># shortest path s -&gt; t</span>
+    path, u = [], t
+    <span style="color:#0099ff">while</span> u <span style="color:#0099ff">is</span> <span style="color:#0099ff">not</span> <span style="color:#0099ff">None</span>:
+        path.append(u); u = prev[u]
+    path.reverse()
+    <span style="color:#0099ff">return</span> path <span style="color:#0099ff">if</span> path <span style="color:#0099ff">and</span> path[0] == s <span style="color:#0099ff">else</span> []  <span style="color:#999"># [] if unreachable</span>
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; graph;          <span style="color:#999">// graph[u] = neighbors</span>
+
+pair&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;, vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; bfs(<span style="color:#0099ff">int</span> n, <span style="color:#0099ff">int</span> s) {
+    vector&lt;<span style="color:#0099ff">int</span>&gt; dist(n, -1), prev(n, -1);   <span style="color:#999">// -1 = infinity / none</span>
+    dist[s] = 0;
+    queue&lt;<span style="color:#0099ff">int</span>&gt; q; q.push(s);
+    <span style="color:#0099ff">while</span> (!q.empty()) {
+        <span style="color:#0099ff">int</span> u = q.front(); q.pop();
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> v : graph[u])
+            <span style="color:#0099ff">if</span> (dist[v] == -1) {            <span style="color:#999">// newly discovered</span>
+                dist[v] = dist[u] + 1;
+                prev[v] = u;
+                q.push(v);
+            }
+    }
+    <span style="color:#0099ff">return</span> {dist, prev};
+}
+vector&lt;<span style="color:#0099ff">int</span>&gt; reconstruct(<span style="color:#0099ff">const</span> vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; prev, <span style="color:#0099ff">int</span> s, <span style="color:#0099ff">int</span> t) {
+    vector&lt;<span style="color:#0099ff">int</span>&gt; path;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> u = t; u != -1; u = prev[u]) path.push_back(u);
+    reverse(path.begin(), path.end());
+    <span style="color:#0099ff">if</span> (path.empty() || path.front() != s) <span style="color:#0099ff">return</span> {};  <span style="color:#999">// unreachable</span>
+    <span style="color:#0099ff">return</span> path;
+}
+</code></pre>
+    </div>
+    <p>
+        Each vertex is enqueued <strong>at most once</strong> (its distance leaves &infin; the moment it's found and never
+        re-enters the queue), so every edge is scanned at most twice &mdash; <strong>O(|V| + |E|)</strong>, linear.
+    </p>
+
+    <h3>Shortest-path tree</h3>
+    <p>
+        Distances alone don't tell you the <em>route</em>. Fix that with one extra array: when v is discovered while
+        processing u, record <code>prev[v] = u</code>. Following <code>prev</code> from any vertex back to s &mdash; each
+        hop drops the distance by exactly 1 &mdash; traces a shortest path; reverse it to read it forward. These
+        <code>prev</code> pointers form a <strong>tree</strong> (no cycles: distances strictly decrease along every hop,
+        so a loop is impossible) rooted at s.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>BFS</th>
+            <th>DFS</th>
+        </tr>
+        <tr>
+            <td>Frontier</td>
+            <td bgcolor="lightblue">queue (FIFO)</td>
+            <td>stack / recursion</td>
+        </tr>
+        <tr>
+            <td>Finds shortest paths?</td>
+            <td bgcolor="lightgreen">yes (unweighted)</td>
+            <td bgcolor="#ff9999">no</td>
+        </tr>
+        <tr>
+            <td>Order</td>
+            <td>nearest first, layer by layer</td>
+            <td>deepest first</td>
+        </tr>
+    </table>
+    <p>
+        BFS gives the right answer only when every edge "costs" 1. The moment edges carry different
+        <strong>weights</strong>, layer-by-layer breaks &mdash; that's <a href="./21-weighted-shortest-paths.html">Dijkstra
+        and Bellman-Ford</a>.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>collections.deque</code> is the queue &mdash; <code>append</code> + <code>popleft</code> O(1).
+                    A <code>list</code> with <code>pop(0)</code> turns BFS into O(V&middot;n).</li>
+                <li>For grid problems, encode a cell <code>(r, c)</code> as a tuple key or a flat <code>r*W + c</code>
+                    integer.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::queue&lt;int&gt;</code> over a <code>deque</code>; at scale a preallocated
+                    <code>vector</code> + head index is faster.</li>
+                <li>Use a <code>-1</code> sentinel for unvisited <code>dist</code>/<code>prev</code> &mdash; one array does
+                    double duty as the "visited" flag.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

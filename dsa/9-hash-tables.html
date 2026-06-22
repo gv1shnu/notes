@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Hash Tables</h2>
+    <p>
+        Store a <strong>map</strong> (keys &rarr; values) with near-O(1) <code>HasKey</code> / <code>Get</code> /
+        <code>Set</code>. A <strong>hash function</strong> <code>h</code> turns a key into an index in 0..m-1; you store
+        the pair at that index. The snag: two keys can hash to the same index &mdash; a <strong>collision</strong>.
+    </p>
+
+    <h3>Chaining</h3>
+    <p>
+        Make each table cell a (doubly-)linked list. On a collision, just append to that cell's list ("chain"). Lookup =
+        hash to the cell, then scan its chain.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> HashTable:
+    <span style="color:#0099ff">def</span> __init__(self, m=8):
+        self.m = m
+        self.buckets = [[] <span style="color:#0099ff">for</span> _ <span style="color:#0099ff">in</span> range(m)]   <span style="color:#999"># chains</span>
+
+    <span style="color:#0099ff">def</span> _h(self, key):
+        <span style="color:#0099ff">return</span> hash(key) % self.m
+
+    <span style="color:#0099ff">def</span> set(self, key, value):                  <span style="color:#999"># O(1) average</span>
+        chain = self.buckets[self._h(key)]
+        <span style="color:#0099ff">for</span> i, (k, _) <span style="color:#0099ff">in</span> enumerate(chain):
+            <span style="color:#0099ff">if</span> k == key: chain[i] = (key, value); <span style="color:#0099ff">return</span>
+        chain.append((key, value))
+
+    <span style="color:#0099ff">def</span> get(self, key):                         <span style="color:#999"># O(1) average</span>
+        <span style="color:#0099ff">for</span> k, v <span style="color:#0099ff">in</span> self.buckets[self._h(key)]:
+            <span style="color:#0099ff">if</span> k == key: <span style="color:#0099ff">return</span> v
+        <span style="color:#0099ff">return</span> <span style="color:#0099ff">None</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> HashTable {
+    <span style="color:#0099ff">int</span> m;
+    vector&lt;list&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;&gt;&gt; buckets;       <span style="color:#999">// chains</span>
+    HashTable(<span style="color:#0099ff">int</span> m = 8) : m(m), buckets(m) {}
+
+    <span style="color:#0099ff">int</span> h(<span style="color:#0099ff">int</span> key) { <span style="color:#0099ff">return</span> ((key % m) + m) % m; }
+
+    <span style="color:#0099ff">void</span> set(<span style="color:#0099ff">int</span> key, <span style="color:#0099ff">int</span> value) {             <span style="color:#999">// O(1) average</span>
+        <span style="color:#0099ff">auto</span>&amp; chain = buckets[h(key)];
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; kv : chain) <span style="color:#0099ff">if</span> (kv.first == key) { kv.second = value; <span style="color:#0099ff">return</span>; }
+        chain.push_back({key, value});
+    }
+    <span style="color:#0099ff">bool</span> get(<span style="color:#0099ff">int</span> key, <span style="color:#0099ff">int</span>&amp; out) {           <span style="color:#999">// O(1) average</span>
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; kv : buckets[h(key)]) <span style="color:#0099ff">if</span> (kv.first == key) { out = kv.second; <span style="color:#0099ff">return</span> <span style="color:#0099ff">true</span>; }
+        <span style="color:#0099ff">return</span> <span style="color:#0099ff">false</span>;
+    }
+};
+</code></pre>
+    </div>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Quantity</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td>HasKey / Get / Set</td>
+            <td>O(1 + c), c = longest chain</td>
+        </tr>
+        <tr>
+            <td>Memory</td>
+            <td>O(n + m)</td>
+        </tr>
+    </table>
+
+    <h3>Load factor</h3>
+    <p>
+        <code>&alpha; = n / m</code> (items &divide; cells). Too small &rarr; wasted space; too big &rarr; long chains,
+        slow. Keep it in the sweet spot, roughly <strong>0.5 &le; &alpha; &le; 1</strong>.
+    </p>
+
+    <h3>Universal hashing</h3>
+    <p>
+        No single hash function is good for all inputs (an adversary can pick keys that all collide). The fix is
+        randomization, like quicksort's random pivot: define a <strong>universal family</strong> of hash functions &mdash;
+        one where any two distinct keys collide with probability &le; 1/m &mdash; and pick one at random.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>With a random universal hash</th>
+            <th>Expected</th>
+        </tr>
+        <tr>
+            <td>longest chain</td>
+            <td>O(1 + &alpha;)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Get / Set / HasKey</td>
+            <td>O(1) on average (&alpha; kept constant)</td>
+        </tr>
+    </table>
+
+    <h3>Rehashing</h3>
+    <p>
+        Don't know n in advance? Borrow the dynamic-array trick: when &alpha; crosses a threshold (say 0.9),
+        <strong>double</strong> the table, pick a fresh hash function, and re-insert every key. A single rehash is O(n),
+        but it's rare &mdash; so amortized cost per operation stays O(1).
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>dict</code> and <code>set</code> use <strong>open addressing</strong> (probing, not chaining)
+                    with a compact, insertion-ordered layout; O(1) average get/set, resize near 2/3 full.</li>
+                <li>Keys must be <strong>hashable</strong> (immutable) &mdash; <code>__hash__</code> + <code>__eq__</code>.
+                    String hashing is randomized per process (<code>PYTHONHASHSEED</code>) to thwart collision DoS.</li>
+                <li><code>collections.defaultdict</code> / <code>Counter</code> are dict subclasses for the common
+                    "missing key" and tallying patterns.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::unordered_map</code> / <code>unordered_set</code> use <strong>bucket chaining</strong>;
+                    O(1) average, O(n) worst. Tune with <code>reserve</code>/<code>max_load_factor</code>.</li>
+                <li><code>std::map</code> / <code>set</code> are a <em>different</em> structure &mdash; balanced (red-black)
+                    trees, O(log n), kept <strong>sorted</strong>. Pick them when you need ordering or range queries.</li>
+                <li>Custom key types need a hash functor (<code>std::hash</code> specialization) plus
+                    <code>operator==</code>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

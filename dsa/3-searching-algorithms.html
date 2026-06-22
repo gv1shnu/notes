@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Searching Algorithms</h2>
+    <p>
+        Find a key in a collection. The whole story is whether the data is sorted &mdash; that one fact is the
+        difference between O(n) and O(log n).
+    </p>
+
+    <h3>Linear search &mdash; O(n)</h3>
+    <p>
+        Walk the array front to back; return the index on a match, else <code>-1</code>. Works on any array
+        (sorted or not) and on linked lists. Worst case (key absent) checks all n elements.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> linear_search(A, key):
+    <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(len(A)):   <span style="color:#999"># walk front to back</span>
+        <span style="color:#0099ff">if</span> A[i] == key:
+            <span style="color:#0099ff">return</span> i             <span style="color:#999"># found</span>
+    <span style="color:#0099ff">return</span> -1                    <span style="color:#999"># absent</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">int</span> linear_search(<span style="color:#0099ff">const</span> vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> key) {
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; (<span style="color:#0099ff">int</span>)A.size(); ++i)  <span style="color:#999">// walk front to back</span>
+        <span style="color:#0099ff">if</span> (A[i] == key) <span style="color:#0099ff">return</span> i;              <span style="color:#999">// found</span>
+    <span style="color:#0099ff">return</span> -1;                                  <span style="color:#999">// absent</span>
+}
+</code></pre>
+    </div>
+
+    <p>
+        Recurrence: <code>T(n) = T(n-1) + O(1) = O(n)</code> &mdash; technically a (degenerate) divide-and-conquer:
+        the subproblem shrinks by just one each step.
+    </p>
+
+    <h3>Binary search &mdash; O(log n)</h3>
+    <p>
+        On a <strong>sorted</strong> array, halve the search space each step: compare the key to the midpoint and discard
+        the half it can't be in.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> binary_search(A, key):       <span style="color:#999"># A must be sorted</span>
+    lo, hi = 0, len(A) - 1
+    <span style="color:#0099ff">while</span> lo &lt;= hi:
+        mid = (lo + hi) // 2       <span style="color:#999"># no overflow in Python</span>
+        <span style="color:#0099ff">if</span> A[mid] == key:
+            <span style="color:#0099ff">return</span> mid
+        <span style="color:#0099ff">elif</span> key &lt; A[mid]:
+            hi = mid - 1
+        <span style="color:#0099ff">else</span>:
+            lo = mid + 1
+    <span style="color:#0099ff">return</span> lo                     <span style="color:#999"># insertion point if absent</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">int</span> binary_search_idx(<span style="color:#0099ff">const</span> vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; A, <span style="color:#0099ff">int</span> key) {  <span style="color:#999">// A sorted</span>
+    <span style="color:#0099ff">int</span> lo = 0, hi = (<span style="color:#0099ff">int</span>)A.size() - 1;
+    <span style="color:#0099ff">while</span> (lo &lt;= hi) {
+        <span style="color:#0099ff">int</span> mid = lo + (hi - lo) / 2;        <span style="color:#999">// avoids int overflow</span>
+        <span style="color:#0099ff">if</span> (A[mid] == key) <span style="color:#0099ff">return</span> mid;
+        <span style="color:#0099ff">else if</span> (key &lt; A[mid]) hi = mid - 1;
+        <span style="color:#0099ff">else</span>                  lo = mid + 1;
+    }
+    <span style="color:#0099ff">return</span> lo;                          <span style="color:#999">// insertion point if absent</span>
+}
+</code></pre>
+    </div>
+
+    <p>
+        Recurrence: <code>T(n) = T(n/2) + O(1) = O(log n)</code>. The iterative form (above) avoids the recursion stack.
+        When absent, <code>lo</code> is the <strong>insertion point</strong> &mdash; where the key <em>would</em> go to
+        keep the array sorted &mdash; so callers learn more than a bare "not found". (Note the C++ overflow-safe midpoint
+        <code>lo + (hi - lo) / 2</code>; Python's unbounded ints make <code>(lo + hi) // 2</code> safe.)
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Search</th>
+            <th>Needs sorted?</th>
+            <th>Time</th>
+        </tr>
+        <tr>
+            <td>Linear</td>
+            <td>no</td>
+            <td bgcolor="orange">O(n)</td>
+        </tr>
+        <tr>
+            <td>Binary</td>
+            <td>yes</td>
+            <td bgcolor="lightgreen">O(log n)</td>
+        </tr>
+    </table>
+
+    <p>
+        Why it matters: a 50,000-word dictionary lookup drops from ~50,000 comparisons to ~16 &mdash; "ten seconds" to
+        "instant". The catch is keeping data sorted; if sorting breaks a needed correspondence, store a sorted array of
+        <em>indices</em> (a space-for-time trade) instead.
+    </p>
+
+    <h3>Language notes</h3>
+    <p>
+        You rarely hand-roll these &mdash; both languages ship binary search. Reach for the library, but know what's
+        underneath:
+    </p>
+    <div class="langnote">
+        <div data-lang="py">
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Call</th>
+                    <th>Time</th>
+                    <th>Under the hood</th>
+                </tr>
+                <tr>
+                    <td><code>bisect.bisect_left / bisect_right(a, x)</code></td>
+                    <td bgcolor="lightgreen">O(log n)</td>
+                    <td>binary search on a sorted <code>list</code>; returns the insertion index (C-accelerated)</td>
+                </tr>
+                <tr>
+                    <td><code>bisect.insort(a, x)</code></td>
+                    <td bgcolor="orange">O(n)</td>
+                    <td>finds the spot in O(log n), but the <code>list</code> insert shifts elements &rarr; O(n)</td>
+                </tr>
+                <tr>
+                    <td><code>x in a</code> (on a <code>list</code>)</td>
+                    <td bgcolor="orange">O(n)</td>
+                    <td>linear scan &mdash; for membership use a <code>set</code>/<code>dict</code> (O(1) average)</td>
+                </tr>
+            </table>
+        </div>
+        <div data-lang="cpp">
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Call</th>
+                    <th>Time</th>
+                    <th>Under the hood</th>
+                </tr>
+                <tr>
+                    <td><code>std::lower_bound / upper_bound</code></td>
+                    <td bgcolor="lightgreen">O(log n)</td>
+                    <td>first/last slot for a key; <strong>needs a sorted random-access range</strong> (degrades on a
+                        list)</td>
+                </tr>
+                <tr>
+                    <td><code>std::binary_search</code></td>
+                    <td bgcolor="lightgreen">O(log n)</td>
+                    <td>returns only <code>bool</code>; on a <code>std::set/map</code> use the container's own
+                        <code>.find()</code></td>
+                </tr>
+                <tr>
+                    <td><code>std::find</code></td>
+                    <td bgcolor="orange">O(n)</td>
+                    <td>linear scan over any range &mdash; the std equivalent of linear search</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <p>
+        Either way: the library binary search assumes the range is already sorted and randomly indexable &mdash; the
+        moment you hand it a linked structure, the O(log n) promise quietly becomes O(n).
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
