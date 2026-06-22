@@ -119,12 +119,10 @@
     <p>MySQL / PostgreSQL</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE TABLE</span> players (
+<code><span style="color:#0099ff;">CREATE TABLE</span> players (
     player_id INT <span style="color:#0099ff;">PRIMARY KEY</span>,
     username  VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>
-);
-</code>
+);</code>
 </pre>
 
     <p>
@@ -181,14 +179,12 @@
     <p>MySQL / PostgreSQL</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE TABLE</span> match_stats (
+<code><span style="color:#0099ff;">CREATE TABLE</span> match_stats (
     match_id  INT,
     player_id INT,
     kills     INT,
     <span style="color:#0099ff;">PRIMARY KEY</span> (match_id, player_id)
-);
-</code>
+);</code>
 </pre>
 
     <hr>
@@ -209,9 +205,7 @@
     <p>MySQL / PostgreSQL</p>
 
     <pre>
-<code>
-team_id INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
-</code>
+<code>team_id INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)</code>
 </pre>
 
     <p>
@@ -236,9 +230,7 @@ team_id INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
     </p>
 
     <pre>
-<code>
-player_id <span style="color:#0099ff;">SERIAL</span> <span style="color:#0099ff;">PRIMARY KEY</span>   -- surrogate: meaningless, but stable
-</code>
+<code>player_id <span style="color:#0099ff;">SERIAL</span> <span style="color:#0099ff;">PRIMARY KEY</span>   -- surrogate: meaningless, but stable</code>
 </pre>
 
     <p>

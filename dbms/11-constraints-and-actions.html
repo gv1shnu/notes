@@ -58,8 +58,7 @@
     <p>Here they are at work.</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE TABLE</span> teams (
+<code><span style="color:#0099ff;">CREATE TABLE</span> teams (
     team_id   INT <span style="color:#0099ff;">PRIMARY KEY</span>,
     team_name VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>,
     region    VARCHAR(10) <span style="color:#0099ff;">NOT NULL</span>
@@ -71,8 +70,7 @@
     score        INT <span style="color:#0099ff;">DEFAULT</span> 0 <span style="color:#0099ff;">CHECK</span> (score &gt;= 0),
     level      VARCHAR(20) <span style="color:#0099ff;">DEFAULT</span> 'Unranked',
     team_id   INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
-);
-</code>
+);</code>
 </pre>
 
     <p>
@@ -84,16 +82,14 @@
     <p>A few now fail by design:</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, score) <span style="color:#0099ff;">VALUES</span> (1, 'TenZ', -50);
+<code><span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, score) <span style="color:#0099ff;">VALUES</span> (1, 'TenZ', -50);
 -- rejected: CHECK (score &gt;= 0)
 
 <span style="color:#0099ff;">INSERT INTO</span> players (player_id, username) <span style="color:#0099ff;">VALUES</span> (2, 'TenZ');
 -- rejected: UNIQUE on username
 
 <span style="color:#0099ff;">INSERT INTO</span> players (player_id, username, team_id) <span style="color:#0099ff;">VALUES</span> (3, 'Derke', 99);
--- rejected: no team 99 exists
-</code>
+-- rejected: no team 99 exists</code>
 </pre>
 
     <hr>
@@ -139,15 +135,13 @@
     <p>You attach the action when defining the key:</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE TABLE</span> players (
+<code><span style="color:#0099ff;">CREATE TABLE</span> players (
     player_id INT <span style="color:#0099ff;">PRIMARY KEY</span>,
     username  VARCHAR(30) <span style="color:#0099ff;">NOT NULL</span> <span style="color:#0099ff;">UNIQUE</span>,
     team_id   INT <span style="color:#0099ff;">REFERENCES</span> teams(team_id)
               <span style="color:#0099ff;">ON DELETE</span> <span style="color:#0099ff;">SET NULL</span>
               <span style="color:#0099ff;">ON UPDATE</span> <span style="color:#0099ff;">CASCADE</span>
-);
-</code>
+);</code>
 </pre>
 
     <p>
@@ -175,13 +169,11 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ALTER TABLE</span> players
+<code><span style="color:#0099ff;">ALTER TABLE</span> players
 <span style="color:#0099ff;">ADD CONSTRAINT</span> chk_rr <span style="color:#0099ff;">CHECK</span> (score <span style="color:#0099ff;">BETWEEN</span> 0 <span style="color:#0099ff;">AND</span> 1000);
 
 <span style="color:#0099ff;">ALTER TABLE</span> players
-<span style="color:#0099ff;">DROP CONSTRAINT</span> chk_rr;
-</code>
+<span style="color:#0099ff;">DROP CONSTRAINT</span> chk_rr;</code>
 </pre>
 
     <hr>

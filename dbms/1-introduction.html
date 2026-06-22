@@ -51,16 +51,14 @@
         Example, <em>Employee struct:</em>
 
     <pre>
-<code>
-C
+<code>C
 
 <span style="color:#0099ff;">struct</span> Employee {
     <span style="color:#0099ff;">int</span> id;
     <span style="color:#0099ff;">char</span> name[50];
     <span style="color:#0099ff;">unsigned int</span> salary;
     <span style="color:#0099ff;">char</span> dept[20];
-};
-</code>
+};</code>
 </pre>
 
     Flat file on floppy disk
@@ -97,8 +95,7 @@ C
     Operation: Read 101
 
     <pre>
-<code>
-C
+<code>C
 
 <span style="color:#0099ff;">struct</span> Employee e;
 <span style="color:#0099ff;">FILE</span> *fp = fopen("employees.dat", "rb");
@@ -110,8 +107,7 @@ C
     }
 }
 
-fclose(fp);
-</code>
+fclose(fp);</code>
 </pre>
 
     <table border="1" cellpadding="10">
@@ -137,8 +133,7 @@ fclose(fp);
     Operation: Write 101
 
     <pre>
-<code>
-C
+<code>C
 
 <span style="color:#0099ff;">struct</span> Employee e = {
     .id = 101,
@@ -151,8 +146,7 @@ C
 
 fwrite(&amp;e, <span style="color:#0099ff;">sizeof</span>(<span style="color:#0099ff;">struct</span> Employee), 1, fp);
 
-fclose(fp);
-</code>
+fclose(fp);</code>
 </pre>
 
     This meant that writing was easy: dump complete struct to disk. Reading could be simple when record locations were

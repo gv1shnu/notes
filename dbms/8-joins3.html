@@ -58,13 +58,11 @@
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT p.username, s.squad_name
 FROM players p
 INNER JOIN squads s ON p.squad_id = s.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>
@@ -86,15 +84,13 @@ INNER JOIN squads s ON p.squad_id = s.squad_id;
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT s.squad_name, SUM(p.kills) AS total_kills
 FROM players p
 INNER JOIN squads s ON p.squad_id = s.squad_id
 GROUP BY s.squad_name
 ORDER BY total_kills DESC;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>
@@ -130,14 +126,12 @@ ORDER BY total_kills DESC;
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT p.username, s.squad_name, s.region
 FROM players p
 INNER JOIN squads s ON p.squad_id = s.squad_id
 WHERE s.region = 'EU';
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>

@@ -133,12 +133,10 @@
     <p>The obvious attempt fails:</p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> score &gt; AVG(score);   -- error
-</code>
+<span style="color:#0099ff;">WHERE</span> score &gt; AVG(score);   -- error</code>
 </pre>
 
     <p>
@@ -153,12 +151,10 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> score &gt; (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players);
-</code>
+<span style="color:#0099ff;">WHERE</span> score &gt; (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players);</code>
 </pre>
 
     <p>
@@ -200,12 +196,10 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, score,
        score - (<span style="color:#0099ff;">SELECT</span> AVG(score) <span style="color:#0099ff;">FROM</span> players) <span style="color:#0099ff;">AS</span> diff
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>
@@ -227,12 +221,10 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'APAC');
-</code>
+<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'APAC');</code>
 </pre>
 
     <p>
@@ -269,16 +261,14 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> region, avg_rr
 <span style="color:#0099ff;">FROM</span> (
     <span style="color:#0099ff;">SELECT</span> region, AVG(score) <span style="color:#0099ff;">AS</span> avg_rr
     <span style="color:#0099ff;">FROM</span> players
     <span style="color:#0099ff;">GROUP BY</span> region
 ) <span style="color:#0099ff;">AS</span> r
-<span style="color:#0099ff;">WHERE</span> avg_rr &gt; 750;
-</code>
+<span style="color:#0099ff;">WHERE</span> avg_rr &gt; 750;</code>
 </pre>
 
     <p>
@@ -314,12 +304,10 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> username, region, score
 <span style="color:#0099ff;">FROM</span> players p
-<span style="color:#0099ff;">WHERE</span> score = (<span style="color:#0099ff;">SELECT</span> MAX(score) <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> region = p.region);
-</code>
+<span style="color:#0099ff;">WHERE</span> score = (<span style="color:#0099ff;">SELECT</span> MAX(score) <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> region = p.region);</code>
 </pre>
 
     <p>
@@ -374,15 +362,13 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> team_name
 <span style="color:#0099ff;">FROM</span> teams t
 <span style="color:#0099ff;">WHERE</span> <span style="color:#0099ff;">EXISTS</span> (
     <span style="color:#0099ff;">SELECT</span> 1 <span style="color:#0099ff;">FROM</span> players
     <span style="color:#0099ff;">WHERE</span> team_id = t.team_id <span style="color:#0099ff;">AND</span> level = 'Radiant'
-);
-</code>
+);</code>
 </pre>
 
     <table border="1" cellpadding="10">
@@ -403,11 +389,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username
+<code><span style="color:#0099ff;">SELECT</span> username
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">NOT IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'EU');
-</code>
+<span style="color:#0099ff;">WHERE</span> team_id <span style="color:#0099ff;">NOT IN</span> (<span style="color:#0099ff;">SELECT</span> team_id <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> region = 'EU');</code>
 </pre>
 
     <p>
@@ -419,13 +403,11 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username
+<code><span style="color:#0099ff;">SELECT</span> username
 <span style="color:#0099ff;">FROM</span> players p
 <span style="color:#0099ff;">WHERE</span> <span style="color:#0099ff;">NOT EXISTS</span> (
     <span style="color:#0099ff;">SELECT</span> 1 <span style="color:#0099ff;">FROM</span> teams <span style="color:#0099ff;">WHERE</span> team_id = p.team_id <span style="color:#0099ff;">AND</span> region = 'EU'
-);
-</code>
+);</code>
 </pre>
 
     <hr>

@@ -96,12 +96,10 @@
     </table>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> AVG(score)
 <span style="color:#0099ff;">AS</span> avg_score
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>
@@ -138,13 +136,11 @@
     </p>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> level, COUNT(*)
 <span style="color:#0099ff;">AS</span> total_players
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">GROUP BY</span> level;
-</code>
+<span style="color:#0099ff;">GROUP BY</span> level;</code>
 </pre>
 
     <table border="1" cellpadding="10">
@@ -187,14 +183,12 @@
     </table>
 
     <pre>
-<code>
-<p>MySQL / PostgreSQL</p>
+<code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> level, COUNT(*)
 <span style="color:#0099ff;">AS</span> total_players
 <span style="color:#0099ff;">FROM</span> players
 <span style="color:#0099ff;">GROUP BY</span> level
-<span style="color:#0099ff;">HAVING</span> COUNT(*) > 1;
-</code>
+<span style="color:#0099ff;">HAVING</span> COUNT(*) > 1;</code>
 </pre>
 
     <table border="1" cellpadding="10">

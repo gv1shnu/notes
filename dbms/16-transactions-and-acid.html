@@ -26,11 +26,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score - 100 <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
+<code><span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score - 100 <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
 -- crash here, and the points are gone
-<span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 100 <span style="color:#0099ff;">WHERE</span> username = 'Zekken';
-</code>
+<span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 100 <span style="color:#0099ff;">WHERE</span> username = 'Zekken';</code>
 </pre>
 
     <p>
@@ -45,12 +43,10 @@
     <p>PostgreSQL ( <code>START TRANSACTION</code> in MySQL )</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">BEGIN</span>;
+<code><span style="color:#0099ff;">BEGIN</span>;
     <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score - 100 <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
     <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 100 <span style="color:#0099ff;">WHERE</span> username = 'Zekken';
-<span style="color:#0099ff;">COMMIT</span>;
-</code>
+<span style="color:#0099ff;">COMMIT</span>;</code>
 </pre>
 
     <p>
@@ -60,9 +56,7 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">ROLLBACK</span>;   -- undo everything since BEGIN
-</code>
+<code><span style="color:#0099ff;">ROLLBACK</span>;   -- undo everything since BEGIN</code>
 </pre>
 
     <hr>
@@ -114,11 +108,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SAVEPOINT</span> before_bonus;
+<code><span style="color:#0099ff;">SAVEPOINT</span> before_bonus;
     <span style="color:#0099ff;">UPDATE</span> players <span style="color:#0099ff;">SET</span> score = score + 50 <span style="color:#0099ff;">WHERE</span> team_id = 1;
-<span style="color:#0099ff;">ROLLBACK TO</span> before_bonus;   -- undo just the bonus, keep the rest
-</code>
+<span style="color:#0099ff;">ROLLBACK TO</span> before_bonus;   -- undo just the bonus, keep the rest</code>
 </pre>
 
     <hr>

@@ -66,11 +66,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, region, score,
+<code><span style="color:#0099ff;">SELECT</span> username, region, score,
        AVG(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region) <span style="color:#0099ff;">AS</span> region_avg
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <table border="1" cellpadding="10">
@@ -99,13 +97,11 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, region, score,
+<code><span style="color:#0099ff;">SELECT</span> username, region, score,
        ROW_NUMBER() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> row_num,
        RANK()       <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rnk,
        DENSE_RANK() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> dense
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>
@@ -145,11 +141,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, score,
+<code><span style="color:#0099ff;">SELECT</span> username, score,
        SUM(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score) <span style="color:#0099ff;">AS</span> running_rr
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>
@@ -168,12 +162,10 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, score,
+<code><span style="color:#0099ff;">SELECT</span> username, score,
        LAG(score)  <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rr_above,
        LEAD(score) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rr_below
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>
@@ -192,11 +184,9 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, score,
+<code><span style="color:#0099ff;">SELECT</span> username, score,
        NTILE(3) <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> tier
-<span style="color:#0099ff;">FROM</span> players;
-</code>
+<span style="color:#0099ff;">FROM</span> players;</code>
 </pre>
 
     <p>The top third land in tier 1, the middle in 2, the bottom in 3.</p>
@@ -213,15 +203,13 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> username, region, score
+<code><span style="color:#0099ff;">SELECT</span> username, region, score
 <span style="color:#0099ff;">FROM</span> (
     <span style="color:#0099ff;">SELECT</span> username, region, score,
            ROW_NUMBER() <span style="color:#0099ff;">OVER</span> (<span style="color:#0099ff;">PARTITION BY</span> region <span style="color:#0099ff;">ORDER BY</span> score <span style="color:#0099ff;">DESC</span>) <span style="color:#0099ff;">AS</span> rn
     <span style="color:#0099ff;">FROM</span> players
 ) ranked
-<span style="color:#0099ff;">WHERE</span> rn = 1;
-</code>
+<span style="color:#0099ff;">WHERE</span> rn = 1;</code>
 </pre>
 
     <hr>

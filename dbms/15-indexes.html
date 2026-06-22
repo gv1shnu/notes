@@ -51,9 +51,7 @@
     <p>MySQL / PostgreSQL</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE INDEX</span> idx_username <span style="color:#0099ff;">ON</span> players(username);
-</code>
+<code><span style="color:#0099ff;">CREATE INDEX</span> idx_username <span style="color:#0099ff;">ON</span> players(username);</code>
 </pre>
 
     <p>
@@ -98,9 +96,7 @@
     <p>An index can span several columns, in order:</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">CREATE INDEX</span> idx_team_score <span style="color:#0099ff;">ON</span> players(team_id, score);
-</code>
+<code><span style="color:#0099ff;">CREATE INDEX</span> idx_team_score <span style="color:#0099ff;">ON</span> players(team_id, score);</code>
 </pre>
 
     <p>
@@ -150,9 +146,7 @@
     </p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">EXPLAIN</span> <span style="color:#0099ff;">SELECT</span> * <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ';
-</code>
+<code><span style="color:#0099ff;">EXPLAIN</span> <span style="color:#0099ff;">SELECT</span> * <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ';</code>
 </pre>
 
     <p>

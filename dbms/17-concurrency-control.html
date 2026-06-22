@@ -63,9 +63,7 @@
     </table>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SET TRANSACTION ISOLATION LEVEL</span> SERIALIZABLE;
-</code>
+<code><span style="color:#0099ff;">SET TRANSACTION ISOLATION LEVEL</span> SERIALIZABLE;</code>
 </pre>
 
     <p>
@@ -94,9 +92,7 @@
     <p>You can also lock explicitly when you know a read-modify-write is coming:</p>
 
     <pre>
-<code>
-<span style="color:#0099ff;">SELECT</span> score <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ' <span style="color:#0099ff;">FOR UPDATE</span>;
-</code>
+<code><span style="color:#0099ff;">SELECT</span> score <span style="color:#0099ff;">FROM</span> players <span style="color:#0099ff;">WHERE</span> username = 'TenZ' <span style="color:#0099ff;">FOR UPDATE</span>;</code>
 </pre>
 
     <p>

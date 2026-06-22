@@ -24,13 +24,11 @@
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT players.username, squads.squad_name
 FROM players
 INNER JOIN squads ON players.squad_id = squads.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>
@@ -94,13 +92,11 @@ INNER JOIN squads ON players.squad_id = squads.squad_id;
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT players.username, squads.squad_name
 FROM players
 LEFT JOIN squads ON players.squad_id = squads.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>
@@ -169,13 +165,11 @@ LEFT JOIN squads ON players.squad_id = squads.squad_id;
 
 
     <pre>
-<code>
-<span style="color:violet;">
+<code><span style="color:violet;">
 SELECT players.username, squads.squad_name
 FROM players
 RIGHT JOIN squads ON players.squad_id = squads.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>
@@ -250,8 +244,7 @@ RIGHT JOIN squads ON players.squad_id = squads.squad_id;
 
 
     <pre>
-<code>
-MySQL — not supported natively. Simulate with UNION:
+<code>MySQL — not supported natively. Simulate with UNION:
 
 <span style="color:violet;">
 SELECT players.username, squads.squad_name
@@ -263,20 +256,17 @@ UNION
 SELECT players.username, squads.squad_name
 FROM players
 RIGHT JOIN squads ON players.squad_id = squads.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <pre>
-<code>
-PostgreSQL
+<code>PostgreSQL
 
 <span style="color:violet;">
 SELECT players.username, squads.squad_name
 FROM players
 FULL OUTER JOIN squads ON players.squad_id = squads.squad_id;
-</span>
-</code>
+</span></code>
 </pre>
 
     <p>Result:</p>

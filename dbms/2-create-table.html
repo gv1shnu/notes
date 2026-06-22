@@ -21,8 +21,7 @@
     </p>
 
     <pre>
-<code>
-<p>Standard version</p>
+<code><p>Standard version</p>
 <em>MySQL / PostgreSQL</em>
 <span style="color:violet;">
 CREATE TABLE players (
@@ -31,13 +30,11 @@ CREATE TABLE players (
     level      VARCHAR(20),
     score        INT
 );
-</span>
-</code>
+</span></code>
 </pre>
 
     <pre>
-<code>
-<p>Best Practice using Constraints</p>
+<code><p>Best Practice using Constraints</p>
 <em>MySQL / PostgreSQL</em>
 <span style="color:violet;">
 CREATE TABLE players (
@@ -46,24 +43,21 @@ CREATE TABLE players (
     level      VARCHAR(20),
     score        INT CHECK (score >= 0)  -- score can't be negative
 );
-</span>
-</code>
+</span></code>
 </pre>
 
     <em>Constraints and actions when they are violated, will be discussed <a
             href="./11-constraints-and-actions.html">later</a>.</em>
 
   <pre>
-<code>
-Prompt
+<code>Prompt
     <span style="color:lightblue;">
 Create a new table named 'players' with the following columns:
 - player_id (INT, primary key)
 - username (VARCHAR of 30 characters, not null)
 - level (VARCHAR of 20 characters)
 - score (INT, must be non-negative)
-</span>
-</code>
+</span></code>
 </pre>
 
 <p>
@@ -98,21 +92,17 @@ Create a new table named 'players' with the following columns:
     <h3>List the tables present in the selected database</h3>
 
     <pre>
-<code>
-MySQL
+<code>MySQL
 <span style="color:lightgreen;">
 SHOW TABLES;
-</span>
-</code>
+</span></code>
 </pre>
 
     <pre>
-<code>
-PostgreSQL
+<code>PostgreSQL
 <span style="color:lightgreen;">
 \dt
-</span>
-</code>
+</span></code>
 </pre>
 
 <table>
@@ -129,21 +119,17 @@ PostgreSQL
     <h3>Show description of a table</h3>
 
 <pre>
-<code>
-MySQL
+<code>MySQL
 <span style="color:lightgreen;">
 DESCRIBE players;
-</span>
-</code>
+</span></code>
 </pre>
 
     <pre>
-<code>
-PostgreSQL
+<code>PostgreSQL
 <span style="color:lightgreen;">
 \d players
-</span>
-</code>
+</span></code>
 </pre>
 
 <table>
