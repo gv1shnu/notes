@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Linear Transformations</h2>
+
+    <p>
+        The last piece of the toolkit &mdash; and the one that quietly <em>is</em> quantum computing. First, a name
+        change: a <strong>column matrix</strong> (one column, several rows) is what we'll call a <strong>vector</strong>.
+        Not the arrow-in-physics kind &mdash; here a "vector" just means a column of numbers. A qubit's state will be
+        exactly this.
+    </p>
+
+    <h3>Transform = matrix &times; vector</h3>
+    <p>
+        Plot a point (x&#8321;, y&#8321;) and you can send it somewhere new (x&#8322;, y&#8322;) by multiplying it by a
+        matrix &mdash; rotating, scaling, reflecting it. That's a <strong>linear transformation</strong>. A rotation by
+        angle &theta;, for instance, is a fixed matrix of sines and cosines; multiply your vector by it and it spins to a
+        new spot.
+    </p>
+    <p>
+        This is the whole mechanic of a quantum gate: a qubit's state is a vector, a gate is a matrix, and "applying a
+        gate" is just multiplying them. You'll let Python (Qiskit) grind the arithmetic &mdash; but <em>this</em> is what
+        it's doing under the hood.
+    </p>
+
+    <h3>Two families that define everything</h3>
+    <p>
+        Both are defined purely by how the <a href="./6-special-matrices.html">dagger</a> X&dagger; relates to X:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Family</th>
+            <th>Condition</th>
+            <th>Represents</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Unitary</td>
+            <td>X&dagger; = X<sup>&minus;1</sup></td>
+            <td><strong>reversible</strong> operations &mdash; quantum gates</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Hermitian</td>
+            <td>X&dagger; = X</td>
+            <td><strong>irreversible</strong> operations &mdash; measurements / observables</td>
+        </tr>
+    </table>
+    <p>
+        A <strong>unitary</strong> matrix's dagger is its inverse, so every gate can be cleanly undone &mdash; you can put
+        a qubit into superposition and pull it back out. A <strong>Hermitian</strong> matrix equals its own dagger and
+        models the one thing you can't undo: looking.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> that's the entire toolkit. State = vector, gate = unitary matrix, gate
+        application = matrix &times; vector, measurement = the irreversible Hermitian one. Time to spend it &mdash; on
+        actual qubits.
+    </p>
+
+    <p>
+        Next, qubits. <a href="./8-qubits.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, special matrices. <a href="./6-special-matrices.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

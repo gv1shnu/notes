@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Oracles</h2>
+
+    <p>
+        Every quantum algorithm ahead &mdash; Bernstein&ndash;Vazirani, Deutsch, Grover &mdash; is built around an
+        <strong>oracle</strong> (a "black box"): a function <code>f</code> you can <em>query</em> but not look inside.
+        Feed it an input, get an output, no peeking at the gears. The interesting question becomes "how few queries do I
+        need to learn something about f?"
+    </p>
+
+    <h3>Making a function reversible</h3>
+    <p>
+        Gates are <a href="./6-special-matrices.html">reversible</a>, but a function like <code>f(x)</code> usually
+        isn't. The fix is to never overwrite the input &mdash; XOR the answer into a separate output qubit:
+    </p>
+    <p>
+        <strong>U<sub>f</sub> : &#124;x&#10217;&#124;y&#10217; &rarr; &#124;x&#10217;&#124;y &oplus; f(x)&#10217;</strong>
+    </p>
+    <p>
+        Apply U<sub>f</sub> twice and you're back where you started (y &oplus; f &oplus; f = y), so it's unitary. The
+        input &#124;x&#10217; survives untouched &mdash; which is the whole point.
+    </p>
+
+    <h3>The trick that makes it useful: phase kickback</h3>
+    <p>
+        Run the oracle on a plain output qubit and nothing exciting happens. But prep that qubit in
+        <strong>&#124;&minus;&#10217;</strong> first (X then H), and something sneaky occurs:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>f(x)</th>
+            <th>Effect on &#124;x&#10217;</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>nothing</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">1</td>
+            <td>multiply &#124;x&#10217; by &minus;1 (a phase flip)</td>
+        </tr>
+    </table>
+    <p>
+        The function's answer doesn't flip the output qubit &mdash; it gets <strong>kicked back</strong> into the
+        <a href="./16-phase-and-the-bloch-sphere.html">phase</a> of the input. And phase, sandwiched between Hadamards,
+        becomes a measurable result through <strong>interference</strong>. Combine that with
+        <a href="./13-quantum-gates.html">Hadamards</a> putting every input into superposition, and a single oracle call
+        touches <em>all</em> inputs at once, writing each answer into a phase.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> Hadamard everything &rarr; one oracle query (answers land in phases) &rarr;
+        Hadamard again (interference reads them out). That three-beat is the skeleton of every algorithm in the next few
+        pages; only the oracle changes.
+    </p>
+
+    <p>
+        Next, the Bernstein&ndash;Vazirani algorithm. <a href="./20-bernstein-vazirani.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, quantum teleportation. <a href="./18-quantum-teleportation.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

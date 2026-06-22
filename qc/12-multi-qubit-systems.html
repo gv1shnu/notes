@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Multi-Qubit Systems</h2>
+
+    <p>
+        One qubit is a 2-entry vector. The obvious question: how do two qubits combine? Not by addition &mdash; by the
+        <a href="./5-matrices.html">tensor product</a> (&otimes;). And that's where the exponential magic from page one
+        finally shows up.
+    </p>
+
+    <h3>Combine by tensoring</h3>
+    <p>
+        Tensor two single-qubit kets and you get a 4-entry state. The four basis states for two qubits:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Ket</th>
+            <th>Built from</th>
+            <th>Vector</th>
+        </tr>
+        <tr>
+            <td>&#124;00&#10217;</td>
+            <td>&#124;0&#10217; &otimes; &#124;0&#10217;</td>
+            <td>[1; 0; 0; 0]</td>
+        </tr>
+        <tr>
+            <td>&#124;01&#10217;</td>
+            <td>&#124;0&#10217; &otimes; &#124;1&#10217;</td>
+            <td>[0; 1; 0; 0]</td>
+        </tr>
+        <tr>
+            <td>&#124;10&#10217;</td>
+            <td>&#124;1&#10217; &otimes; &#124;0&#10217;</td>
+            <td>[0; 0; 1; 0]</td>
+        </tr>
+        <tr>
+            <td>&#124;11&#10217;</td>
+            <td>&#124;1&#10217; &otimes; &#124;1&#10217;</td>
+            <td>[0; 0; 0; 1]</td>
+        </tr>
+    </table>
+    <p>
+        Each entry is the probability amplitude for one combination. And the count explodes:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Qubits</th>
+            <th>Amplitudes</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>4</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td bgcolor="lightblue">1024</td>
+        </tr>
+        <tr>
+            <td>n</td>
+            <td bgcolor="lightgreen">2<sup>n</sup></td>
+        </tr>
+    </table>
+    <p>
+        This is the "all 256 at once" promise from the <a href="./1-introduction.html">introduction</a>, now with
+        receipts: <code>n</code> qubits carry 2<sup>n</sup> amplitudes <em>simultaneously</em>. 300 qubits hold more
+        amplitudes than there are atoms in the observable universe. (Storing that on your laptop: not recommended.)
+    </p>
+
+    <h3>The grand finale: the Bell state</h3>
+    <p>
+        Put it all together in one state:
+    </p>
+    <p>
+        <strong>(1/&radic;2)( &#124;00&#10217; + &#124;11&#10217; )</strong>
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Outcome</th>
+            <th>Probability</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">00</td>
+            <td>50%</td>
+        </tr>
+        <tr>
+            <td>01</td>
+            <td>0%</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>0%</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">11</td>
+            <td>50%</td>
+        </tr>
+    </table>
+    <p>
+        Read it off: it's a 50/50 <strong>superposition</strong> &mdash; <em>and</em> it's
+        <strong>entangled</strong>, because the only outcomes are 00 and 11. Measure the first qubit, get 0, and the
+        second is instantly 0 too; never a mismatch. Superposition and entanglement, living in one four-number column.
+        That little state is the whole course in miniature.
+    </p>
+
+    <h3>Where this goes</h3>
+    <p>
+        You now have the foundations: the math toolkit, the three quantum principles, and the notation to write states
+        without crying. Later courses spend this on <strong>quantum gates</strong> (those reversible
+        <a href="./7-linear-transformations.html">unitary matrices</a>), <strong>circuits</strong>, measurement, and the
+        famous algorithms &mdash; Shor's, Grover's, and friends.
+    </p>
+
+    <p>
+        Next &mdash; Course 3 picks up exactly here &mdash; quantum gates.
+        <a href="./13-quantum-gates.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, bra-ket notation. <a href="./11-bra-ket-notation.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

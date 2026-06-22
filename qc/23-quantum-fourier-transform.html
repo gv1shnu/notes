@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Fourier Transform</h2>
+
+    <p>
+        The QFT is the gear that makes <a href="./25-shors-algorithm.html">Shor</a> turn, but it stands on its own. It's
+        a <strong>change of basis</strong>: it moves a state from the <strong>computational basis</strong> (is it 0 or
+        1?) to the <strong>Fourier basis</strong> (what's its phase pattern?). Information that was sitting in
+        <em>which</em> state gets re-expressed as <a href="./16-phase-and-the-bloch-sphere.html">phases</a> spread across
+        the qubits.
+    </p>
+
+    <h3>The one-qubit case you already know</h3>
+    <p>
+        For a single qubit the QFT <em>is</em> just the <a href="./13-quantum-gates.html">Hadamard</a> gate: it sends
+        &#124;0&#10217; &rarr; &#124;+&#10217; and &#124;1&#10217; &rarr; &#124;&minus;&#10217;, swapping
+        "computational" for "phase." The general n-qubit version is the same idea scaled up:
+    </p>
+    <p>
+        <strong>&#124;x&#10217; &rarr; (1/&radic;N) &Sigma;<sub>y</sub> e<sup>2&pi;i&middot;xy/N</sup>
+        &#124;y&#10217;</strong> &nbsp;(N = 2<sup>n</sup>)
+    </p>
+    <p>
+        Don't fight the formula &mdash; read the intent: it stamps the number <code>x</code> into a set of rotations, one
+        per qubit, each turning at a different rate. Built from Hadamards and
+        <a href="./14-controlled-gates.html">controlled</a> phase rotations, with swap gates at the end to undo the
+        reversed qubit order (the reason you'll spot stray SWAPs in QFT circuits online).
+    </p>
+
+    <h3>Why it's a big deal</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Transform</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td>Classical FFT</td>
+            <td bgcolor="orange">O(n &middot; 2<sup>n</sup>)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">QFT</td>
+            <td bgcolor="lightgreen">O(n&sup2;)</td>
+        </tr>
+    </table>
+    <p>
+        <strong>Why it matters:</strong> the QFT is exponentially cheaper than its classical cousin, and it's how a
+        quantum computer reads <em>periodicity</em> &mdash; a repeating pattern hidden in a state. Run it in reverse (the
+        adjoint, QFT&dagger;) and phases collapse back into a number you can measure. That reverse step is exactly what
+        the next page, phase estimation, uses to extract an answer.
+    </p>
+
+    <p>
+        Next, Quantum Phase Estimation. <a href="./24-quantum-phase-estimation.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Grover's search. <a href="./22-grovers-search.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

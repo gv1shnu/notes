@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Bra-ket Notation</h2>
+
+    <p>
+        Writing out full column matrices for every qubit gets old fast &mdash; and we've only seen <em>one</em> qubit.
+        Dirac's <strong>bra-ket</strong> notation (yes, as in "bracket", and no, you don't pronounce the c) is pure
+        shorthand. No new physics, just less ink.
+    </p>
+
+    <h3>The pieces</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Is</th>
+        </tr>
+        <tr>
+            <td>&#124;A&#10217;</td>
+            <td>ket</td>
+            <td>a column vector (a state)</td>
+        </tr>
+        <tr>
+            <td>&#10216;A&#124;</td>
+            <td>bra</td>
+            <td>its <a href="./6-special-matrices.html">adjoint</a> (&dagger;) &mdash; the row version</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">&#10216;A&#124;E&#10217;</td>
+            <td>bra-ket</td>
+            <td>bra &times; ket = the <strong>inner product</strong> (a probability)</td>
+        </tr>
+    </table>
+    <p>
+        So <strong>&#10216;A&#124;E&#10217;</strong> is exactly "adjoint of A, times E" &mdash; the
+        <a href="./8-qubits.html">inner product</a> from the qubit page, now one tidy symbol instead of a transpose, a
+        conjugate, and a multiplication spelled out.
+    </p>
+
+    <h3>The standard kets</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Ket</th>
+            <th>Vector</th>
+        </tr>
+        <tr>
+            <td>&#124;0&#10217;</td>
+            <td>[1; 0]</td>
+        </tr>
+        <tr>
+            <td>&#124;1&#10217;</td>
+            <td>[0; 1]</td>
+        </tr>
+    </table>
+    <p>
+        The labels 0 and 1 are just names &mdash; you don't do arithmetic <em>on</em> them; they point at fixed vectors.
+    </p>
+
+    <h3>Why it's worth it</h3>
+    <p>
+        Factor the shared 1/&radic;2 out of the superposition state and it collapses to something you can actually read:
+    </p>
+    <p>
+        [1/&radic;2 ; 1/&radic;2] &nbsp;=&nbsp; <strong>(1/&radic;2)( &#124;0&#10217; + &#124;1&#10217; )</strong>
+    </p>
+    <p>
+        That's "an equal blend of 0 and 1" at a glance &mdash; and you'll write it roughly a thousand more times. The
+        payoff compounds with more qubits, which (naturally) is the next and final page.
+    </p>
+
+    <p>
+        Next, multi-qubit systems. <a href="./12-multi-qubit-systems.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, entanglement. <a href="./10-entanglement.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

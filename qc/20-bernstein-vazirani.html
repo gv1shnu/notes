@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Bernstein&ndash;Vazirani</h2>
+
+    <p>
+        First real algorithm, and a clean win for quantum. The problem: there's a hidden n-bit string <strong>s</strong>,
+        and an <a href="./19-quantum-oracles.html">oracle</a> that, given x, returns the bitwise dot product
+        <strong>s &middot; x</strong> (mod 2). Find s.
+    </p>
+
+    <h3>The query count</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Approach</th>
+            <th>Queries to recover s (n bits)</th>
+        </tr>
+        <tr>
+            <td>Guess randomly</td>
+            <td bgcolor="#ff9999">up to 2<sup>n</sup></td>
+        </tr>
+        <tr>
+            <td>Classical, clever (probe one bit at a time)</td>
+            <td bgcolor="orange">n</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Bernstein&ndash;Vazirani (quantum)</td>
+            <td bgcolor="lightgreen">1</td>
+        </tr>
+    </table>
+    <p>
+        Classically you must isolate each bit &mdash; query <code>1000...</code> to read s's first bit, <code>0100...</code>
+        for the second, n queries total. Quantumly, <strong>one shot</strong> hands you the whole string.
+    </p>
+
+    <h3>The recipe</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>H on all n input qubits (superposition over every x)</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>put the ancilla in &#124;&minus;&#10217; (X then H) &mdash; arms phase kickback</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>apply the oracle (a CNOT to the ancilla from each qubit where s has a 1)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">4</td>
+            <td>H on all n input qubits again, then measure &rarr; out comes <strong>s</strong></td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>Why it works:</strong> the oracle kicks back a phase of (&minus;1)<sup>s&middot;x</sup> onto every x in
+        the superposition at once. The second layer of Hadamards interferes all those phases so that everything cancels
+        <em>except</em> the single basis state equal to s. Skip the &#124;&minus;&#10217; ancilla and you lose the
+        kickback &mdash; the result decays to a useless 50/50 (a great thing to break on purpose to see why it's there).
+        One oracle call, the entire hidden string. Next, an even tidier version of the same magic.
+    </p>
+
+    <p>
+        Next, the Deutsch algorithm. <a href="./21-deutsch.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, quantum oracles. <a href="./19-quantum-oracles.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

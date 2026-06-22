@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Complex Numbers</h2>
+
+    <p>
+        Quantum amplitudes aren't ordinary numbers &mdash; they're <em>complex</em>. The whole thing rests on one
+        cheerfully impossible definition: <strong>i = &radic;&minus;1</strong>. There's no real number whose square is
+        &minus;1, so we imagined one (hence "imaginary"), and it turns out to be wildly useful.
+    </p>
+
+    <p>
+        A <strong>complex number</strong> is a real part plus an imaginary part: <code>a + bi</code>. For example
+        &radic;&minus;9 = &radic;9 &middot; &radic;&minus;1 = 3i.
+    </p>
+
+    <h3>Arithmetic</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>Rule</th>
+        </tr>
+        <tr>
+            <td>Add / subtract</td>
+            <td>real with real, imaginary with imaginary</td>
+        </tr>
+        <tr>
+            <td>Multiply</td>
+            <td>expand normally, then replace <strong>i&sup2; with &minus;1</strong></td>
+        </tr>
+        <tr>
+            <td>Divide</td>
+            <td>multiply top and bottom by the denominator's conjugate (below)</td>
+        </tr>
+    </table>
+    <p>
+        That single substitution <code>i&sup2; = &minus;1</code> is the entire trick. Multiplying (5 + 3i)(3 + 2i) just
+        means watch for an i&sup2; mid-expansion and flip its sign.
+    </p>
+
+    <h3>The two stars of the show</h3>
+    <p>
+        Two operations dominate every quantum probability calculation:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Name</th>
+            <th>Definition</th>
+            <th>Example on 3 + 2i</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Complex conjugate (z*)</td>
+            <td>flip the sign of the imaginary part only</td>
+            <td>3 &minus; 2i</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Squared magnitude (|z|&sup2;)</td>
+            <td>z &times; z* = a&sup2; + b&sup2; (always a real number)</td>
+            <td>3&sup2; + 2&sup2; = 13</td>
+        </tr>
+    </table>
+    <p>
+        Note the magic: a complex number times its own conjugate, (3 + 2i)(3 &minus; 2i), has its imaginary terms cancel
+        (&minus;6i + 6i) and lands on a clean <strong>real</strong> 13. That's also <em>why</em> division works &mdash;
+        multiplying by the conjugate forces the denominator real, so you can split it cleanly.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> a qubit's state carries complex amplitudes, and the probability of measuring an
+        outcome is the <strong>squared magnitude</strong> of its amplitude. The conjugate is how we'll "undo" amplitudes
+        when taking inner products. Memorize these two; the rest is bookkeeping.
+    </p>
+
+    <p>
+        Next, matrices. <a href="./5-matrices.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, statistics. <a href="./3-statistics.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Superdense Coding</h2>
+
+    <p>
+        First real protocol, and our first cast members: <strong>Alice</strong> and <strong>Bob</strong> (and
+        eventually <strong>Eve</strong>, the eavesdropper) &mdash; you'll meet this trio in every quantum paper ever
+        written. The goal: Alice sends Bob <strong>two classical bits</strong> by physically transmitting just
+        <strong>one qubit</strong>.
+    </p>
+
+    <h3>The catch it has to beat</h3>
+    <p>
+        A measured qubit collapses to a single bit &mdash; one qubit "obviously" carries one bit. Superdense coding
+        sneaks past that by spending <a href="./10-entanglement.html">entanglement</a> set up <em>ahead of time</em>: a
+        source entangles a pair (the usual <a href="./14-controlled-gates.html">H + CNOT</a>) and hands one half to
+        Alice, one to Bob, before any message exists.
+    </p>
+
+    <h3>Alice encodes with one gate</h3>
+    <p>
+        Alice picks a gate for her half depending on the two bits she wants to send, then ships that single qubit to Bob:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Bits to send</th>
+            <th>Alice applies</th>
+        </tr>
+        <tr>
+            <td>00</td>
+            <td>I (identity &mdash; do nothing)</td>
+        </tr>
+        <tr>
+            <td>01</td>
+            <td>X (flip)</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>Z (phase)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">11</td>
+            <td>X then Z (flip + phase)</td>
+        </tr>
+    </table>
+    <p>
+        Because the pair is entangled, poking her qubit reaches into the joint state. Bob &mdash; now holding both halves
+        &mdash; runs the entangling recipe <em>in reverse</em> (CNOT then H) and measures, recovering both bits exactly.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> the bits ride in <em>which gate</em> Alice chose, decoded by interference, not
+        in the lone qubit's raw value. It's the first taste of "entanglement is a resource you spend." Flip the whole
+        idea around &mdash; send a <em>qubit's state</em> using <em>classical bits</em> &mdash; and you get
+        teleportation. Next.
+    </p>
+
+    <p>
+        Next, quantum teleportation. <a href="./18-quantum-teleportation.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, phase and the Bloch sphere. <a href="./16-phase-and-the-bloch-sphere.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

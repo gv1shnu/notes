@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Hardware</h2>
+
+    <p>
+        Every algorithm so far assumed perfect qubits. Reality begs to differ. The closing question of the course: what
+        are these qubits actually <em>made of</em>, and why don't we all have a quantum computer yet?
+    </p>
+
+    <h3>The enemy: decoherence</h3>
+    <p>
+        A qubit's quantum behaviour is fragile &mdash; a stray bit of heat, light, or vibration and the
+        <a href="./9-superposition-and-interference.html">superposition</a> collapses, taking your information with it.
+        <strong>Coherence time</strong> is how long a qubit holds its state before that happens. Today's qubits are noisy
+        and short-lived, which is why machines hover around 50&ndash;100 usable qubits, not the thousands Shor would need
+        to scare anyone's bank.
+    </p>
+
+    <h3>The contenders</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Technology</th>
+            <th>Idea</th>
+            <th>Players</th>
+            <th>Trade-off</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Superconducting</td>
+            <td>tiny currents on a chip</td>
+            <td>IBM, Google, Rigetti</td>
+            <td>fast, familiar to make &mdash; but needs near absolute-zero fridges</td>
+        </tr>
+        <tr>
+            <td>Photonic</td>
+            <td>states of light (photons)</td>
+            <td>Xanadu, PsiQuantum</td>
+            <td>room temperature &mdash; but the optics get big fast</td>
+        </tr>
+        <tr>
+            <td>Ion traps</td>
+            <td>charged atoms held in fields</td>
+            <td>IonQ, Honeywell</td>
+            <td>long coherence &mdash; but slower and hard to scale</td>
+        </tr>
+        <tr>
+            <td>Annealers</td>
+            <td>special-purpose, not reprogrammable</td>
+            <td>D-Wave</td>
+            <td>thousands of qubits &mdash; but only for one kind of problem</td>
+        </tr>
+    </table>
+    <p>
+        (Microsoft is chasing a fifth path &mdash; <strong>topological</strong> qubits &mdash; betting on hardware that's
+        intrinsically noise-resistant. We'll see.) No winner has emerged; superconducting is merely the current
+        front-runner.
+    </p>
+
+    <p>
+        <strong>Where this leaves us:</strong> we're in the noisy, small-scale era &mdash; the algorithms work, the
+        machines just aren't big or clean enough yet. Closing that gap is the job of <strong>error correction</strong>
+        (a "to add" topic for a later course). You now have the full arc: the
+        <a href="./4-complex-numbers.html">math</a>, the <a href="./8-qubits.html">qubits</a>, the
+        <a href="./13-quantum-gates.html">gates</a> and circuits, the protocols, and the algorithms that make the whole
+        enterprise worth the refrigeration bill.
+    </p>
+
+    <p>
+        Back to <a href="./index.html">contents</a>.
+    </p>
+
+    <p>
+        Prev, Shor's algorithm. <a href="./25-shors-algorithm.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

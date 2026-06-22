@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Controlled Gates: CNOT &amp; Toffoli</h2>
+
+    <p>
+        Single-qubit gates rotate one qubit in isolation &mdash; they can't make two qubits <em>care</em> about each
+        other. <a href="./10-entanglement.html">Entanglement</a> needs a gate where one qubit's value decides what
+        happens to another. That's a <strong>controlled</strong> gate.
+    </p>
+
+    <h3>CNOT &mdash; controlled NOT</h3>
+    <p>
+        Two qubits: a <strong>control</strong> and a <strong>target</strong>. The rule is one line:
+    </p>
+    <p>
+        <strong>if control = &#124;1&#10217;, flip the target; otherwise do nothing.</strong>
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Input</th>
+            <th>Output</th>
+        </tr>
+        <tr>
+            <td>&#124;00&#10217;</td>
+            <td>&#124;00&#10217;</td>
+        </tr>
+        <tr>
+            <td>&#124;01&#10217;</td>
+            <td>&#124;01&#10217;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">&#124;10&#10217;</td>
+            <td bgcolor="lightblue">&#124;11&#10217;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">&#124;11&#10217;</td>
+            <td bgcolor="lightblue">&#124;10&#10217;</td>
+        </tr>
+    </table>
+    <p>
+        Read the target as <em>control <strong>XOR</strong> target</em> &mdash; the same exclusive-or from classical
+        logic, now reversible.
+    </p>
+
+    <h3>The greatest hit: the Bell state</h3>
+    <p>
+        Hadamard then CNOT is the two-line recipe that produces entanglement, and you will type it a hundred times:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>State</th>
+        </tr>
+        <tr>
+            <td>Start</td>
+            <td>&#124;00&#10217;</td>
+        </tr>
+        <tr>
+            <td>H on q0</td>
+            <td>(1/&radic;2)(&#124;00&#10217; + &#124;10&#10217;) &mdash; q0 in superposition</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">CNOT (q0&rarr;q1)</td>
+            <td bgcolor="lightgreen">(1/&radic;2)(&#124;00&#10217; + &#124;11&#10217;) &mdash; entangled</td>
+        </tr>
+    </table>
+    <p>
+        That's the <a href="./12-multi-qubit-systems.html">Bell state</a> from the end of Course 1, now <em>built</em>
+        rather than just admired. The superposition feeds CNOT both possibilities at once; CNOT ties them together so the
+        only survivors are 00 and 11. Measure one qubit, instantly know the other.
+    </p>
+
+    <h3>Toffoli &mdash; CNOT with a plus-one</h3>
+    <p>
+        The <strong>Toffoli</strong> gate (CCX) is just CNOT with <em>two</em> controls: flip the target if and only if
+        <strong>both</strong> controls are &#124;1&#10217;. Once you know CNOT, you know this one for free &mdash; it's a
+        reversible <strong>AND</strong>, and it's enough to rebuild any classical circuit on a quantum computer.
+    </p>
+
+    <p>
+        <strong>The intuition that pays off:</strong> every controlled gate is "check the control(s), conditionally act
+        on the target." Meet a strange new gate in the Qiskit docs and that sentence (plus a matrix multiply) decodes it.
+        Time to actually run one.
+    </p>
+
+    <p>
+        Next, building circuits in Qiskit. <a href="./15-building-circuits-in-qiskit.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, quantum gates. <a href="./13-quantum-gates.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

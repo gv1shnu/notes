@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Matrices</h2>
+
+    <p>
+        If quantum computing had a national sport, it would be matrix multiplication. A <strong>matrix</strong> is just a
+        table of numbers (real or complex), described as <strong>rows &times; columns</strong> &mdash; a 2&times;3 matrix
+        has 2 rows, 3 columns. Always rows first; the course will not let you forget this.
+    </p>
+
+    <h3>The easy operations</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operation</th>
+            <th>How</th>
+        </tr>
+        <tr>
+            <td>Add / subtract</td>
+            <td>element by corresponding element (same shape required)</td>
+        </tr>
+        <tr>
+            <td>Scalar multiply</td>
+            <td>multiply every element by the number</td>
+        </tr>
+    </table>
+
+    <h3>Matrix &times; matrix &mdash; the one that matters</h3>
+    <p>
+        Each result entry is a <strong>row of the first</strong> matrix dotted with a <strong>column of the
+        second</strong>: multiply the lined-up numbers, add them up. Two rules fall out of this:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+        <tr>
+            <td>Can A &times; B even happen?</td>
+            <td bgcolor="orange">only if columns(A) = rows(B)</td>
+        </tr>
+        <tr>
+            <td>What shape is the result?</td>
+            <td>rows(A) &times; columns(B)</td>
+        </tr>
+        <tr>
+            <td>Is A&times;B = B&times;A?</td>
+            <td bgcolor="#ff9999">no &mdash; order matters (often B&times;A isn't even legal)</td>
+        </tr>
+    </table>
+    <p>
+        That last point &mdash; matrix multiplication is <strong>not commutative</strong> &mdash; is not a technicality.
+        In quantum computing it's the reason the <em>order</em> you apply operations changes the outcome.
+    </p>
+
+    <h3>Tensor product &mdash; not multiplication</h3>
+    <p>
+        Different beast, different symbol (&otimes;). The <strong>tensor product</strong> doesn't shrink things down to a
+        dot-product; it <em>blows them up</em>, multiplying every element of the first matrix by the whole second matrix
+        and stacking the results. A 2-element vector &otimes; a 2-element vector gives a <strong>4</strong>-element one.
+    </p>
+    <p>
+        <strong>Why it matters:</strong> a single qubit is a 2-row column matrix. Two qubits aren't "added" &mdash;
+        they're <em>tensored</em>, giving 4 entries; three give 8; ten give 1024. That exponential blow-up is precisely
+        where a quantum computer's power (and your future headaches) live. We'll cash this in at
+        <a href="./12-multi-qubit-systems.html">multi-qubit systems</a>.
+    </p>
+
+    <p>
+        Next, special matrices. <a href="./6-special-matrices.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, complex numbers. <a href="./4-complex-numbers.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Statistics</h2>
+
+    <p>
+        High-school territory, and the course admits it &mdash; but quantum measurement is all about spreads of outcomes,
+        so the vocabulary earns its place. The centre first:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Term</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td>Mean</td>
+            <td>the average &mdash; sum &divide; count</td>
+        </tr>
+        <tr>
+            <td>Median</td>
+            <td>the middle value of the <em>sorted</em> list</td>
+        </tr>
+        <tr>
+            <td>Min / Max</td>
+            <td>smallest / largest</td>
+        </tr>
+    </table>
+    <p>
+        Median is the honest one: a single billionaire wandering into a list of salaries yanks the mean upward, while the
+        median barely flinches. Outliers lie to averages.
+    </p>
+
+    <h3>The problem: how spread out is the data?</h3>
+    <p>
+        Knowing the mean is 43.57 tells you nothing about whether the numbers huddle together or sprawl from 0 to a
+        billion. We need a measure of <strong>spread</strong>. Naive idea: average each value's distance from the mean.
+        Naive failure: the negatives and positives cancel to ~0. Useless.
+    </p>
+
+    <h3>The fix: square first</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>What</th>
+        </tr>
+        <tr>
+            <td>1. Variance</td>
+            <td>average of <strong>squared</strong> distances from the mean (squaring kills the sign)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">2. Standard deviation</td>
+            <td>&radic;variance &mdash; back in the original units, so it's actually interpretable</td>
+        </tr>
+    </table>
+    <p>
+        For the course's sample list: variance &asymp; 515, so standard deviation &asymp; 22. The variance (515) looks
+        absurd next to a max of 79 because it lives in "squared units"; taking the root drags it back to a number you can
+        read as "typical distance from the mean is about 22."
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> that exact move &mdash; <em>square the thing, sum, take the root</em> &mdash; is
+        how a qubit turns its amplitudes into probabilities (the <a href="./4-complex-numbers.html">squared
+        magnitude</a>, coming next). Same reflex, fancier setting.
+    </p>
+
+    <p>
+        Next, complex numbers. <a href="./4-complex-numbers.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, probability. <a href="./2-probability.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

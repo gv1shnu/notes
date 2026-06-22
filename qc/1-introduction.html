@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Introduction</h2>
+
+    <p>
+        A classical computer sees the entire world &mdash; this sentence, your playlist, every cat video &mdash; as
+        nothing but <strong>1s and 0s</strong>. A transistor either has voltage (1) or doesn't (0). Stack those bits and
+        you can encode any number, letter, colour, or frame of video. Genuinely revolutionary&hellip; and also the source
+        of the one limitation quantum computing exists to attack.
+    </p>
+
+    <h3>The problem: one number at a time</h3>
+    <p>
+        With <code>n</code> bits you can <em>represent</em> any of 2<sup>n</sup> values &mdash; but only
+        <strong>one of them at any instant</strong>. Eight bits hold some number from 0 to 255; to try all 256 you must
+        run through them one&hellip;by&hellip;one.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Classical bit</th>
+            <th>Qubit</th>
+        </tr>
+        <tr>
+            <td>Value</td>
+            <td>0 <strong>or</strong> 1</td>
+            <td bgcolor="lightblue">0, 1, or any blend of both</td>
+        </tr>
+        <tr>
+            <td>8 of them hold&hellip;</td>
+            <td>one number in 0&ndash;255</td>
+            <td bgcolor="lightgreen">the <em>possibility</em> of all 256 at once</td>
+        </tr>
+        <tr>
+            <td>Powered by</td>
+            <td>voltage on / off</td>
+            <td>superposition, interference, entanglement</td>
+        </tr>
+    </table>
+
+    <h3>The idea: certainty is overrated</h3>
+    <p>
+        A qubit, thanks to <strong>superposition</strong>, holds 0 and 1 simultaneously &mdash; not as a stored value,
+        but as a <em>probability of being either</em> until you look. Wire several together with
+        <strong>entanglement</strong> and let their possibilities <strong>interfere</strong>, and the machine can explore
+        an exponential space of answers in one sweep. That is the whole pitch: for a <em>specific</em> class of problems,
+        an enormous jump in what's computable.
+    </p>
+
+    <p>
+        A fair warning before the hype runs away with us: this is not magic, and it does not make everything faster. As
+        Feynman put it, <em>"if you think you understand quantum mechanics, you don't understand quantum mechanics."</em>
+        Comforting, isn't it.
+    </p>
+
+    <h3>What this course actually is</h3>
+    <p>
+        To speak <em>qubit</em>, you first need the language: a little <a href="./2-probability.html">probability</a>,
+        some <a href="./4-complex-numbers.html">complex numbers</a>, and a lot of
+        <a href="./5-matrices.html">matrices</a>. This first course builds that toolkit, then cashes it in on
+        <a href="./8-qubits.html">qubits</a>, <a href="./9-superposition-and-interference.html">superposition</a>, and
+        <a href="./10-entanglement.html">entanglement</a>. Gates, circuits, and the famous algorithms come in later
+        courses &mdash; foundations first.
+    </p>
+
+    <p>
+        Next, probability. <a href="./2-probability.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Back to <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Qubits</h2>
+
+    <p>
+        Toolkit assembled, payoff time. A <strong>qubit</strong>'s state is a 2-row <a
+        href="./7-linear-transformations.html">vector</a> &mdash; two numbers (amplitudes). The top one governs the
+        chance of measuring <strong>0</strong>, the bottom one the chance of <strong>1</strong>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>State</th>
+            <th>Vector [top; bottom]</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td>&#124;0&#10217; (classical 0, "spin down")</td>
+            <td>[1; 0]</td>
+            <td>measure 0 with 100% probability</td>
+        </tr>
+        <tr>
+            <td>&#124;1&#10217; (classical 1, "spin up")</td>
+            <td>[0; 1]</td>
+            <td>measure 1 with 100% probability</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">superposition</td>
+            <td>[1/&radic;2 ; 1/&radic;2]</td>
+            <td>50% / 50% &mdash; genuinely undecided</td>
+        </tr>
+    </table>
+
+    <h3>The rule: squared magnitudes sum to 1</h3>
+    <p>
+        Given amplitudes <code>a</code> (top) and <code>b</code> (bottom), the probabilities are their
+        <a href="./4-complex-numbers.html">squared magnitudes</a>, and they must obey:
+    </p>
+    <p>
+        <code>|a|&sup2; + |b|&sup2; = 1</code>
+    </p>
+    <p>
+        Which is just <a href="./2-probability.html">probability's</a> "it'll be <em>something</em>" rule wearing a lab
+        coat. Check the superposition state: (1/&radic;2)&sup2; + (1/&radic;2)&sup2; = &frac12; + &frac12; = 1. Two
+        amplitudes that look modest, a tidy 50/50 split. Unlike a bit, a qubit isn't stuck at 0 or 1 &mdash; it can sit
+        anywhere on the spectrum between, as long as the squares still add to 1.
+    </p>
+
+    <h3>Reading a probability: the inner product</h3>
+    <p>
+        To ask "what's the chance this state measures as <em>that</em> one?", take the <strong>inner product</strong>:
+        the <a href="./6-special-matrices.html">adjoint</a> (&dagger;) of one vector times the other. For perfectly
+        aligned states it returns 1 (certainty); for opposed states, 0. It's the same square-and-sum reflex from
+        <a href="./3-statistics.html">statistics</a>, now deciding measurement odds &mdash; and the bra-ket notation a
+        couple of pages on exists purely to make this less painful to write.
+    </p>
+
+    <p>
+        <strong>The catch:</strong> you only ever <em>see</em> a collapsed 0 or 1. The rich in-between lives entirely
+        before measurement &mdash; which is exactly what the next page is about.
+    </p>
+
+    <p>
+        Next, superposition and interference. <a href="./9-superposition-and-interference.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, linear transformations. <a href="./7-linear-transformations.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>
