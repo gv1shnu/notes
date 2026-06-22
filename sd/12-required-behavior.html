@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The structure: The Method</h2>
+
+    <h3>12. Required behaviour, not functionality.</h3>
+    <p>
+        Capture how the system must <strong>behave</strong>, not what it must <em>do</em>. "System should open a file"
+        is functional and open to interpretation; the behavioural version pins it down:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Functional</th>
+            <th>Behavioural</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">open a file</td>
+            <td bgcolor="lightgreen">show the open dialog, filtered to *.x; only let the user reach paths they have permission for; hold a write-exclusive lock; auto-release after 3 idle hours and log it</td>
+        </tr>
+    </table>
+
+    <p>
+        A sequence of required behaviours is a <strong>use case</strong> (use case, not <em>user</em> case &mdash; the
+        consumer may be another system; like Google, most of a system is below the waterline). Managers encapsulate the
+        sequencing of use cases; engines, the activities within them.
+    </p>
+
+    <p>
+        Next, composable design. <a href="./13-composable-design.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, resource access. <a href="./11-resource-access.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

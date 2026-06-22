@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The structure: The Method</h2>
+
+    <h3>10. Managers &amp; engines.</h3>
+    <p>
+        A use case is a sequence of activities. There are only two things that can change &mdash; the
+        <strong>sequence</strong> or the <strong>activities</strong> &mdash; and each gets its own kind of component.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Manager</th>
+            <th>Engine</th>
+        </tr>
+        <tr>
+            <td>Encapsulates</td>
+            <td>the sequence (a family of related use cases)</td>
+            <td>an activity / business rule</td>
+        </tr>
+        <tr>
+            <td>Named like</td>
+            <td bgcolor="lightgreen">a noun (BankManager)</td>
+            <td bgcolor="lightgreen">a verb (CalculationEngine)</td>
+        </tr>
+        <tr>
+            <td>Wrong name</td>
+            <td bgcolor="red">BillingManager (verb &rarr; functional!)</td>
+            <td bgcolor="red">AccountEngine (noun &rarr; functional!)</td>
+        </tr>
+    </table>
+
+    <p>
+        Engines are <strong>rare</strong> and shared across managers. There's a rough golden ratio (Fibonacci-ish):
+        1 manager &rarr; 0&ndash;1 engines, 2 &rarr; 1, 3 &rarr; 2. Eight managers means you've already failed. An
+        explosion of engines is functional decomposition hiding &mdash; if there are only 2&ndash;3 ways to do something,
+        that's a <code>switch</code> statement, not a component.
+    </p>
+
+    <p>
+        Watch the trap: <strong>volatile &ne; variable.</strong> Variability is just code; a component earns its place
+        only for genuine open-ended volatility.
+    </p>
+
+    <p>
+        Next, resource access. <a href="./11-resource-access.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, the layered taxonomy. <a href="./9-layered-taxonomy.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

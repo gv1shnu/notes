@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The disease: functional decomposition</h2>
+
+    <h3>4. The testing trap.</h3>
+    <p>
+        A jumbo jet where every component passes unit testing flawlessly &mdash; would you board it? No. Defects live in
+        the <em>interactions</em> between components, not inside any one of them. The fuel pump is fine, the pipe is fine,
+        but a g-force turn makes a cavitation bubble that stalls the engine.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Testing</th>
+            <th>Catches</th>
+        </tr>
+        <tr>
+            <td>Unit</td>
+            <td>defects inside one component</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Regression</td>
+            <td>defects in the interaction between subsystems (the real ones)</td>
+        </tr>
+    </table>
+
+    <p>
+        A functionally-decomposed system is so coupled you <em>can't</em> delineate it for regression testing &mdash; so
+        it's effectively untestable, so it's rife with defects. Developers fall back on unit testing not because it's
+        valuable but because it's all they can do.
+    </p>
+
+    <p>
+        That's <strong>searching under the streetlight</strong>: a man looks for his keys under the lamp, not where he
+        dropped them, "because the light is better here."
+    </p>
+
+    <p>
+        Next, solutions masquerading as requirements. <a href="./5-solutions-as-requirements.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, it cannot add value. <a href="./3-it-cannot-add-value.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

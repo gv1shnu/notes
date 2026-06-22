@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The structure: The Method</h2>
+
+    <h3>11. Resource access.</h3>
+    <p>
+        ResourceAccess hides <em>how</em> a resource is reached. The classic mistake is to expose
+        <strong>CRUD</strong> on its interface &mdash; <code>insert</code>/<code>select</code> betrays a database,
+        <code>open</code>/<code>read</code>/<code>seek</code> betrays a file. Swap the store and everyone upstairs
+        detonates.
+    </p>
+
+    <p>
+        Instead, expose <strong>atomic business verbs</strong>: verbs so fundamental they can't be expressed with other
+        verbs.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Verb</th>
+            <th>Atomic?</th>
+        </tr>
+        <tr>
+            <td>transfer money</td>
+            <td bgcolor="red">no &mdash; it's credit + debit</td>
+        </tr>
+        <tr>
+            <td>credit / debit an account</td>
+            <td bgcolor="lightgreen">yes</td>
+        </tr>
+    </table>
+
+    <p>
+        Atomic verbs pertain to the nature of the business, so they <strong>never change</strong> &mdash; banks have done
+        credit/debit since the Medici. Internally, ResourceAccess transforms the verb into actual store calls, so you can
+        swap database &rarr; file &rarr; cache without touching anyone above it.
+    </p>
+
+    <p>
+        Next, required behaviour &amp; use cases. <a href="./12-required-behavior.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, managers &amp; engines. <a href="./10-managers-and-engines.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>System Design Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>The disease: functional decomposition</h2>
+
+    <h3>2. Why it fails.</h3>
+    <p>
+        Functional decomposition is also <strong>time</strong> decomposition: B means "after A, before C". Lift B out
+        to reuse it and A dangles off the front, C off the back. So the problems compound:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Problem</th>
+            <th>Why</th>
+        </tr>
+        <tr>
+            <td bgcolor="red">No reuse</td>
+            <td>a block is glued to the steps before and after it</td>
+        </tr>
+        <tr>
+            <td>Duplication</td>
+            <td>so everyone reinvents the wheel across systems</td>
+        </tr>
+        <tr>
+            <td>Bloated client</td>
+            <td>someone must sequence A&rarr;B&rarr;C; that someone is the client &rarr; business logic leaks into it</td>
+        </tr>
+        <tr>
+            <td>Many entry points</td>
+            <td>enter for A, for B, for C &rarr; security/scaling nightmares (good design wants <em>one</em> entry)</td>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Explosion or god-service</td>
+            <td>300 tiny blocks (nonlinear integration cost) <em>or</em> one monolith (diabolical internal complexity)</td>
+        </tr>
+    </table>
+
+    <p>
+        Try to fix it by making A call B call C instead, and it gets worse: A must know about B, B about C, and all the
+        failure/undo logic of A and B leaks into C. Three "services" become one giant clump of doom &mdash; and the
+        complexity grows <strong>non-linearly</strong>.
+    </p>
+
+    <p>
+        Next, the deeper reason it can't work. <a href="./3-it-cannot-add-value.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, functional decomposition. <a href="./1-functional-decomposition.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>
