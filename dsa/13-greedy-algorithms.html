@@ -84,6 +84,34 @@
         and needs dynamic programming.)
     </p>
 
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> fractional_knapsack(items, capacity):  <span style="color:#999"># items = [(value, weight)]</span>
+    items.sort(key=<span style="color:#0099ff">lambda</span> it: it[0] / it[1], reverse=<span style="color:#0099ff">True</span>)  <span style="color:#999"># best $/kg first</span>
+    total = 0.0
+    <span style="color:#0099ff">for</span> value, weight <span style="color:#0099ff">in</span> items:
+        <span style="color:#0099ff">if</span> capacity &lt;= 0: <span style="color:#0099ff">break</span>
+        take = min(weight, capacity)         <span style="color:#999"># take as much as fits</span>
+        total += value * (take / weight)
+        capacity -= take
+    <span style="color:#0099ff">return</span> total
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">double</span> fractional_knapsack(vector&lt;pair&lt;<span style="color:#0099ff">double</span>,<span style="color:#0099ff">double</span>&gt;&gt; items, <span style="color:#0099ff">double</span> capacity) {
+    <span style="color:#999">// items = {value, weight}; sort by value/weight descending</span>
+    sort(items.begin(), items.end(), [](<span style="color:#0099ff">auto</span>&amp; a, <span style="color:#0099ff">auto</span>&amp; b) {
+        <span style="color:#0099ff">return</span> a.first / a.second &gt; b.first / b.second;
+    });
+    <span style="color:#0099ff">double</span> total = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; [value, weight] : items) {
+        <span style="color:#0099ff">if</span> (capacity &lt;= 0) <span style="color:#0099ff">break</span>;
+        <span style="color:#0099ff">double</span> take = min(weight, capacity);   <span style="color:#999">// take as much as fits</span>
+        total += value * (take / weight);
+        capacity -= take;
+    }
+    <span style="color:#0099ff">return</span> total;
+}
+</code></pre>
+    </div>
+
     <h3>Where greedy beats brute force</h3>
     <p>
         The <strong>celebration party</strong> problem: split children into the fewest groups so any two in a group
@@ -98,10 +126,33 @@
         safe, reach for dynamic programming.
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>The greedy step is usually just a sort by a key &mdash; <code>sorted(items, key=...)</code> /
+                    <code>list.sort(key=...)</code>, stable, O(n log n).</li>
+                <li><code>functools.cmp_to_key</code> wraps an old-style two-argument comparator when the order isn't a
+                    simple key.</li>
+                <li>"Repeatedly take the best" without a full sort &rarr; <code>heapq</code> (a heap).</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Pass a comparator lambda to <code>std::sort</code>; structured bindings
+                    <code>auto&amp; [value, weight]</code> unpack the pairs.</li>
+                <li>When you only need a few "best" picks, a <code>std::priority_queue</code> beats sorting everything.</li>
+                <li>Beware floating-point ties in the ratio comparator &mdash; an epsilon or integer cross-multiplication
+                    (<code>a.v*b.w &gt; b.v*a.w</code>) avoids instability.</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

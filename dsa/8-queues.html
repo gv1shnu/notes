@@ -61,15 +61,75 @@
         always left unused so <code>read == write</code> unambiguously means "empty" (not "full"). That's what keeps both
         Enqueue and Dequeue O(1) instead of an O(n) shift.
     </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> CircularQueue:
+    <span style="color:#0099ff">def</span> __init__(self, cap):
+        self.data = [<span style="color:#0099ff">None</span>] * (cap + 1)   <span style="color:#999"># one slot left empty</span>
+        self.read = self.write = 0
+
+    <span style="color:#0099ff">def</span> enqueue(self, x):                <span style="color:#999"># O(1)</span>
+        self.data[self.write] = x
+        self.write = (self.write + 1) % len(self.data)
+
+    <span style="color:#0099ff">def</span> dequeue(self):                   <span style="color:#999"># O(1)</span>
+        x = self.data[self.read]
+        self.read = (self.read + 1) % len(self.data)
+        <span style="color:#0099ff">return</span> x
+
+    <span style="color:#0099ff">def</span> empty(self):
+        <span style="color:#0099ff">return</span> self.read == self.write
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> CircularQueue {
+    vector&lt;<span style="color:#0099ff">int</span>&gt; data; <span style="color:#0099ff">int</span> read = 0, write = 0;
+    CircularQueue(<span style="color:#0099ff">int</span> cap) : data(cap + 1) {}   <span style="color:#999">// one slot left empty</span>
+
+    <span style="color:#0099ff">void</span> enqueue(<span style="color:#0099ff">int</span> x) {                <span style="color:#999">// O(1)</span>
+        data[write] = x;
+        write = (write + 1) % data.size();
+    }
+    <span style="color:#0099ff">int</span> dequeue() {                      <span style="color:#999">// O(1)</span>
+        <span style="color:#0099ff">int</span> x = data[read];
+        read = (read + 1) % data.size();
+        <span style="color:#0099ff">return</span> x;
+    }
+    <span style="color:#0099ff">bool</span> empty() { <span style="color:#0099ff">return</span> read == write; }
+};
+</code></pre>
+    </div>
     <p>
         Stacks are LIFO, queues are FIFO &mdash; that one difference is why a queue is right for servers, scheduling, and
         breadth-first search, while a stack fits undo and depth-first search.
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>collections.deque</code> is the queue: <code>append</code> + <code>popleft</code> both O(1).
+                    Never use a <code>list</code> as a queue &mdash; <code>pop(0)</code> is O(n).</li>
+                <li><code>deque(maxlen=k)</code> gives a fixed-size ring buffer that auto-drops the oldest item.</li>
+                <li><code>queue.Queue</code> is a <em>thread-safe</em> wrapper (locks) for producer/consumer pipelines &mdash;
+                    correctness over speed.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::queue&lt;T&gt;</code> is an adapter over <code>std::deque</code>;
+                    <code>push</code>/<code>pop</code>/<code>front</code>/<code>back</code> are O(1).</li>
+                <li><code>std::deque</code> itself already gives O(1) at both ends (segmented storage) &mdash; use it
+                    directly when you need indexing too.</li>
+                <li>For BFS over a fixed graph, a preallocated <code>vector</code> + head/tail indices is often faster
+                    than <code>queue</code>.</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

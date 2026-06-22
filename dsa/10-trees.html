@@ -52,6 +52,38 @@
         <em>queue</em>: enqueue the root, then repeatedly dequeue a node and enqueue its children.
     </p>
 
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> inorder(node, visit):          <span style="color:#999"># left, node, right -&gt; sorted for a BST</span>
+    <span style="color:#0099ff">if</span> node <span style="color:#0099ff">is</span> <span style="color:#0099ff">None</span>: <span style="color:#0099ff">return</span>
+    inorder(node.left, visit)
+    visit(node.key)
+    inorder(node.right, visit)
+
+<span style="color:#0099ff">def</span> level_order(root, visit):      <span style="color:#999"># BFS, uses a queue</span>
+    <span style="color:#0099ff">from</span> collections <span style="color:#0099ff">import</span> deque
+    q = deque([root] <span style="color:#0099ff">if</span> root <span style="color:#0099ff">else</span> [])
+    <span style="color:#0099ff">while</span> q:
+        n = q.popleft(); visit(n.key)
+        <span style="color:#0099ff">if</span> n.left:  q.append(n.left)
+        <span style="color:#0099ff">if</span> n.right: q.append(n.right)
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">void</span> inorder(Node* node, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; out) {  <span style="color:#999">// left, node, right</span>
+    <span style="color:#0099ff">if</span> (!node) <span style="color:#0099ff">return</span>;
+    inorder(node-&gt;left, out);
+    out.push_back(node-&gt;key);
+    inorder(node-&gt;right, out);
+}
+<span style="color:#0099ff">void</span> level_order(Node* root, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; out) {   <span style="color:#999">// BFS</span>
+    queue&lt;Node*&gt; q; <span style="color:#0099ff">if</span> (root) q.push(root);
+    <span style="color:#0099ff">while</span> (!q.empty()) {
+        Node* n = q.front(); q.pop(); out.push_back(n-&gt;key);
+        <span style="color:#0099ff">if</span> (n-&gt;left)  q.push(n-&gt;left);
+        <span style="color:#0099ff">if</span> (n-&gt;right) q.push(n-&gt;right);
+    }
+}
+</code></pre>
+    </div>
+
     <h3>Binary search trees</h3>
     <p>
         A <strong>BST</strong> keeps everything in the left subtree &le; the node &le; everything in the right. So Find,
@@ -62,6 +94,32 @@
         The catch: depth can be terrible. Insert 1,2,3,4,5 in order and the tree degenerates into a chain &rarr; O(n).
         We need it <strong>balanced</strong> (each node's two subtrees ~equal size) for O(log n).
     </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> find(node, key):               <span style="color:#999"># O(height)</span>
+    <span style="color:#0099ff">while</span> node <span style="color:#0099ff">and</span> node.key != key:
+        node = node.left <span style="color:#0099ff">if</span> key &lt; node.key <span style="color:#0099ff">else</span> node.right
+    <span style="color:#0099ff">return</span> node
+
+<span style="color:#0099ff">def</span> insert(root, key):             <span style="color:#999"># O(height)</span>
+    <span style="color:#0099ff">if</span> root <span style="color:#0099ff">is</span> <span style="color:#0099ff">None</span>: <span style="color:#0099ff">return</span> Node(key)
+    <span style="color:#0099ff">if</span>   key &lt; root.key: root.left  = insert(root.left, key)
+    <span style="color:#0099ff">elif</span> key &gt; root.key: root.right = insert(root.right, key)
+    <span style="color:#0099ff">return</span> root                     <span style="color:#999"># equal key: ignore (no dups)</span>
+</code></pre>
+<pre data-lang="cpp"><code>Node* find(Node* node, <span style="color:#0099ff">int</span> key) {  <span style="color:#999">// O(height)</span>
+    <span style="color:#0099ff">while</span> (node &amp;&amp; node-&gt;key != key)
+        node = key &lt; node-&gt;key ? node-&gt;left : node-&gt;right;
+    <span style="color:#0099ff">return</span> node;
+}
+Node* insert(Node* root, <span style="color:#0099ff">int</span> key) {  <span style="color:#999">// O(height)</span>
+    <span style="color:#0099ff">if</span> (!root) <span style="color:#0099ff">return</span> <span style="color:#0099ff">new</span> Node(key);
+    <span style="color:#0099ff">if</span>      (key &lt; root-&gt;key) root-&gt;left  = insert(root-&gt;left, key);
+    <span style="color:#0099ff">else if</span> (key &gt; root-&gt;key) root-&gt;right = insert(root-&gt;right, key);
+    <span style="color:#0099ff">return</span> root;                    <span style="color:#999">// equal key: ignore (no dups)</span>
+}
+</code></pre>
+    </div>
 
     <h3>Rotations</h3>
     <p>
@@ -97,10 +155,36 @@
         are what make it work.)
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>No built-in balanced BST. For sorted/ordered needs reach for the third-party
+                    <code>sortedcontainers</code> (<code>SortedList</code>, <code>SortedDict</code>) &mdash; O(log n)
+                    add/remove, backed by a list of lists, not a tree.</li>
+                <li>Unordered lookups go to <code>dict</code>/<code>set</code> (hashing, O(1) average); priority needs go
+                    to <code>heapq</code>.</li>
+                <li>Recursive traversals risk <code>RecursionError</code> on a skewed (chain-like) tree &mdash; iterate
+                    with an explicit stack for deep inputs.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::set</code> / <code>map</code> (and the <code>multi</code> variants) <em>are</em> balanced
+                    BSTs (red-black trees): O(log n) insert/find/erase, iteration in sorted order.</li>
+                <li><code>lower_bound</code> / <code>upper_bound</code> on them give O(log n) range queries &mdash; the
+                    payoff over a hash map.</li>
+                <li>Tree nodes are scattered in memory, so for pure lookup a <code>unordered_map</code> usually wins;
+                    use the tree when order matters.</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

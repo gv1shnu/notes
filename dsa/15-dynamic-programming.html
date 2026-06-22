@@ -31,10 +31,26 @@
         <strong>left to right</strong>:
     </p>
 
-    <pre><code>minCoins[0] = 0
-for amount = 1 .. m:
-    minCoins[amount] = 1 + min( minCoins[amount - c] for each coin c &le; amount )
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> min_coins(m, coins):           <span style="color:#999"># fewest coins to make m</span>
+    dp = [0] + [float(<span style="color:#cc6600">'inf'</span>)] * m
+    <span style="color:#0099ff">for</span> amount <span style="color:#0099ff">in</span> range(1, m + 1):
+        <span style="color:#0099ff">for</span> c <span style="color:#0099ff">in</span> coins:
+            <span style="color:#0099ff">if</span> c &lt;= amount:
+                dp[amount] = min(dp[amount], 1 + dp[amount - c])
+    <span style="color:#0099ff">return</span> dp[m]
 </code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">int</span> min_coins(<span style="color:#0099ff">int</span> m, <span style="color:#0099ff">const</span> vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; coins) {  <span style="color:#999">// fewest coins to make m</span>
+    vector&lt;<span style="color:#0099ff">int</span>&gt; dp(m + 1, INT_MAX);
+    dp[0] = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> amount = 1; amount &lt;= m; ++amount)
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> c : coins)
+            <span style="color:#0099ff">if</span> (c &lt;= amount &amp;&amp; dp[amount - c] != INT_MAX)
+                dp[amount] = min(dp[amount], 1 + dp[amount - c]);
+    <span style="color:#0099ff">return</span> dp[m];
+}
+</code></pre>
+    </div>
 
     <p>
         Each amount is solved once by looking up smaller amounts already computed. O(m &middot; #coins).
@@ -46,12 +62,36 @@ for amount = 1 .. m:
         the first <code>i</code> of A and first <code>j</code> of B. Each cell looks at three neighbours:
     </p>
 
-    <pre><code>D(i,j) = min(
-    D(i-1, j)   + 1,                 # deletion
-    D(i,   j-1) + 1,                 # insertion
-    D(i-1, j-1) + (A[i] != B[j])     # match (0) or substitution (1)
-)
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> edit_distance(A, B):
+    n, m = len(A), len(B)
+    D = [[0] * (m + 1) <span style="color:#0099ff">for</span> _ <span style="color:#0099ff">in</span> range(n + 1)]   <span style="color:#999"># not [[0]*m]*n !</span>
+    <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(n + 1): D[i][0] = i      <span style="color:#999"># delete all</span>
+    <span style="color:#0099ff">for</span> j <span style="color:#0099ff">in</span> range(m + 1): D[0][j] = j      <span style="color:#999"># insert all</span>
+    <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(1, n + 1):
+        <span style="color:#0099ff">for</span> j <span style="color:#0099ff">in</span> range(1, m + 1):
+            cost = 0 <span style="color:#0099ff">if</span> A[i-1] == B[j-1] <span style="color:#0099ff">else</span> 1
+            D[i][j] = min(D[i-1][j] + 1,       <span style="color:#999"># deletion</span>
+                          D[i][j-1] + 1,       <span style="color:#999"># insertion</span>
+                          D[i-1][j-1] + cost)  <span style="color:#999"># match / substitute</span>
+    <span style="color:#0099ff">return</span> D[n][m]
 </code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">int</span> edit_distance(<span style="color:#0099ff">const</span> string&amp; A, <span style="color:#0099ff">const</span> string&amp; B) {
+    <span style="color:#0099ff">int</span> n = A.size(), m = B.size();
+    vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt; D(n + 1, vector&lt;<span style="color:#0099ff">int</span>&gt;(m + 1));
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt;= n; ++i) D[i][0] = i;   <span style="color:#999">// delete all</span>
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> j = 0; j &lt;= m; ++j) D[0][j] = j;   <span style="color:#999">// insert all</span>
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 1; i &lt;= n; ++i)
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> j = 1; j &lt;= m; ++j) {
+            <span style="color:#0099ff">int</span> cost = (A[i-1] == B[j-1]) ? 0 : 1;
+            D[i][j] = min({ D[i-1][j] + 1,       <span style="color:#999">// deletion</span>
+                            D[i][j-1] + 1,       <span style="color:#999">// insertion</span>
+                            D[i-1][j-1] + cost }); <span style="color:#999">// match / substitute</span>
+        }
+    <span style="color:#0099ff">return</span> D[n][m];
+}
+</code></pre>
+    </div>
 
     <table border="1" cellpadding="10">
         <tr>
@@ -111,10 +151,34 @@ for amount = 1 .. m:
         read back the solution.
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><strong>Top-down for free:</strong> write the plain recursion and slap
+                    <code>@functools.lru_cache(None)</code> on it &mdash; the memo table appears automatically.</li>
+                <li>Build 2D tables as <code>[[0]*m for _ in range(n)]</code>; <strong>never</strong>
+                    <code>[[0]*m]*n</code> &mdash; that aliases the same row n times.</li>
+                <li><code>float('inf')</code> is a safe "unreachable" sentinel (no overflow on +1).</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Bottom-up with <code>vector&lt;vector&lt;int&gt;&gt;</code>; <code>std::min({a, b, c})</code> takes an
+                    initializer list of candidates.</li>
+                <li>Guard <code>INT_MAX</code> sentinels before adding, or they overflow &mdash; or use a smaller "big"
+                    value like <code>1e9</code>.</li>
+                <li>Top-down memo: a <code>vector</code>/<code>unordered_map</code> cache plus recursion (watch the call
+                    stack on large states).</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

@@ -47,6 +47,41 @@
         <code>vector</code>, Java <code>ArrayList</code>, Python <code>list</code>.)
     </p>
 
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> DynamicArray:
+    <span style="color:#0099ff">def</span> __init__(self):
+        self.cap, self.size = 1, 0
+        self.data = [<span style="color:#0099ff">None</span>] * self.cap
+
+    <span style="color:#0099ff">def</span> push_back(self, x):           <span style="color:#999"># amortized O(1)</span>
+        <span style="color:#0099ff">if</span> self.size == self.cap:     <span style="color:#999"># full -&gt; grow</span>
+            self._resize(2 * self.cap)
+        self.data[self.size] = x
+        self.size += 1
+
+    <span style="color:#0099ff">def</span> _resize(self, new_cap):       <span style="color:#999"># O(n) copy, rare</span>
+        new = [<span style="color:#0099ff">None</span>] * new_cap
+        <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(self.size):
+            new[i] = self.data[i]
+        self.data, self.cap = new, new_cap
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> DynamicArray {
+    <span style="color:#0099ff">int</span>* data; <span style="color:#0099ff">int</span> size = 0, cap = 1;
+    DynamicArray() { data = <span style="color:#0099ff">new</span> <span style="color:#0099ff">int</span>[cap]; }
+
+    <span style="color:#0099ff">void</span> push_back(<span style="color:#0099ff">int</span> x) {           <span style="color:#999">// amortized O(1)</span>
+        <span style="color:#0099ff">if</span> (size == cap) resize(2 * cap);  <span style="color:#999">// full -&gt; grow</span>
+        data[size++] = x;
+    }
+    <span style="color:#0099ff">void</span> resize(<span style="color:#0099ff">int</span> new_cap) {         <span style="color:#999">// O(n) copy, rare</span>
+        <span style="color:#0099ff">int</span>* nw = <span style="color:#0099ff">new</span> <span style="color:#0099ff">int</span>[new_cap];
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; size; ++i) nw[i] = data[i];
+        <span style="color:#0099ff">delete</span>[] data; data = nw; cap = new_cap;
+    }
+};
+</code></pre>
+    </div>
+
     <h3>Amortized analysis (aggregate method)</h3>
     <p>
         A single <code>pushBack</code> is O(n) in the worst case (the copy) &mdash; but those are rare. Doubling means the
@@ -71,10 +106,35 @@
         the space; growing by 1.5&times; wastes less, by 3&times; wastes more.
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>list</code> <em>is</em> a dynamic array of object pointers; <code>append</code> over-allocates
+                    geometrically &rarr; amortized O(1).</li>
+                <li><code>insert(0, x)</code> and <code>pop(0)</code> are <strong>O(n)</strong> (everything shifts) &mdash;
+                    use <code>collections.deque</code> for O(1) at both ends.</li>
+                <li>Storing pointers means an extra indirection per element; <code>array.array</code> / <code>numpy</code>
+                    pack raw values contiguously for cache-friendliness.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::vector&lt;T&gt;</code> stores <code>T</code> contiguously and grows ~2&times;;
+                    <code>push_back</code> is amortized O(1).</li>
+                <li><code>reserve(n)</code> pre-allocates to skip reallocations; a reallocation
+                    <strong>invalidates</strong> all iterators/pointers into the vector.</li>
+                <li><code>insert</code>/<code>erase</code> in the middle is O(n); <code>shrink_to_fit</code> releases the
+                    spare capacity.</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

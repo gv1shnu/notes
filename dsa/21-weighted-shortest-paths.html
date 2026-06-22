@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Weighted Shortest Paths</h2>
+    <p>
+        Now each edge carries a <strong>weight</strong> (time, cost, distance) and we minimize the <em>sum</em> along the
+        path &mdash; not the edge count, so <a href="./20-bfs-shortest-paths.html">BFS</a> no longer applies. Two engines
+        do it, split by whether negative weights are allowed.
+    </p>
+
+    <h3>The shared primitive: edge relaxation</h3>
+    <p>
+        Keep <code>dist[v]</code> = best path length to v found <em>so far</em> (an upper bound, starting at &infin;, with
+        <code>dist[s]=0</code>). <strong>Relaxing</strong> edge (u, v) asks: is going through u cheaper?
+    </p>
+    <pre><code><span style="color:#0099ff">relax</span>(u, v):
+    <span style="color:#0099ff">if</span> dist[v] &gt; dist[u] + w(u, v):
+        dist[v] = dist[u] + w(u, v)
+        prev[v] = u</code></pre>
+    <p>
+        It's correct because of <strong>optimal substructure</strong>: every subpath of a shortest path is itself
+        shortest. Both algorithms below are just <em>different schedules</em> of relaxations.
+    </p>
+
+    <h3>Dijkstra &mdash; non-negative weights</h3>
+    <p>
+        <strong>Greedy:</strong> repeatedly pick the unfinalized vertex with the smallest <code>dist</code>, finalize it,
+        and relax its outgoing edges. Once picked, its distance is final &mdash; but <em>only</em> because no later
+        (non-negative) edge can make a path cheaper. A single negative edge breaks that guarantee.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Priority queue</th>
+            <th>Running time</th>
+            <th>Best when</th>
+        </tr>
+        <tr>
+            <td>array</td>
+            <td>O(|V|&sup2;)</td>
+            <td bgcolor="lightblue">dense graphs (|E| &asymp; |V|&sup2;)</td>
+        </tr>
+        <tr>
+            <td>binary heap</td>
+            <td>O((|V| + |E|) log |V|)</td>
+            <td bgcolor="lightgreen">sparse graphs</td>
+        </tr>
+    </table>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">import</span> heapq
+
+<span style="color:#0099ff">def</span> dijkstra(graph, s):             <span style="color:#999"># graph: u -&gt; [(v, w), ...], w &gt;= 0</span>
+    dist = {u: float(<span style="color:#cc6600">'inf'</span>) <span style="color:#0099ff">for</span> u <span style="color:#0099ff">in</span> graph}
+    dist[s] = 0
+    pq = [(0, s)]                   <span style="color:#999"># (distance, node) min-heap</span>
+    <span style="color:#0099ff">while</span> pq:
+        d, u = heapq.heappop(pq)
+        <span style="color:#0099ff">if</span> d &gt; dist[u]: <span style="color:#0099ff">continue</span>    <span style="color:#999"># stale entry, skip</span>
+        <span style="color:#0099ff">for</span> v, w <span style="color:#0099ff">in</span> graph[u]:
+            <span style="color:#0099ff">if</span> dist[u] + w &lt; dist[v]:
+                dist[v] = dist[u] + w
+                heapq.heappush(pq, (dist[v], v))
+    <span style="color:#0099ff">return</span> dist
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;&gt;&gt; graph;   <span style="color:#999">// graph[u] = {(v, w), ...}, w &gt;= 0</span>
+
+vector&lt;<span style="color:#0099ff">long long</span>&gt; dijkstra(<span style="color:#0099ff">int</span> n, <span style="color:#0099ff">int</span> s) {
+    <span style="color:#0099ff">const</span> <span style="color:#0099ff">long long</span> INF = 1e18;
+    vector&lt;<span style="color:#0099ff">long long</span>&gt; dist(n, INF);
+    dist[s] = 0;
+    priority_queue&lt;pair&lt;<span style="color:#0099ff">long long</span>,<span style="color:#0099ff">int</span>&gt;,
+        vector&lt;pair&lt;<span style="color:#0099ff">long long</span>,<span style="color:#0099ff">int</span>&gt;&gt;, greater&lt;&gt;&gt; pq;  <span style="color:#999">// min-heap</span>
+    pq.push({0, s});
+    <span style="color:#0099ff">while</span> (!pq.empty()) {
+        <span style="color:#0099ff">auto</span> [d, u] = pq.top(); pq.pop();
+        <span style="color:#0099ff">if</span> (d &gt; dist[u]) <span style="color:#0099ff">continue</span>;      <span style="color:#999">// stale entry, skip</span>
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span> [v, w] : graph[u])
+            <span style="color:#0099ff">if</span> (dist[u] + w &lt; dist[v]) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+    }
+    <span style="color:#0099ff">return</span> dist;
+}
+</code></pre>
+    </div>
+
+    <h3>Bellman-Ford &mdash; negative weights allowed</h3>
+    <p>
+        Drop the greedy order: just relax <em>every</em> edge, and repeat <strong>|V| &minus; 1</strong> times. Why
+        |V|&minus;1? A shortest path is simple, so it has at most |V|&minus;1 edges; one full sweep extends every
+        correct distance by one more edge.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Dijkstra</th>
+            <th>Bellman-Ford</th>
+        </tr>
+        <tr>
+            <td>Negative edges</td>
+            <td bgcolor="#ff9999">no</td>
+            <td bgcolor="lightgreen">yes (no negative cycle)</td>
+        </tr>
+        <tr>
+            <td>Strategy</td>
+            <td>greedy + priority queue</td>
+            <td>relax all edges, |V|&minus;1 passes</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td bgcolor="lightgreen">O((|V|+|E|) log|V|)</td>
+            <td>O(|V| &middot; |E|)</td>
+        </tr>
+    </table>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> bellman_ford(n, edges, s):      <span style="color:#999"># edges: list of (u, v, w)</span>
+    dist = [float(<span style="color:#cc6600">'inf'</span>)] * n
+    dist[s] = 0
+    <span style="color:#0099ff">for</span> _ <span style="color:#0099ff">in</span> range(n - 1):          <span style="color:#999"># |V|-1 relaxation passes</span>
+        <span style="color:#0099ff">for</span> u, v, w <span style="color:#0099ff">in</span> edges:
+            <span style="color:#0099ff">if</span> dist[u] + w &lt; dist[v]:
+                dist[v] = dist[u] + w
+    <span style="color:#0099ff">for</span> u, v, w <span style="color:#0099ff">in</span> edges:           <span style="color:#999"># extra pass: any relax =&gt; neg cycle</span>
+        <span style="color:#0099ff">if</span> dist[u] + w &lt; dist[v]:
+            <span style="color:#0099ff">return</span> <span style="color:#0099ff">None</span>             <span style="color:#999"># negative cycle reachable</span>
+    <span style="color:#0099ff">return</span> dist
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> Edge { <span style="color:#0099ff">int</span> u, v, w; };
+
+vector&lt;<span style="color:#0099ff">long long</span>&gt; bellman_ford(<span style="color:#0099ff">int</span> n, vector&lt;Edge&gt;&amp; edges, <span style="color:#0099ff">int</span> s, <span style="color:#0099ff">bool</span>&amp; neg) {
+    <span style="color:#0099ff">const</span> <span style="color:#0099ff">long long</span> INF = 1e18;
+    vector&lt;<span style="color:#0099ff">long long</span>&gt; dist(n, INF);
+    dist[s] = 0;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = 0; i &lt; n - 1; ++i)     <span style="color:#999">// |V|-1 relaxation passes</span>
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; e : edges)
+            <span style="color:#0099ff">if</span> (dist[e.u] &lt; INF &amp;&amp; dist[e.u] + e.w &lt; dist[e.v])
+                dist[e.v] = dist[e.u] + e.w;
+    neg = <span style="color:#0099ff">false</span>;
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span>&amp; e : edges)               <span style="color:#999">// extra pass detects neg cycle</span>
+        <span style="color:#0099ff">if</span> (dist[e.u] &lt; INF &amp;&amp; dist[e.u] + e.w &lt; dist[e.v]) neg = <span style="color:#0099ff">true</span>;
+    <span style="color:#0099ff">return</span> dist;
+}
+</code></pre>
+    </div>
+
+    <h3>Negative cycles &amp; arbitrage</h3>
+    <p>
+        If the graph has a cycle of negative total weight, "shortest" is meaningless &mdash; loop it forever and the
+        distance &rarr; &minus;&infin;. <strong>Detect it</strong> with one extra (|V|-th) pass: if <em>any</em> edge still
+        relaxes, a negative cycle is reachable. Trace it by following <code>prev</code> backwards from a vertex that
+        relaxed on that pass.
+    </p>
+    <p>
+        <strong>Currency arbitrage</strong> is exactly this: take &minus;log of each exchange rate, and a negative cycle =
+        a loop of trades that multiplies your money. <em>Infinite</em> arbitrage reaches currency u iff u is reachable
+        (run BFS from every node that relaxed on pass |V|) from such a cycle &mdash; a negative cycle existing isn't
+        enough; u must be downstream of one.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>heapq</code> has <strong>no decrease-key</strong> &mdash; push a fresh <code>(dist, node)</code>
+                    and skip stale pops with the <code>if d &gt; dist[u]: continue</code> guard.</li>
+                <li>Tuples compare lexicographically, so <code>(dist, node)</code> naturally orders by distance.</li>
+                <li><code>float('inf')</code> absorbs <code>+ w</code> safely, so Bellman-Ford needs no overflow
+                    guard.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>priority_queue</code> is a max-heap &mdash; add <code>greater&lt;&gt;</code> for a min-heap. Same
+                    lazy-deletion trick (no decrease-key).</li>
+                <li>Use a <code>long long</code> <code>INF = 1e18</code> and guard <code>dist[u] &lt; INF</code> before
+                    adding, or sums overflow.</li>
+                <li>Structured bindings <code>auto [v, w]</code> unpack the adjacency pairs cleanly.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

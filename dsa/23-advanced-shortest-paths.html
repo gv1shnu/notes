@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Advanced Shortest Paths</h2>
+    <p>
+        For a single source&rarr;target query on a huge graph (non-negative weights), plain
+        <a href="./21-weighted-shortest-paths.html">Dijkstra</a> is too slow &mdash; it fans out in a growing
+        <em>circle</em> around s, scanning millions of irrelevant vertices. The first easy win is <strong>early
+        stopping</strong>: quit the moment t is extracted. These techniques shrink the search far more.
+    </p>
+
+    <h3>Bidirectional Dijkstra</h3>
+    <p>
+        Run two searches at once &mdash; forward from s, backward from t (over reversed edges) &mdash; alternating turns,
+        and stop when they <strong>meet in the middle</strong>. Two radius-r circles cover roughly half the area of one
+        radius-2r circle, so on road maps it's about a <strong>2&times;</strong> speedup. On small-world graphs (social
+        networks) the one-big-circle is enormous but the two meeting circles are tiny &mdash;
+        <strong>thousands&times;</strong> faster.
+    </p>
+
+    <h3>A* &mdash; Dijkstra with potentials</h3>
+    <p>
+        Add a <strong>potential</strong> &pi;(v) estimating the remaining distance v&rarr;t (e.g. straight-line / GPS
+        distance). Reweight every edge:
+    </p>
+    <pre><code>&ell;<sub>&pi;</sub>(u, v) = &ell;(u, v) &minus; &pi;(u) + &pi;(v)</code></pre>
+    <p>
+        The &pi; terms telescope along any s&rarr;t path, so they shift every path's length by the same constant &mdash;
+        <strong>shortest paths are unchanged</strong>. Running Dijkstra on these weights picks the vertex minimizing
+        <code>dist[v] + &pi;(v)</code>: the one that looks closest <em>to the goal</em>, so the search aims at t instead
+        of spreading evenly. The catch &mdash; &pi; must be <strong>feasible</strong> (all &ell;<sub>&pi;</sub> &ge; 0,
+        i.e. &pi; a lower bound on the true remaining distance), or Dijkstra's non-negativity assumption breaks.
+    </p>
+    <p>
+        In code, A* is just <a href="./21-weighted-shortest-paths.html">Dijkstra</a> with the priority changed from
+        <code>g = dist[v]</code> to <code>f = dist[v] + h(v)</code>:
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">import</span> heapq
+
+<span style="color:#0099ff">def</span> a_star(graph, s, t, h):         <span style="color:#999"># h(v) = lower-bound estimate to t</span>
+    dist = {s: 0}
+    pq = [(h(s), s)]                <span style="color:#999"># priority f = g + h</span>
+    <span style="color:#0099ff">while</span> pq:
+        _, u = heapq.heappop(pq)
+        <span style="color:#0099ff">if</span> u == t: <span style="color:#0099ff">return</span> dist[u]   <span style="color:#999"># target settled -&gt; done</span>
+        <span style="color:#0099ff">for</span> v, w <span style="color:#0099ff">in</span> graph[u]:
+            nd = dist[u] + w
+            <span style="color:#0099ff">if</span> nd &lt; dist.get(v, float(<span style="color:#cc6600">'inf'</span>)):
+                dist[v] = nd
+                heapq.heappush(pq, (nd + h(v), v))
+    <span style="color:#0099ff">return</span> float(<span style="color:#cc6600">'inf'</span>)             <span style="color:#999"># unreachable</span>
+</code></pre>
+<pre data-lang="cpp"><code>vector&lt;vector&lt;pair&lt;<span style="color:#0099ff">int</span>,<span style="color:#0099ff">int</span>&gt;&gt;&gt; graph;   <span style="color:#999">// graph[u] = {(v, w), ...}</span>
+
+<span style="color:#0099ff">long long</span> a_star(<span style="color:#0099ff">int</span> n, <span style="color:#0099ff">int</span> s, <span style="color:#0099ff">int</span> t, function&lt;<span style="color:#0099ff">long long</span>(<span style="color:#0099ff">int</span>)&gt; h) {
+    <span style="color:#0099ff">const</span> <span style="color:#0099ff">long long</span> INF = 1e18;
+    vector&lt;<span style="color:#0099ff">long long</span>&gt; dist(n, INF);
+    dist[s] = 0;
+    priority_queue&lt;pair&lt;<span style="color:#0099ff">long long</span>,<span style="color:#0099ff">int</span>&gt;,
+        vector&lt;pair&lt;<span style="color:#0099ff">long long</span>,<span style="color:#0099ff">int</span>&gt;&gt;, greater&lt;&gt;&gt; pq;
+    pq.push({h(s), s});             <span style="color:#999">// priority f = g + h</span>
+    <span style="color:#0099ff">while</span> (!pq.empty()) {
+        <span style="color:#0099ff">auto</span> [f, u] = pq.top(); pq.pop();
+        <span style="color:#0099ff">if</span> (u == t) <span style="color:#0099ff">return</span> dist[t]; <span style="color:#999">// target settled -&gt; done</span>
+        <span style="color:#0099ff">for</span> (<span style="color:#0099ff">auto</span> [v, w] : graph[u]) {
+            <span style="color:#0099ff">long long</span> nd = dist[u] + w;
+            <span style="color:#0099ff">if</span> (nd &lt; dist[v]) {
+                dist[v] = nd;
+                pq.push({nd + h(v), v});
+            }
+        }
+    }
+    <span style="color:#0099ff">return</span> INF;                     <span style="color:#999">// unreachable</span>
+}
+</code></pre>
+    </div>
+    <p>
+        <strong>Bidirectional Dijkstra</strong> is two of these searches sharing a best-meeting distance;
+        <strong>contraction hierarchies</strong> add an offline preprocessing pass &mdash; both are long enough that in
+        practice you lean on a library (see notes).
+    </p>
+
+    <h3>Contraction hierarchies</h3>
+    <p>
+        The big gun for road networks. Long trips climb a <em>hierarchy</em> of roads &mdash; street &rarr; highway
+        &rarr; interstate &rarr; highway &rarr; street &mdash; so node <strong>importance</strong> rises then falls along
+        a shortest path. Split the work into two phases:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Phase</th>
+            <th>What happens</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td><strong>Preprocess</strong> (once)</td>
+            <td>order all nodes by importance, contract them adding <em>shortcut</em> edges that preserve distances</td>
+            <td bgcolor="#ffcc66">hours/days &mdash; offline</td>
+        </tr>
+        <tr>
+            <td><strong>Query</strong></td>
+            <td>bidirectional search that only ever moves to <em>more important</em> nodes</td>
+            <td bgcolor="lightgreen">milliseconds</td>
+        </tr>
+    </table>
+    <p>
+        Because both halves only climb upward in importance and meet at the single most-important node on the route, the
+        explored graph is tiny. Same answer as Dijkstra, <strong>thousands&times;</strong> (and more) faster &mdash; this
+        is the preprocess-then-serve pattern real map services (Google, Yandex) ship to production.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Method</th>
+            <th>Idea</th>
+            <th>Road-network speedup vs Dijkstra</th>
+        </tr>
+        <tr>
+            <td>Early stopping</td>
+            <td>quit when t is settled</td>
+            <td>modest</td>
+        </tr>
+        <tr>
+            <td>Bidirectional</td>
+            <td>meet in the middle</td>
+            <td bgcolor="lightblue">~2&times; (huge on social graphs)</td>
+        </tr>
+        <tr>
+            <td>A*</td>
+            <td>aim at the target with &pi;</td>
+            <td bgcolor="lightblue">depends on heuristic quality</td>
+        </tr>
+        <tr>
+            <td>Contraction hierarchies</td>
+            <td>preprocess + climb importance</td>
+            <td bgcolor="lightgreen">thousands&times;+</td>
+        </tr>
+    </table>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>A* is Dijkstra with priority <code>dist + h</code> &mdash; reuse <code>heapq</code>. A
+                    <em>consistent</em> (monotone) heuristic keeps this simple version correct.</li>
+                <li>Don't hand-roll the hard ones: <code>networkx</code> ships <code>astar_path</code> and
+                    <code>bidirectional_dijkstra</code> for small/medium graphs.</li>
+                <li>Real road-scale routing (contraction hierarchies, transit-node routing) &rarr; a C-backed library
+                    (e.g. <code>routingkit</code> bindings, OSRM), not pure Python.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::function</code> for the heuristic is convenient; template it for speed in hot loops.</li>
+                <li>Bidirectional Dijkstra = two <code>priority_queue</code>s plus a shared best-meeting distance and a
+                    proper stopping rule.</li>
+                <li>Production routing uses dedicated engines (<strong>RoutingKit</strong>, OSRM) that build the
+                    contraction hierarchy offline &mdash; you query, not rebuild.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+</html>

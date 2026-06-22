@@ -90,6 +90,66 @@
         the tree complete.
     </p>
 
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">class</span> MaxHeap:
+    <span style="color:#0099ff">def</span> __init__(self):
+        self.h = [<span style="color:#0099ff">None</span>]                <span style="color:#999"># index 0 unused (1-indexed)</span>
+
+    <span style="color:#0099ff">def</span> sift_up(self, i):
+        <span style="color:#0099ff">while</span> i &gt; 1 <span style="color:#0099ff">and</span> self.h[i] &gt; self.h[i // 2]:   <span style="color:#999"># bigger than parent</span>
+            self.h[i], self.h[i // 2] = self.h[i // 2], self.h[i]
+            i //= 2
+
+    <span style="color:#0099ff">def</span> sift_down(self, i):
+        n = len(self.h) - 1
+        <span style="color:#0099ff">while</span> 2 * i &lt;= n:
+            j = 2 * i                          <span style="color:#999"># larger child</span>
+            <span style="color:#0099ff">if</span> j + 1 &lt;= n <span style="color:#0099ff">and</span> self.h[j + 1] &gt; self.h[j]: j += 1
+            <span style="color:#0099ff">if</span> self.h[i] &gt;= self.h[j]: <span style="color:#0099ff">break</span>
+            self.h[i], self.h[j] = self.h[j], self.h[i]
+            i = j
+
+    <span style="color:#0099ff">def</span> insert(self, x):                  <span style="color:#999"># O(log n)</span>
+        self.h.append(x); self.sift_up(len(self.h) - 1)
+
+    <span style="color:#0099ff">def</span> extract_max(self):                <span style="color:#999"># O(log n)</span>
+        n = len(self.h) - 1
+        self.h[1], self.h[n] = self.h[n], self.h[1]
+        top = self.h.pop()
+        <span style="color:#0099ff">if</span> len(self.h) &gt; 1: self.sift_down(1)
+        <span style="color:#0099ff">return</span> top
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">struct</span> MaxHeap {
+    vector&lt;<span style="color:#0099ff">int</span>&gt; h{0};                   <span style="color:#999">// index 0 unused (1-indexed)</span>
+
+    <span style="color:#0099ff">void</span> sift_up(<span style="color:#0099ff">int</span> i) {
+        <span style="color:#0099ff">while</span> (i &gt; 1 &amp;&amp; h[i] &gt; h[i / 2]) {      <span style="color:#999">// bigger than parent</span>
+            swap(h[i], h[i / 2]); i /= 2;
+        }
+    }
+    <span style="color:#0099ff">void</span> sift_down(<span style="color:#0099ff">int</span> i) {
+        <span style="color:#0099ff">int</span> n = h.size() - 1;
+        <span style="color:#0099ff">while</span> (2 * i &lt;= n) {
+            <span style="color:#0099ff">int</span> j = 2 * i;                      <span style="color:#999">// larger child</span>
+            <span style="color:#0099ff">if</span> (j + 1 &lt;= n &amp;&amp; h[j + 1] &gt; h[j]) ++j;
+            <span style="color:#0099ff">if</span> (h[i] &gt;= h[j]) <span style="color:#0099ff">break</span>;
+            swap(h[i], h[j]); i = j;
+        }
+    }
+    <span style="color:#0099ff">void</span> insert(<span style="color:#0099ff">int</span> x) {                  <span style="color:#999">// O(log n)</span>
+        h.push_back(x); sift_up(h.size() - 1);
+    }
+    <span style="color:#0099ff">int</span> extract_max() {                  <span style="color:#999">// O(log n)</span>
+        <span style="color:#0099ff">int</span> n = h.size() - 1;
+        swap(h[1], h[n]);
+        <span style="color:#0099ff">int</span> top = h.back(); h.pop_back();
+        <span style="color:#0099ff">if</span> (h.size() &gt; 1) sift_down(1);
+        <span style="color:#0099ff">return</span> top;
+    }
+};
+</code></pre>
+    </div>
+
     <h3>BuildHeap &amp; HeapSort</h3>
     <p>
         SiftDown every internal node bottom-up to turn an array into a heap. Naively that looks like O(n log n), but most
@@ -98,10 +158,33 @@
         for "top k": build-heap + k extracts = O(n) when k &le; n/log n.
     </p>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>heapq</code> is a <strong>min-heap</strong> over a plain <code>list</code>:
+                    <code>heappush</code>/<code>heappop</code> O(log n), <code>heapify</code> O(n).</li>
+                <li>Want a max-heap? Push <strong>negated</strong> values (or <code>(-priority, item)</code> tuples).</li>
+                <li><code>heapq.nlargest/nsmallest(k, it)</code> for top-k; <code>heappushpop</code> /
+                    <code>heapreplace</code> fuse push+pop in one O(log n) step.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::priority_queue</code> is a <strong>max-heap</strong> by default (over a
+                    <code>vector</code>): <code>push</code>/<code>pop</code>/<code>top</code>.</li>
+                <li>Min-heap: <code>priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt;</code>.</li>
+                <li>Lower-level: <code>std::make_heap</code>/<code>push_heap</code>/<code>pop_heap</code> work on a raw
+                    range; <code>nth_element</code> does O(n) selection without a heap.</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>

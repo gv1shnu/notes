@@ -95,6 +95,32 @@
         One fewer recursive call changes the whole growth rate &mdash; the heart of clever D&amp;C.
     </p>
 
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> karatsuba(x, y):               <span style="color:#999"># x, y nonnegative ints</span>
+    <span style="color:#0099ff">if</span> x &lt; 10 <span style="color:#0099ff">or</span> y &lt; 10:           <span style="color:#999"># base case</span>
+        <span style="color:#0099ff">return</span> x * y
+    half = max(len(str(x)), len(str(y))) // 2
+    hi_x, lo_x = divmod(x, 10**half)   <span style="color:#999"># split each number in two</span>
+    hi_y, lo_y = divmod(y, 10**half)
+    a = karatsuba(hi_x, hi_y)          <span style="color:#999"># 3 recursive mults, not 4</span>
+    b = karatsuba(lo_x, lo_y)
+    c = karatsuba(hi_x + lo_x, hi_y + lo_y)
+    <span style="color:#0099ff">return</span> a * 10**(2*half) + (c - a - b) * 10**half + b
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">long long</span> karatsuba(<span style="color:#0099ff">long long</span> x, <span style="color:#0099ff">long long</span> y) {  <span style="color:#999">// small operands only</span>
+    <span style="color:#0099ff">if</span> (x &lt; 10 || y &lt; 10) <span style="color:#0099ff">return</span> x * y;          <span style="color:#999">// base case</span>
+    <span style="color:#0099ff">int</span> half = max(num_digits(x), num_digits(y)) / 2;
+    <span style="color:#0099ff">long long</span> p = pow10(half);                  <span style="color:#999">// split point 10^half</span>
+    <span style="color:#0099ff">long long</span> hi_x = x / p, lo_x = x % p;
+    <span style="color:#0099ff">long long</span> hi_y = y / p, lo_y = y % p;
+    <span style="color:#0099ff">long long</span> a = karatsuba(hi_x, hi_y);         <span style="color:#999">// 3 recursive mults</span>
+    <span style="color:#0099ff">long long</span> b = karatsuba(lo_x, lo_y);
+    <span style="color:#0099ff">long long</span> c = karatsuba(hi_x + lo_x, hi_y + lo_y);
+    <span style="color:#0099ff">return</span> a * pow10(2*half) + (c - a - b) * p + b;
+}
+</code></pre>
+    </div>
+
     <h3>The Master Theorem</h3>
     <p>
         A formula for <code>T(n) = a&middot;T(n/b) + O(n<sup>d</sup>)</code> &mdash; no recursion tree needed. Compare
@@ -146,10 +172,36 @@
         </tr>
     </table>
 
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li><code>int</code> is arbitrary-precision, and CPython <em>already</em> switches to Karatsuba for big
+                    multiplications internally &mdash; so <code>x * y</code> is fast; you'd only write the above to learn
+                    it.</li>
+                <li><code>divmod(x, 10**k)</code> is the idiomatic split into high/low halves.</li>
+                <li>Deep D&amp;C recursion can hit the recursion limit; most of these (merge sort, Karatsuba) are
+                    O(log n) deep, so it's rarely an issue.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Native integers are fixed-width and <strong>overflow silently</strong> &mdash; real big-number work
+                    needs <code>__int128</code> (up to 127 bits) or a big-int library
+                    (<code>boost::multiprecision</code>).</li>
+                <li>The snippet assumes helper <code>num_digits</code>/<code>pow10</code>; a production version stores
+                    digits in a <code>vector</code> and multiplies limb by limb.</li>
+                <li>Past large sizes, <strong>FFT-based</strong> multiplication (O(n log n)) overtakes Karatsuba's
+                    O(n<sup>1.58</sup>).</li>
+            </ul>
+        </div>
+    </div>
+
     <p>
         Back to the <a href="./index.html">contents</a>.
     </p>
 
+    <script src="./codetabs.js"></script>
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
 </body>
