@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Superposition &amp; Interference</h2>
+
+    <p>
+        The previous page wrote superposition down as a vector. This page is the physics that earns it &mdash; the
+        <strong>double-slit experiment</strong> (Young, ~150 years before anyone said "qubit"). Shine light through a
+        barrier with two slits and watch what hits the screen.
+    </p>
+
+    <h3>The puzzle</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Setup</th>
+            <th>You'd expect</th>
+            <th>You get</th>
+        </tr>
+        <tr>
+            <td>One slit</td>
+            <td>one band of light</td>
+            <td>one band &#10003;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Two slits</td>
+            <td>two bands</td>
+            <td>many bands &mdash; an <strong>interference pattern</strong></td>
+        </tr>
+    </table>
+    <p>
+        Waves explain that easily: ripples from each slit overlap, reinforcing in some places
+        (<strong>constructive</strong>) and cancelling in others (<strong>destructive</strong>). So light is a wave.
+        Case closed. Except quantum mechanics never lets a case stay closed.
+    </p>
+
+    <h3>The weird part</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>What they tried</th>
+            <th>What happened</th>
+        </tr>
+        <tr>
+            <td>Add a detector to see which slit each photon takes</td>
+            <td bgcolor="orange">pattern vanishes &mdash; two bands, like particles</td>
+        </tr>
+        <tr>
+            <td>Unplug the detector (leave it sitting there)</td>
+            <td bgcolor="lightgreen">pattern returns</td>
+        </tr>
+        <tr>
+            <td>Fire photons <em>one at a time</em></td>
+            <td bgcolor="lightgreen">pattern <strong>still</strong> builds up</td>
+        </tr>
+    </table>
+
+    <h3>The only explanation that survives</h3>
+    <p>
+        A lone photon, with nothing else around, interferes <strong>with itself</strong>. It went through the left slit
+        and the right slit &mdash; not as two photons, but as one photon holding both possibilities at once. That is
+        <strong>superposition</strong>: not "in many places," but <em>carrying the possibility of every place</em> until
+        something forces the issue.
+    </p>
+    <p>
+        And the act of measuring is what forces it: observation <strong>collapses the wave function</strong> into a
+        single definite outcome. The photons don't "know" they're watched in any spooky sense &mdash; but the maths is
+        merciless about it, and yes, this is the part where Feynman reminds you that you don't understand it.
+    </p>
+
+    <p>
+        <strong>The three pillars:</strong> superposition (hold all options), interference (let amplitudes add and cancel
+        to steer the result), and &mdash; next page &mdash; entanglement.
+    </p>
+
+    <p>
+        Next, entanglement. <a href="./10-entanglement.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, qubits. <a href="./8-qubits.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

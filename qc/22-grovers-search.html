@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Grover's Search</h2>
+
+    <p>
+        Now an algorithm with real-world teeth. The problem: an <strong>unstructured</strong> list of N items &mdash; no
+        sorting, no order &mdash; and you want the one that matches. Think finding a name in a shuffled phone book by
+        value, not position.
+    </p>
+
+    <h3>The speed-up</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Approach</th>
+            <th>Lookups</th>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Classical (check one by one)</td>
+            <td>O(N) &mdash; on average N/2</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Grover</td>
+            <td>O(&radic;N)</td>
+        </tr>
+    </table>
+    <p>
+        Not the exponential leap of <a href="./25-shors-algorithm.html">Shor</a>, but a <strong>quadratic</strong> one
+        that applies to a huge range of "search / satisfy this condition" problems &mdash; a billion items in ~31,000
+        steps instead of a billion.
+    </p>
+
+    <h3>How it works: amplitude amplification</h3>
+    <p>
+        Start with every item in equal <a href="./9-superposition-and-interference.html">superposition</a>, then repeat
+        two moves:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Move</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td><strong>Oracle</strong></td>
+            <td>flips the <a href="./16-phase-and-the-bloch-sphere.html">phase</a> of the winning item (marks it)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><strong>Diffusion</strong></td>
+            <td>"reflect about the average" &mdash; nudges every amplitude toward the mean</td>
+        </tr>
+    </table>
+    <p>
+        The oracle pushes the winner's amplitude just below the average; the diffusion step reflects everything across
+        that average, which yanks the winner <em>up</em> and pushes the rest <em>down</em>. Each pair of moves makes the
+        winner a little more likely. Do it ~&radic;N times and the winner dominates the measurement.
+    </p>
+
+    <p>
+        <strong>The catch worth knowing:</strong> more isn't better. Overshoot the ~&radic;N iterations and the amplitude
+        sails <em>past</em> certainty and starts shrinking again &mdash; the probability oscillates. For 4 items, exactly
+        <strong>one</strong> iteration nails it with certainty; knowing when to stop is part of the algorithm.
+    </p>
+
+    <p>
+        Next, the Quantum Fourier Transform. <a href="./23-quantum-fourier-transform.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Deutsch. <a href="./21-deutsch.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

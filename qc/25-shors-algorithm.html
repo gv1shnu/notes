@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Shor's Algorithm</h2>
+
+    <p>
+        The headliner. Shor's algorithm <strong>factors large numbers</strong> exponentially faster than any known
+        classical method &mdash; and that quietly threatens most of the encryption running the internet.
+    </p>
+
+    <h3>The problem: factoring is hard (on purpose)</h3>
+    <p>
+        <strong>RSA</strong> rests on one asymmetry: multiplying two big primes is easy, but recovering them from the
+        product is brutally hard. A 256-bit number would take a classical computer <em>thousands of years</em> to factor
+        &mdash; which is precisely why your card payments are safe today.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Factoring</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td bgcolor="#ff9999">Classical (best known)</td>
+            <td>exponential &mdash; millennia for big keys</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Shor (quantum)</td>
+            <td>polynomial &mdash; minutes, given a big enough machine</td>
+        </tr>
+    </table>
+
+    <h3>The trick: factoring is secretly period-finding</h3>
+    <p>
+        Shor's leap is realizing you don't attack the factors head-on. Instead:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Action</th>
+            <th>Where</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>pick a random <code>a</code> &lt; N</td>
+            <td>classical</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">2</td>
+            <td>find the <strong>period r</strong> of <code>a<sup>x</sup> mod N</code> (it repeats every r)</td>
+            <td>quantum</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>if r is even, <code>gcd(a<sup>r/2</sup> &plusmn; 1, N)</code> gives a real factor</td>
+            <td>classical</td>
+        </tr>
+    </table>
+    <p>
+        The sequence <code>a, a&sup2;, a&sup3;, &hellip; mod N</code> cycles with some period r; once you know r, a little
+        <a href="./5-matrices.html">modular arithmetic</a> and a GCD pop the factors out. Step 2 &mdash; finding r &mdash;
+        is the only hard part, and it's exactly <a href="./24-quantum-phase-estimation.html">phase estimation</a>: the
+        period hides as a phase of the "multiply by a" operation, and <a href="./23-quantum-fourier-transform.html">QFT
+        + QPE</a> read it out where interference makes the period's multiples stand out and everything else cancel.
+    </p>
+
+    <p>
+        <strong>The fine print:</strong> it's probabilistic &mdash; a random <code>a</code> gives a usable (even) period
+        only about half the time, so you may retry. And in practice you'll just call a library; the genius is in
+        <em>why</em> it works, not the typing.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> a large, reliable quantum computer running Shor breaks RSA &mdash; which is why
+        the world is busy inventing <strong>post-quantum cryptography</strong> before that day arrives. The threat is
+        real; the timeline is the open question. Which brings us to the hardware.
+    </p>
+
+    <p>
+        Next, quantum hardware. <a href="./26-quantum-hardware.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Quantum Phase Estimation. <a href="./24-quantum-phase-estimation.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

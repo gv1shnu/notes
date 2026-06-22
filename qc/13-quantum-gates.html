@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Gates</h2>
+
+    <p>
+        Course 1 gave us qubits sitting in state vectors. This course makes them <em>do</em> something. The problem:
+        how do you change a qubit's state? The answer is exactly what
+        <a href="./7-linear-transformations.html">linear transformations</a> promised &mdash; a <strong>gate is a
+        unitary matrix</strong>, and "applying a gate" is multiplying it by the state vector. Unitary means
+        <a href="./6-special-matrices.html">reversible</a>, so every gate can be undone (measurement is the lone
+        exception).
+    </p>
+
+    <h3>Single-qubit gates</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Gate</th>
+            <th>Does</th>
+            <th>Note</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">X</td>
+            <td>flips &#124;0&#10217; &harr; &#124;1&#10217;</td>
+            <td>the quantum <strong>NOT</strong> gate</td>
+        </tr>
+        <tr>
+            <td>Y</td>
+            <td>flip + phase (carries an imaginary i)</td>
+            <td rowspan="2">X, Y, Z are the <strong>Pauli</strong> gates</td>
+        </tr>
+        <tr>
+            <td>Z</td>
+            <td>leaves &#124;0&#10217;, flips the sign of &#124;1&#10217;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">H (Hadamard)</td>
+            <td>&#124;0&#10217; &rarr; equal blend of &#124;0&#10217; and &#124;1&#10217;</td>
+            <td>creates <strong>superposition</strong> &mdash; the workhorse</td>
+        </tr>
+    </table>
+
+    <p>
+        Don't memorize the matrices &mdash; recognize the moves. <strong>X</strong> is just the NOT gate from
+        <a href="./1-introduction.html">page one</a>, now a 2&times;2 matrix: multiply it by &#124;1&#10217; and out pops
+        &#124;0&#10217;. <strong>Z</strong> famously does <em>nothing</em> to &#124;0&#10217; (its &minus;1 has nothing to
+        bite on), which trips up everyone exactly once.
+    </p>
+
+    <h3>Hadamard: the superposition machine</h3>
+    <p>
+        Apply <strong>H</strong> to &#124;0&#10217; and you get the 50/50 superposition (1/&radic;2)(&#124;0&#10217; +
+        &#124;1&#10217;) &mdash; written <strong>&#124;+&#10217;</strong>. Apply it to &#124;1&#10217; and you get
+        (1/&radic;2)(&#124;0&#10217; &minus; &#124;1&#10217;) &mdash; written <strong>&#124;&minus;&#10217;</strong>. Both
+        are still 50/50 on measurement; the difference is a <a href="./16-phase-and-the-bloch-sphere.html">phase</a> (the
+        sign), which matters more than it looks. Almost every algorithm opens by Hadamard-ing everything into
+        superposition, then steering it with interference.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> Qiskit ships dozens of gates, but once you see them as matrices multiplying a
+        vector, a gate you've never met is just a multiplication you haven't done yet. The interesting power, though,
+        starts when one qubit controls another &mdash; next page.
+    </p>
+
+    <p>
+        Next, controlled gates. <a href="./14-controlled-gates.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, multi-qubit systems. <a href="./12-multi-qubit-systems.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Deutsch</h2>
+
+    <p>
+        The granddaddy &mdash; the first algorithm to prove quantum can beat classical, even if the problem is a toy. You
+        get a one-bit <a href="./19-quantum-oracles.html">oracle</a> <code>f</code> and a promise: it's either
+        <strong>constant</strong> or <strong>balanced</strong>. Which one?
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Type</th>
+            <th>f(0), f(1)</th>
+            <th>Coin analogy</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Constant</td>
+            <td>same (0,0 or 1,1)</td>
+            <td>heads&ndash;heads / tails&ndash;tails</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Balanced</td>
+            <td>different (0,1 or 1,0)</td>
+            <td>heads&ndash;tails / tails&ndash;heads</td>
+        </tr>
+    </table>
+
+    <h3>One query vs two</h3>
+    <p>
+        Classically you have no choice: evaluate f(0), evaluate f(1), compare. <strong>Two</strong> queries &mdash;
+        because you must see both outputs to know if they match. The Deutsch algorithm answers in <strong>one</strong>,
+        using the now-familiar three-beat:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>H the input qubit; ancilla in &#124;&minus;&#10217;</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>apply the oracle (phase kickback)</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>H the input qubit, then measure</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Read</td>
+            <td><strong>0 &rarr; constant</strong>, <strong>1 &rarr; balanced</strong></td>
+        </tr>
+    </table>
+
+    <p>
+        The single query is asked in superposition, so the oracle stamps both f(0) and f(1) into phases at once;
+        interference then compares them <em>without you ever reading either value</em>. You never learn f(0) or f(1)
+        individually &mdash; only the one global fact you actually asked for.
+    </p>
+
+    <p>
+        <strong>It scales:</strong> the <strong>Deutsch&ndash;Jozsa</strong> version takes an n-bit function promised
+        constant or balanced. Classically that's up to 2<sup>n&minus;1</sup>+1 queries; quantumly, still
+        <strong>one</strong>. The toy grows teeth.
+    </p>
+
+    <p>
+        Next, Grover's search. <a href="./22-grovers-search.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Bernstein&ndash;Vazirani. <a href="./20-bernstein-vazirani.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

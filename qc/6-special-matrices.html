@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Special Matrices</h2>
+
+    <p>
+        A few matrices show up so often they get names. Each is a tool we'll need to <em>undo</em> quantum operations and
+        <em>read off</em> probabilities.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Name</th>
+            <th>What it is</th>
+            <th>Why we care</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Identity (I)</td>
+            <td>1s down the diagonal, 0s elsewhere</td>
+            <td>multiplying by it changes nothing &mdash; the "do nothing" matrix</td>
+        </tr>
+        <tr>
+            <td>Inverse (X<sup>&minus;1</sup>)</td>
+            <td>the matrix that undoes X: X &middot; X<sup>&minus;1</sup> = I</td>
+            <td>reversing an operation</td>
+        </tr>
+        <tr>
+            <td>Transpose (X<sup>T</sup>)</td>
+            <td>flip across the diagonal &mdash; rows become columns</td>
+            <td>note (XY)<sup>T</sup> = Y<sup>T</sup>X<sup>T</sup> (order flips)</td>
+        </tr>
+        <tr>
+            <td>Conjugate (X*)</td>
+            <td>flip the sign of every imaginary part; leave reals alone</td>
+            <td>borrowed straight from <a href="./4-complex-numbers.html">complex numbers</a></td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Adjoint / dagger (X&dagger;)</td>
+            <td>transpose <strong>and</strong> conjugate (either order works)</td>
+            <td>the single most-used operation in quantum computing</td>
+        </tr>
+    </table>
+
+    <h3>The identity is the goalpost</h3>
+    <p>
+        The inverse is <em>defined</em> by the identity: X<sup>&minus;1</sup> is whatever you multiply X by to land back
+        on I. For a real number, 5<sup>&minus;1</sup> = 1/5 because 5 &times; 1/5 = 1; matrices play the same game, just
+        with a table instead of a 1.
+    </p>
+
+    <h3>The dagger (&dagger;)</h3>
+    <p>
+        Take a matrix, transpose it, conjugate it &mdash; that's the <strong>adjoint</strong>, written X&dagger;. Order
+        doesn't matter (transpose-then-conjugate = conjugate-then-transpose). It looks like trivia now, but the dagger is
+        the hinge of the next page: it's what separates the operations a quantum computer can <em>reverse</em> from the
+        ones it can't.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> hold onto <strong>identity</strong> (the goalpost), <strong>inverse</strong>
+        (undo), and <strong>dagger</strong> (transpose + conjugate). The next page defines the two most important matrix
+        families entirely in terms of how X&dagger; relates to X.
+    </p>
+
+    <p>
+        Next, linear transformations. <a href="./7-linear-transformations.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, matrices. <a href="./5-matrices.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

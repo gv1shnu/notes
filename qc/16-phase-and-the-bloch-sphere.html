@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Phase &amp; the Bloch Sphere</h2>
+
+    <p>
+        Back on the <a href="./13-quantum-gates.html">gates page</a>, the Z gate did "nothing" to probabilities yet
+        clearly <em>did</em> something. That something is <strong>phase</strong> &mdash; a hidden part of a qubit's state
+        that probabilities alone can't show. To see it, we need a better picture than a bar chart.
+    </p>
+
+    <h3>The Bloch sphere</h3>
+    <p>
+        A single qubit's full state is a point on the surface of a sphere:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Location</th>
+            <th>State</th>
+        </tr>
+        <tr>
+            <td>North pole</td>
+            <td>&#124;0&#10217;</td>
+        </tr>
+        <tr>
+            <td>South pole</td>
+            <td>&#124;1&#10217;</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Equator</td>
+            <td>50/50 superpositions &mdash; &#124;+&#10217;, &#124;&minus;&#10217;, and everything between</td>
+        </tr>
+    </table>
+    <p>
+        <strong>Latitude</strong> sets the measurement probabilities (how far from the poles); <strong>longitude</strong>
+        is the <strong>phase</strong>. A gate is a rotation of this point &mdash; Hadamard, for instance, is just a
+        particular quarter-turn. (Careful: the Bloch sphere only draws <em>one</em> qubit. Entangle two and it can't
+        depict them &mdash; entanglement isn't a property either qubit holds alone.)
+    </p>
+
+    <h3>Phase: the equator's secret</h3>
+    <p>
+        &#124;+&#10217; and &#124;&minus;&#10217; both measure 50/50 &mdash; identical histograms &mdash; yet they sit on
+        <em>opposite</em> sides of the equator. The only difference is phase (a sign). Phase gates spin a state around
+        that axis:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Gate</th>
+            <th>Phase rotation</th>
+        </tr>
+        <tr>
+            <td>Z</td>
+            <td>half turn (180&deg;)</td>
+        </tr>
+        <tr>
+            <td>S</td>
+            <td>quarter turn (90&deg;)</td>
+        </tr>
+        <tr>
+            <td>T</td>
+            <td>eighth turn (45&deg;)</td>
+        </tr>
+        <tr>
+            <td>rx / ry / rz</td>
+            <td>any custom angle you like</td>
+        </tr>
+    </table>
+
+    <h3>Why a "hidden" thing matters</h3>
+    <p>
+        Measure a qubit directly and phase is invisible. But sandwich a phase between two Hadamards &mdash;
+        <strong>H &middot; Z &middot; H</strong> &mdash; and the outcome flips entirely. The second Hadamard turns the
+        phase difference into an amplitude difference that interference can act on. That conversion (phase &rarr;
+        interference &rarr; measurable result) is the engine of <em>every</em> quantum algorithm coming up: hide the
+        answer in phases, then interfere it into the open.
+    </p>
+
+    <p>
+        Next, superdense coding. <a href="./17-superdense-coding.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, building circuits in Qiskit. <a href="./15-building-circuits-in-qiskit.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

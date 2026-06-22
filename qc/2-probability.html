@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Probability</h2>
+
+    <p>
+        Measuring a qubit doesn't return "the answer" &mdash; it returns <em>an</em> answer, with some probability. So
+        before any quantum mechanics, we need the grammar of chance. <strong>P(A)</strong> is the probability of event A,
+        a number from 0 (never) to 1 (always). Everything else is about combining events.
+    </p>
+
+    <h3>Two questions: AND and OR</h3>
+    <p>
+        <strong>AND</strong> = both happen. <strong>OR</strong> = at least one happens. How you compute them depends on
+        how the events relate:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Relationship</th>
+            <th>Meaning</th>
+            <th>Rule</th>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Mutually exclusive</td>
+            <td>can't both happen &mdash; P(A AND B) = 0</td>
+            <td>P(A OR B) = P(A) + P(B)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Independent</td>
+            <td>one says nothing about the other</td>
+            <td>P(A AND B) = P(A) &times; P(B)</td>
+        </tr>
+        <tr>
+            <td>Independent (OR)</td>
+            <td>add, then remove the double-counted overlap</td>
+            <td>P(A OR B) = P(A) + P(B) &minus; P(A AND B)</td>
+        </tr>
+    </table>
+
+    <p>
+        Say <strong>A</strong> = I go out tonight and <strong>B</strong> = my wife goes out tonight. If someone
+        <em>must</em> stay home with the kid, A and B are mutually exclusive. If a babysitter shows up, they become
+        independent &mdash; and the dog, frankly, has its own plans.
+    </p>
+
+    <h3>Worked example</h3>
+    <p>
+        P(A) = 30%, P(B) = 40%, independent. Then:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Quantity</th>
+            <th>Computation</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>P(A AND B)</td>
+            <td>0.30 &times; 0.40</td>
+            <td>0.12</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">P(A OR B)</td>
+            <td>0.30 + 0.40 &minus; 0.12</td>
+            <td>0.58</td>
+        </tr>
+    </table>
+    <p>
+        Forget to subtract the overlap and you'd claim 70% &mdash; counting the "both go out" world twice. That
+        subtraction is the same bookkeeping that keeps quantum probabilities honest.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> a qubit's two outcomes must have probabilities that add to exactly
+        <strong>1</strong> &mdash; it's going to be <em>something</em>. Keep that "must sum to 1" rule in your pocket; it
+        reappears the moment we write down a qubit's state.
+    </p>
+
+    <p>
+        Next, statistics. <a href="./3-statistics.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, introduction. <a href="./1-introduction.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

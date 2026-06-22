@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Entanglement</h2>
+
+    <p>
+        The third pillar. To get there we need <strong>spin</strong> &mdash; one of the four numbers that pin down an
+        electron. Despite the name, electrons don't actually spin; "spin" just measures out to one of two values,
+        <strong>up</strong> or <strong>down</strong>. Perfect for encoding a bit: down = 0, up = 1.
+    </p>
+
+    <h3>Spin is a qubit</h3>
+    <p>
+        Before you measure, an electron's spin is in <a href="./9-superposition-and-interference.html">superposition</a>
+        &mdash; neither up nor down, but the possibility of both. Measure it and it collapses to one. Measure
+        <em>again</em> and you get the same answer; the first look already settled it. (This is
+        <strong>Schr&ouml;dinger's cat</strong>: sealed in a box with a 50/50 poison, it's "alive and dead" until you
+        open the lid &mdash; an analogy that has caused more confusion than enlightenment, but here we are.)
+    </p>
+
+    <h3>The problem: making two qubits agree</h3>
+    <p>
+        When two electrons interact, their spins can become <strong>correlated</strong> &mdash; entangled. Now measuring
+        one instantly tells you the other, with no second measurement needed:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Analogy</th>
+            <th>Open one box&hellip;</th>
+            <th>&hellip;and you instantly know</th>
+        </tr>
+        <tr>
+            <td>Apple / banana in two boxes</td>
+            <td>banana</td>
+            <td bgcolor="lightgreen">the other is the apple</td>
+        </tr>
+        <tr>
+            <td>Entangled spins</td>
+            <td>up</td>
+            <td bgcolor="lightgreen">the partner is down &mdash; instantly</td>
+        </tr>
+    </table>
+    <p>
+        "Instantly" means <em>instantly</em> &mdash; faster than light, whether the partner is across the room or across
+        the galaxy. Einstein loathed this and called it <strong>"spooky action at a distance"</strong>, which remains
+        the best name physics has ever produced.
+    </p>
+
+    <h3>Why it's powerful</h3>
+    <p>
+        The apple/banana boxes are <em>anti</em>-correlated, but we can engineer the correlation we want &mdash; e.g.
+        both qubits always agreeing (both 0 or both 1). Tie many qubits together this way and one measurement ripples
+        knowledge across the whole set. Combine that with superposition's parallel possibilities and interference's
+        steering, and you have the machinery behind every quantum speed-up.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> superposition + interference + entanglement is the entire toolbox. From here on
+        it's notation &mdash; a tidier way to write states, starting with bra-ket.
+    </p>
+
+    <p>
+        Next, bra-ket notation. <a href="./11-bra-ket-notation.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, superposition and interference. <a href="./9-superposition-and-interference.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

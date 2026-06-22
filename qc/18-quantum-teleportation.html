@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Teleportation</h2>
+
+    <p>
+        Superdense coding sent classical bits with a qubit; teleportation does the reverse &mdash; it moves a
+        <em>qubit's unknown state</em> &#124;&psi;&#10217; from Alice to Bob using entanglement plus two classical bits.
+        And no, nothing physically travels Star-Trek style; the <strong>information</strong> is what relocates.
+    </p>
+
+    <h3>The problem: you can't just copy a qubit</h3>
+    <p>
+        The <strong>no-cloning theorem</strong>: there is no operation that copies an unknown quantum state. It makes
+        grim sense &mdash; you can't read the state without measuring, and measuring destroys it. So "copy &#124;&psi;&#10217;
+        to Bob" is off the table from the start. Teleportation <em>moves</em> it instead, leaving nothing behind.
+    </p>
+
+    <h3>The protocol</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Who</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Source</td>
+            <td>entangle a pair; give one qubit to Alice, one to Bob</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Alice</td>
+            <td>CNOT from &#124;&psi;&#10217; onto her half, then H on &#124;&psi;&#10217;</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Alice</td>
+            <td><strong>measure</strong> her two qubits &rarr; two classical bits (&#124;&psi;&#10217; is now destroyed)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Alice</td>
+            <td>send those two bits to Bob (ordinary channel)</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">5</td>
+            <td>Bob</td>
+            <td>apply corrections based on the bits &rarr; his qubit becomes &#124;&psi;&#10217;</td>
+        </tr>
+    </table>
+
+    <p>
+        Alice's measurement leaves Bob's qubit in one of four versions of &#124;&psi;&#10217; (flipped, phase-shifted, or
+        both). Her two bits tell him which, and he undoes it &mdash; no <code>if</code> statements needed, just a
+        <a href="./14-controlled-gates.html">controlled</a>-X and controlled-Z keyed off the bits:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Alice's bits</th>
+            <th>Bob applies</th>
+        </tr>
+        <tr>
+            <td>00</td>
+            <td>nothing</td>
+        </tr>
+        <tr>
+            <td>01</td>
+            <td>X</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>Z</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>Z then X</td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>Two things that save you from sci-fi nonsense:</strong> the original is <em>measured away</em>, so
+        no-cloning is respected (it's a move, not a copy); and Bob is stuck until Alice's classical bits arrive, so
+        <strong>nothing beats light speed</strong>. Entanglement spent + 2 classical bits = one qubit's state, relocated.
+    </p>
+
+    <p>
+        Next, quantum oracles. <a href="./19-quantum-oracles.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, superdense coding. <a href="./17-superdense-coding.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

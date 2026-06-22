@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Quantum Phase Estimation</h2>
+
+    <p>
+        QPE is the payoff of the <a href="./23-quantum-fourier-transform.html">QFT</a> and the last piece before Shor.
+        The problem: a <a href="./13-quantum-gates.html">gate</a> U adds a phase to a state &mdash; U&#124;&psi;&#10217;
+        = e<sup>2&pi;i&theta;</sup>&#124;&psi;&#10217; &mdash; but you don't know &theta;. Estimate it.
+    </p>
+
+    <h3>Why you can't just measure it</h3>
+    <p>
+        A phase is invisible to a direct measurement (recall the <a href="./16-phase-and-the-bloch-sphere.html">Z gate</a>
+        leaving probabilities untouched). You could apply U and measure thousands of times to guess &theta; statistically
+        &mdash; slow and imprecise, especially for small angles. QPE reads it out directly instead.
+    </p>
+
+    <h3>The circuit</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>a <strong>counting register</strong> of n qubits, all Hadamard'd into superposition</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>apply <strong>controlled-U</strong> powers (U, U&sup2;, U&#8308;, &hellip;) onto &#124;&psi;&#10217;</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>each one kicks &theta; back into the counting register's phases at a different rate</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">4</td>
+            <td>apply the <strong>inverse QFT</strong>, then measure &rarr; the bits <em>are</em> &theta;</td>
+        </tr>
+    </table>
+
+    <p>
+        The controlled-U powers write &theta; across the counting qubits as a Fourier-basis pattern; running the QFT
+        <em>backwards</em> (QFT&dagger;) collapses that pattern into an ordinary binary number &mdash; &theta; to n bits
+        of precision. More counting qubits, more precision. This is
+        <a href="./19-quantum-oracles.html">phase kickback</a> grown up: instead of one bit of phase, you extract a whole
+        high-resolution number.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> a startling number of hard problems can be recast as "find the phase of some
+        unitary." The biggest of them &mdash; factoring &mdash; is next, and it's QPE that does the heavy lifting.
+    </p>
+
+    <p>
+        Next, Shor's algorithm. <a href="./25-shors-algorithm.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, Quantum Fourier Transform. <a href="./23-quantum-fourier-transform.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>

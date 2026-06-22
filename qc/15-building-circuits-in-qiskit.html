@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Quantum Computing Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Building Circuits in Qiskit</h2>
+
+    <p>
+        We've drawn circuits by hand and pushed states through matrices. <strong>Qiskit</strong> (IBM's Python SDK) does
+        the bookkeeping so we can build, run, and measure for real. A circuit needs two kinds of register:
+        <strong>qubits</strong> to compute on, and <strong>classical bits</strong> to catch the measured results.
+    </p>
+
+    <h3>"Hello, Quantum" &mdash; the Bell state in code</h3>
+    <pre>
+<code><span style="color:#0099ff;">from</span> qiskit <span style="color:#0099ff;">import</span> QuantumCircuit
+<span style="color:#0099ff;">from</span> qiskit_aer <span style="color:#0099ff;">import</span> AerSimulator
+
+qc = QuantumCircuit(2, 2)        <span style="color:#999;"># 2 qubits, 2 classical bits</span>
+qc.h(0)                          <span style="color:#999;"># Hadamard on q0 -> superposition</span>
+qc.cx(0, 1)                      <span style="color:#999;"># CNOT q0->q1   -> entangle</span>
+qc.measure([0, 1], [0, 1])       <span style="color:#999;"># collapse into the classical bits</span>
+
+sim = AerSimulator()
+counts = sim.run(qc, shots=1024).result().get_counts()
+<span style="color:#0099ff;">print</span>(counts)                   <span style="color:#999;"># ~ {'00': 519, '11': 505}</span>
+</code>
+</pre>
+
+    <h3>Two things that bite beginners</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Idea</th>
+            <th>Why it matters</th>
+        </tr>
+        <tr>
+            <td bgcolor="orange">Measurement is mandatory</td>
+            <td>without <code>measure</code>, results never reach the classical bits &mdash; you get nothing to read</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">Shots</td>
+            <td>each run yields <em>one</em> collapsed outcome; running 1024 times reveals the
+                <strong>distribution</strong></td>
+        </tr>
+    </table>
+    <p>
+        One shot of the Bell state gives you a single "00" or "11" &mdash; useless on its own. Run it 1024 times and the
+        ~50/50 split appears: roughly 512 each, never a 01 or 10. The histogram <em>is</em> the answer. (1024 because a
+        software engineer can't resist a power of two.)
+    </p>
+
+    <h3>Simulator now, real hardware later</h3>
+    <p>
+        <code>AerSimulator</code> runs the circuit on your laptop &mdash; instant, free, perfect for learning. IBM also
+        exposes <strong>real quantum computers</strong> over the cloud (named after cities), but they come with job
+        <em>queues</em> and genuine noise. The simulator is where you'll live; real hardware is a swap of the backend
+        once the circuit works.
+    </p>
+
+    <p>
+        <strong>Why it matters:</strong> build &rarr; measure &rarr; run for shots &rarr; read the histogram. That loop
+        is every Qiskit program from here on; the algorithms just change what goes between "build" and "measure."
+    </p>
+
+    <p>
+        Next, phase and the Bloch sphere. <a href="./16-phase-and-the-bloch-sphere.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Prev, controlled gates. <a href="./14-controlled-gates.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+</body>
+
+</html>
