@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Backtracking</h2>
+    <p>
+        Build a solution one choice at a time, and the moment a partial choice <em>can't</em> lead to a valid answer,
+        undo it and try the next option. It's a <a href="./11-graphs.html">depth-first</a> walk over the tree of all
+        choices &mdash; with the power to <strong>prune</strong> whole branches early. The natural fit for combinatorial
+        search: permutations, subsets, N-Queens, Sudoku, mazes.
+    </p>
+
+    <h3>The recipe: choose, explore, un-choose</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Step</th>
+            <th>What</th>
+        </tr>
+        <tr>
+            <td>1. Choose</td>
+            <td>make one move, extend the partial solution</td>
+        </tr>
+        <tr>
+            <td>2. Explore</td>
+            <td>recurse on the rest</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">3. Un-choose</td>
+            <td>undo the move (the "backtrack") so the next option starts clean</td>
+        </tr>
+    </table>
+    <p>
+        That third step &mdash; restoring state on the way back up &mdash; is what makes it backtracking rather than
+        plain recursion. Here it generates every subset:
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> subsets(nums):
+    res, path = [], []
+    <span style="color:#0099ff">def</span> backtrack(start):
+        res.append(path[:])              <span style="color:#999"># record current subset</span>
+        <span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(start, len(nums)):
+            path.append(nums[i])         <span style="color:#999"># choose</span>
+            backtrack(i + 1)             <span style="color:#999"># explore</span>
+            path.pop()                   <span style="color:#999"># un-choose</span>
+    backtrack(0)
+    <span style="color:#0099ff">return</span> res
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">void</span> backtrack(<span style="color:#0099ff">int</span> start, vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; nums,
+               vector&lt;<span style="color:#0099ff">int</span>&gt;&amp; path, vector&lt;vector&lt;<span style="color:#0099ff">int</span>&gt;&gt;&amp; res) {
+    res.push_back(path);                 <span style="color:#999">// record current subset</span>
+    <span style="color:#0099ff">for</span> (<span style="color:#0099ff">int</span> i = start; i &lt; (<span style="color:#0099ff">int</span>)nums.size(); ++i) {
+        path.push_back(nums[i]);         <span style="color:#999">// choose</span>
+        backtrack(i + 1, nums, path, res);  <span style="color:#999">// explore</span>
+        path.pop_back();                 <span style="color:#999">// un-choose</span>
+    }
+}
+</code></pre>
+    </div>
+
+    <h3>Pruning is the whole point</h3>
+    <p>
+        The decision tree is <strong>exponential</strong> &mdash; trying every branch is brute force. Backtracking earns
+        its keep by killing branches early: add a check before "explore" and skip choices that already violate a
+        constraint (a queen on a shared diagonal, a digit breaking a Sudoku row). The earlier you prune, the more of the
+        tree you never walk.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td bgcolor="#ff9999">Brute force (no pruning)</td>
+            <td>explore every leaf</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Backtracking (with pruning)</td>
+            <td>exponential worst case, but often vastly less in practice</td>
+        </tr>
+    </table>
+    <p>
+        It's <a href="./5-recursion.html">recursion</a> with an undo step, so it inherits the call stack &mdash; and
+        runs on almost anything, which is why the roadmap lists it under "any."
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>For the classic enumerations, <code>itertools</code> already has it &mdash;
+                    <code>permutations</code>, <code>combinations</code>, <code>product</code> &mdash; faster than a
+                    hand-rolled loop.</li>
+                <li><code>path[:]</code> (or <code>list(path)</code>) makes a <strong>copy</strong> when recording;
+                    appending <code>path</code> itself stores a reference that later <code>pop</code>s will mutate.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li><code>std::next_permutation</code> walks permutations in-place without recursion.</li>
+                <li>Pass <code>path</code>/<code>res</code> by <strong>reference</strong> to avoid copying the whole
+                    vector at every call; <code>push_back(path)</code> copies only when you record a hit.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+</html>

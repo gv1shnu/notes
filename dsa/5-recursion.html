@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <!-- Character encoding and viewport settings for mobile responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <!-- Page title shown in browser tab -->
+    <title>DSA Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Recursion</h2>
+    <p>
+        A function that solves a problem by calling <em>itself</em> on a smaller version of the same problem. It fits
+        when a problem is <strong>self-similar</strong> &mdash; a factorial, a tree, a divide-and-conquer split. Every
+        recursion rides the <a href="./7-stacks.html">call stack</a>: each call is a frame pushed on, returned frames pop
+        off.
+    </p>
+
+    <h3>Two parts, always</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Part</th>
+            <th>Job</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">Base case</td>
+            <td>the smallest input you can answer directly &mdash; <strong>stops</strong> the recursion</td>
+        </tr>
+        <tr>
+            <td>Recursive case</td>
+            <td>do a bit of work, then call yourself on a <strong>strictly smaller</strong> input</td>
+        </tr>
+    </table>
+    <p>
+        Miss the base case (or never shrink toward it) and the stack grows forever &mdash; a
+        <strong>stack overflow</strong>. The two rules: <em>have</em> a base case, and <em>always move toward it</em>.
+    </p>
+
+    <div class="codetabs">
+<pre data-lang="py"><code><span style="color:#0099ff">def</span> factorial(n):
+    <span style="color:#0099ff">if</span> n &lt;= 1:           <span style="color:#999"># base case</span>
+        <span style="color:#0099ff">return</span> 1
+    <span style="color:#0099ff">return</span> n * factorial(n - 1)   <span style="color:#999"># recursive case</span>
+</code></pre>
+<pre data-lang="cpp"><code><span style="color:#0099ff">long long</span> factorial(<span style="color:#0099ff">int</span> n) {
+    <span style="color:#0099ff">if</span> (n &lt;= 1) <span style="color:#0099ff">return</span> 1;          <span style="color:#999">// base case</span>
+    <span style="color:#0099ff">return</span> n * factorial(n - 1);   <span style="color:#999">// recursive case</span>
+}
+</code></pre>
+    </div>
+
+    <h3>Recursion vs iteration</h3>
+    <p>
+        Anything recursive can be rewritten with a loop and an <em>explicit</em> stack &mdash; recursion just lets the
+        language manage that stack for you. The trade is clarity vs control:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Recursion</th>
+            <th>Iteration</th>
+        </tr>
+        <tr>
+            <td>Stack</td>
+            <td>the call stack (hidden)</td>
+            <td>an explicit stack / none</td>
+        </tr>
+        <tr>
+            <td>Reads as</td>
+            <td bgcolor="lightgreen">the problem's definition</td>
+            <td>bookkeeping</td>
+        </tr>
+        <tr>
+            <td>Risk</td>
+            <td bgcolor="orange">stack overflow on deep input</td>
+            <td>safe at any depth</td>
+        </tr>
+    </table>
+
+    <h3>The optimization: stop redoing work</h3>
+    <p>
+        Naive recursion on <strong>overlapping</strong> subproblems explodes &mdash; <code>fib(n)</code> recomputes the
+        same values exponentially (see <a href="./1-introduction.html">the intro</a>). Cache each answer once
+        (<strong>memoization</strong>) and it collapses to linear; that move <em>is</em>
+        <a href="./15-dynamic-programming.html">dynamic programming</a>. Recursion is also the spine of
+        <a href="./12-divide-and-conquer.html">divide &amp; conquer</a>, <a href="./10-trees.html">tree</a> traversal,
+        and <a href="./14-backtracking.html">backtracking</a>.
+    </p>
+
+    <h3>Language notes</h3>
+    <div class="langnote">
+        <div data-lang="py">
+            <ul>
+                <li>Default recursion limit is ~1000 frames; deeper hits <code>RecursionError</code>. Raise it with
+                    <code>sys.setrecursionlimit</code> or convert to a loop.</li>
+                <li>CPython does <strong>no tail-call optimization</strong> &mdash; a "tail recursive" function still
+                    grows the stack.</li>
+                <li>Memoize for free with <code>@functools.lru_cache(None)</code>.</li>
+            </ul>
+        </div>
+        <div data-lang="cpp">
+            <ul>
+                <li>Recursion uses the real call stack (~1&nbsp;MB) &mdash; overflow <strong>segfaults</strong> silently
+                    rather than throwing.</li>
+                <li>Compilers <em>may</em> optimize tail calls (<code>-O2</code>), but it isn't guaranteed &mdash; don't
+                    rely on it for deep recursion.</li>
+                <li>For very deep work, hand-roll an explicit <code>std::stack</code>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="./codetabs.js"></script>
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+</html>
