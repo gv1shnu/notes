@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Variables &amp; Numbers</h2>
+
+    <p>
+        A <strong>variable</strong> is just a name pointing at a value. No declaration, no type keyword &mdash; you
+        assign, and Python figures out the rest. Reassign it to something of a different type and Python won't blink.
+    </p>
+
+    <pre><code>name = <span style="color:#cc6600">"Vishnu"</span>     <span style="color:#999"># a string</span>
+score = 842          <span style="color:#999"># an int</span>
+score = <span style="color:#cc6600">"high"</span>       <span style="color:#999"># now a string &mdash; perfectly legal</span></code></pre>
+
+    <p>
+        Names are lowercase with underscores (<code>player_score</code>), can't start with a digit, and are
+        case-sensitive. The <code>=</code> binds the name to the object on its right.
+    </p>
+
+    <h3>The number types</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Type</th>
+            <th>Example</th>
+            <th>Note</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">int</td>
+            <td><code>842</code></td>
+            <td><strong>arbitrary precision</strong> &mdash; no overflow, ever</td>
+        </tr>
+        <tr>
+            <td>float</td>
+            <td><code>3.14</code></td>
+            <td>fractional; subject to rounding (<code>0.1 + 0.2 != 0.3</code>)</td>
+        </tr>
+        <tr>
+            <td>complex</td>
+            <td><code>2 + 3j</code></td>
+            <td>real + imaginary, built in</td>
+        </tr>
+    </table>
+
+    <h3>Arithmetic</h3>
+    <pre><code>7 + 2     <span style="color:#999"># 9</span>
+7 - 2     <span style="color:#999"># 5</span>
+7 * 2     <span style="color:#999"># 14</span>
+7 / 2     <span style="color:#999"># 3.5   true division -> always float</span>
+7 // 2    <span style="color:#999"># 3     floor division</span>
+7 % 2     <span style="color:#999"># 1     remainder (modulo)</span>
+7 ** 2    <span style="color:#999"># 49    power</span></code></pre>
+    <p>
+        The one that trips people: <code>/</code> always gives a float (<code>4 / 2</code> is <code>2.0</code>); use
+        <code>//</code> when you want an integer result. Mixing an int and a float promotes to float.
+    </p>
+
+    <h3>Checking and converting</h3>
+    <pre><code><span style="color:#0099ff">type</span>(score)   <span style="color:#999"># &lt;class 'int'&gt;</span>
+<span style="color:#0099ff">int</span>(<span style="color:#cc6600">"42"</span>)    <span style="color:#999"># 42    string -> int</span>
+<span style="color:#0099ff">float</span>(3)     <span style="color:#999"># 3.0</span>
+<span style="color:#0099ff">str</span>(842)     <span style="color:#999"># "842" number -> string</span></code></pre>
+    <p>
+        Conversions are explicit on purpose &mdash; Python won't quietly add a string to an int. The bridge between
+        "user typed text" and "math" is one of these casts, usually <code>int(...)</code> or <code>float(...)</code>.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

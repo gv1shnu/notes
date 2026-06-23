@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Inheritance &amp; Special Methods</h2>
+
+    <p>
+        Two ways <a href="./9-classes.html">classes</a> get powerful: one class can build on another, and any class can
+        hook into Python's built-in syntax.
+    </p>
+
+    <h3>Inheritance &mdash; build on what exists</h3>
+    <p>
+        A <strong>subclass</strong> inherits everything from its parent, then adds or overrides. Don't rewrite the shared
+        parts &mdash; extend them.
+    </p>
+    <pre><code><span style="color:#0099ff">class</span> Player:
+    <span style="color:#0099ff">def</span> __init__(self, name):
+        self.name = name
+    <span style="color:#0099ff">def</span> role(self):
+        <span style="color:#0099ff">return</span> <span style="color:#cc6600">"player"</span>
+
+<span style="color:#0099ff">class</span> Captain(Player):          <span style="color:#999"># Captain IS-A Player</span>
+    <span style="color:#0099ff">def</span> __init__(self, name, team):
+        super().__init__(name)   <span style="color:#999"># run the parent's setup</span>
+        self.team = team
+    <span style="color:#0099ff">def</span> role(self):             <span style="color:#999"># override</span>
+        <span style="color:#0099ff">return</span> <span style="color:#cc6600">"captain"</span>
+
+c = Captain(<span style="color:#cc6600">"TenZ"</span>, <span style="color:#cc6600">"SEN"</span>)
+c.name      <span style="color:#999"># 'TenZ'      inherited</span>
+c.role()    <span style="color:#999"># 'captain'   overridden</span></code></pre>
+    <p>
+        <code>super().__init__(...)</code> calls the parent's constructor so you don't duplicate its work; then the
+        child adds its own. Overriding <code>role</code> means a <code>Captain</code> answers differently from a plain
+        <code>Player</code> &mdash; same method name, specialized behaviour.
+    </p>
+
+    <h3>Special ("dunder") methods</h3>
+    <p>
+        Methods wrapped in <code>__double_underscores__</code> let your objects plug into Python's own syntax &mdash;
+        printing, <code>len()</code>, <code>+</code>, <code>==</code>. Define them and your class behaves like a built-in.
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Define</th>
+            <th>Powers</th>
+        </tr>
+        <tr>
+            <td><code>__init__</code></td>
+            <td><code>Player(...)</code> &mdash; construction</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>__str__</code></td>
+            <td><code>print(p)</code> &mdash; the human-readable form</td>
+        </tr>
+        <tr>
+            <td><code>__len__</code></td>
+            <td><code>len(p)</code></td>
+        </tr>
+        <tr>
+            <td><code>__eq__</code></td>
+            <td><code>p == q</code></td>
+        </tr>
+        <tr>
+            <td><code>__add__</code></td>
+            <td><code>p + q</code></td>
+        </tr>
+    </table>
+    <pre><code><span style="color:#0099ff">class</span> Vec:
+    <span style="color:#0099ff">def</span> __init__(self, x, y):
+        self.x, self.y = x, y
+    <span style="color:#0099ff">def</span> __add__(self, other):       <span style="color:#999"># defines the + operator</span>
+        <span style="color:#0099ff">return</span> Vec(self.x + other.x, self.y + other.y)
+    <span style="color:#0099ff">def</span> __str__(self):
+        <span style="color:#0099ff">return</span> <span style="color:#cc6600">f"({self.x}, {self.y})"</span>
+
+<span style="color:#0099ff">print</span>(Vec(1, 2) + Vec(3, 4))   <span style="color:#999"># (4, 6)</span></code></pre>
+    <p>
+        That's <strong>operator overloading</strong>: <code>+</code> on two <code>Vec</code>s now means vector addition,
+        and <code>print</code> shows a clean <code>(4, 6)</code> instead of a cryptic memory address. Same syntax you
+        already use on numbers and lists &mdash; now on your own types.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

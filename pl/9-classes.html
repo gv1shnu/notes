@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Classes &amp; Objects</h2>
+
+    <p>
+        Once data and the functions that act on it belong together, bundle them. A <strong>class</strong> is a blueprint;
+        an <strong>object</strong> is one thing built from it. The class <code>Player</code> defines what every player
+        <em>has</em> and <em>does</em>; each actual player is an instance.
+    </p>
+
+    <pre><code><span style="color:#0099ff">class</span> Player:
+    <span style="color:#0099ff">def</span> __init__(self, name, score):   <span style="color:#999"># constructor — runs on creation</span>
+        self.name = name                <span style="color:#999"># attribute (data)</span>
+        self.score = score
+
+    <span style="color:#0099ff">def</span> promote(self, points):         <span style="color:#999"># method (behaviour)</span>
+        self.score += points
+
+p = Player(<span style="color:#cc6600">"TenZ"</span>, 842)   <span style="color:#999"># create an instance</span>
+p.name                       <span style="color:#999"># 'TenZ'</span>
+p.promote(50)                <span style="color:#999"># p.score is now 892</span></code></pre>
+
+    <h3>The two names that confuse everyone</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Name</th>
+            <th>What it is</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>__init__</code></td>
+            <td>the <strong>constructor</strong> &mdash; called automatically when you write <code>Player(...)</code>,
+                sets up the object's starting attributes</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen"><code>self</code></td>
+            <td>the <strong>instance itself</strong> &mdash; the first parameter of every method, how an object refers
+                to its own data</td>
+        </tr>
+    </table>
+    <p>
+        You never pass <code>self</code> explicitly &mdash; <code>p.promote(50)</code> quietly becomes
+        <code>Player.promote(p, 50)</code>, and <code>p</code> arrives as <code>self</code>. Inside a method,
+        <code>self.score</code> reads/writes <em>this</em> object's score, keeping each instance's data its own.
+    </p>
+
+    <h3>Why bother</h3>
+    <p>
+        You could keep a player as a <a href="./5-dicts-sets-tuples.html">dict</a> and pass it to loose functions &mdash;
+        but a class keeps the data and the operations on it in one place, so the rest of your code says
+        <code>p.promote(50)</code> instead of juggling dictionaries and helper functions. That bundling is the whole
+        point of objects, and it pays off most when classes start <a href="./10-inheritance-and-special-methods.html">building
+        on each other</a>.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Functions</h2>
+
+    <p>
+        A named, reusable block of code &mdash; the unit of "don't repeat yourself." Define it with <code>def</code>,
+        feed it <strong>parameters</strong>, and get something back with <code>return</code>.
+    </p>
+
+    <pre><code><span style="color:#0099ff">def</span> greet(name, greeting=<span style="color:#cc6600">"Hello"</span>):   <span style="color:#999"># greeting has a default</span>
+    <span style="color:#0099ff">return</span> <span style="color:#cc6600">f"{greeting}, {name}"</span>
+
+greet(<span style="color:#cc6600">"TenZ"</span>)                  <span style="color:#999"># 'Hello, TenZ'</span>
+greet(<span style="color:#cc6600">"TenZ"</span>, <span style="color:#cc6600">"Hi"</span>)            <span style="color:#999"># 'Hi, TenZ'      positional</span>
+greet(name=<span style="color:#cc6600">"TenZ"</span>, greeting=<span style="color:#cc6600">"Yo"</span>)  <span style="color:#999"># by keyword (order-free)</span></code></pre>
+    <p>
+        A function with no <code>return</code> hands back <code>None</code>. <strong>Default values</strong> make
+        arguments optional; <strong>keyword arguments</strong> let callers name what they pass, so order stops mattering
+        and the call reads clearly.
+    </p>
+
+    <h3>Taking any number of arguments</h3>
+    <pre><code><span style="color:#0099ff">def</span> total(*nums):          <span style="color:#999"># *args  -> a tuple of extras</span>
+    <span style="color:#0099ff">return</span> sum(nums)
+
+total(1, 2, 3)             <span style="color:#999"># 6</span>
+
+<span style="color:#0099ff">def</span> config(**opts):        <span style="color:#999"># **kwargs -> a dict of named extras</span>
+    <span style="color:#0099ff">return</span> opts
+
+config(debug=<span style="color:#0099ff">True</span>, level=5)  <span style="color:#999"># {'debug': True, 'level': 5}</span></code></pre>
+
+    <h3>Scope: local vs global</h3>
+    <pre><code>count = 0              <span style="color:#999"># global</span>
+
+<span style="color:#0099ff">def</span> bump():
+    count = 99         <span style="color:#999"># a NEW local — the global is untouched</span>
+
+bump()
+<span style="color:#0099ff">print</span>(count)          <span style="color:#999"># still 0</span></code></pre>
+    <p>
+        Names assigned inside a function are <strong>local</strong> &mdash; they vanish when it returns and don't leak
+        out. A function can <em>read</em> an outer variable, but assigning creates a fresh local unless you explicitly
+        say <code>global</code> (rarely a good idea &mdash; prefer returning a value).
+    </p>
+
+    <h3>Talking to the user</h3>
+    <pre><code>name = <span style="color:#0099ff">input</span>(<span style="color:#cc6600">"Your name? "</span>)   <span style="color:#999"># input() always returns a STRING</span>
+age  = <span style="color:#0099ff">int</span>(<span style="color:#0099ff">input</span>(<span style="color:#cc6600">"Age? "</span>))  <span style="color:#999"># cast it for math</span>
+<span style="color:#0099ff">print</span>(<span style="color:#cc6600">f"Hi {name}, next year you're {age + 1}"</span>)</code></pre>
+    <p>
+        <code>input()</code> hands back text every time &mdash; even "<code>25</code>" arrives as <code>"25"</code>, so
+        wrap it in <code>int()</code>/<code>float()</code> before doing arithmetic (the same cast from
+        <a href="./2-variables-and-numbers.html">numbers</a>).
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

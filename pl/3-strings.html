@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Strings</h2>
+
+    <p>
+        Text, written in single, double, or triple quotes. The defining fact: strings are <strong>immutable</strong>
+        &mdash; every "edit" returns a <em>new</em> string, the original never changes. They're also
+        <strong>sequences</strong>, so indexing and slicing work just like a list of characters.
+    </p>
+
+    <pre><code>s = <span style="color:#cc6600">"Hello"</span>
+s = <span style="color:#cc6600">'also fine'</span>
+s = <span style="color:#cc6600">"""spans
+multiple lines"""</span></code></pre>
+
+    <h3>Indexing &amp; slicing</h3>
+    <pre><code>s = <span style="color:#cc6600">"Python"</span>
+s[0]      <span style="color:#999"># 'P'   first</span>
+s[-1]     <span style="color:#999"># 'n'   last (negative = from the end)</span>
+s[0:3]    <span style="color:#999"># 'Pyt' [start:stop) — stop excluded</span>
+s[2:]     <span style="color:#999"># 'thon'</span>
+s[::-1]   <span style="color:#999"># 'nohtyP' reversed (step of -1)</span>
+<span style="color:#0099ff">len</span>(s)    <span style="color:#999"># 6</span></code></pre>
+    <p>
+        Slicing is <code>[start:stop:step]</code>, and <code>stop</code> is always excluded &mdash; <code>s[0:3]</code>
+        gives three characters, indices 0,1,2. That half-open convention shows up everywhere in Python.
+    </p>
+
+    <h3>Building strings</h3>
+    <pre><code>a = <span style="color:#cc6600">"foo"</span> + <span style="color:#cc6600">"bar"</span>     <span style="color:#999"># 'foobar' concatenation</span>
+b = <span style="color:#cc6600">"ab"</span> * 3           <span style="color:#999"># 'ababab' repetition</span>
+
+name, score = <span style="color:#cc6600">"TenZ"</span>, 842
+<span style="color:#0099ff">print</span>(<span style="color:#cc6600">f"{name} has {score}"</span>)   <span style="color:#999"># f-string: 'TenZ has 842'</span></code></pre>
+    <p>
+        The <strong>f-string</strong> (note the <code>f</code> prefix) is the modern way to interpolate &mdash; drop any
+        expression inside <code>{ }</code> and it's formatted in place. Far cleaner than <code>+</code>-ing pieces
+        together.
+    </p>
+
+    <h3>The methods you'll reach for</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Call</th>
+            <th>Does</th>
+        </tr>
+        <tr>
+            <td><code>s.upper()</code> / <code>s.lower()</code></td>
+            <td>change case (returns a new string)</td>
+        </tr>
+        <tr>
+            <td><code>s.strip()</code></td>
+            <td>trim surrounding whitespace</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>s.split(",")</code></td>
+            <td>string &rarr; list of pieces</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>",".join(parts)</code></td>
+            <td>list of strings &rarr; one string</td>
+        </tr>
+        <tr>
+            <td><code>s.replace("a", "b")</code></td>
+            <td>swap substrings</td>
+        </tr>
+        <tr>
+            <td><code>"x" in s</code></td>
+            <td>membership test (True/False)</td>
+        </tr>
+    </table>
+    <p>
+        <code>split</code> and <code>join</code> are inverses and do most of the heavy lifting in real text work.
+        Because strings are immutable, all of these <em>return</em> a result &mdash; <code>s.upper()</code> alone changes
+        nothing unless you assign it.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

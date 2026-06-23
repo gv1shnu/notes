@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Modules &amp; Libraries</h2>
+
+    <p>
+        No one writes everything from scratch. A <strong>module</strong> is just a <code>.py</code> file full of code you
+        can pull into another with <code>import</code> &mdash; whether it's Python's own batteries, someone else's
+        package, or your own file.
+    </p>
+
+    <h3>Importing</h3>
+    <pre><code><span style="color:#0099ff">import</span> math                 <span style="color:#999"># whole module</span>
+math.sqrt(16)               <span style="color:#999"># 4.0   — reach in with the name</span>
+
+<span style="color:#0099ff">from</span> random <span style="color:#0099ff">import</span> randint   <span style="color:#999"># just one name</span>
+randint(1, 6)               <span style="color:#999"># a die roll, no 'random.' prefix</span>
+
+<span style="color:#0099ff">import</span> numpy <span style="color:#0099ff">as</span> np           <span style="color:#999"># aliased (common for big libs)</span></code></pre>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Form</th>
+            <th>Use</th>
+        </tr>
+        <tr>
+            <td><code>import math</code></td>
+            <td>keeps the namespace &mdash; <code>math.sqrt</code>, clear where it came from</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>from math import sqrt</code></td>
+            <td>pulls one name in directly &mdash; shorter, but can clash</td>
+        </tr>
+        <tr>
+            <td><code>import numpy as np</code></td>
+            <td>a short alias for a long name</td>
+        </tr>
+    </table>
+    <p>
+        The standard library alone covers a lot &mdash; <code>math</code>, <code>random</code>, <code>datetime</code>,
+        <code>json</code>, <code>os</code>. Beyond that, <code>pip install &lt;name&gt;</code> grabs third-party packages
+        (numpy, requests, &hellip;) from the Python Package Index.
+    </p>
+
+    <h3>Your own module</h3>
+    <p>
+        Any file you write is importable by its filename. Put helpers in <code>tools.py</code>, then elsewhere:
+    </p>
+    <pre><code><span style="color:#0099ff">from</span> tools <span style="color:#0099ff">import</span> greet   <span style="color:#999"># uses greet() defined in tools.py</span></code></pre>
+
+    <h3>Imported vs run directly</h3>
+    <pre><code><span style="color:#0099ff">def</span> main():
+    <span style="color:#0099ff">print</span>(<span style="color:#cc6600">"running!"</span>)
+
+<span style="color:#0099ff">if</span> __name__ == <span style="color:#cc6600">"__main__"</span>:   <span style="color:#999"># only when run directly, not when imported</span>
+    main()</code></pre>
+    <p>
+        When you <em>run</em> a file, Python sets its <code>__name__</code> to <code>"__main__"</code>; when you
+        <em>import</em> it, <code>__name__</code> is the module's name instead. That one check lets a file double as both
+        a runnable script <strong>and</strong> an importable library &mdash; its functions load on import, but the demo
+        code only fires when you run it yourself.
+    </p>
+
+    <p>
+        That's the core of Python: <a href="./2-variables-and-numbers.html">values</a> in
+        <a href="./4-lists.html">containers</a>, <a href="./6-conditionals-and-booleans.html">decisions</a> and
+        <a href="./7-loops.html">loops</a>, organized with <a href="./8-functions.html">functions</a> and
+        <a href="./9-classes.html">objects</a>, kept safe with <a href="./11-error-handling.html">error handling</a>, and
+        scaled with the world's modules. The rest is practice.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

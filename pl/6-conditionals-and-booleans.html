@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Conditionals &amp; Booleans</h2>
+
+    <p>
+        Code that makes decisions needs something to decide on: a <strong>boolean</strong>, either <code>True</code> or
+        <code>False</code>. Comparisons produce them, logic combines them, and <code>if</code> acts on them.
+    </p>
+
+    <h3>Producing booleans</h3>
+    <pre><code>5 == 5     <span style="color:#999"># True   equal (two = signs!)</span>
+5 != 3     <span style="color:#999"># True   not equal</span>
+5 &gt; 3      <span style="color:#999"># True</span>
+5 &lt;= 5     <span style="color:#999"># True</span>
+
+(5 &gt; 3) <span style="color:#0099ff">and</span> (2 &gt; 9)   <span style="color:#999"># False  both must hold</span>
+(5 &gt; 3) <span style="color:#0099ff">or</span>  (2 &gt; 9)   <span style="color:#999"># True   either holds</span>
+<span style="color:#0099ff">not</span> (5 &gt; 3)            <span style="color:#999"># False  flip it</span></code></pre>
+    <p>
+        The classic bug: <code>=</code> assigns, <code>==</code> compares. Python uses the words <code>and</code>,
+        <code>or</code>, <code>not</code> rather than symbols &mdash; reads like English on purpose.
+    </p>
+
+    <h3>Truthiness</h3>
+    <p>
+        Any value can be tested directly &mdash; you don't always need an explicit comparison. "Empty" things are
+        <strong>falsy</strong>:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th bgcolor="#ff9999">Falsy</th>
+            <th bgcolor="lightgreen">Truthy</th>
+        </tr>
+        <tr>
+            <td><code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>,
+                <code>False</code></td>
+            <td>everything else (any non-zero number, any non-empty container)</td>
+        </tr>
+    </table>
+    <p>
+        So <code>if items:</code> reads as "if the list has anything in it" &mdash; cleaner than
+        <code>if len(items) &gt; 0:</code>.
+    </p>
+
+    <h3>if / elif / else</h3>
+    <pre><code>score = 842
+<span style="color:#0099ff">if</span> score &gt;= 800:
+    rank = <span style="color:#cc6600">"Radiant"</span>
+<span style="color:#0099ff">elif</span> score &gt;= 500:
+    rank = <span style="color:#cc6600">"Immortal"</span>
+<span style="color:#0099ff">else</span>:
+    rank = <span style="color:#cc6600">"Diamond"</span></code></pre>
+    <p>
+        Python checks branches top to bottom and runs the <strong>first</strong> that's true, then skips the rest. The
+        <strong>indentation</strong> (4 spaces) is what marks the body &mdash; there are no braces, so misaligned code is
+        a real bug, not a style nit. For a quick one-liner there's the ternary:
+    </p>
+    <pre><code>label = <span style="color:#cc6600">"pass"</span> <span style="color:#0099ff">if</span> score &gt;= 500 <span style="color:#0099ff">else</span> <span style="color:#cc6600">"fail"</span></code></pre>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Dictionaries, Sets &amp; Tuples</h2>
+
+    <p>
+        Three more built-in containers, each with a distinct job. Pick by the question you're asking:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Type</th>
+            <th>Shape</th>
+            <th>Use when</th>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen">dict</td>
+            <td>key &rarr; value pairs</td>
+            <td>you look things up by a label</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue">set</td>
+            <td>unordered unique values</td>
+            <td>you care about membership / dedup</td>
+        </tr>
+        <tr>
+            <td>tuple</td>
+            <td>ordered, <strong>immutable</strong> sequence</td>
+            <td>a fixed group that shouldn't change</td>
+        </tr>
+    </table>
+
+    <h3>Dictionary &mdash; lookups by key</h3>
+    <pre><code>player = {<span style="color:#cc6600">"name"</span>: <span style="color:#cc6600">"TenZ"</span>, <span style="color:#cc6600">"score"</span>: 842}
+player[<span style="color:#cc6600">"name"</span>]          <span style="color:#999"># 'TenZ'</span>
+player[<span style="color:#cc6600">"level"</span>] = 99      <span style="color:#999"># add / update a key</span>
+player.get(<span style="color:#cc6600">"rank"</span>, <span style="color:#cc6600">"NA"</span>)  <span style="color:#999"># safe read with a default</span>
+<span style="color:#cc6600">"score"</span> <span style="color:#0099ff">in</span> player        <span style="color:#999"># True — checks keys</span>
+
+<span style="color:#0099ff">for</span> k, v <span style="color:#0099ff">in</span> player.items():  <span style="color:#999"># iterate key+value</span>
+    <span style="color:#0099ff">print</span>(k, v)</code></pre>
+    <p>
+        Keys are unique and lookups are <strong>O(1) average</strong> (it's a hash table). Reading a missing key with
+        <code>[]</code> raises an error &mdash; use <code>.get(key, default)</code> when absence is normal.
+    </p>
+
+    <h3>Set &mdash; membership &amp; uniqueness</h3>
+    <pre><code>seen = {1, 2, 2, 3}        <span style="color:#999"># {1, 2, 3} — duplicates collapse</span>
+3 <span style="color:#0099ff">in</span> seen                  <span style="color:#999"># True (O(1))</span>
+seen.add(4)
+{1, 2} &amp; {2, 3}            <span style="color:#999"># {2}  intersection</span>
+{1, 2} | {2, 3}            <span style="color:#999"># {1, 2, 3} union</span>
+{1, 2} - {2}               <span style="color:#999"># {1}  difference</span></code></pre>
+    <p>
+        A one-line dedup: <code>list(set(items))</code>. Sets are unordered, so don't index them &mdash; they're for
+        "is this in here?" and the algebra of groups.
+    </p>
+
+    <h3>Tuple &mdash; fixed and unpackable</h3>
+    <pre><code>point = (3, 4)
+x, y = point          <span style="color:#999"># unpacking: x=3, y=4</span>
+point[0] = 9          <span style="color:#999"># TypeError — tuples can't change</span></code></pre>
+    <p>
+        Because they're immutable, tuples can be used as <strong>dictionary keys</strong> (a list can't). They're also
+        what's quietly happening when you write <code>a, b = b, a</code> to swap, or <code>return x, y</code> from a
+        function &mdash; that's tuple packing.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

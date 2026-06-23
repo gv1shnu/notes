@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Loops</h2>
+
+    <p>
+        Doing something repeatedly. Python has two: <strong>for</strong> (walk over a collection) and
+        <strong>while</strong> (repeat until a condition flips). The choice is simple &mdash; do you know <em>what</em>
+        you're iterating over, or just <em>when to stop</em>?
+    </p>
+
+    <h3>for &mdash; iterate over items</h3>
+    <pre><code><span style="color:#0099ff">for</span> name <span style="color:#0099ff">in</span> [<span style="color:#cc6600">"TenZ"</span>, <span style="color:#cc6600">"aspas"</span>, <span style="color:#cc6600">"yay"</span>]:
+    <span style="color:#0099ff">print</span>(name)
+
+<span style="color:#0099ff">for</span> i <span style="color:#0099ff">in</span> range(3):       <span style="color:#999"># 0, 1, 2  (stop is excluded)</span>
+    <span style="color:#0099ff">print</span>(i)</code></pre>
+    <p>
+        Python's <code>for</code> loops over the items <em>directly</em> &mdash; no manual index. Need the index too?
+        Use <code>enumerate</code>; iterate two lists in lockstep with <code>zip</code>:
+    </p>
+    <pre><code><span style="color:#0099ff">for</span> i, name <span style="color:#0099ff">in</span> enumerate(players):     <span style="color:#999"># (0, 'TenZ'), (1, 'aspas'), ...</span>
+    <span style="color:#0099ff">print</span>(i, name)
+
+<span style="color:#0099ff">for</span> name, score <span style="color:#0099ff">in</span> zip(names, scores):  <span style="color:#999"># pair them up</span>
+    <span style="color:#0099ff">print</span>(name, score)</code></pre>
+
+    <h3>while &mdash; repeat until done</h3>
+    <pre><code>n = 5
+<span style="color:#0099ff">while</span> n &gt; 0:
+    <span style="color:#0099ff">print</span>(n)
+    n -= 1            <span style="color:#999"># must move toward the exit, or loop forever</span></code></pre>
+    <p>
+        Use <code>while</code> when the number of iterations isn't known up front. The cardinal sin: forgetting to change
+        the condition variable &mdash; an <strong>infinite loop</strong>.
+    </p>
+
+    <h3>Steering a loop: break, continue, pass</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Keyword</th>
+            <th>Effect</th>
+        </tr>
+        <tr>
+            <td bgcolor="#ff9999"><code>break</code></td>
+            <td>exit the loop entirely, right now</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>continue</code></td>
+            <td>skip to the next iteration</td>
+        </tr>
+        <tr>
+            <td><code>pass</code></td>
+            <td>do nothing &mdash; a placeholder where syntax needs a body</td>
+        </tr>
+    </table>
+    <pre><code><span style="color:#0099ff">for</span> x <span style="color:#0099ff">in</span> range(10):
+    <span style="color:#0099ff">if</span> x == 5:
+        <span style="color:#0099ff">break</span>          <span style="color:#999"># stop at 5</span>
+    <span style="color:#0099ff">if</span> x % 2 == 0:
+        <span style="color:#0099ff">continue</span>       <span style="color:#999"># skip evens</span>
+    <span style="color:#0099ff">print</span>(x)           <span style="color:#999"># prints 1, 3</span></code></pre>
+    <p>
+        <code>break</code> is your early exit (e.g. stop once you've found what you searched for); <code>continue</code>
+        filters out cases you don't care about; <code>pass</code> just fills a block you haven't written yet.
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>

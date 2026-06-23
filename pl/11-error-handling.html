@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Programming Notes - Vishnu Gandarapu</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Error Handling</h2>
+
+    <p>
+        Things go wrong &mdash; a user types letters where you expected a number, a file isn't there, you divide by zero.
+        Python signals these with <strong>exceptions</strong>: by default they crash the program. Handling them means
+        catching the crash and deciding what to do instead.
+    </p>
+
+    <h3>try / except</h3>
+    <pre><code><span style="color:#0099ff">try</span>:
+    age = <span style="color:#0099ff">int</span>(<span style="color:#0099ff">input</span>(<span style="color:#cc6600">"Age? "</span>))   <span style="color:#999"># might fail if not a number</span>
+<span style="color:#0099ff">except</span> ValueError:
+    <span style="color:#0099ff">print</span>(<span style="color:#cc6600">"That wasn't a number."</span>)   <span style="color:#999"># runs only on that error</span></code></pre>
+    <p>
+        Code that might fail goes in <code>try</code>; the recovery goes in <code>except</code>. Catch the
+        <strong>specific</strong> exception you expect &mdash; a bare <code>except:</code> swallows <em>everything</em>
+        (including typos and Ctrl-C), hiding bugs you'd want to see.
+    </p>
+
+    <h3>The full shape</h3>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Block</th>
+            <th>Runs when</th>
+        </tr>
+        <tr>
+            <td><code>try</code></td>
+            <td>always &mdash; the risky code</td>
+        </tr>
+        <tr>
+            <td bgcolor="#ff9999"><code>except</code></td>
+            <td>an error of that type occurred</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightgreen"><code>else</code></td>
+            <td>no error occurred</td>
+        </tr>
+        <tr>
+            <td bgcolor="lightblue"><code>finally</code></td>
+            <td><strong>always</strong> &mdash; error or not (cleanup)</td>
+        </tr>
+    </table>
+    <pre><code><span style="color:#0099ff">try</span>:
+    f = <span style="color:#0099ff">open</span>(<span style="color:#cc6600">"data.txt"</span>)
+<span style="color:#0099ff">except</span> FileNotFoundError:
+    <span style="color:#0099ff">print</span>(<span style="color:#cc6600">"No file."</span>)
+<span style="color:#0099ff">else</span>:
+    <span style="color:#0099ff">print</span>(f.read())     <span style="color:#999"># only if open() succeeded</span>
+<span style="color:#0099ff">finally</span>:
+    <span style="color:#0099ff">print</span>(<span style="color:#cc6600">"done"</span>)        <span style="color:#999"># cleanup, no matter what</span></code></pre>
+
+    <h3>Raising your own</h3>
+    <pre><code><span style="color:#0099ff">def</span> withdraw(balance, amount):
+    <span style="color:#0099ff">if</span> amount &gt; balance:
+        <span style="color:#0099ff">raise</span> ValueError(<span style="color:#cc6600">"insufficient funds"</span>)
+    <span style="color:#0099ff">return</span> balance - amount</code></pre>
+    <p>
+        Use <code>raise</code> to signal a problem your own code detects &mdash; better to fail loudly at the source than
+        return a wrong answer. The caller can then <code>try/except</code> it. (Common built-ins you'll meet:
+        <code>ValueError</code>, <code>TypeError</code>, <code>KeyError</code>, <code>IndexError</code>,
+        <code>ZeroDivisionError</code>.)
+    </p>
+
+    <p>
+        Back to the <a href="./index.html">contents</a>.
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+  <script src="/comments.js" defer></script>
+</body>
+
+</html>
