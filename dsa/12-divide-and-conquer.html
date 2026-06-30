@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -44,6 +45,76 @@
         <a href="./4-sorting-algorithms.html">merge sort / quicksort</a> (two half-size subproblems &rarr; O(n log n)).
         This page is about how to <em>analyze</em> any such algorithm.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        Merge sort as a recursion tree. <strong>Divide</strong> walks top-down, halving the array until each piece is a
+        single element (trivially sorted); then <strong>combine</strong> merges sorted halves back up the tree (green),
+        sorted slice by sorted slice, until the whole array is ordered at the root. <strong>Reset</strong> shuffles.
+    </p>
+    <div class="sim" id="dc-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var arr = []; for (var i = 0; i < 8; i++) arr.push(Math.floor(Math.random() * 90) + 10);
+            var nodes = [], idc = 0;
+            function mk(lo, hi, level) {
+                var nd = { id: idc++, lo: lo, hi: hi, level: level, vals: arr.slice(lo, hi), sorted: null, kids: [] };
+                nodes.push(nd);
+                if (hi - lo > 1) { var mid = (lo + hi) >> 1; nd.kids = [mk(lo, mid, level + 1), mk(mid, hi, level + 1)]; }
+                return nd;
+            }
+            var root = mk(0, arr.length, 0);
+            var leaf = 0, maxL = 0;
+            (function lay(nd) { maxL = Math.max(maxL, nd.level); if (nd.kids.length) { nd.kids.forEach(lay); nd.x = (nd.kids[0].x + nd.kids[1].x) / 2; } else { nd.x = leaf++; } })(root);
+            var nLeaf = leaf;
+
+            var frames = [];
+            function snap(active, mode, cap) {
+                frames.push({ state: nodes.map(function (n) { return { id: n.id, vals: (n.sorted || n.vals).slice(), sorted: !!n.sorted }; }), active: active, mode: mode, caption: cap });
+            }
+            (function run(nd) {
+                snap(nd.id, 'divide', 'Divide [' + nd.lo + ',' + nd.hi + ') → ' + (nd.kids.length ? 'split into two halves.' : 'single element — already sorted.'));
+                if (nd.kids.length) {
+                    run(nd.kids[0]); run(nd.kids[1]);
+                    var a = nd.kids[0].sorted, b = nd.kids[1].sorted, out = [], i = 0, j = 0;
+                    while (i < a.length && j < b.length) out.push(a[i] <= b[j] ? a[i++] : b[j++]);
+                    while (i < a.length) out.push(a[i++]); while (j < b.length) out.push(b[j++]);
+                    nd.sorted = out;
+                    snap(nd.id, 'merge', 'Merge sorted halves → [' + out.join(' ') + '].');
+                } else nd.sorted = nd.vals.slice();
+            })(root);
+            snap(-1, 'done', 'Sorted: [' + root.sorted.join(' ') + ']. log n levels × O(n) per level = O(n log n).');
+
+            var H = 14 + maxL * 18;
+            function render(fr) {
+                var W = 100, sx = function (x) { return 7 + x * (86 / Math.max(1, nLeaf - 1)); };
+                var s = '<svg class="sim-svg" viewBox="0 0 ' + W + ' ' + H + '" width="100%">';
+                nodes.forEach(function (nd) {
+                    if (nd.kids.length) nd.kids.forEach(function (k) {
+                        s += '<line x1="' + sx(nd.x) + '" y1="' + (8 + nd.level * 18) + '" x2="' + sx(k.x) + '" y2="' + (8 + k.level * 18) + '" class="edge"/>';
+                    });
+                });
+                nodes.forEach(function (nd) {
+                    var st = fr.state[nd.id], px = sx(nd.x), py = 8 + nd.level * 18;
+                    var txt = st.vals.join(' '), w = Math.max(11, txt.length * 3.4 + 4);
+                    var cls = 'node';
+                    if (nd.id === fr.active) cls += fr.mode === 'merge' ? ' hl-green' : ' hl-orange';
+                    else if (st.sorted) cls += ' hl-green'; else cls += ' hl-blue';
+                    s += '<rect x="' + (px - w / 2) + '" y="' + (py - 5) + '" width="' + w + '" height="10" rx="2" class="' + cls + '"/>';
+                    s += '<text x="' + px + '" y="' + py + '" class="nlabel" style="font-size:5px">' + txt + '</text>';
+                });
+                s += '</svg>'; stage.innerHTML = s;
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'dividing' },
+                { cls: 'hl-blue', label: 'waiting' },
+                { cls: 'hl-green', label: 'merged (sorted)' }
+            ] };
+        }
+        DSASim({ mount: 'dc-sim', setup: build });
+    })();
+    </script>
 
     <h3>Recurrence relations</h3>
     <p>

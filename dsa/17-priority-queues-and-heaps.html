@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -149,6 +150,84 @@
 };
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        A binary <strong>max-heap</strong> as a complete tree, with its backing array below (index <code>i</code> → parent
+        <code>i/2</code>, children <code>2i</code>, <code>2i+1</code>). Each Insert drops a value at the next leaf and
+        <strong>sifts up</strong> until its parent is bigger; then one ExtractMax swaps the root out and
+        <strong>sifts down</strong>. <strong>Reset</strong> picks new values.
+    </p>
+    <div class="sim" id="heap-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var maxN = 7;
+            var pos = { 1: [50, 11], 2: [28, 33], 3: [72, 33], 4: [15, 55], 5: [41, 55], 6: [59, 55], 7: [85, 55] };
+            var nodes = [], edges = [];
+            for (var i = 1; i <= maxN; i++) { nodes.push({ id: i, x: pos[i][0], y: pos[i][1], label: '' }); if (i > 1) edges.push({ a: (i >> 1), b: i }); }
+            stage.innerHTML = ''; stage.style.display = 'block';
+            var treeDiv = document.createElement('div'), arrDiv = document.createElement('div');
+            arrDiv.style.cssText = 'display:flex;gap:4px;justify-content:center;margin-top:10px;flex-wrap:wrap;';
+            stage.appendChild(treeDiv); stage.appendChild(arrDiv);
+            var G = DSASim.graphSVG(treeDiv, nodes, edges, { w: 100, h: 66, r: 7 });
+            var acells = [];
+            for (var k = 1; k <= maxN; k++) {
+                var col = document.createElement('div'); col.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+                var c = document.createElement('div'); c.className = 'sim-cell';
+                var idx = document.createElement('div'); idx.style.cssText = 'font-size:.6rem;color:#999;'; idx.textContent = k;
+                col.appendChild(c); col.appendChild(idx); arrDiv.appendChild(col); acells.push(c);
+            }
+
+            var h = [null], frames = [];
+            function snap(marks, cap) { frames.push({ h: h.slice(), marks: marks || {}, caption: cap }); }
+            var pool = []; while (pool.length < maxN) { var v = Math.floor(Math.random() * 90) + 10; if (pool.indexOf(v) < 0) pool.push(v); }
+            snap({}, 'Empty max-heap. Insert: ' + pool.join(', ') + '.');
+            pool.forEach(function (x) {
+                h.push(x); var i = h.length - 1, m = {}; m[i] = 'hl-orange';
+                snap(m, 'Insert ' + x + ' at index ' + i + ' (next leaf). Sift up.');
+                while (i > 1) {
+                    var p = i >> 1, mc = {}; mc[i] = 'hl-orange'; mc[p] = 'hl-blue';
+                    snap(mc, 'Compare ' + h[i] + ' (idx ' + i + ') with parent ' + h[p] + ' (idx ' + p + ').');
+                    if (h[i] > h[p]) { var t = h[i]; h[i] = h[p]; h[p] = t; var ms = {}; ms[p] = 'hl-orange'; ms[i] = 'hl-blue'; snap(ms, h[p] + ' &gt; ' + h[i] + ' → swap up.'); i = p; }
+                    else { var mo = {}; mo[i] = 'hl-green'; snap(mo, 'Parent ≥ child → heap property holds.'); break; }
+                }
+            });
+            var n = h.length - 1;
+            if (n >= 2) {
+                var mm = {}; mm[1] = 'hl-orange'; mm[n] = 'hl-blue';
+                snap(mm, 'ExtractMax: max = ' + h[1] + ' at the root. Swap it with the last leaf (idx ' + n + ').');
+                var tt = h[1]; h[1] = h[n]; h[n] = tt; var top = h.pop(); n = h.length - 1;
+                snap({}, 'Removed ' + top + '. Sift the new root down.');
+                var i2 = 1;
+                while (2 * i2 <= n) {
+                    var j = 2 * i2; if (j + 1 <= n && h[j + 1] > h[j]) j++;
+                    var mc2 = {}; mc2[i2] = 'hl-orange'; mc2[j] = 'hl-blue';
+                    snap(mc2, 'Compare ' + h[i2] + ' with larger child ' + h[j] + ' (idx ' + j + ').');
+                    if (h[i2] >= h[j]) { var mo2 = {}; mo2[i2] = 'hl-green'; snap(mo2, 'Parent ≥ both children → done.'); break; }
+                    var s = h[i2]; h[i2] = h[j]; h[j] = s; var ms2 = {}; ms2[j] = 'hl-orange'; ms2[i2] = 'hl-blue'; snap(ms2, 'Swap down.'); i2 = j;
+                }
+                snap({}, 'Heap valid again — the new max sits at the root. Insert &amp; extract are both O(log n).');
+            }
+
+            function render(fr) {
+                var size = fr.h.length - 1;
+                nodes.forEach(function (nd) {
+                    if (nd.id <= size) { G.setNode(nd.id, fr.marks[nd.id] || ''); G.setLabel(nd.id, fr.h[nd.id]); }
+                    else { G.setNode(nd.id, 'hl-hidden'); G.setLabel(nd.id, ''); }
+                });
+                edges.forEach(function (e) { G.setEdge(e.a, e.b, e.b <= size ? '' : 'hl-hidden'); });
+                acells.forEach(function (c, kk) { var ix = kk + 1; if (ix <= size) { c.textContent = fr.h[ix]; c.className = 'sim-cell ' + (fr.marks[ix] || ''); } else { c.textContent = ''; c.className = 'sim-cell hl-dim'; } });
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'sifting node' },
+                { cls: 'hl-blue', label: 'compared with' },
+                { cls: 'hl-green', label: 'settled' }
+            ] };
+        }
+        DSASim({ mount: 'heap-sim', setup: build });
+    })();
+    </script>
 
     <h3>BuildHeap &amp; HeapSort</h3>
     <p>

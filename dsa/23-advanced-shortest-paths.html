@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -93,6 +94,101 @@
         <strong>contraction hierarchies</strong> add an offline preprocessing pass &mdash; both are long enough that in
         practice you lean on a library (see notes).
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        A* on a grid (4-directional, Manhattan <code>h</code>). <strong>S</strong>&rarr;<strong>G</strong>, black cells
+        are walls; each cell shows its <code>f = g + h</code>. Watch the frontier (blue) drive <em>toward</em> the goal
+        rather than fanning out evenly the way Dijkstra would. <strong>Reset</strong> drops a fresh maze.
+    </p>
+    <div class="sim" id="astar-sim"></div>
+    <script>
+    (function () {
+        var R = 9, C = 15;
+        function build(stage) {
+            var grid, start = { r: R >> 1, c: 1 }, goal = { r: R >> 1, c: C - 2 }, frames;
+            function key(r, c) { return r * C + c; }
+            function h(r, c) { return Math.abs(r - goal.r) + Math.abs(c - goal.c); }
+
+            function astarFrames() {
+                var g = {}; g[key(start.r, start.c)] = 0;
+                var came = {}, open = [{ r: start.r, c: start.c, f: h(start.r, start.c) }];
+                var inOpen = {}; inOpen[key(start.r, start.c)] = 1;
+                var closed = {}, dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]], fr = [];
+                function fmap() { var m = {}; for (var k in g) m[k] = g[k] + h(Math.floor(k / C), k % C); return m; }
+                function snap(cur, cap, path) {
+                    fr.push({ open: Object.assign({}, inOpen), closed: Object.assign({}, closed), current: cur, f: fmap(), path: path || null, caption: cap });
+                }
+                snap(null, 'Start at S. Frontier = {S}. Each cell shows f = g + h.', null);
+                while (open.length) {
+                    var bi = 0;
+                    for (var i = 1; i < open.length; i++) {
+                        var a = open[i], b = open[bi];
+                        if (a.f < b.f || (a.f === b.f && h(a.r, a.c) < h(b.r, b.c))) bi = i;
+                    }
+                    var cur = open.splice(bi, 1)[0]; delete inOpen[key(cur.r, cur.c)];
+                    if (cur.r === goal.r && cur.c === goal.c) {
+                        var path = [], k = key(cur.r, cur.c);
+                        while (k !== undefined) { path.push(k); k = came[k]; }
+                        snap(key(cur.r, cur.c), 'Goal reached. Path = ' + g[key(goal.r, goal.c)] + ' steps; ' + Object.keys(closed).length + ' nodes expanded.', path);
+                        return fr;
+                    }
+                    closed[key(cur.r, cur.c)] = 1;
+                    var pushed = 0, cg = g[key(cur.r, cur.c)];
+                    for (var d = 0; d < 4; d++) {
+                        var nr = cur.r + dirs[d][0], nc = cur.c + dirs[d][1];
+                        if (nr < 0 || nr >= R || nc < 0 || nc >= C || grid[nr][nc] === 1) continue;
+                        var nk = key(nr, nc); if (closed[nk]) continue;
+                        var t = cg + 1;
+                        if (!(nk in g) || t < g[nk]) {
+                            g[nk] = t; came[nk] = key(cur.r, cur.c);
+                            var ex = null; for (var e = 0; e < open.length; e++) if (open[e].r === nr && open[e].c === nc) { ex = open[e]; break; }
+                            if (ex) ex.f = t + h(nr, nc); else { open.push({ r: nr, c: nc, f: t + h(nr, nc) }); inOpen[nk] = 1; }
+                            pushed++;
+                        }
+                    }
+                    snap(key(cur.r, cur.c), 'Expand (' + cur.r + ',' + cur.c + ') f=' + (cg + h(cur.r, cur.c)) + ' (g=' + cg + '+h=' + h(cur.r, cur.c) + '). ' + (pushed ? 'Queued ' + pushed + ' neighbour' + (pushed > 1 ? 's' : '') + '.' : 'No new neighbours.'), null);
+                }
+                snap(null, 'Frontier exhausted — goal unreachable.', null);
+                return fr;
+            }
+
+            for (var attempt = 0; attempt < 200; attempt++) {
+                grid = [];
+                for (var r = 0; r < R; r++) { grid[r] = []; for (var c = 0; c < C; c++) grid[r][c] = Math.random() < 0.28 ? 1 : 0; }
+                grid[start.r][start.c] = 0; grid[goal.r][goal.c] = 0;
+                var f = astarFrames();
+                if (f[f.length - 1].path) { frames = f; break; }
+                frames = f;
+            }
+
+            var G = DSASim.grid(stage, R, C, 36);
+            function render(fr) {
+                for (var r = 0; r < R; r++) for (var c = 0; c < C; c++) {
+                    var k = key(r, c), el = G.at(r, c), cls = 'sim-cell', label = '';
+                    if (grid[r][c] === 1) cls += ' hl-dark';
+                    else {
+                        var fv = fr.f[k]; if (fv !== undefined) label = fv;
+                        if (fr.open[k]) cls += ' hl-blue';
+                        if (fr.closed[k]) cls += ' hl-green';
+                        if (fr.path && fr.path.indexOf(k) !== -1) cls += ' hl-gold';
+                        if (k === fr.current) cls += ' hl-orange';
+                    }
+                    if (r === start.r && c === start.c) { cls += ' hl-start'; label = 'S'; }
+                    if (r === goal.r && c === goal.c) { cls += ' hl-goal'; label = 'G'; }
+                    el.className = cls; el.textContent = label;
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'frontier (open)' },
+                { cls: 'hl-green', label: 'expanded (closed)' },
+                { cls: 'hl-orange', label: 'expanding now' },
+                { cls: 'hl-gold', label: 'final path' }
+            ] };
+        }
+        DSASim({ mount: 'astar-sim', setup: build });
+    })();
+    </script>
 
     <h3>Contraction hierarchies</h3>
     <p>

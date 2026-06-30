@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -108,6 +109,65 @@ vector&lt;<span style="color:#0099ff">int</span>&gt; reconstruct(<span style="co
         Each vertex is enqueued <strong>at most once</strong> (its distance leaves &infin; the moment it's found and never
         re-enters the queue), so every edge is scanned at most twice &mdash; <strong>O(|V| + |E|)</strong>, linear.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        BFS from <strong>S</strong> on a grid, one <strong>distance layer</strong> at a time. Each step discovers every
+        cell exactly one edge further out (orange), all simultaneously &mdash; that synchronised ripple is why the first
+        time you reach a cell is along a shortest path. The number is its distance. <strong>Reset</strong> redraws.
+    </p>
+    <div class="sim" id="bfs-sim"></div>
+    <script>
+    (function () {
+        var R = 9, C = 15;
+        function build(stage) {
+            var grid = [], start = { r: R >> 1, c: 1 };
+            for (var r = 0; r < R; r++) { grid[r] = []; for (var c = 0; c < C; c++) grid[r][c] = Math.random() < 0.22 ? 1 : 0; }
+            grid[start.r][start.c] = 0;
+            function key(r, c) { return r * C + c; }
+            var dist = {}; dist[key(start.r, start.c)] = 0;
+            var frontier = [start], d = 0, frames = [];
+            var dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            function snap(layer, cap) { frames.push({ dist: Object.assign({}, dist), layer: layer, caption: cap }); }
+            snap(0, 'Layer 0 = {S}, distance 0. The source is the only thing at distance 0.');
+            while (frontier.length) {
+                var next = [];
+                for (var i = 0; i < frontier.length; i++) {
+                    var u = frontier[i];
+                    for (var k = 0; k < 4; k++) {
+                        var nr = u.r + dirs[k][0], nc = u.c + dirs[k][1];
+                        if (nr < 0 || nr >= R || nc < 0 || nc >= C || grid[nr][nc] === 1) continue;
+                        var nk = key(nr, nc);
+                        if (!(nk in dist)) { dist[nk] = d + 1; next.push({ r: nr, c: nc }); }
+                    }
+                }
+                if (next.length) { d++; snap(d, 'Layer ' + d + ': ' + next.length + ' new cell' + (next.length > 1 ? 's' : '') + ' at distance ' + d + ' (all discovered at once).'); }
+                frontier = next;
+            }
+            snap(d, 'Done — every reachable cell labelled with its shortest-path distance from S.');
+
+            var G = DSASim.grid(stage, R, C, 36);
+            function render(fr) {
+                for (var r = 0; r < R; r++) for (var c = 0; c < C; c++) {
+                    var k = key(r, c), el = G.at(r, c), cls = 'sim-cell', label = '';
+                    if (grid[r][c] === 1) cls += ' hl-dark';
+                    else if (k in fr.dist) {
+                        label = fr.dist[k];
+                        cls += fr.dist[k] === fr.layer ? ' hl-orange' : ' hl-green';
+                    } else cls += ' hl-dim';
+                    if (r === start.r && c === start.c) { cls = 'sim-cell hl-start'; label = 'S'; }
+                    el.className = cls; el.textContent = label;
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'newest layer' },
+                { cls: 'hl-green', label: 'reached earlier' },
+                { cls: 'hl-dim', label: 'not yet reached' }
+            ] };
+        }
+        DSASim({ mount: 'bfs-sim', setup: build });
+    })();
+    </script>
 
     <h3>Shortest-path tree</h3>
     <p>

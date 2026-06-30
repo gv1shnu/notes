@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -81,6 +82,55 @@
 };
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        Repeated <code>pushBack</code> on a dynamic array. Most pushes just fill a spare slot (O(1)); when capacity runs
+        out, watch it <strong>double</strong> and copy everything over (the rare O(n) step, shown in green).
+        <strong>Reset</strong> starts over.
+    </p>
+    <div class="sim" id="arr-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            stage.style.display = 'flex'; stage.style.flexWrap = 'wrap';
+            stage.style.gap = '4px'; stage.style.justifyContent = 'center';
+            var cap = 1, size = 0, data = [''], frames = [];
+            function snap(marks, cap2) { frames.push({ data: data.slice(), size: size, cap: cap, marks: marks || {}, caption: cap2 }); }
+            snap({}, 'Empty: size=0, capacity=1.');
+            for (var p = 1; p <= 10; p++) {
+                var x = Math.floor(Math.random() * 90) + 10;
+                if (size === cap) {
+                    var oldcap = cap, copyMarks = {};
+                    for (var i = 0; i < size; i++) copyMarks[i] = 'hl-green';
+                    cap = cap * 2; while (data.length < cap) data.push('');
+                    snap(copyMarks, 'Full (cap ' + oldcap + '). Grow → ' + cap + ': allocate + copy ' + size + ' items — O(' + size + ').');
+                }
+                data[size] = x; size++;
+                var m = {}; m[size - 1] = 'hl-orange';
+                snap(m, 'pushBack ' + x + ' → slot ' + (size - 1) + ' (O(1)). size=' + size + ', cap=' + cap + '.');
+            }
+            function render(fr) {
+                stage.innerHTML = '';
+                for (var i = 0; i < fr.cap; i++) {
+                    var e = document.createElement('div'); e.className = 'sim-cell';
+                    if (fr.marks[i]) e.classList.add(fr.marks[i]);
+                    else if (i < fr.size) e.classList.add('hl-blue');
+                    else e.classList.add('hl-dim');
+                    e.textContent = fr.data[i] === '' ? '' : fr.data[i];
+                    stage.appendChild(e);
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'used' },
+                { cls: 'hl-orange', label: 'just written' },
+                { cls: 'hl-green', label: 'copied on resize' },
+                { cls: 'hl-dim', label: 'spare capacity' }
+            ] };
+        }
+        DSASim({ mount: 'arr-sim', setup: build });
+    })();
+    </script>
 
     <h3>Amortized analysis (aggregate method)</h3>
     <p>

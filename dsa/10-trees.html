@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -83,6 +84,69 @@
 }
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        Keys inserted into a <strong>BST</strong> one at a time &mdash; each walks down (&lt; goes left, &gt; goes right)
+        and attaches where it falls off. Then an <strong>in-order</strong> traversal (left, node, right) reads the keys
+        back out, and they come out <strong>sorted</strong> &mdash; that's the BST invariant paying off.
+        <strong>Reset</strong> shuffles the insert order (different shape, same sorted output).
+    </p>
+    <div class="sim" id="bst-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var vals = [50, 30, 70, 20, 40, 60, 80];
+            for (var s = vals.length - 1; s > 0; s--) { var t = Math.floor(Math.random() * (s + 1)); var tmp = vals[s]; vals[s] = vals[t]; vals[t] = tmp; }
+            var root = null;
+            function ins(nd, key, par) { if (!nd) return { key: key, left: null, right: null, parent: par }; if (key < nd.key) nd.left = ins(nd.left, key, nd); else nd.right = ins(nd.right, key, nd); return nd; }
+            vals.forEach(function (k) { root = ins(root, k, null); });
+            var inList = [];
+            (function ino(nd) { if (!nd) return; ino(nd.left); nd.rank = inList.length; inList.push(nd); ino(nd.right); })(root);
+            var maxD = 0;
+            (function dep(nd, d) { if (!nd) return; nd.depth = d; maxD = Math.max(maxD, d); dep(nd.left, d + 1); dep(nd.right, d + 1); })(root, 0);
+            var n = inList.length;
+            var nodes = inList.map(function (nd) { return { id: nd.key, x: 8 + nd.rank * (84 / Math.max(1, n - 1)), y: 9 + nd.depth * 15, label: nd.key }; });
+            var edges = inList.filter(function (nd) { return nd.parent; }).map(function (nd) { return { a: nd.parent.key, b: nd.key }; });
+
+            var inserted = {}, frames = [];
+            function snap(active, mode, visited, cap) { frames.push({ ins: Object.assign({}, inserted), active: active, mode: mode, visited: visited.slice(), caption: cap }); }
+            snap(-1, '', [], 'Empty tree. Insert keys: ' + vals.join(', ') + '.');
+            vals.forEach(function (k) {
+                inserted[k] = 1;
+                var node = inList.filter(function (x) { return x.key === k; })[0];
+                var where = node.parent ? ((k < node.parent.key ? 'left' : 'right') + ' child of ' + node.parent.key) : 'the root';
+                snap(k, 'insert', [], 'Insert ' + k + ' → becomes ' + where + '.');
+            });
+            var visited = [];
+            inList.forEach(function (nd) {
+                visited.push(nd.key);
+                snap(nd.key, 'visit', visited, 'In-order visit ' + nd.key + ' → sorted so far: ' + visited.join(' '));
+            });
+            snap(-1, 'done', visited, 'In-order traversal = ' + visited.join(' ') + ' — sorted, guaranteed.');
+
+            var G = DSASim.graphSVG(stage, nodes, edges, { w: 100, h: 18 + maxD * 15, r: 7 });
+            function render(fr) {
+                nodes.forEach(function (nd) {
+                    if (!fr.ins[nd.id]) { G.setNode(nd.id, 'hl-hidden'); G.setLabel(nd.id, ''); return; }
+                    G.setLabel(nd.id, nd.id);
+                    var cls = '';
+                    if (nd.id === fr.active) cls = fr.mode === 'visit' ? 'hl-orange' : 'hl-green';
+                    else if (fr.visited.indexOf(nd.id) !== -1) cls = 'hl-green';
+                    else cls = 'hl-blue';
+                    G.setNode(nd.id, cls);
+                });
+                edges.forEach(function (e) { G.setEdge(e.a, e.b, (fr.ins[e.a] && fr.ins[e.b]) ? '' : 'hl-hidden'); });
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'in tree' },
+                { cls: 'hl-green', label: 'inserted / visited' },
+                { cls: 'hl-orange', label: 'visiting now' }
+            ] };
+        }
+        DSASim({ mount: 'bst-sim', setup: build });
+    })();
+    </script>
 
     <h3>Binary search trees</h3>
     <p>

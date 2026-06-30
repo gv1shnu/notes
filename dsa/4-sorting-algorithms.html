@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -149,6 +150,95 @@
         A random pivot (shuffle, or pick a random index to swap in) makes the worst case practically impossible; in
         practice quicksort is the fastest general sort (cache-friendly, in place).
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        Bars are array values; height is the number. Pick an algorithm and step through &mdash; watch what each one
+        actually <em>does</em> with the data. <strong>Reset</strong> shuffles a fresh array.
+    </p>
+    <p style="margin-bottom:.5rem;">
+        <label style="font-size:.9rem;color:var(--muted);">Algorithm
+            <select id="sort-algo" style="font-family:'Inter',sans-serif;font-size:.85rem;padding:.25rem .4rem;">
+                <option value="selection">Selection sort &mdash; O(n&sup2;)</option>
+                <option value="quick">Quicksort &mdash; O(n log n) avg</option>
+            </select>
+        </label>
+    </p>
+    <div class="sim" id="sort-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var algo = document.getElementById('sort-algo').value;
+            var n = 9, a = [];
+            for (var t = 0; t < n; t++) a.push(Math.floor(Math.random() * 36) + 5);
+            var maxV = Math.max.apply(null, a);
+            var bars = DSASim.bars(stage, a, maxV, 150);
+            var frames = [], done = [];
+
+            function snap(marks, cap) { frames.push({ arr: a.slice(), marks: marks || {}, caption: cap }); }
+
+            if (algo === 'selection') {
+                snap({}, 'Unsorted. Selection sort grows a sorted prefix on the left.');
+                for (var i = 0; i < n; i++) {
+                    var m = i;
+                    for (var j = i + 1; j < n; j++) {
+                        var mk = {}; for (var k = 0; k < i; k++) mk[k] = 'hl-green';
+                        mk[m] = 'hl-gold'; mk[j] = 'hl-orange';
+                        snap(mk, 'Scan A[' + j + ']=' + a[j] + ' against current min A[' + m + ']=' + a[m] + '.');
+                        if (a[j] < a[m]) m = j;
+                    }
+                    var sw = {}; for (var k2 = 0; k2 < i; k2++) sw[k2] = 'hl-green';
+                    sw[i] = 'hl-red'; sw[m] = 'hl-red';
+                    snap(sw, 'Smallest of the rest is ' + a[m] + ' → swap into slot ' + i + '.');
+                    var tmp = a[i]; a[i] = a[m]; a[m] = tmp;
+                    var lk = {}; for (var k3 = 0; k3 <= i; k3++) lk[k3] = 'hl-green';
+                    snap(lk, 'Slot ' + i + ' locked.');
+                }
+            } else {
+                done = new Array(n).fill(false);
+                var baseDone = function () { var m = {}; for (var k = 0; k < n; k++) if (done[k]) m[k] = 'hl-green'; return m; };
+                var partition = function (lo, hi) {
+                    var pivot = a[hi], i = lo;
+                    for (var j = lo; j < hi; j++) {
+                        var mk = baseDone(); mk[hi] = 'hl-gold'; mk[j] = 'hl-orange'; if (i !== j && i !== hi) mk[i] = 'hl-blue';
+                        snap(mk, 'Partition [' + lo + '..' + hi + '], pivot=' + pivot + '. Is A[' + j + ']=' + a[j] + ' < ' + pivot + '?');
+                        if (a[j] < pivot) { var t = a[i]; a[i] = a[j]; a[j] = t; i++; }
+                    }
+                    var t2 = a[i]; a[i] = a[hi]; a[hi] = t2; done[i] = true;
+                    var mk2 = baseDone(); mk2[i] = 'hl-green';
+                    snap(mk2, 'Pivot ' + pivot + ' settles at index ' + i + ' — its final spot.');
+                    return i;
+                };
+                var qs = function (lo, hi) {
+                    if (lo > hi) return;
+                    if (lo === hi) { done[lo] = true; return; }
+                    var p = partition(lo, hi); qs(lo, p - 1); qs(p + 1, hi);
+                };
+                snap({}, 'Unsorted. Quicksort partitions around a pivot (the last element).');
+                qs(0, n - 1);
+            }
+            var fm = {}; for (var f = 0; f < n; f++) fm[f] = 'hl-green';
+            snap(fm, 'Sorted.');
+
+            function render(fr) {
+                fr.arr.forEach(function (v, i) {
+                    var b = bars[i];
+                    b.style.height = Math.max(14, (v / maxV) * 150) + 'px';
+                    b.textContent = v;
+                    b.className = 'sim-bar ' + (fr.marks[i] || '');
+                });
+            }
+            var legend = algo === 'selection'
+                ? [{ cls: 'hl-orange', label: 'scanning' }, { cls: 'hl-gold', label: 'current min' }, { cls: 'hl-green', label: 'sorted' }]
+                : [{ cls: 'hl-gold', label: 'pivot' }, { cls: 'hl-orange', label: 'comparing' }, { cls: 'hl-blue', label: 'boundary i' }, { cls: 'hl-green', label: 'placed' }];
+            return { frames: frames, render: render, legend: legend };
+        }
+        DSASim({ mount: 'sort-sim', setup: build });
+        document.getElementById('sort-algo').addEventListener('change', function () {
+            document.querySelector('#sort-sim [data-act=reset]').click();
+        });
+    })();
+    </script>
 
     <h3>The n log n wall</h3>
     <p>

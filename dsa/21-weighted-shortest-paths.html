@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -96,6 +97,67 @@ vector&lt;<span style="color:#0099ff">long long</span>&gt; dijkstra(<span style=
 }
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        Dijkstra from vertex 0 on a weighted graph. Each step <strong>greedily settles</strong> the nearest unfinalized
+        vertex (orange → green, its label is the final distance) and <strong>relaxes</strong> its edges (gold), lowering
+        neighbours' tentative distances. Once green, a vertex is done. <strong>Reset</strong> replays.
+    </p>
+    <div class="sim" id="dij-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var nodes = [{ id: 0, x: 10, y: 30 }, { id: 1, x: 38, y: 12 }, { id: 2, x: 38, y: 48 },
+                         { id: 3, x: 66, y: 12 }, { id: 4, x: 66, y: 48 }, { id: 5, x: 92, y: 30 }];
+            var elist = [[0, 1, 4], [0, 2, 1], [2, 1, 2], [1, 3, 5], [2, 4, 8], [3, 5, 3], [4, 5, 6], [3, 4, 2]];
+            var edges = elist.map(function (e) { return { a: e[0], b: e[1], w: e[2] }; });
+            var adj = {}; nodes.forEach(function (n) { adj[n.id] = []; });
+            elist.forEach(function (e) { adj[e[0]].push([e[1], e[2]]); adj[e[1]].push([e[0], e[2]]); });
+
+            var INF = Infinity, dist = {}, done = {};
+            nodes.forEach(function (n) { dist[n.id] = INF; });
+            dist[0] = 0;
+            var frames = [];
+            function lbl(v) { return dist[v] === INF ? '∞' : dist[v]; }
+            function snap(active, edge, cap) {
+                var ns = {}, ls = {};
+                nodes.forEach(function (n) { ls[n.id] = lbl(n.id); if (done[n.id]) ns[n.id] = 'hl-green'; else if (dist[n.id] < INF) ns[n.id] = 'hl-blue'; });
+                if (active !== null) ns[active] = 'hl-orange';
+                frames.push({ ns: ns, ls: ls, edge: edge, caption: cap });
+            }
+            snap(null, null, 'dist[0]=0, everything else ∞. Repeatedly settle the closest unfinished vertex.');
+            while (true) {
+                var u = -1, best = INF;
+                nodes.forEach(function (n) { if (!done[n.id] && dist[n.id] < best) { best = dist[n.id]; u = n.id; } });
+                if (u === -1) break;
+                done[u] = 1;
+                snap(u, null, 'Settle ' + u + ' at distance ' + dist[u] + ' — now final. Relax its edges.');
+                adj[u].forEach(function (e) {
+                    var v = e[0], w = e[1];
+                    if (!done[v] && dist[u] + w < dist[v]) {
+                        dist[v] = dist[u] + w;
+                        snap(u, [u, v], 'Relax ' + u + '→' + v + ' (w=' + w + '): dist[' + v + '] ↓ ' + dist[v] + '.');
+                    }
+                });
+            }
+            snap(null, null, 'Done. Every label is the shortest distance from 0.');
+
+            var G = DSASim.graphSVG(stage, nodes, edges, { w: 100, h: 60, r: 8 });
+            function render(fr) {
+                nodes.forEach(function (n) { G.setNode(n.id, fr.ns[n.id] || ''); G.setLabel(n.id, fr.ls[n.id]); });
+                edges.forEach(function (e) { G.setEdge(e.a, e.b, ''); });
+                if (fr.edge) G.setEdge(fr.edge[0], fr.edge[1], 'hl-gold');
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'settling' },
+                { cls: 'hl-blue', label: 'reached (tentative)' },
+                { cls: 'hl-green', label: 'finalized' }
+            ] };
+        }
+        DSASim({ mount: 'dij-sim', setup: build });
+    })();
+    </script>
 
     <h3>Bellman-Ford &mdash; negative weights allowed</h3>
     <p>

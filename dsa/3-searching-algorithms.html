@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -83,6 +84,64 @@
         keep the array sorted &mdash; so callers learn more than a bare "not found". (Note the C++ overflow-safe midpoint
         <code>lo + (hi - lo) / 2</code>; Python's unbounded ints make <code>(lo + hi) // 2</code> safe.)
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        Binary search for a key in a sorted array. The live window is <code>lo&hellip;hi</code>; each step probes the
+        midpoint (orange) and throws away the half that can't contain the key (dimmed). <strong>Reset</strong> picks a
+        fresh array and key &mdash; sometimes absent, so you can watch <code>lo</code> close in on the insertion point.
+    </p>
+    <div class="sim" id="bs-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var n = 12, vals = [], x = Math.floor(Math.random() * 6) + 1;
+            for (var i = 0; i < n; i++) { x += Math.floor(Math.random() * 5) + 1; vals.push(x); }
+            var present = Math.random() < 0.7;
+            var target = vals[Math.floor(Math.random() * n)];
+            if (!present) { target += 1; while (vals.indexOf(target) !== -1) target++; }
+            var cells = DSASim.cells(stage, vals);
+
+            var frames = [], lo = 0, hi = n - 1, found = -1;
+            frames.push({ lo: 0, hi: n - 1, mid: -1, found: -1,
+                caption: 'Searching for ' + target + '. lo=0, hi=' + (n - 1) + '.' });
+            while (lo <= hi) {
+                var mid = (lo + hi) >> 1;
+                if (vals[mid] === target) {
+                    frames.push({ lo: lo, hi: hi, mid: mid, found: mid,
+                        caption: 'A[' + mid + ']=' + vals[mid] + ' = ' + target + ' → found at index ' + mid + '.' });
+                    found = mid; break;
+                } else if (target < vals[mid]) {
+                    frames.push({ lo: lo, hi: hi, mid: mid, found: -1,
+                        caption: 'A[' + mid + ']=' + vals[mid] + ' > ' + target + ' → discard right, hi=' + (mid - 1) + '.' });
+                    hi = mid - 1;
+                } else {
+                    frames.push({ lo: lo, hi: hi, mid: mid, found: -1,
+                        caption: 'A[' + mid + ']=' + vals[mid] + ' < ' + target + ' → discard left, lo=' + (mid + 1) + '.' });
+                    lo = mid + 1;
+                }
+            }
+            if (found < 0) frames.push({ lo: lo, hi: hi, mid: -1, found: -1,
+                caption: target + ' is absent. lo>hi → insertion point is index ' + lo + '.' });
+
+            function render(fr) {
+                cells.forEach(function (el, i) {
+                    var cls = 'sim-cell';
+                    if (i < fr.lo || i > fr.hi) cls += ' hl-dim';
+                    if (i === fr.mid) cls += (fr.found === i ? ' hl-green' : ' hl-orange');
+                    if (fr.found === i) cls = 'sim-cell hl-green';
+                    el.className = cls;
+                });
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'midpoint probed' },
+                { cls: 'hl-green', label: 'found' },
+                { cls: 'hl-dim', label: 'discarded half' }
+            ] };
+        }
+        DSASim({ mount: 'bs-sim', setup: build });
+    })();
+    </script>
 
     <table border="1" cellpadding="10">
         <tr>

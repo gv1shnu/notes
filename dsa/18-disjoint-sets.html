@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -97,6 +98,69 @@
 };
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        A forest of seven elements. Each arrow points to a <strong>parent</strong>; a node pointing to itself is a
+        <strong>root</strong> (green) &mdash; the group's id. <strong>Union</strong> hangs the shorter root under the
+        taller (union by rank); then a <strong>Find</strong> walks to the root and <strong>path-compresses</strong>,
+        re-pointing the whole path straight at it. <strong>Reset</strong> replays.
+    </p>
+    <div class="sim" id="dsu-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var pos = { 0: [15, 16], 1: [38, 16], 2: [61, 16], 3: [84, 16], 4: [27, 47], 5: [50, 47], 6: [73, 47] };
+            var n = 7, parent = [], rank = [];
+            for (var i = 0; i < n; i++) { parent[i] = i; rank[i] = 0; }
+            var frames = [];
+            function snap(active, path, cap) { frames.push({ parent: parent.slice(), active: active, path: path ? path.slice() : [], caption: cap }); }
+            snap(-1, [], 'Seven singletons — each element is its own group (points to itself = root).');
+            function froot(x) { while (parent[x] !== x) x = parent[x]; return x; }
+            function uni(a, b) {
+                var ra = froot(a), rb = froot(b);
+                if (ra === rb) { snap(ra, [a, b], 'Union(' + a + ',' + b + '): already the same set, nothing to do.'); return; }
+                if (rank[ra] < rank[rb]) { var t = ra; ra = rb; rb = t; }
+                parent[rb] = ra; if (rank[ra] === rank[rb]) rank[ra]++;
+                snap(rb, [rb, ra], 'Union(' + a + ',' + b + '): hang root ' + rb + ' under the taller root ' + ra + '.');
+            }
+            function findc(x) {
+                var path = [], c = x; while (parent[c] !== c) { path.push(c); c = parent[c]; } path.push(c); var root = c;
+                snap(x, path.slice(), 'Find(' + x + '): walk ' + path.join(' → ') + ' up to root ' + root + '.');
+                path.forEach(function (p) { parent[p] = root; });
+                snap(root, path.slice(), 'Path compression: every node on the path now points straight at ' + root + '.');
+            }
+            uni(0, 1); uni(2, 3); uni(0, 2); findc(3); uni(4, 5); uni(6, 4);
+            snap(-1, [], 'Connected? find(1)=find(3) → yes; find(1)≠find(5) → no. Effectively O(1) per op.');
+
+            function render(fr) {
+                var s = '<svg class="sim-svg" viewBox="0 0 100 60" width="100%">';
+                s += '<defs><marker id="dsu-ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#999"/></marker></defs>';
+                for (var i = 0; i < n; i++) {
+                    if (fr.parent[i] !== i) {
+                        var a = pos[i], b = pos[fr.parent[i]], onPath = fr.path.indexOf(i) !== -1 && fr.path.indexOf(fr.parent[i]) !== -1;
+                        s += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" class="edge' + (onPath ? ' hl-gold' : '') + '" marker-end="url(#dsu-ar)"/>';
+                    }
+                }
+                for (var k = 0; k < n; k++) {
+                    var p = pos[k], isRoot = fr.parent[k] === k, cls = 'node';
+                    if (k === fr.active) cls += ' hl-orange';
+                    else if (fr.path.indexOf(k) !== -1) cls += ' hl-blue';
+                    else if (isRoot) cls += ' hl-green';
+                    s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="7" class="' + cls + '"/>';
+                    s += '<text x="' + p[0] + '" y="' + p[1] + '" class="nlabel">' + k + '</text>';
+                }
+                s += '</svg>'; stage.innerHTML = s;
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-green', label: 'root (group id)' },
+                { cls: 'hl-orange', label: 'active' },
+                { color: '#e0b000', label: 'find path' }
+            ] };
+        }
+        DSASim({ mount: 'dsu-sim', setup: build });
+    })();
+    </script>
 
     <h3>Near-constant time</h3>
     <p>

@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -111,6 +112,63 @@
 }
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        Fractional knapsack, greedily. Items are sorted by <strong>value-per-kg</strong> (bar height); the sack (15&nbsp;kg)
+        is filled best-first, taking all of each item until one only <strong>partly</strong> fits (gold) and the sack is
+        full. <strong>Reset</strong> shuffles new spices.
+    </p>
+    <div class="sim" id="greedy-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var labels = ['A', 'B', 'C', 'D', 'E'];
+            var items = labels.map(function (nm) {
+                var w = Math.floor(Math.random() * 6) + 3, r = Math.floor(Math.random() * 6) + 4;
+                return { nm: nm, w: w, r: r, v: w * r };
+            });
+            items.sort(function (a, b) { return b.r - a.r; });
+            var cap = 15, total = 0, frames = [];
+            var maxR = Math.max.apply(null, items.map(function (x) { return x.r; }));
+            function snap(states, cap2) { frames.push({ states: states, caption: cap2 }); }
+            snap({}, 'Sorted by value-per-kg, best first. Sack capacity 15 kg.');
+            for (var i = 0; i < items.length; i++) {
+                if (cap <= 0) break;
+                var it = items[i], take = Math.min(it.w, cap), gained = it.r * take, partial = take < it.w;
+                total += gained; cap -= take;
+                var st = {}; for (var j = 0; j < i; j++) st[j] = 'hl-green';
+                st[i] = partial ? 'hl-gold' : 'hl-orange';
+                snap(st, 'Take ' + take + 'kg of spice ' + it.nm + ' ($' + it.r + '/kg)' + (partial ? ' — only part fits' : '') +
+                    ' → +$' + gained + '. Value $' + total + ', ' + cap + 'kg left.');
+            }
+            var done = {}; for (var d = 0; d < items.length; d++) done[d] = 'hl-green';
+            snap(done, 'Sack full. Maximum value = $' + total + '.');
+
+            stage.style.display = 'flex'; stage.style.flexDirection = 'column'; stage.style.alignItems = 'center'; stage.style.gap = '6px';
+            stage.innerHTML = '';
+            var barRow = document.createElement('div'); barRow.style.cssText = 'display:flex;align-items:flex-end;gap:10px;height:150px;';
+            var lblRow = document.createElement('div'); lblRow.style.cssText = 'display:flex;gap:10px;';
+            var bars = items.map(function (it) {
+                var b = document.createElement('div'); b.className = 'sim-bar';
+                b.style.width = '56px'; b.style.height = Math.max(20, it.r / maxR * 140) + 'px';
+                b.textContent = '$' + it.r; barRow.appendChild(b);
+                var l = document.createElement('div');
+                l.style.cssText = 'width:56px;text-align:center;font-size:.74rem;color:var(--muted);font-family:JetBrains Mono,monospace;';
+                l.innerHTML = it.nm + '<br>' + it.w + 'kg'; lblRow.appendChild(l);
+                return b;
+            });
+            stage.appendChild(barRow); stage.appendChild(lblRow);
+            function render(fr) { bars.forEach(function (b, i) { b.className = 'sim-bar ' + (fr.states[i] || ''); }); }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'taken in full' },
+                { cls: 'hl-gold', label: 'partial (fills sack)' },
+                { cls: 'hl-green', label: 'done' }
+            ] };
+        }
+        DSASim({ mount: 'greedy-sim', setup: build });
+    })();
+    </script>
 
     <h3>Where greedy beats brute force</h3>
     <p>

@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -94,6 +95,60 @@
         It's <a href="./5-recursion.html">recursion</a> with an undo step, so it inherits the call stack &mdash; and
         runs on almost anything, which is why the roadmap lists it under "any."
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        <strong>N-Queens</strong> &mdash; place one queen per row so none attack. Step through: a queen goes down a row
+        (green ♛); a column under attack is skipped (red); when a row has no safe column the search
+        <strong>backtracks</strong> and removes the previous queen (orange) to try its next option. That undo is
+        backtracking. <strong>Reset</strong> replays.
+    </p>
+    <div class="sim" id="bt-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var N = 6, cols = [], frames = [], solved = false;
+            function safe(r, c) { for (var i = 0; i < r; i++) if (cols[i] === c || Math.abs(cols[i] - c) === r - i) return false; return true; }
+            function snap(att, status, cap) { frames.push({ queens: cols.slice(), att: att, status: status, caption: cap }); }
+            snap(null, 'start', 'Place ' + N + ' queens, one per row, none attacking. Start at row 0.');
+            (function solve(r) {
+                if (solved) return;
+                if (r === N) { solved = true; snap(null, 'solved', 'All ' + N + ' queens placed, zero attacks — solved!'); return; }
+                for (var c = 0; c < N && !solved; c++) {
+                    if (safe(r, c)) {
+                        cols[r] = c; snap([r, c], 'place', 'Row ' + r + ': col ' + c + ' is safe → place ♛.');
+                        solve(r + 1);
+                        if (solved) return;
+                        cols.length = r; snap([r, c], 'remove', 'No safe column below row ' + r + ' → backtrack, remove ♛ at (' + r + ',' + c + ').');
+                    } else {
+                        snap([r, c], 'conflict', 'Row ' + r + ': col ' + c + ' is attacked → skip.');
+                    }
+                }
+            })(0);
+
+            var G = DSASim.grid(stage, N, N, 40);
+            function render(fr) {
+                for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) {
+                    var el = G.at(r, c), cls = 'sim-cell', txt = '';
+                    if ((r + c) % 2 === 1) cls += ' hl-dim';
+                    var isQ = fr.queens[r] === c;
+                    var isAtt = fr.att && fr.att[0] === r && fr.att[1] === c;
+                    if (isQ) { cls = 'sim-cell hl-green'; txt = '♛'; }
+                    if (isAtt && fr.status === 'conflict') { cls = 'sim-cell hl-red'; txt = '×'; }
+                    if (isAtt && fr.status === 'remove') { cls = 'sim-cell hl-orange'; txt = '♛'; }
+                    el.className = cls; el.textContent = txt;
+                    el.style.fontSize = '1.1rem';
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-green', label: 'queen placed' },
+                { cls: 'hl-red', label: 'attacked — skip' },
+                { cls: 'hl-orange', label: 'backtrack — remove' }
+            ] };
+        }
+        DSASim({ mount: 'bt-sim', setup: build });
+    })();
+    </script>
 
     <h3>Language notes</h3>
     <div class="langnote">

@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -146,6 +147,70 @@
         (same rate both ways), little-<strong>o</strong> is strictly slower. Big-O is the one we'll use for almost
         everything &mdash; just remember it hides constants, so the last factor-of-2 still needs real measurement.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        The same growth orders, animated as <code>n</code> climbs. Bars are on a <strong>log scale</strong> (each gridless
+        step is ×10) &mdash; otherwise <code>2<sup>n</sup></code> would dwarf everything off-screen, which is exactly the
+        point. Press <strong>Play</strong> and watch the gap explode.
+    </p>
+    <div class="sim" id="bigo-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var names = ['1', 'log n', 'n', 'n log n', 'n&sup2;', '2&#8319;'];
+            var fns = [
+                function () { return 1; },
+                function (n) { return Math.max(1, Math.log2(n)); },
+                function (n) { return n; },
+                function (n) { return n * Math.max(1, Math.log2(n)); },
+                function (n) { return n * n; },
+                function (n) { return Math.pow(2, n); }
+            ];
+            var colors = ['hl-green', 'hl-green', 'hl-blue', 'hl-blue', 'hl-orange', 'hl-red'];
+            var maxLog = Math.log10(Math.pow(2, 30));
+            function fmt(v) { v = Math.round(v); return v >= 100000 ? v.toExponential(1) : '' + v; }
+
+            stage.style.display = 'flex'; stage.style.flexDirection = 'column';
+            stage.style.alignItems = 'center'; stage.style.gap = '6px';
+            stage.innerHTML = '';
+            var barRow = document.createElement('div');
+            barRow.style.cssText = 'display:flex;align-items:flex-end;gap:14px;height:165px;';
+            var nameRow = document.createElement('div');
+            nameRow.style.cssText = 'display:flex;gap:14px;';
+            var bars = [];
+            for (var i = 0; i < 6; i++) {
+                var b = document.createElement('div');
+                b.className = 'sim-bar ' + colors[i];
+                b.style.width = '54px';
+                bars.push(b); barRow.appendChild(b);
+                var nm = document.createElement('div');
+                nm.style.cssText = 'width:54px;text-align:center;font-size:.78rem;color:var(--muted);font-family:JetBrains Mono,monospace;';
+                nm.innerHTML = names[i]; nameRow.appendChild(nm);
+            }
+            stage.appendChild(barRow); stage.appendChild(nameRow);
+
+            var frames = [];
+            for (var n = 1; n <= 30; n++) {
+                var vals = fns.map(function (f) { return f(n); });
+                frames.push({ n: n, vals: vals,
+                    caption: 'n=' + n + ' → n=' + n + ', n log n=' + fmt(vals[3]) + ', n&sup2;=' + vals[4] + ', 2&#8319;=' + fmt(vals[5]) });
+            }
+            function render(fr) {
+                fr.vals.forEach(function (v, i) {
+                    bars[i].style.height = Math.max(6, Math.log10(v + 1) / maxLog * 150) + 'px';
+                    bars[i].textContent = '';
+                });
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'linear-ish' },
+                { cls: 'hl-orange', label: 'n&sup2;' },
+                { cls: 'hl-red', label: '2&#8319; (explodes)' }
+            ] };
+        }
+        DSASim({ mount: 'bigo-sim', setup: build });
+    })();
+    </script>
 
     <h3>Language notes</h3>
     <div class="langnote">

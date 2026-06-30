@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -101,6 +102,81 @@
         Stacks are LIFO, queues are FIFO &mdash; that one difference is why a queue is right for servers, scheduling, and
         breadth-first search, while a stack fits undo and depth-first search.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        A circular buffer of 6 slots (capacity 5 &mdash; one slot is always kept empty). <strong>W</strong> is where the
+        next Enqueue writes, <strong>R</strong> is the front the next Dequeue reads; both wrap past the end. Watch
+        <code>read</code> chase <code>write</code> around the ring. <strong>Reset</strong> generates a new op sequence.
+    </p>
+    <div class="sim" id="q-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var N = 6, cap = N - 1;                    // one slot kept empty
+            var data = new Array(N).fill(''), read = 0, write = 0;
+            stage.style.display = 'flex'; stage.style.flexDirection = 'row';
+            stage.style.gap = '4px'; stage.style.justifyContent = 'center';
+            stage.innerHTML = '';
+            var cols = [];
+            for (var i = 0; i < N; i++) {
+                var col = document.createElement('div');
+                col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;';
+                var cell = document.createElement('div'); cell.className = 'sim-cell';
+                var ptr = document.createElement('div');
+                ptr.style.cssText = 'font-size:.72rem;font-family:JetBrains Mono,monospace;color:var(--accent);height:1.1em;font-weight:700;';
+                col.appendChild(cell); col.appendChild(ptr);
+                stage.appendChild(col); cols.push({ cell: cell, ptr: ptr });
+            }
+            function count() { return (write - read + N) % N; }
+            function occ(i) { if (read === write) return false; return read < write ? (i >= read && i < write) : (i >= read || i < write); }
+
+            var frames = [];
+            function snap(cap2) { frames.push({ data: data.slice(), read: read, write: write, caption: cap2 }); }
+            snap('Empty queue. read = write = 0 means nothing is buffered.');
+
+            var ops = 13;
+            for (var o = 0; o < ops; o++) {
+                var doEnq;
+                if (count() === 0) doEnq = true;
+                else if (count() === cap) doEnq = false;
+                else doEnq = Math.random() < 0.6;
+                if (doEnq) {
+                    var v = Math.floor(Math.random() * 9) + 1;
+                    data[write] = v;
+                    var w0 = write; write = (write + 1) % N;
+                    snap('Enqueue ' + v + ' → data[' + w0 + ']=' + v + ', write → ' + write +
+                        (count() === cap ? '. Full (1 slot kept free).' : '.'));
+                } else {
+                    var r0 = read, x = data[read]; data[read] = '';
+                    read = (read + 1) % N;
+                    snap('Dequeue → returns ' + x + ' from data[' + r0 + '], read → ' + read +
+                        (read === write ? '. Now empty.' : '.'));
+                }
+            }
+
+            function render(fr) {
+                cols.forEach(function (c, i) {
+                    var cls = 'sim-cell';
+                    var occupied = (function () { if (fr.read === fr.write) return false; return fr.read < fr.write ? (i >= fr.read && i < fr.write) : (i >= fr.read || i < fr.write); })();
+                    if (occupied) cls += ' hl-blue';
+                    c.cell.className = cls;
+                    c.cell.textContent = fr.data[i] === '' ? '' : fr.data[i];
+                    var p = '';
+                    if (i === fr.read && i === fr.write) p = 'RW';
+                    else if (i === fr.read) p = 'R';
+                    else if (i === fr.write) p = 'W';
+                    c.ptr.textContent = p;
+                });
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'buffered items' },
+                { color: '#fff', label: 'R = read/front · W = write/back' }
+            ] };
+        }
+        DSASim({ mount: 'q-sim', setup: build });
+    })();
+    </script>
 
     <h3>Language notes</h3>
     <div class="langnote">

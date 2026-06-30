@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -97,6 +98,60 @@ vector&lt;<span style="color:#0099ff">int</span>&gt; topological_sort(<span styl
 }
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        Topological sort by DFS on this DAG (arrows = "must come before"). A vertex turns green and gets a
+        <strong>post number</strong> when it <em>finishes</em> &mdash; and listing vertices in <strong>decreasing post
+        number</strong> puts every arrow pointing forward. Watch the order assemble below. <strong>Reset</strong> replays.
+    </p>
+    <div class="sim" id="topo-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var nodes = [{ id: 0, x: 12, y: 30 }, { id: 1, x: 36, y: 13 }, { id: 2, x: 36, y: 47 },
+                         { id: 3, x: 62, y: 13 }, { id: 4, x: 62, y: 47 }, { id: 5, x: 88, y: 30 }];
+            var edges = [{ a: 0, b: 1 }, { a: 0, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4 }, { a: 3, b: 5 }, { a: 4, b: 5 }];
+            var adj = {}; nodes.forEach(function (n) { adj[n.id] = []; });
+            edges.forEach(function (e) { adj[e.a].push(e.b); });
+            Object.keys(adj).forEach(function (k) { adj[k].sort(function (a, b) { return a - b; }); });
+
+            var post = {}, clock = 1, finish = [], frames = [];
+            function snap(active, edge, cap) {
+                var ns = {}, ls = {};
+                nodes.forEach(function (n) {
+                    if (post[n.id]) { ns[n.id] = 'hl-green'; ls[n.id] = n.id + ':' + post[n.id]; }
+                    else if (visited[n.id]) { ns[n.id] = 'hl-blue'; ls[n.id] = '' + n.id; }
+                    else ls[n.id] = '' + n.id;
+                });
+                if (active !== null) ns[active] = 'hl-orange';
+                frames.push({ ns: ns, ls: ls, edge: edge, caption: cap });
+            }
+            var visited = {};
+            (function dfs(u, parent) {
+                visited[u] = 1; snap(u, parent === null ? null : [parent, u], 'Visit ' + u + '.');
+                adj[u].forEach(function (w) { if (!visited[w]) dfs(w, u); });
+                post[u] = clock++; finish.push(u);
+                snap(u, null, 'Finish ' + u + ': post = ' + post[u] + '. (topo order so far: ' + finish.slice().reverse().join(' → ') + ')');
+            })(0, null);
+            nodes.forEach(function (n) { if (!visited[n.id]) (function dfs(u, p) { visited[u] = 1; snap(u, p === null ? null : [p, u], 'Visit ' + u + '.'); adj[u].forEach(function (w) { if (!visited[w]) dfs(w, u); }); post[u] = clock++; finish.push(u); snap(u, null, 'Finish ' + u + ': post = ' + post[u] + '.'); })(n.id, null); });
+            snap(null, null, 'Topological order = decreasing post = ' + finish.slice().reverse().join(' → ') + '. Every edge points forward.');
+
+            var G = DSASim.graphSVG(stage, nodes, edges, { w: 100, h: 60, r: 8, directed: true });
+            function render(fr) {
+                nodes.forEach(function (n) { G.setNode(n.id, fr.ns[n.id] || ''); G.setLabel(n.id, fr.ls[n.id]); });
+                edges.forEach(function (e) { G.setEdge(e.a, e.b, ''); });
+                if (fr.edge) G.setEdge(fr.edge[0], fr.edge[1], 'hl-gold');
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'active' },
+                { cls: 'hl-blue', label: 'visited, not finished' },
+                { cls: 'hl-green', label: 'finished (id:post)' }
+            ] };
+        }
+        DSASim({ mount: 'topo-sim', setup: build });
+    })();
+    </script>
 
     <h3>Strongly connected components</h3>
     <p>

@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -69,6 +70,56 @@
 };
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        No shifting, just <strong>re-pointing</strong>. Traversal must walk node by node (no indexing); but inserting or
+        removing at a known node only rewrites a pointer or two (gold) &mdash; O(1), however long the list. Step through a
+        traverse → insert → push-front → pop-front sequence.
+    </p>
+    <div class="sim" id="ll-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var frames = [];
+            function snap(list, marks, redge, cap) { frames.push({ list: list.slice(), marks: marks || {}, redge: redge === undefined ? -1 : redge, caption: cap }); }
+            snap(['A', 'B', 'C', 'D'], {}, -1, 'head → A → B → C → D → ∅. Each node stores a key and a next pointer.');
+            snap(['A', 'B', 'C', 'D'], { 0: 'hl-orange' }, -1, 'Traverse from head: visit A.');
+            snap(['A', 'B', 'C', 'D'], { 1: 'hl-orange' }, -1, 'Follow next → B. No random access; you must walk.');
+            snap(['A', 'B', 'X', 'C', 'D'], { 1: 'hl-green', 2: 'hl-orange' }, 1, 'Insert X after B: X.next = B.next (→C), then B.next = X. Two writes, no shifting.');
+            snap(['A', 'B', 'X', 'C', 'D'], { 2: 'hl-green' }, -1, 'Done → A → B → X → C → D. Only B’s pointer moved.');
+            snap(['Z', 'A', 'B', 'X', 'C', 'D'], { 0: 'hl-orange' }, 0, 'push_front(Z): Z.next = head, head = Z. O(1) at the front.');
+            snap(['A', 'B', 'X', 'C', 'D'], { 0: 'hl-orange' }, -1, 'pop_front(): head = head.next. Old head Z unlinked. O(1).');
+            snap(['A', 'B', 'X', 'C', 'D'], {}, -1, 'Final list. Edits at a known node are O(1) — the price is no O(1) indexing.');
+
+            function render(fr) {
+                var n = fr.list.length, pad = 10, step = 92, H = 70, y = 38, W = pad * 2 + n * step;
+                var s = '<svg class="sim-svg" viewBox="0 0 ' + W + ' ' + H + '" width="100%">';
+                s += '<text x="' + (pad + 24) + '" y="14" class="elabel">head</text>';
+                for (var i = 0; i < n; i++) {
+                    var x = pad + i * step, cls = 'node' + (fr.marks[i] ? ' ' + fr.marks[i] : '');
+                    s += '<rect x="' + x + '" y="' + (y - 17) + '" width="48" height="34" rx="6" class="' + cls + '"/>';
+                    s += '<text x="' + (x + 24) + '" y="' + y + '" class="nlabel">' + fr.list[i] + '</text>';
+                    var ax1 = x + 48, ax2 = x + step, ecls = 'edge' + (i === fr.redge ? ' hl-gold' : '');
+                    if (i < n - 1) {
+                        s += '<line x1="' + ax1 + '" y1="' + y + '" x2="' + (ax2 - 6) + '" y2="' + y + '" class="' + ecls + '"/>';
+                        s += '<polygon points="' + (ax2 - 6) + ',' + (y - 4) + ' ' + ax2 + ',' + y + ' ' + (ax2 - 6) + ',' + (y + 4) + '" fill="#999"/>';
+                    } else {
+                        s += '<line x1="' + ax1 + '" y1="' + y + '" x2="' + (ax1 + 22) + '" y2="' + y + '" class="' + ecls + '"/>';
+                        s += '<text x="' + (ax1 + 32) + '" y="' + y + '" class="nlabel" style="fill:#999">∅</text>';
+                    }
+                }
+                s += '</svg>'; stage.innerHTML = s;
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'current node' },
+                { cls: 'hl-green', label: 'pointer source' },
+                { color: '#e0b000', label: 'rewired pointer' }
+            ] };
+        }
+        DSASim({ mount: 'll-sim', setup: build });
+    })();
+    </script>
 
     <h3>Singly-linked</h3>
     <p>

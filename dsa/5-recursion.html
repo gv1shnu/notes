@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -53,6 +54,61 @@
 }
 </code></pre>
     </div>
+
+    <h3>Watch it run</h3>
+    <p>
+        <code>factorial(5)</code> on the call stack. Going <strong>down</strong>, each call pushes a frame and waits
+        (orange) for a smaller one; the <strong>base case</strong> bottoms out; going back <strong>up</strong>, frames
+        pop and multiply in their return values (green). The stack is the whole mechanism.
+    </p>
+    <div class="sim" id="rec-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var n = 5, stack = [], frames = [];
+            function snap(active, mode, cap) {
+                frames.push({ stack: stack.map(function (f) { return { n: f.n, ret: f.ret }; }), active: active, mode: mode, caption: cap });
+            }
+            snap(-1, '', 'Call factorial(' + n + ').');
+            for (var k = n; k >= 1; k--) {
+                stack.push({ n: k, ret: null });
+                snap(stack.length - 1, 'call', k <= 1 ? 'factorial(1): base case reached → will return 1.' : 'factorial(' + k + ') needs factorial(' + (k - 1) + ') → push frame, wait.');
+            }
+            var child = null;
+            while (stack.length) {
+                var top = stack[stack.length - 1];
+                if (top.n <= 1) { top.ret = 1; snap(stack.length - 1, 'return', 'factorial(1) = 1 (base). Pop, return up.'); }
+                else { top.ret = top.n * child; snap(stack.length - 1, 'return', 'factorial(' + top.n + ') = ' + top.n + ' × ' + child + ' = ' + top.ret + '. Pop, return up.'); }
+                child = top.ret; stack.pop();
+            }
+            snap(-1, '', 'factorial(' + n + ') = ' + child + '. Stack empty.');
+
+            stage.style.display = 'flex'; stage.style.flexDirection = 'column-reverse';
+            stage.style.alignItems = 'center'; stage.style.gap = '3px'; stage.style.minHeight = '60px'; stage.style.justifyContent = 'flex-end';
+            function render(fr) {
+                stage.innerHTML = '';
+                fr.stack.forEach(function (f, idx) {
+                    var e = document.createElement('div'); e.className = 'sim-cell';
+                    e.style.cssText = 'width:auto;min-width:150px;padding:0 10px;';
+                    if (idx === fr.active) e.classList.add(fr.mode === 'call' ? 'hl-orange' : 'hl-green');
+                    else e.classList.add('hl-blue');
+                    e.textContent = 'factorial(' + f.n + ')' + (f.ret !== null ? ' = ' + f.ret : ' = ?');
+                    stage.appendChild(e);
+                });
+                if (!fr.stack.length) {
+                    var e = document.createElement('div'); e.style.cssText = 'font-size:.72rem;color:#999;font-family:JetBrains Mono,monospace;';
+                    e.textContent = '(stack empty)'; stage.appendChild(e);
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'calling (waiting)' },
+                { cls: 'hl-green', label: 'returning' },
+                { cls: 'hl-blue', label: 'frame on stack' }
+            ] };
+        }
+        DSASim({ mount: 'rec-sim', setup: build });
+    })();
+    </script>
 
     <h3>Recursion vs iteration</h3>
     <p>

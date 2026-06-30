@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -101,6 +102,53 @@ x ^ (1 &lt;&lt; i)    <span style="color:#999">// toggle bit i</span>
         present." That <em>bitmask</em> turns subset enumeration and <a href="./15-dynamic-programming.html">DP over
         subsets</a> into plain integer loops over <code>0 .. 2<sup>n</sup>-1</code>.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        <strong>Kernighan's trick</strong> counting set bits: <code>x &amp; (x - 1)</code> clears the
+        <em>lowest</em> set bit, so looping it runs once per set bit &mdash; not once per bit. Each step the lowest 1
+        (red) drops to 0 and the count ticks up. <strong>Reset</strong> picks a new number.
+    </p>
+    <div class="sim" id="bit-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var W = 8, x = Math.floor(Math.random() * 254) + 1;
+            var frames = [], count = 0;
+            function lowIdx(v) { for (var b = 0; b < W; b++) if ((v >> b) & 1) return b; return -1; }
+            function bin(v) { var s = ''; for (var b = W - 1; b >= 0; b--) s += (v >> b) & 1; return s; }
+            function snap(curX, drop, cnt, cap) { frames.push({ x: curX, drop: drop, count: cnt, caption: cap }); }
+            snap(x, lowIdx(x), 0, 'x = ' + bin(x) + ' (' + x + '). Count set bits by clearing the lowest each step.');
+            while (x) {
+                var li = lowIdx(x);
+                var nx = x & (x - 1);
+                count++;
+                snap(nx, lowIdx(nx), count, 'x &amp; (x-1) clears bit ' + li + ' → ' + bin(nx) + '. count = ' + count + '.');
+                x = nx;
+            }
+            snap(0, -1, count, 'x = 0 → done. Set-bit count = ' + count + '.');
+
+            stage.style.display = 'flex'; stage.style.gap = '4px'; stage.style.justifyContent = 'center';
+            function render(fr) {
+                stage.innerHTML = '';
+                for (var b = W - 1; b >= 0; b--) {
+                    var bit = (fr.x >> b) & 1;
+                    var e = document.createElement('div'); e.className = 'sim-cell';
+                    if (b === fr.drop) e.classList.add('hl-red');
+                    else if (bit) e.classList.add('hl-blue');
+                    else e.classList.add('hl-dim');
+                    e.textContent = bit;
+                    stage.appendChild(e);
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-blue', label: 'set bit (1)' },
+                { cls: 'hl-red', label: 'lowest set bit — about to clear' }
+            ] };
+        }
+        DSASim({ mount: 'bit-sim', setup: build });
+    })();
+    </script>
 
     <h3>Language notes</h3>
     <div class="langnote">

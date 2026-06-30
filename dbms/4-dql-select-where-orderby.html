@@ -79,9 +79,9 @@
 
     <p>
         If you want to select all columns, you can use SELECT *. <br>
-    
+
         Note: SELECT * returns everything, which is wasteful on large tables and couples your query to the table's
-        structure, preferred to be used only during development and debugging. 
+        structure, preferred to be used only during development and debugging.
         In production, it's better to specify the columns you need.
     </p>
     <hr>
@@ -92,12 +92,40 @@
         WHERE filters rows.
     </p>
 
-    <pre>
-<code><p>MySQL / PostgreSQL</p>
+    <table>
+        <tr>
+            <td>
+                <pre><code><p>MySQL / PostgreSQL</p>
 <span style="color:#0099ff;">SELECT</span> *
 <span style="color:#0099ff;">FROM</span> players
-<span style="color:#0099ff;">WHERE</span> level = 'Radiant';</code>
-</pre>
+<span style="color:#0099ff;">WHERE</span> level = 'Radiant';
+</code></pre>
+            </td>
+
+            <td>
+                <pre><code><p>Python</p>
+<span style="color:#0099ff;">for</span> player <span style="color:#0099ff;">in</span> players:
+    <span style="color:#0099ff;">if</span> player["level"] == <span style="color:#66cc66;">"Radiant"</span>:
+        <span style="color:#ff9900;">print</span>(player)
+    <span style="color:#0099ff;">else</span>:
+        <span style="color:#0099ff;">pass</span>
+</code></pre>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <div class="tenor-gif-embed" data-postid="18224441" data-share-method="host" data-aspect-ratio="2.37037"
+                    data-width="100%">
+                    <a href="https://tenor.com/view/same-different-but-still-gif-18224441">
+                        Same Different GIF
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <script async src="https://tenor.com/embed.js"></script>
 
     <table border="1" cellpadding="10">
 
@@ -138,7 +166,7 @@
                 <img src="./assets/postgre_orderby1.png" />
             </td>
         </tr>
-         <tr>
+        <tr>
             <td>
                 <img src="./assets/mysql_orderby2.png" />
             </td>
@@ -151,7 +179,7 @@
 
     <hr>
 
-    
+
     <p>We covered the basic CRUD operations using SQL till now.</p>
 
     <p>
@@ -164,7 +192,7 @@
 
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
-  <script src="/comments.js" defer></script>
+    <script src="/comments.js" defer></script>
 </body>
 
 </html>

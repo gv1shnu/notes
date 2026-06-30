@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -79,6 +80,59 @@
             <td>O(n + m)</td>
         </tr>
     </table>
+
+    <h3>Watch it run</h3>
+    <p>
+        Insert keys into <code>m = 7</code> buckets, <code>h(key) = key % 7</code>. Most land in an empty bucket;
+        when two keys share an index it's a <strong>collision</strong> &mdash; they just chain downward. Watch the chains
+        grow as the load factor climbs. <strong>Reset</strong> picks new keys.
+    </p>
+    <div class="sim" id="hash-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var m = 7, buckets = []; for (var i = 0; i < m; i++) buckets.push([]);
+            var keys = [], used = {};
+            while (keys.length < 9) { var k = Math.floor(Math.random() * 90) + 10; if (!used[k]) { used[k] = 1; keys.push(k); } }
+
+            var frames = [];
+            function snap(hi, justKey, cap) {
+                frames.push({ buckets: buckets.map(function (b) { return b.slice(); }), hi: hi, justKey: justKey, caption: cap });
+            }
+            snap(-1, -1, 'Empty table: 7 buckets, each an (initially empty) chain.');
+            keys.forEach(function (k) {
+                var b = k % m, collision = buckets[b].length > 0;
+                buckets[b].push(k);
+                snap(b, k, 'insert ' + k + ': h(' + k + ') = ' + k + ' % 7 = ' + b +
+                    (collision ? ' → collision, append to chain (len ' + buckets[b].length + ').' : ' → empty bucket.'));
+            });
+
+            stage.style.display = 'flex'; stage.style.gap = '8px'; stage.style.justifyContent = 'center'; stage.style.alignItems = 'flex-start';
+            function render(fr) {
+                stage.innerHTML = '';
+                for (var b = 0; b < m; b++) {
+                    var col = document.createElement('div');
+                    col.style.cssText = 'display:flex;flex-direction:column;gap:3px;align-items:center;';
+                    var idx = document.createElement('div');
+                    idx.className = 'sim-cell' + (b === fr.hi ? ' hl-orange' : '');
+                    idx.style.cssText += 'font-weight:700;color:#555;';
+                    idx.textContent = b; col.appendChild(idx);
+                    fr.buckets[b].forEach(function (k) {
+                        var e = document.createElement('div');
+                        e.className = 'sim-cell' + (k === fr.justKey && b === fr.hi ? ' hl-orange' : ' hl-blue');
+                        e.textContent = k; col.appendChild(e);
+                    });
+                    stage.appendChild(col);
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'target bucket / new key' },
+                { cls: 'hl-blue', label: 'chained keys' }
+            ] };
+        }
+        DSASim({ mount: 'hash-sim', setup: build });
+    })();
+    </script>
 
     <h3>Load factor</h3>
     <p>

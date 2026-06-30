@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -111,6 +112,61 @@
         Fill the grid row by row; the answer is <code>D(n,m)</code>. O(n&middot;m). Trace the chosen arrows back to
         reconstruct the actual alignment.
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        The edit-distance table filling in. Each cell (orange) is the min of its three neighbours (blue) &mdash; up
+        (delete), left (insert), diagonal (match/substitute, +1 if the letters differ). Watch the answer build to the
+        bottom-right corner. <strong>Reset</strong> picks a new word pair.
+    </p>
+    <div class="sim" id="dp-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var pairs = [['SUNNY', 'SNOWY'], ['KITTEN', 'SITTING'], ['CART', 'CATS'], ['HOUSE', 'HORSE'], ['ABCDE', 'ACED']];
+            var pick = pairs[Math.floor(Math.random() * pairs.length)];
+            var A = pick[0], B = pick[1], n = A.length, m = B.length;
+            var D = []; for (var i = 0; i <= n; i++) { D[i] = []; for (var j = 0; j <= m; j++) D[i][j] = null; }
+            var frames = [];
+            function snap(cur, srcs, cap) {
+                frames.push({ D: D.map(function (r) { return r.slice(); }), cur: cur, srcs: srcs || [], caption: cap });
+            }
+            for (var i = 0; i <= n; i++) D[i][0] = i;
+            for (var j = 0; j <= m; j++) D[0][j] = j;
+            snap(null, [], 'A="' + A + '" (rows), B="' + B + '" (cols). Base row/col = delete-all / insert-all.');
+            for (var i2 = 1; i2 <= n; i2++) {
+                for (var j2 = 1; j2 <= m; j2++) {
+                    var cost = A[i2 - 1] === B[j2 - 1] ? 0 : 1;
+                    D[i2][j2] = Math.min(D[i2 - 1][j2] + 1, D[i2][j2 - 1] + 1, D[i2 - 1][j2 - 1] + cost);
+                    snap([i2, j2], [[i2 - 1, j2], [i2, j2 - 1], [i2 - 1, j2 - 1]],
+                        'D(' + i2 + ',' + j2 + '): "' + A[i2 - 1] + '" vs "' + B[j2 - 1] + '" ' +
+                        (cost ? '(differ, +1)' : '(match, +0)') + ' → min = ' + D[i2][j2] + '.');
+                }
+            }
+            snap([n, m], [], 'Edit distance("' + A + '","' + B + '") = D(' + n + ',' + m + ') = ' + D[n][m] + '.');
+
+            var G = DSASim.grid(stage, n + 1, m + 1, 40);
+            function eq(a, r, c) { return a && a[0] === r && a[1] === c; }
+            function render(fr) {
+                for (var r = 0; r <= n; r++) for (var c = 0; c <= m; c++) {
+                    var el = G.at(r, c), v = fr.D[r][c], cls = 'sim-cell';
+                    var isSrc = fr.srcs.some(function (s) { return s[0] === r && s[1] === c; });
+                    if (eq(fr.cur, r, c)) cls += ' hl-orange';
+                    else if (isSrc) cls += ' hl-blue';
+                    else if (v !== null) cls += ' hl-green';
+                    el.className = cls;
+                    el.textContent = v === null ? '' : v;
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'cell being filled' },
+                { cls: 'hl-blue', label: 'three neighbours' },
+                { cls: 'hl-green', label: 'computed' }
+            ] };
+        }
+        DSASim({ mount: 'dp-sim', setup: build });
+    })();
+    </script>
 
     <h3>Knapsack (0/1 and unbounded)</h3>
     <p>

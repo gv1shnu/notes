@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -118,6 +119,59 @@ vector&lt;<span style="color:#0099ff">int</span>&gt; connected_components() {
         bump the counter before each fresh <code>explore</code>. Same O(|V| + |E|). (This is the
         <strong>repeat</strong>: one tool, <code>explore</code>, reused to answer a bigger question.)
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        DFS from vertex 0, with the pre/post clock running. A vertex turns orange when <code>explore</code> enters it
+        (pre is stamped), stays blue while its descendants are still being explored, and turns green when it finishes
+        (post is stamped). The label reads <code>pre/post</code>. Watch the intervals nest. <strong>Reset</strong> replays.
+    </p>
+    <div class="sim" id="dfs-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var nodes = [{ id: 0, x: 15, y: 14 }, { id: 1, x: 45, y: 11 }, { id: 2, x: 82, y: 14 },
+                         { id: 3, x: 18, y: 48 }, { id: 4, x: 50, y: 50 }, { id: 5, x: 84, y: 46 }];
+            var edges = [{ a: 0, b: 1 }, { a: 1, b: 2 }, { a: 0, b: 3 }, { a: 1, b: 4 }, { a: 2, b: 5 }, { a: 3, b: 4 }, { a: 4, b: 5 }];
+            var adj = {}; nodes.forEach(function (n) { adj[n.id] = []; });
+            edges.forEach(function (e) { adj[e.a].push(e.b); adj[e.b].push(e.a); });
+            Object.keys(adj).forEach(function (k) { adj[k].sort(function (a, b) { return a - b; }); });
+
+            var pre = {}, post = {}, clock = 1, frames = [];
+            function snap(active, edge, cap) {
+                var ns = {}, ls = {};
+                nodes.forEach(function (n) {
+                    if (post[n.id]) ns[n.id] = 'hl-green'; else if (pre[n.id]) ns[n.id] = 'hl-blue';
+                    ls[n.id] = pre[n.id] ? (pre[n.id] + (post[n.id] ? '/' + post[n.id] : '/·')) : ('' + n.id);
+                });
+                if (active !== null) ns[active] = 'hl-orange';
+                frames.push({ ns: ns, ls: ls, edge: edge, caption: cap });
+            }
+            snap(null, null, 'DFS from vertex 0. The clock ticks on enter (pre) and exit (post).');
+            (function dfs(u, parent) {
+                pre[u] = clock++; snap(u, parent === null ? null : [parent, u], 'Enter ' + u + ': pre[' + u + '] = ' + pre[u] + '.');
+                adj[u].forEach(function (w) {
+                    if (!pre[w]) { dfs(w, u); snap(u, [u, w], 'Back at ' + u + ' after exploring ' + w + '.'); }
+                });
+                post[u] = clock++; snap(u, null, 'Finish ' + u + ': post[' + u + '] = ' + post[u] + '. Interval [' + pre[u] + ',' + post[u] + '].');
+            })(0, null);
+            snap(null, null, 'Done — every interval is nested or disjoint, never interleaved.');
+
+            var G = DSASim.graphSVG(stage, nodes, edges, { w: 100, h: 62, r: 8 });
+            function render(fr) {
+                nodes.forEach(function (n) { G.setNode(n.id, fr.ns[n.id] || ''); G.setLabel(n.id, fr.ls[n.id]); });
+                edges.forEach(function (e) { G.setEdge(e.a, e.b, ''); });
+                if (fr.edge) G.setEdge(fr.edge[0], fr.edge[1], 'hl-gold');
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'active' },
+                { cls: 'hl-blue', label: 'open (pre set)' },
+                { cls: 'hl-green', label: 'finished (post set)' }
+            ] };
+        }
+        DSASim({ mount: 'dfs-sim', setup: build });
+    })();
+    </script>
 
     <h3>Capturing the search order: pre/post numbers</h3>
     <p>

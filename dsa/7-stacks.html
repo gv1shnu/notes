@@ -10,6 +10,7 @@
     <!-- Page title shown in browser tab -->
     <title>DSA Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
 </head>
 
 <body>
@@ -94,6 +95,80 @@
         The stack naturally remembers the still-open brackets in the exact order they must close &mdash; that's what
         LIFO is for. (Also: function call stacks, expression parsing, undo.)
     </p>
+
+    <h3>Watch it run</h3>
+    <p>
+        The bracket scan, live. Each opener gets pushed onto the stack; each closer must match the
+        <strong>top</strong> (blue) or the string is unbalanced. <strong>Reset</strong> picks a new string &mdash; some
+        balanced, some not.
+    </p>
+    <div class="sim" id="stk-sim"></div>
+    <script>
+    (function () {
+        function build(stage) {
+            var samples = ['([])()', '{[()]}', '(()', ')(', '([)]', '()[]{}', '{[]}('];
+            var s = samples[Math.floor(Math.random() * samples.length)];
+            stage.style.display = 'flex'; stage.style.flexDirection = 'column';
+            stage.style.alignItems = 'center'; stage.style.gap = '16px';
+            stage.innerHTML = '';
+            var strRow = document.createElement('div');
+            strRow.style.cssText = 'display:flex;gap:4px;';
+            var strCells = s.split('').map(function (ch) {
+                var e = document.createElement('div'); e.className = 'sim-cell'; e.textContent = ch;
+                strRow.appendChild(e); return e;
+            });
+            var stk = document.createElement('div');
+            stk.style.cssText = 'display:flex;flex-direction:column-reverse;gap:3px;min-height:44px;justify-content:flex-end;';
+            stage.appendChild(strRow); stage.appendChild(stk);
+
+            var pairs = { ')': '(', ']': '[', '}': '{' };
+            var stack = [], frames = [], failed = false;
+            function snap(pos, cap) { frames.push({ pos: pos, stack: stack.slice(), caption: cap, fail: failed }); }
+            snap(-1, 'Scan "' + s + '" left to right. Push openers, match closers.');
+            for (var i = 0; i < s.length; i++) {
+                var ch = s[i];
+                if (ch === '(' || ch === '[' || ch === '{') {
+                    stack.push(ch); snap(i, 'pos ' + i + ': "' + ch + '" opener → push (depth ' + stack.length + ').');
+                } else {
+                    if (!stack.length) { failed = true; snap(i, 'pos ' + i + ': "' + ch + '" but stack empty → UNBALANCED.'); break; }
+                    var top = stack[stack.length - 1];
+                    if (top === pairs[ch]) { stack.pop(); snap(i, 'pos ' + i + ': "' + ch + '" matches top "' + top + '" → pop (depth ' + stack.length + ').'); }
+                    else { failed = true; snap(i, 'pos ' + i + ': "' + ch + '" vs top "' + top + '" → mismatch, UNBALANCED.'); break; }
+                }
+            }
+            if (!failed) {
+                if (!stack.length) snap(s.length, 'End: stack empty → BALANCED &#10003;');
+                else { failed = true; snap(s.length, 'End: ' + stack.length + ' opener(s) left unclosed → UNBALANCED.'); }
+            }
+
+            function render(fr) {
+                strCells.forEach(function (e, i) {
+                    var cls = 'sim-cell';
+                    if (i < fr.pos) cls += ' hl-dim';
+                    if (i === fr.pos) cls += fr.fail ? ' hl-red' : ' hl-orange';
+                    e.className = cls;
+                });
+                stk.innerHTML = '';
+                fr.stack.forEach(function (ch, idx) {
+                    var e = document.createElement('div');
+                    e.className = 'sim-cell' + (idx === fr.stack.length - 1 ? ' hl-blue' : '');
+                    e.textContent = ch; stk.appendChild(e);
+                });
+                if (!fr.stack.length) {
+                    var e = document.createElement('div');
+                    e.style.cssText = 'font-size:.72rem;color:#999;font-family:JetBrains Mono,monospace;';
+                    e.textContent = '(empty)'; stk.appendChild(e);
+                }
+            }
+            return { frames: frames, render: render, legend: [
+                { cls: 'hl-orange', label: 'scanning' },
+                { cls: 'hl-blue', label: 'stack top' },
+                { cls: 'hl-red', label: 'mismatch' }
+            ] };
+        }
+        DSASim({ mount: 'stk-sim', setup: build });
+    })();
+    </script>
 
     <h3>Language notes</h3>
     <div class="langnote">
