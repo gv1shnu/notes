@@ -146,13 +146,18 @@
         <code>ON CONFLICT DO NOTHING</code> and MySQL uses <code>INSERT IGNORE</code>.
     </p>
 
+    <p>
+        <strong>Note:</strong> By default, no, data stored in PostgreSQL is not encrypted. However, if you're using one of the cloud platforms,
+        AWS/Azure/GCP, they all encrypt the data at rest and in motion.
+    </p>
+
     <hr>
 
     <h3>UPDATE</h3>
 
     <p>
         UPDATE modifies existing rows.
-        You could always remove the existing row and add the updated row as a separate 
+        You could always remove the existing row and add the updated row as a separate
         (That's what Postgre's internal systems do).
         However, UPDATE is atomic and less verbose.
     </p>
@@ -164,7 +169,7 @@
 <span style="color:#0099ff;">WHERE</span> player_id = 1;</code>
 </pre>
 
-  <pre>
+    <pre>
 <code>Prompt
     <span style="color:lightblue;">
 Update the score of player_id 1 to 900 in the players table.
@@ -210,7 +215,7 @@ Update the score of player_id 1 to 900 in the players table.
 <span style="color:#0099ff;">WHERE</span> player_id = 1;</code>
 </pre>
 
- <pre>
+    <pre>
 <code>Prompt
     <span style="color:lightblue;">
 Delete the player with player_id 1 from the players table.
@@ -243,7 +248,7 @@ Delete the player with player_id 1 from the players table.
 
     <p>
         <strong>Note:</strong><br>
-        Running DELETE without WHERE clause removes all rows from the table, 
+        Running DELETE without WHERE clause removes all rows from the table,
         similar to TRUNCATE, to be discussed <a href="./10-ddl-alter-drop.html">later</a>.
     </p>
 
@@ -251,14 +256,14 @@ Delete the player with player_id 1 from the players table.
 <code><span style="color:#0099ff;">DELETE FROM</span> players;</code>
 </pre>
 
-<table border="1" cellpadding="10">
+    <table border="1" cellpadding="10">
         <tr>
             <th>player_id</th>
             <th>username</th>
             <th>level</th>
             <th>score</th>
         </tr>
-</table>
+    </table>
 
     <p>
         Next, DQL <a href="./4-dql-select-where-orderby.html">&gt;&gt;</a>
@@ -270,7 +275,7 @@ Delete the player with player_id 1 from the players table.
 
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
-  <script src="/comments.js" defer></script>
+    <script src="/comments.js" defer></script>
 </body>
 
 </html>

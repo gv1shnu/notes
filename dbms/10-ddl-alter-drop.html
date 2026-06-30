@@ -47,8 +47,22 @@
             <th>score</th>
             <th>level</th>
         </tr>
-        <tr><td>1</td><td>TenZ</td><td>NA</td><td>1</td><td>842</td><td>Radiant</td></tr>
-        <tr><td>2</td><td>Zekken</td><td>NA</td><td>1</td><td>788</td><td>Radiant</td></tr>
+        <tr>
+            <td>1</td>
+            <td>TenZ</td>
+            <td>NA</td>
+            <td>1</td>
+            <td>842</td>
+            <td>Radiant</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Zekken</td>
+            <td>NA</td>
+            <td>1</td>
+            <td>788</td>
+            <td>Radiant</td>
+        </tr>
     </table>
 
     <hr>
@@ -123,12 +137,13 @@
 
     <p>DROP operates on the object itself, not the rows.</p>
 
+    <p>
+        <img src="./assets/aviibw.gif" alt="" />
     <pre>
 <code><span style="color:#0099ff;">DROP TABLE</span> players;
 
-<span style="color:#0099ff;">DROP DATABASE</span> company;</code>
 </pre>
-
+    </p>
     <p>
         Both are destructive and final. To avoid an error when you're not sure the object exists,
         guard it:
@@ -173,8 +188,6 @@
             <td>No</td>
         </tr>
     </table>
-
-    <p><strong>Note: </strong>Transactions using DBMS shall be discussed later.</p>
 
     <p>
         DELETE walks the table row by row, logging each removal, which is why it is slower but
@@ -239,7 +252,7 @@
 
     <script src="../footer.js"></script>
     <script src="../home.js"></script>
-  <script src="/comments.js" defer></script>
+    <script src="/comments.js" defer></script>
 </body>
 
 </html>
