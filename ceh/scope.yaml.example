@@ -1,0 +1,27 @@
+# Copy to scope.yaml per engagement. Used by validate_scope.py and batch scripts.
+engagement: lab-example
+client: fictional-lab
+approved_start: "2025-06-01"
+approved_end: "2025-06-30"
+emergency_contact: "lab-admin@example.com"
+
+domains:
+  - lab.example.com
+  - "*.lab.example.com"
+
+cidrs:
+  - 10.10.10.0/24
+
+hosts:
+  - dvwa.lab.example.com
+
+forbidden:
+  - production.example.com
+  - 192.168.0.0/16
+
+allowed_techniques:
+  active_scan: true
+  credential_testing: true   # lab accounts only
+  password_spray: false
+  dos: false
+  social_engineering: false

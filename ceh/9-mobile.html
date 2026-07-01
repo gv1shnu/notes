@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Mobile</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Mobile</h2>
+
+    <p>
+        A mobile app is two targets in one: the app on the device, and the backend API it talks to. The backend is often
+        the bigger prize and is tested like any web API. The app itself is worth taking apart for what developers leave
+        inside it.
+    </p>
+
+    <h3>What to check</h3>
+
+    <ul>
+        <li>Insecure local storage — data cached in cleartext on the device</li>
+        <li>Hardcoded secrets in the app package (API keys, tokens)</li>
+        <li>Weak API authentication behind the app</li>
+        <li>TLS problems, including whether certificate pinning can be bypassed</li>
+        <li>Insecure deep links and weak session handling</li>
+        <li>Assumptions that the device is not rooted or jailbroken</li>
+    </ul>
+
+    <h3>Cracking one open</h3>
+
+    <p>
+        An Android APK is a zip file. Unpack it and search the strings and resources for secrets before doing anything
+        dynamic:
+    </p>
+
+    <pre><code>$ unzip -q app.apk -d app/
+$ grep -rniE 'api[_-]?key|secret|password|bearer' app/
+app/res/values/strings.xml:  &lt;string name="api_key"&gt;AIzaSyD...&lt;/string&gt;</code></pre>
+
+    <p>
+        A hardcoded API key in <code>strings.xml</code> is a finding on its own, and often the key to the backend. Tools
+        like <code>jadx</code> decompile the code for reading, and an intercepting proxy plus an emulator lets you watch
+        (and test) the API calls — the OWASP Mobile Application Security guide is the checklist to work through.
+    </p>
+
+    <p>
+        Next: IoT and OT
+        <a href="./9-iot-ot.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Wireless
+        <a href="./9-wireless.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

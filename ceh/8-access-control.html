@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Access control and IDOR</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Access control and IDOR</h2>
+
+    <p>
+        The most reliably-present bug in real web apps is broken access control. The app checks <em>are you logged in</em>
+        but forgets to check <em>is this yours</em>. So <code>/api/v1/invoice?id=1004</code> happily returns invoice 1004
+        even when you are logged in as a different user. This is IDOR — Insecure Direct Object Reference.
+    </p>
+
+    <h3>Try it</h3>
+
+    <p>
+        You are logged in as <strong>alice</strong> and you own invoice #1004. Change the <code>id</code> and watch what
+        the server hands back. Then turn on the ownership check to see the fix.
+    </p>
+
+    <div class="sim" id="idor-sim">
+        <div class="sim-toolbar">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--muted)">GET /api/v1/invoice?id=</span>
+            <input type="text" id="idor-id" value="1004" style="width:6rem" inputmode="numeric">
+            <button id="idor-go">Send</button>
+            <button class="ghost" id="idor-dec">id − 1</button>
+            <button class="ghost" id="idor-inc">id + 1</button>
+            <label class="sim-toggle"><input type="checkbox" id="idor-fix"> enforce ownership check (the fix)</label>
+        </div>
+        <div class="sim-out" id="idor-out"></div>
+        <div class="sim-verdict" id="idor-verdict"></div>
+    </div>
+
+    <p>
+        Nothing here is "hacking" in the movie sense — you changed a number in a URL. The vulnerability is the
+        <em>absence</em> of a check, which is exactly why automated scanners miss it and humans find it. The fix is an
+        ownership check on every object access: does this session own the thing it is asking for?
+    </p>
+
+    <h3>Where to look</h3>
+
+    <ul>
+        <li>Numeric or guessable IDs in URLs, forms, and API calls</li>
+        <li>Horizontal access — reaching another user's data at the same privilege level</li>
+        <li>Vertical access — a normal user reaching admin-only functions</li>
+        <li>Hidden admin endpoints that rely on "nobody knows the URL"</li>
+    </ul>
+
+    <p>
+        Prove it with one cross-account read and stop — do not enumerate the whole table. One invoice that is not yours
+        is a finding; scraping every customer's data is an incident.
+    </p>
+
+    <p>
+        Next: SQL injection
+        <a href="./8-sql-injection.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Authentication and session
+        <a href="./8-auth-and-session.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        (function () {
+            var INVOICES = {
+                1003: { owner: 'carol', amount: '₹12,400', items: 'Mechanical keyboard, wrist rest' },
+                1004: { owner: 'alice', amount: '₹3,150',  items: 'USB-C cable, laptop sleeve' },
+                1005: { owner: 'bob',   amount: '₹88,000', items: 'Server rack, 2x SSD (enterprise)' },
+                1006: { owner: 'dave',  amount: '₹450',    items: 'Sticker pack' }
+            };
+            var ME = 'alice';
+            var id = document.getElementById('idor-id');
+            var out = document.getElementById('idor-out');
+            var verdict = document.getElementById('idor-verdict');
+            var fix = document.getElementById('idor-fix');
+
+            function send() {
+                var n = parseInt(id.value, 10);
+                var rec = INVOICES[n];
+                var head = '<span class="m">GET /api/v1/invoice?id=' + (isNaN(n) ? '?' : n) + '</span>\n' +
+                           '<span class="m">Cookie: session=&lt;alice&gt;</span>\n\n';
+                if (!rec) {
+                    out.innerHTML = head + '<span class="y">HTTP/1.1 404 Not Found</span>';
+                    verdict.className = 'sim-verdict warn';
+                    verdict.textContent = 'No such invoice — try 1003–1006.';
+                    return;
+                }
+                if (fix.checked && rec.owner !== ME) {
+                    out.innerHTML = head + '<span class="s">HTTP/1.1 403 Forbidden</span>\n<span class="m">{ "error": "not your resource" }</span>';
+                    verdict.className = 'sim-verdict ok';
+                    verdict.textContent = 'Fixed: the server checked ownership (invoice belongs to ' + rec.owner + ') and refused.';
+                    return;
+                }
+                out.innerHTML = head + '<span class="g">HTTP/1.1 200 OK</span>\n<span class="m">{</span>\n' +
+                    '  <span class="k">"owner"</span>: <span class="s">"' + rec.owner + '"</span>,\n' +
+                    '  <span class="k">"amount"</span>: <span class="s">"' + rec.amount + '"</span>,\n' +
+                    '  <span class="k">"items"</span>: <span class="s">"' + rec.items + '"</span>\n<span class="m">}</span>';
+                if (rec.owner === ME) {
+                    verdict.className = 'sim-verdict ok';
+                    verdict.textContent = 'Your own invoice — normal so far.';
+                } else {
+                    verdict.className = 'sim-verdict bad';
+                    verdict.textContent = 'IDOR! You read ' + rec.owner + '’s private invoice as alice. Authenticated, but not authorised.';
+                }
+            }
+            document.getElementById('idor-go').addEventListener('click', send);
+            document.getElementById('idor-inc').addEventListener('click', function () { id.value = (parseInt(id.value, 10) || 1004) + 1; send(); });
+            document.getElementById('idor-dec').addEventListener('click', function () { id.value = (parseInt(id.value, 10) || 1004) - 1; send(); });
+            fix.addEventListener('change', send);
+            send();
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

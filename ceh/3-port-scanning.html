@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Port scanning</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
+</head>
+
+<body>
+    <h2>Port scanning</h2>
+
+    <p>
+        Host discovery told us a machine is alive. Port scanning asks the next question: <strong>which doors are
+        open?</strong> A port is a numbered door on a host — 22 is usually SSH, 80 is usually a web server, 443 is HTTPS.
+        Scanning knocks on each door and listens for how it answers.
+    </p>
+
+    <p>
+        You do not knock by hand. One command does the whole building:
+    </p>
+
+    <pre><code>$ sudo nmap -sS -T4 --top-ports 1000 10.10.10.5
+
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for 10.10.10.5
+Host is up (0.021s latency).
+Not shown: 996 closed tcp ports (reset)
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+80/tcp   open     http
+443/tcp  open     https
+3306/tcp filtered mysql
+
+Nmap done: 1 IP address (1 host up) scanned in 4.11 seconds</code></pre>
+
+    <p>
+        Four words in that <code>STATE</code> column carry the whole meaning. Before we trust them, we need to know what
+        they are and how nmap decided.
+    </p>
+
+    <h3>The three states</h3>
+
+    <p>
+        Every port lands in one of these. The trap for beginners is treating "closed" and "filtered" as the same thing —
+        they are not.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>State</th>
+            <th>What nmap saw</th>
+            <th>What it means</th>
+        </tr>
+        <tr>
+            <td><strong>open</strong></td>
+            <td>The port answered and accepted the connection</td>
+            <td>A service is listening here. This is what you want.</td>
+        </tr>
+        <tr>
+            <td><strong>closed</strong></td>
+            <td>The port answered, but refused</td>
+            <td>The host is reachable; nothing is listening on this port right now.</td>
+        </tr>
+        <tr>
+            <td><strong>filtered</strong></td>
+            <td>The port said <em>nothing at all</em></td>
+            <td>A firewall dropped the probe. You cannot tell open from closed — the door is behind a wall.</td>
+        </tr>
+    </table>
+
+    <p>
+        "Closed" means the host is talking to you and this particular port is empty. "Filtered" means something is
+        actively hiding the port from you. One is an empty room; the other is a locked corridor you cannot see down.
+    </p>
+
+    <h3>How a SYN scan decides</h3>
+
+    <p>
+        The default scan (<code>-sS</code>, the "SYN scan") sends a single <code>SYN</code> packet — the first step of a
+        TCP handshake — and reads the reply. It never finishes the handshake, which is why it is fast and quiet. The
+        reply alone is enough to classify the port. Step through it:
+    </p>
+
+    <div id="portscan-sim"></div>
+
+    <p>
+        The pattern is the whole lesson: <strong>SYN/ACK back → open</strong>, <strong>RST back → closed</strong>,
+        <strong>silence → filtered</strong>. Because nmap answers the open port's SYN/ACK with a <code>RST</code> instead
+        of an <code>ACK</code>, the connection is never completed, so many applications never even log it. That is the
+        "half-open" trick, and it is why <code>-sS</code> is the sensible default on an authorised test.
+    </p>
+
+    <h3>Connect scan vs SYN scan</h3>
+
+    <p>
+        A SYN scan needs raw-socket privileges (hence <code>sudo</code>). Without root, nmap falls back to a
+        <strong>connect scan</strong> (<code>-sT</code>), which completes the full three-way handshake using the
+        operating system's normal connect call.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>SYN scan <code>-sS</code></th>
+            <th>Connect scan <code>-sT</code></th>
+        </tr>
+        <tr>
+            <td>Handshake</td>
+            <td>Half-open (SYN, reply, RST)</td>
+            <td>Full (SYN, SYN/ACK, ACK)</td>
+        </tr>
+        <tr>
+            <td>Needs root</td>
+            <td>Yes</td>
+            <td>No</td>
+        </tr>
+        <tr>
+            <td>Noise</td>
+            <td>Often unlogged by the app</td>
+            <td>Logged as a real connection</td>
+        </tr>
+        <tr>
+            <td>Speed</td>
+            <td>Faster</td>
+            <td>Slower</td>
+        </tr>
+    </table>
+
+    <p>
+        Same verdicts, different footprint. If you are not root, or a proxy is in the way, <code>-sT</code> is what you
+        get.
+    </p>
+
+    <h3>UDP scanning</h3>
+
+    <p>
+        Everything above is TCP. UDP has no handshake — you send a packet and often hear nothing back whether the port
+        is open or firewalled. That ambiguity shows up honestly in the output:
+    </p>
+
+    <pre><code>$ sudo nmap -sU --top-ports 20 10.10.10.5
+
+PORT    STATE         SERVICE
+53/udp  open          domain
+123/udp open|filtered ntp
+161/udp open|filtered snmp</code></pre>
+
+    <p>
+        <code>open|filtered</code> is nmap admitting "I could not tell." UDP scans are slow (the scanner waits on
+        timeouts) and easy to misread, so they are usually run against a small list of ports that matter — DNS (53),
+        SNMP (161), NTP (123) — rather than all 65535. Skipping UDP entirely is how people miss an exposed SNMP service.
+    </p>
+
+    <h3>Timing and load</h3>
+
+    <p>
+        Scanning is traffic you are pointing at someone else's machine, so pace matters. The <code>-T</code> flag picks a
+        template from 0 (paranoid) to 5 (insane); <code>--min-rate</code> sets a packet floor.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Flag</th>
+            <th>Effect</th>
+            <th>When</th>
+        </tr>
+        <tr>
+            <td><code>-T4</code></td>
+            <td>Fast, reasonable default on a healthy network</td>
+            <td>Most authorised lab and internal scans</td>
+        </tr>
+        <tr>
+            <td><code>-T2</code> / <code>-T1</code></td>
+            <td>Slow, gentle, harder to notice</td>
+            <td>Fragile targets, or when you want to stay quiet</td>
+        </tr>
+        <tr>
+            <td><code>-T5</code></td>
+            <td>Very aggressive — can overwhelm or miss results</td>
+            <td>Rarely; fast disposable labs only</td>
+        </tr>
+    </table>
+
+    <p>
+        Old devices — printers, cameras, industrial gear — can fall over under an aggressive scan. When in doubt, slow
+        down. A crashed target is both a bad result and an awkward phone call.
+    </p>
+
+    <h3>Raw data vs interpretation</h3>
+
+    <p>
+        Keep two columns in your notes: what the scanner literally saw, and what you think it means. They are not the
+        same, and mixing them turns a soft guess into a loud claim in the report.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Raw</th>
+            <th>Interpretation</th>
+        </tr>
+        <tr>
+            <td>443/tcp open</td>
+            <td>Web app candidate — check TLS, headers, auth, tech stack next.</td>
+        </tr>
+        <tr>
+            <td>3306/tcp filtered</td>
+            <td>MySQL may exist but is firewalled from here. Note it; do not claim it is exploitable.</td>
+        </tr>
+        <tr>
+            <td>161/udp open|filtered</td>
+            <td>Possible SNMP. Worth a targeted follow-up, not a finding yet.</td>
+        </tr>
+    </table>
+
+    <p>
+        A port number is only a hint anyway. The next step, service and version detection, turns "80 is open" into
+        "nginx 1.18 serving a login page" — that is where the real leads come from.
+    </p>
+
+    <p>
+        (If you are logging the engagement with the campaign tracker, this is the step that fills
+        <code>scans/summary.json</code>. Useful for keeping the timeline straight — but the scan is the point, not the
+        bookkeeping.)
+    </p>
+
+    <p>
+        Next: Service and OS detection
+        <a href="./3-service-and-os.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Host discovery
+        <a href="./3-host-discovery.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        DSASim({
+            mount: 'portscan-sim',
+            setup: function (stage) {
+                var STATE = {
+                    '?':        { cls: 'hl-dim',    label: 'probing…' },
+                    'open':     { cls: 'hl-green',  label: 'open' },
+                    'closed':   { cls: 'hl-red',    label: 'closed' },
+                    'filtered': { cls: 'hl-orange', label: 'filtered' }
+                };
+                var frames = [
+                    { caption: 'SYN scan (-sS): send one SYN to each port, then judge by the reply.',
+                      lanes: [ {p:22,pkt:''},        {p:23,pkt:''},        {p:53,pkt:''} ] },
+                    { caption: 'Probe — a single SYN packet goes out to every target port.',
+                      lanes: [ {p:22,pkt:'SYN  →'},  {p:23,pkt:'SYN  →'},  {p:53,pkt:'SYN  →'} ] },
+                    { caption: 'Port 22 answers SYN/ACK — a service is listening.  →  OPEN.',
+                      lanes: [ {p:22,pkt:'←  SYN/ACK', st:'open'}, {p:23,pkt:'SYN  →'}, {p:53,pkt:'SYN  →'} ] },
+                    { caption: 'Nmap replies RST, not ACK — the handshake never finishes, so the app may never log it.',
+                      lanes: [ {p:22,pkt:'RST  →', st:'open'}, {p:23,pkt:'SYN  →'}, {p:53,pkt:'SYN  →'} ] },
+                    { caption: 'Port 23 answers RST/ACK — nobody is listening.  →  CLOSED.',
+                      lanes: [ {p:22,pkt:'', st:'open'}, {p:23,pkt:'←  RST/ACK', st:'closed'}, {p:53,pkt:'SYN  →'} ] },
+                    { caption: 'Port 53 stays silent. A firewall may be dropping the probe — nmap retransmits…',
+                      lanes: [ {p:22,pkt:'', st:'open'}, {p:23,pkt:'', st:'closed'}, {p:53,pkt:'SYN  →  (retry)'} ] },
+                    { caption: 'Still nothing after retries. No reply at all  →  FILTERED (a firewall ate it).',
+                      lanes: [ {p:22,pkt:'', st:'open'}, {p:23,pkt:'', st:'closed'}, {p:53,pkt:'(timeout)', st:'filtered'} ] },
+                    { caption: 'Verdict:  SYN/ACK = open,  RST = closed,  silence = filtered.',
+                      lanes: [ {p:22,pkt:'', st:'open'}, {p:23,pkt:'', st:'closed'}, {p:53,pkt:'', st:'filtered'} ] }
+                ];
+                return {
+                    frames: frames,
+                    legend: [
+                        { cls: 'hl-green',  label: 'open' },
+                        { cls: 'hl-red',    label: 'closed' },
+                        { cls: 'hl-orange', label: 'filtered' }
+                    ],
+                    render: function (fr) {
+                        stage.style.display = 'block';
+                        stage.innerHTML = fr.lanes.map(function (l) {
+                            var s = STATE[l.st || '?'];
+                            return '<div style="display:flex;align-items:center;gap:.6rem;justify-content:center;' +
+                                   'margin:.4rem 0;font-family:\'JetBrains Mono\',monospace;font-size:.8rem;">' +
+                                   '<span style="width:44px;text-align:right;color:#777;">you</span>' +
+                                   '<span style="width:150px;text-align:center;color:#234;">' + (l.pkt || '') + '</span>' +
+                                   '<span class="sim-cell ' + s.cls + '" style="width:auto;min-width:54px;padding:0 .5rem;">:' + l.p + '</span>' +
+                                   '<span style="width:88px;text-align:left;font-weight:600;color:#333;">' + s.label + '</span>' +
+                                   '</div>';
+                        }).join('');
+                    }
+                };
+            }
+        });
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

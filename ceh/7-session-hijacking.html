@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Session hijacking</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Session hijacking</h2>
+
+    <p>
+        After you log in, the server gives your browser a session token — usually a cookie — that proves who you are on
+        every later request. Steal or reuse that token and you are that user, no password needed. Session security is
+        mostly about protecting the cookie, and three flags do most of the protecting.
+    </p>
+
+    <h3>The three cookie flags</h3>
+
+    <p>
+        Toggle the flags and see which attacks each one closes. The cookie starts wide open.
+    </p>
+
+    <div class="sim" id="cookie-sim">
+        <div class="sim-toolbar" style="margin-bottom:.4rem;">
+            <label class="sim-toggle"><input type="checkbox" data-f="httponly"> HttpOnly</label>
+            <label class="sim-toggle"><input type="checkbox" data-f="secure"> Secure</label>
+            <label class="sim-toggle"><input type="checkbox" data-f="samesite"> SameSite=Lax</label>
+        </div>
+        <div class="sim-out" id="cookie-header"></div>
+        <div id="cookie-attacks" style="margin-top:.8rem;"></div>
+    </div>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Flag</th>
+            <th>Closes</th>
+        </tr>
+        <tr><td><code>HttpOnly</code></td><td>JavaScript can't read the cookie, so an XSS can't steal it.</td></tr>
+        <tr><td><code>Secure</code></td><td>Cookie is only sent over HTTPS, so it can't be sniffed on plain HTTP.</td></tr>
+        <tr><td><code>SameSite</code></td><td>Cookie isn't sent on cross-site requests, blocking CSRF.</td></tr>
+    </table>
+
+    <h3>Other session weaknesses</h3>
+
+    <p>
+        Beyond the flags, look for predictable tokens, session fixation (the token doesn't change after login), tokens
+        that still work after logout, over-long idle timeouts, and tokens leaking in URLs or logs. A session that
+        outlives its own logout is a skeleton key with a timer.
+    </p>
+
+    <p>
+        Next: Evasion
+        <a href="./7-evasion.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Denial of service
+        <a href="./7-dos.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        (function () {
+            var sim = document.getElementById('cookie-sim');
+            var header = document.getElementById('cookie-header');
+            var list = document.getElementById('cookie-attacks');
+            var boxes = sim.querySelectorAll('input[type=checkbox]');
+
+            function render() {
+                var f = {};
+                boxes.forEach(function (b) { f[b.getAttribute('data-f')] = b.checked; });
+
+                var parts = ['session=eyJhbGci...'];
+                if (f.httponly) parts.push('HttpOnly');
+                if (f.secure) parts.push('Secure');
+                if (f.samesite) parts.push('SameSite=Lax');
+                header.innerHTML = '<span class="m">Set-Cookie:</span> ' + parts.join('; ');
+
+                var attacks = [
+                    { name: 'XSS reads document.cookie and steals the session', safe: f.httponly },
+                    { name: 'Sniffing the cookie over plain HTTP', safe: f.secure },
+                    { name: 'CSRF — a cross-site request rides the cookie', safe: f.samesite }
+                ];
+                list.innerHTML = attacks.map(function (a) {
+                    var cls = a.safe ? 'ok' : 'bad';
+                    var tag = a.safe ? 'blocked' : 'possible';
+                    return '<div class="sim-verdict ' + cls + '" style="margin:.4rem 0;">' +
+                        tag.toUpperCase() + ' — ' + a.name + '</div>';
+                }).join('');
+            }
+
+            boxes.forEach(function (b) { b.addEventListener('change', render); });
+            render();
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Recon intro</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Reconnaissance</h2>
+
+    <p>
+        Reconnaissance, also called footprinting, is the first working phase. The goal is to gather as much
+        <strong>relevant</strong> information as possible about the target and its approved scope. "Relevant" means
+        useful for the next phase — personnel, domains, infrastructure, technologies, exposed services, business context.
+        The website says "About us." The tester reads "about our tech stack, hiring plans, DNS habits, and forgotten
+        subdomains."
+    </p>
+
+    <h3>Passive vs active</h3>
+
+    <p>
+        Recon splits into two modes, and the difference is simply <strong>whether you touch the target</strong>.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th></th>
+            <th>Passive</th>
+            <th>Active</th>
+        </tr>
+        <tr>
+            <td>Contact</td>
+            <td>None — you read public and third-party sources</td>
+            <td>Direct — you query the target's own systems</td>
+        </tr>
+        <tr>
+            <td>Detection</td>
+            <td>Effectively invisible</td>
+            <td>Can be logged and noticed</td>
+        </tr>
+        <tr>
+            <td>Examples</td>
+            <td>Search engines, certificate logs, public DNS, Netcraft</td>
+            <td>DNS interrogation, light service probing</td>
+        </tr>
+    </table>
+
+    <p>
+        Always start passive and exhaust it before going active. Passive work costs the target nothing and tells you
+        where to point the noisy tools later. Active recon touches the target, so it must be explicitly allowed by the
+        rules of engagement.
+    </p>
+
+    <h3>What to collect</h3>
+
+    <ul>
+        <li>Owner information</li>
+        <li>Domains and subdomains</li>
+        <li>IP addresses and hosting clues</li>
+        <li>Employee names and email patterns</li>
+        <li>Technologies, third-party services, CDNs</li>
+        <li>Physical locations, company news and events</li>
+    </ul>
+
+    <p>
+        Every recon item should answer one question: <em>why does this help the next phase?</em> If the answer is
+        "because I am nosy," delete it and drink water. And avoid surveilling individuals to find personal weaknesses —
+        that is not pentesting, it is creepy and possibly criminal. Stay professional and in scope.
+    </p>
+
+    <p>
+        The output of this whole chapter is a target inventory: domains, subdomains, IPs, technologies, useful contacts,
+        source links, and a note on what to scan next.
+    </p>
+
+    <p>
+        Next: Search engines and dorks
+        <a href="./2-search-and-dorks.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Methodology
+        <a href="./1-methodology.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

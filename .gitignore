@@ -1,1 +1,5 @@
 .DS_Store
+
+# Pentest engagement artifacts (keep data/README.md)
+ceh/data/*/
+!ceh/data/README.md

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Denial of service</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Denial of service</h2>
+
+    <p>
+        Denial-of-service concepts are important to understand, but actually running DoS against production is one of the
+        riskiest things in this whole set. It is the clearest "never automate, never assume" action — irreversible, and
+        from the outside you cannot see how much you are breaking.
+    </p>
+
+    <h3>Prefer the safe answer</h3>
+
+    <p>
+        Unless the contract specifically includes availability testing, you usually answer DoS questions <em>without</em>
+        launching one:
+    </p>
+
+    <ul>
+        <li>Architecture review — are there rate limits, autoscaling, and upstream DDoS protection?</li>
+        <li>Rate-limit checks — does the app throttle expensive endpoints?</li>
+        <li>Capacity discussion — what happens under a traffic spike, on paper?</li>
+        <li>Controlled lab reproduction — demonstrate the weakness on a copy, never on prod.</li>
+    </ul>
+
+    <p>
+        When availability testing <em>is</em> in scope, it happens in a window everyone agreed to, with a rollback plan
+        and someone watching the target's health. A crashed production service is not a finding — it is an outage you
+        caused.
+    </p>
+
+    <h3>The kinds worth knowing</h3>
+
+    <p>
+        Volumetric (flood the pipe), protocol (exhaust connection tables, e.g. SYN floods), and application-layer (one
+        expensive request repeated until the app falls over). The application-layer ones are the most relevant to a web
+        test, because a single un-throttled, costly endpoint is a design finding you can report from a rate-limit check
+        alone.
+    </p>
+
+    <p>
+        Next: Session hijacking
+        <a href="./7-session-hijacking.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Social engineering
+        <a href="./7-social-engineering.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

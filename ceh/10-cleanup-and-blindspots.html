@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Cleanup and blind spots</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Cleanup and blind spots</h2>
+
+    <p>
+        The report is written, but the engagement is not done until you have cleaned up after yourself and been honest
+        about what you could not see.
+    </p>
+
+    <h3>Cleanup and retest</h3>
+
+    <p>
+        Cleanup means removing what you left behind: test accounts, uploaded files, temporary keys, payload markers,
+        callbacks, and scan artifacts. Retesting later confirms the fixes actually work and avoids the classic "we fixed
+        it by moving it to another endpoint" outcome. A clean engagement ends with: findings delivered, evidence tidy,
+        cleanup complete, fixes tracked, and a retest planned.
+    </p>
+
+    <h3>Name the blind spots</h3>
+
+    <p>
+        Black-box reporting carries one duty that white-box does not: document what you <strong>could not</strong> see.
+        Absence of a finding is not evidence of safety, and an honest limitations section is the difference between a
+        useful report and a falsely reassuring one.
+    </p>
+
+    <ul>
+        <li>Edge / WAF interference and any rate-limit-induced gaps</li>
+        <li>In-scope hosts or endpoints that did not respond</li>
+        <li>Post-authentication surfaces you never reached</li>
+        <li>Anything time-boxed out — name it, don't bury it</li>
+    </ul>
+
+    <p>
+        "We found no critical issues" and "we ran out of time before testing the admin API" are very different sentences.
+        Only one of them is honest, and the client deserves the honest one.
+    </p>
+
+    <h3>The whole campaign, one line</h3>
+
+    <p>
+        From a single rude URL to a delivered report, the path was:
+    </p>
+
+    <pre><code>scope -> recon -> scan -> enumerate -> analyze -> validate
+      -> network/web/platform checks -> report -> cleanup -> retest</code></pre>
+
+    <p>
+        Each phase fed the next. If you tracked it with the <a href="./pipeline.html">campaign tracker</a>, the timeline
+        and artifacts are already sitting there and half the report writes itself — but the thinking, at every step,
+        was yours.
+    </p>
+
+    <p>
+        Back to <a href="./index.html">Contents</a>
+    </p>
+
+    <p>
+        Previous: Reporting
+        <a href="./10-reporting.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - SQL injection</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>SQL injection</h2>
+
+    <p>
+        SQL injection happens when user input becomes part of a database query instead of staying data. When an app
+        builds SQL by gluing strings together — <code>"... WHERE user='" + input + "'"</code> — your quote escapes the
+        string and the rest of your input becomes logic the developer never intended. The result can be authentication
+        bypass, data disclosure, or data modification.
+    </p>
+
+    <h3>Watch the query collapse</h3>
+
+    <p>
+        The login below runs
+        <code>SELECT * FROM users WHERE user='&#123;u&#125;' AND pass='&#123;p&#125;'</code>
+        by string concatenation. Your input is really tokenised and evaluated — including <code>--</code> comments and
+        <code>OR</code> logic. Try a preset, then flip on the parameterised query to watch the same payload fail.
+    </p>
+
+    <div class="sim" id="sqli-sim">
+        <div class="sim-grid">
+            <div>
+                <label>Username field</label>
+                <input type="text" id="sqli-u" value="alice" autocomplete="off" spellcheck="false">
+            </div>
+            <div>
+                <label>Password field</label>
+                <input type="text" id="sqli-p" value="hunter2" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+        <div class="sim-presets">
+            <button class="ghost" data-u="alice" data-p="hunter2">legit login</button>
+            <button class="ghost" data-u="' OR '1'='1' -- " data-p="x">' OR '1'='1' --</button>
+            <button class="ghost" data-u="admin'-- " data-p="x">admin'--</button>
+            <button class="ghost" data-u="' OR 1=1-- " data-p="x">' OR 1=1--</button>
+            <button class="ghost" data-u="' UNION SELECT 1-- " data-p="x">broken payload</button>
+        </div>
+        <div class="sim-toolbar">
+            <button id="sqli-go">Attempt login</button>
+            <label class="sim-toggle"><input type="checkbox" id="sqli-fix"> use parameterised query (the fix)</label>
+        </div>
+        <div class="sim-out" id="sqli-out"></div>
+        <div class="sim-verdict" id="sqli-verdict"></div>
+        <div class="sim-note" id="sqli-note"></div>
+    </div>
+
+    <p>
+        With the parameterised query on, the input is sent to the database as <em>data</em> and never parsed as SQL, so
+        every payload becomes a (wrong) username. That toggle is the entire fix — which is why "use prepared statements"
+        is the only sentence a remediation section really needs here.
+    </p>
+
+    <h3>Prove it safely</h3>
+
+    <p>
+        Prove SQL injection with harmless evidence first: a controlled boolean difference (a payload that is true returns
+        a different response length than one that is false), a safe timing check, or a database error message. Do not
+        dump tables unless the scope explicitly asks for data-exposure proof — and never point an automated tool at
+        <code>--dump</code> to do it for you.
+    </p>
+
+    <p>
+        Next: Cross-site scripting
+        <a href="./8-xss.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Access control and IDOR
+        <a href="./8-access-control.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        (function () {
+            var USERS = [{ user: 'admin', pass: 'S3cr3t!' }, { user: 'alice', pass: 'hunter2' }];
+
+            function tokenize(s) {
+                var toks = [], i = 0;
+                while (i < s.length) {
+                    var c = s[i];
+                    if (c === ' ' || c === '\t' || c === '\n') { i++; continue; }
+                    if ((c === '-' && s[i + 1] === '-') || c === '#') break;
+                    if (c === "'") {
+                        var j = i + 1, buf = '';
+                        while (j < s.length && s[j] !== "'") { buf += s[j]; j++; }
+                        if (j >= s.length) throw new Error("unterminated string literal near '" + buf + "'");
+                        toks.push({ type: 'str', value: buf }); i = j + 1; continue;
+                    }
+                    if (c === '(') { toks.push({ type: 'lp' }); i++; continue; }
+                    if (c === ')') { toks.push({ type: 'rp' }); i++; continue; }
+                    if (c === '=') { toks.push({ type: 'eq' }); i++; continue; }
+                    if (/[0-9]/.test(c)) { var n = ''; while (i < s.length && /[0-9]/.test(s[i])) { n += s[i]; i++; } toks.push({ type: 'str', value: n }); continue; }
+                    if (/[a-zA-Z_]/.test(c)) {
+                        var w = ''; while (i < s.length && /[a-zA-Z0-9_]/.test(s[i])) { w += s[i]; i++; }
+                        var up = w.toUpperCase();
+                        toks.push(up === 'AND' || up === 'OR' ? { type: 'op', value: up } : { type: 'ident', value: w });
+                        continue;
+                    }
+                    throw new Error('unexpected character "' + c + '"');
+                }
+                return toks;
+            }
+
+            function evaluate(toks, row) {
+                var pos = 0;
+                function peek() { return toks[pos]; }
+                function next() { return toks[pos++]; }
+                function truthy(nd) { if (nd.kind === 'bool') return nd.b; var v = String(nd.v); return v !== '' && v !== '0'; }
+                function primary() {
+                    var t = peek();
+                    if (!t) throw new Error('unexpected end of expression');
+                    if (t.type === 'lp') { next(); var v = parseOr(); if (peek() && peek().type === 'rp') next(); return v; }
+                    if (t.type === 'str') { next(); return { kind: 'val', v: t.value }; }
+                    if (t.type === 'ident') { next(); if (!(t.value in row)) throw new Error('unknown column "' + t.value + '"'); return { kind: 'val', v: row[t.value] }; }
+                    throw new Error('syntax error near "' + (t.value || t.type) + '"');
+                }
+                function cmp() { var l = primary(); if (peek() && peek().type === 'eq') { next(); var r = primary(); return { kind: 'bool', b: String(l.v) === String(r.v) }; } return l; }
+                function parseAnd() { var l = cmp(); while (peek() && peek().type === 'op' && peek().value === 'AND') { next(); var r = cmp(); l = { kind: 'bool', b: truthy(l) && truthy(r) }; } return l; }
+                function parseOr() { var l = parseAnd(); while (peek() && peek().type === 'op' && peek().value === 'OR') { next(); var r = parseAnd(); l = { kind: 'bool', b: truthy(l) || truthy(r) }; } return l; }
+                var node = parseOr();
+                if (pos < toks.length) throw new Error('trailing tokens after expression');
+                return truthy(node);
+            }
+
+            var u = document.getElementById('sqli-u'), p = document.getElementById('sqli-p');
+            var out = document.getElementById('sqli-out'), verdict = document.getElementById('sqli-verdict');
+            var note = document.getElementById('sqli-note'), fix = document.getElementById('sqli-fix');
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+            function run() {
+                var uv = u.value, pv = p.value;
+                if (fix.checked) {
+                    var rows = USERS.filter(function (r) { return r.user === uv && r.pass === pv; });
+                    out.innerHTML = '<span class="m">-- parameterised query</span>\n<span class="k">SELECT</span> * <span class="k">FROM</span> users <span class="k">WHERE</span> user=<span class="y">$1</span> <span class="k">AND</span> pass=<span class="y">$2</span>\n<span class="m">$1 = </span><span class="s">' + esc(uv) + '</span>\n<span class="m">$2 = </span><span class="s">' + esc(pv) + '</span>\n\n<span class="m">rows returned: ' + rows.length + '</span>';
+                    if (rows.length) { verdict.className = 'sim-verdict ok'; verdict.textContent = 'Access granted (legitimately — credentials matched).'; note.textContent = 'Input treated as literal data. No injection is possible here.'; }
+                    else { verdict.className = 'sim-verdict bad'; verdict.textContent = 'Access denied.'; note.textContent = 'The payload is just a (wrong) username now. This is the fix in one checkbox.'; }
+                    return;
+                }
+                var query = "user='" + uv + "' AND pass='" + pv + "'";
+                var shown = '<span class="k">SELECT</span> * <span class="k">FROM</span> users <span class="k">WHERE</span> ' + esc(query);
+                var matched = [], err = null;
+                try { var toks = tokenize(query); USERS.forEach(function (r) { if (evaluate(toks.slice(), r)) matched.push(r.user); }); }
+                catch (e) { err = e.message; }
+                if (err) { out.innerHTML = shown + '\n\n<span class="s">SQL error: ' + esc(err) + '</span>'; verdict.className = 'sim-verdict warn'; verdict.textContent = 'Database error — itself a signal (error-based detection).'; note.textContent = 'A leaked error tells an attacker the input reaches SQL. This payload was not valid SQL in this context, but the error confirms injection.'; return; }
+                out.innerHTML = shown + '\n\n<span class="m">rows returned: ' + matched.length + (matched.length ? '  -> [' + matched.join(', ') + ']' : '') + '</span>';
+                var injected = /['#]|--/.test(uv) || /['#]|--/.test(pv);
+                if (matched.length && injected) { verdict.className = 'sim-verdict bad'; verdict.textContent = 'Access granted as "' + matched[0] + '" — without a valid password. Injection successful.'; note.textContent = 'Your input escaped the quotes and added logic; the WHERE clause evaluated true, so a row came back and the app logged you in.'; }
+                else if (matched.length) { verdict.className = 'sim-verdict ok'; verdict.textContent = 'Access granted as "' + matched[0] + '" — legitimate credentials matched.'; note.textContent = 'Normal login. Now try a preset payload in the username field.'; }
+                else { verdict.className = 'sim-verdict ok'; verdict.textContent = 'Access denied — no row matched.'; note.textContent = 'Either wrong credentials, or a payload whose logic still evaluated false.'; }
+            }
+            document.querySelectorAll('#sqli-sim .sim-presets button').forEach(function (b) { b.addEventListener('click', function () { u.value = b.getAttribute('data-u'); p.value = b.getAttribute('data-p'); run(); }); });
+            document.getElementById('sqli-go').addEventListener('click', run);
+            fix.addEventListener('change', run);
+            run();
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

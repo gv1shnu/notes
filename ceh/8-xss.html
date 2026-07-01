@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Cross-site scripting</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Cross-site scripting (XSS)</h2>
+
+    <p>
+        XSS is input that becomes <em>script</em> in another user's browser. If an app takes your input and writes it
+        into a page without encoding, a payload like <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> runs as code
+        instead of showing as text. From there an attacker can steal sessions, rewrite the page, or act as the victim.
+    </p>
+
+    <h3>Data vs code</h3>
+
+    <p>
+        A search box echoes your term back into the results page. Type into it and watch what the server builds — and
+        whether the browser treats it as text or executes it. Then turn on output encoding, the fix.
+    </p>
+
+    <div class="sim" id="xss-sim">
+        <div>
+            <label>Search input</label>
+            <input type="text" id="xss-in" value="&lt;script&gt;alert(1)&lt;/script&gt;" autocomplete="off" spellcheck="false" style="width:100%;padding:.55rem .65rem;border:1px solid var(--border);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:.9rem;">
+        </div>
+        <div class="sim-presets">
+            <button class="ghost" data-x="shoes">harmless search</button>
+            <button class="ghost" data-x="&lt;script&gt;alert(1)&lt;/script&gt;">&lt;script&gt;alert(1)&lt;/script&gt;</button>
+            <button class="ghost" data-x="&lt;img src=x onerror=alert(1)&gt;">img onerror</button>
+            <button class="ghost" data-x="&quot;&gt;&lt;svg onload=alert(1)&gt;">svg onload</button>
+        </div>
+        <div class="sim-toolbar">
+            <button id="xss-go">Submit search</button>
+            <label class="sim-toggle"><input type="checkbox" id="xss-fix"> HTML-encode the output (the fix)</label>
+        </div>
+        <div class="sim-out" id="xss-src"></div>
+        <div class="sim-verdict" id="xss-verdict"></div>
+        <div class="sim-note" id="xss-note"></div>
+    </div>
+
+    <p>
+        With encoding on, <code>&lt;</code> and <code>&gt;</code> become <code>&amp;lt;</code> and <code>&amp;gt;</code>,
+        so the browser shows the payload as text and never runs it. Context matters: the same input is dangerous in an
+        HTML body, an attribute, or a JavaScript string in different ways, so the report should name where the reflection
+        landed.
+    </p>
+
+    <h3>The three kinds, and safe proof</h3>
+
+    <ul>
+        <li><strong>Reflected</strong> — bounced straight back in the response (like the search box above)</li>
+        <li><strong>Stored</strong> — saved and served to other users later; the dangerous one</li>
+        <li><strong>DOM-based</strong> — client-side JavaScript does the unsafe write</li>
+    </ul>
+
+    <p>
+        <code>alert(1)</code> is the industry's "is this thing on?" If the box pops, the point is made — you do not then
+        need to steal anyone's cookies to prove cookies are stealable. Remove any stored markers you leave behind.
+    </p>
+
+    <p>
+        Next: Injection and SSRF
+        <a href="./8-injection-and-ssrf.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: SQL injection
+        <a href="./8-sql-injection.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        (function () {
+            var input = document.getElementById('xss-in');
+            var src = document.getElementById('xss-src');
+            var verdict = document.getElementById('xss-verdict');
+            var note = document.getElementById('xss-note');
+            var fix = document.getElementById('xss-fix');
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            var EXEC = /<script|onerror\s*=|onload\s*=|<img|<svg|javascript:/i;
+
+            function run() {
+                var raw = input.value;
+                if (fix.checked) {
+                    var safe = esc(raw);
+                    src.innerHTML = '<span class="m">server builds:</span>\n&lt;p&gt;Results for: ' + esc(safe) + '&lt;/p&gt;\n\n<span class="m">browser shows the text:</span>  ' + esc(raw);
+                    verdict.className = 'sim-verdict ok';
+                    verdict.textContent = 'Safe — output encoded, payload shown as text.';
+                    note.textContent = 'The angle brackets were escaped before insertion, so nothing executes. This is the fix.';
+                    return;
+                }
+                src.innerHTML = '<span class="m">server builds:</span>\n&lt;p&gt;Results for: ' + esc(raw) + '&lt;/p&gt;';
+                if (EXEC.test(raw)) {
+                    verdict.className = 'sim-verdict bad';
+                    verdict.textContent = 'Script executed — alert(1) fired. This is XSS.';
+                    note.textContent = 'The input was written into the page unencoded, so the browser parsed your tag as code and ran it.';
+                } else {
+                    verdict.className = 'sim-verdict ok';
+                    verdict.textContent = 'Rendered as-is — no script in the input.';
+                    note.textContent = 'A plain search term is harmless. Try a preset payload to see the difference.';
+                }
+            }
+            document.querySelectorAll('#xss-sim .sim-presets button').forEach(function (b) {
+                b.addEventListener('click', function () { input.value = b.getAttribute('data-x'); run(); });
+            });
+            document.getElementById('xss-go').addEventListener('click', run);
+            fix.addEventListener('change', run);
+            run();
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

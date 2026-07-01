@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Web fingerprinting</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Web fingerprinting</h2>
+
+    <p>
+        For a live web host, enumeration starts by working out <strong>what the stack is</strong> — not to exploit it
+        yet, but to decide where to spend attention. A Laravel app behind nginx invites different tests than a static
+        site on IIS. Fingerprinting is read-only and safe to run broadly.
+    </p>
+
+    <h3>Read the headers</h3>
+
+    <p>
+        The response headers alone reveal the server, the framework, cookie behaviour, and which security headers are
+        missing:
+    </p>
+
+    <pre><code>$ curl -sI https://shop.lab.example.com
+HTTP/2 200
+server: nginx/1.18.0
+x-powered-by: Express
+set-cookie: session=eyJ...; Path=/
+content-type: text/html; charset=utf-8</code></pre>
+
+    <p>
+        Three findings already: an Express (Node.js) backend leaked by <code>x-powered-by</code>, a session cookie with
+        <strong>no <code>HttpOnly</code>, <code>Secure</code>, or <code>SameSite</code> flags</strong>, and no
+        <code>Content-Security-Policy</code> or <code>Strict-Transport-Security</code> in sight.
+    </p>
+
+    <h3>Fingerprint the whole stack</h3>
+
+    <p>
+        <code>whatweb</code> rolls many signals into one line:
+    </p>
+
+    <pre><code>$ whatweb https://shop.lab.example.com
+https://shop.lab.example.com [200 OK] Country[US], HTTPParty, nginx[1.18.0],
+  X-Powered-By[Express], Script[jQuery], Cookies[session]</code></pre>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Signal</th>
+            <th>What it whispers</th>
+        </tr>
+        <tr><td>Response headers</td><td>Server, framework, cookie flags, missing protections</td></tr>
+        <tr><td>Favicon hash</td><td>A Shodan/Censys pivot — same hash often means same known app</td></tr>
+        <tr><td>TLS cert &amp; SANs</td><td>More hostnames, internal naming, expiry / self-signed clues</td></tr>
+        <tr><td>404 &amp; error pages</td><td>Stack traces, framework defaults, debug mode left on</td></tr>
+    </table>
+
+    <p>
+        Decide what the stack is <em>before</em> pointing any scanner at it. A vulnerability scanner aimed at the wrong
+        stack just produces confident nonsense.
+    </p>
+
+    <p>
+        Next: Web content discovery
+        <a href="./4-web-content-discovery.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Mail, DNS, and SNMP
+        <a href="./4-mail-dns-snmp.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Host discovery</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Host discovery</h2>
+
+    <p>
+        Recon gave us names, domains, and IP ranges — guesses about what exists. Scanning is where we touch only the
+        approved targets and turn guesses into facts. The very first fact: <strong>which of these addresses are actually
+        alive?</strong> No point port-scanning 254 addresses when three respond. Host discovery is asking "are you there?"
+        politely, rate-limited, and with written permission.
+    </p>
+
+    <h3>Ways to ask</h3>
+
+    <p>
+        A single ping is not enough, because ICMP is often blocked. So discovery combines several probes and treats a
+        reply on <em>any</em> of them as "host is up."
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Method</th>
+            <th>How it asks</th>
+            <th>Best for</th>
+        </tr>
+        <tr><td>ICMP echo</td><td>The classic ping</td><td>Networks that allow ICMP</td></tr>
+        <tr><td>TCP SYN/ACK</td><td>A packet to a common port (80, 443)</td><td>When ICMP is filtered</td></tr>
+        <tr><td>ARP</td><td>Layer-2 "who has this IP?"</td><td>Local networks — reliable and quiet</td></tr>
+        <tr><td>DNS resolution</td><td>Name resolves to an address in scope</td><td>Confirming a target exists at all</td></tr>
+    </table>
+
+    <h3>The sweep</h3>
+
+    <p>
+        A "ping sweep" checks a whole range for live hosts without scanning ports. In nmap that is <code>-sn</code>:
+    </p>
+
+    <pre><code>$ sudo nmap -sn 10.10.10.0/24
+
+Nmap scan report for 10.10.10.5
+Host is up (0.019s latency).
+Nmap scan report for 10.10.10.12
+Host is up (0.021s latency).
+Nmap scan report for 10.10.10.40
+Host is up (0.022s latency).
+Nmap done: 256 IP addresses (3 hosts up) scanned in 3.20 seconds</code></pre>
+
+    <p>
+        Three live hosts out of 256 — now the noisy port scanning only has to hit those three.
+    </p>
+
+    <h3>When the host hides</h3>
+
+    <p>
+        Sometimes a host is up but ignores every discovery probe (a firewall dropping ICMP and unsolicited SYNs). If you
+        already have good reason to believe it exists — recon said so, DNS resolves — tell nmap to skip discovery and
+        just scan it, with <code>-Pn</code>:
+    </p>
+
+    <pre><code>$ sudo nmap -Pn -p 80,443 10.10.10.99</code></pre>
+
+    <p>
+        <code>-Pn</code> means "assume the host is up, don't try to prove it first." Useful when discovery is filtered,
+        but slower and noisier, so reach for it deliberately rather than by default. The key mindset from here on:
+        <strong>silence is not proof of absence.</strong> Firewalls, load balancers, and source-IP rules can all make a
+        live host look dead.
+    </p>
+
+    <p>
+        Next: Port scanning
+        <a href="./3-port-scanning.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Attribution
+        <a href="./2-attribution.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

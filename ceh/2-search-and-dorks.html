@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Search and dorks</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Search engines and Google dorks</h2>
+
+    <p>
+        Search engines have already crawled the target for you. They reveal indexed pages, public profiles, exposed
+        files, and naming patterns — all without touching the target once. Fetching page after page by hand is a waste of
+        time; being <strong>specific</strong> is the entire skill.
+    </p>
+
+    <p>
+        Beyond Google there is Bing, Yahoo, Brave, Yandex, DuckDuckGo, and SearXNG — an open-source metasearch engine
+        that aggregates results from several providers. Functional, not always optimal. Different engines index
+        differently, so a quiet result on one can be loud on another.
+    </p>
+
+    <h3>Google dorks</h3>
+
+    <p>
+        A "dork" is a targeted query built from search operators. Regular search says "here are results." Dorking says
+        "here are results that forgot they were results."
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Operator</th>
+            <th>Finds</th>
+        </tr>
+        <tr><td><code>site:</code></td><td>Pages on one domain only</td></tr>
+        <tr><td><code>filetype:</code> / <code>ext:</code></td><td>A specific file type (pdf, xlsx, sql, env)</td></tr>
+        <tr><td><code>intitle:</code> / <code>inurl:</code></td><td>A word in the page title or URL</td></tr>
+        <tr><td><code>intext:</code></td><td>A word in the page body</td></tr>
+        <tr><td><code>cache:</code></td><td>Google's cached copy of a page</td></tr>
+        <tr><td><code>before:</code> / <code>after:</code></td><td>Date-bounded results (YYYY-MM-DD)</td></tr>
+        <tr><td><code>-word</code></td><td>Exclude a term</td></tr>
+    </table>
+
+    <p>
+        Combine them. To hunt for resume PDFs left on a specific site:
+    </p>
+
+    <pre><code>site:newtonschool.co filetype:pdf resume</code></pre>
+
+    <p>
+        The results are indexed PDF resumes hosted on that domain — names, emails, and phone numbers the site never meant
+        to expose to a search operator. Or, to find resumes of a company's employees anywhere on the web:
+    </p>
+
+    <pre><code>intitle:resume "software engineer" "at Google"</code></pre>
+
+    <p>
+        A few more that pay off on real targets:
+    </p>
+
+    <pre><code>site:target.com intitle:"index of"          # open directory listings
+site:target.com ext:sql | ext:env | ext:log  # leaked configs and dumps
+site:target.com inurl:admin | inurl:login     # exposed panels</code></pre>
+
+    <p>
+        The <a href="https://www.exploit-db.com/google-hacking-database">Google Hacking Database</a> is a curated list of
+        these patterns. When you practise, run them against an in-scope lab target, not random companies — the query is
+        passive, but the follow-up rarely stays that way.
+    </p>
+
+    <p>
+        Next: DNS and subdomains
+        <a href="./2-dns-and-subdomains.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Reconnaissance
+        <a href="./2-recon-intro.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

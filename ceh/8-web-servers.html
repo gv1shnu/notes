@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Web servers</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Web servers</h2>
+
+    <p>
+        Web is the dominant surface in a black-box test, and web testing flows in one direction: from the server's
+        exposure, to the application's behaviour, to the data behind it. This chapter walks that path. It starts with the
+        server itself — the software serving the pages, before any application logic.
+    </p>
+
+    <h3>What to check</h3>
+
+    <ul>
+        <li>Server and version exposure (the <code>Server</code> header)</li>
+        <li>Default pages and sample apps left installed</li>
+        <li>Directory listing turned on</li>
+        <li>TLS configuration and certificates</li>
+        <li>Dangerous HTTP methods enabled</li>
+        <li>Backup and config files under the web root</li>
+        <li>Reverse-proxy and CDN behaviour</li>
+    </ul>
+
+    <h3>Dangerous methods</h3>
+
+    <p>
+        Ask the server which HTTP methods it allows. <code>PUT</code> or <code>DELETE</code> on a content path can mean
+        you upload or remove files directly:
+    </p>
+
+    <pre><code>$ curl -sI -X OPTIONS https://shop.lab.example.com/
+HTTP/2 200
+allow: GET, POST, PUT, DELETE, OPTIONS</code></pre>
+
+    <p>
+        <code>PUT</code> and <code>DELETE</code> being listed is worth a careful, in-scope test — writing a harmless
+        marker file proves it without damage.
+    </p>
+
+    <h3>TLS configuration</h3>
+
+    <p>
+        <code>testssl.sh</code> or <code>sslscan</code> grade the TLS setup — protocol versions, weak ciphers, cert
+        problems:
+    </p>
+
+    <pre><code>$ testssl.sh --quiet https://shop.lab.example.com
+ TLS 1.0    offered (deprecated)
+ TLS 1.3    offered (OK)
+ Certificate Validity  expires in 12 days (!)</code></pre>
+
+    <p>
+        Deprecated TLS 1.0 and a certificate about to expire are both reportable. Also probe for leftover files —
+        <code>/backup.zip</code>, <code>/.git/</code>, <code>/config.php.bak</code> — which spill source and secrets more
+        often than any clever exploit.
+    </p>
+
+    <p>
+        Next: Authentication and session
+        <a href="./8-auth-and-session.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Evasion
+        <a href="./7-evasion.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

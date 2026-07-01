@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Triage and risk</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Triage and risk</h2>
+
+    <p>
+        A scanner produces a long, confident list. Your job is not to believe it — it is to prove what is real, drop what
+        is not, and rank what remains by how much it actually matters here. Automated tools generate candidates; humans
+        make findings.
+    </p>
+
+    <h3>False positives first</h3>
+
+    <p>
+        Before ranking anything, delete the noise. Version-string matching is especially unreliable: a backported patch
+        hides behind an old banner, so "OpenSSH 7.x, therefore vulnerable" is a guess, not a finding. Typical false
+        positives:
+    </p>
+
+    <ul>
+        <li>An "expired certificate" flagged on a CDN edge that is not the real endpoint</li>
+        <li>A CVE matched purely on a version banner, with no proof the vulnerable code path exists</li>
+        <li>Informational findings dressed up as issues</li>
+    </ul>
+
+    <p>
+        The boring settings are where the real findings usually live anyway: default credentials, anonymous access, old
+        TLS, missing MFA, exposed admin panels, world-readable storage, debug mode left on. Tool-heavy courses over-index
+        on scanners; real reports are full of misconfigurations.
+    </p>
+
+    <h3>Risk is not just CVSS</h3>
+
+    <p>
+        A CVSS score describes a vulnerability in the abstract. Risk describes it <em>in this environment</em>. A medium
+        issue on a public payment app can matter more than a high issue buried in a sealed lab VLAN. Rank with context:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Question</th>
+            <th>Why it changes the ranking</th>
+        </tr>
+        <tr><td>Is it reachable?</td><td>An unreachable bug is lower priority unless a path exists to it.</td></tr>
+        <tr><td>Is authentication required?</td><td>Unauthenticated issues usually rank higher.</td></tr>
+        <tr><td>Is exploitation reliable?</td><td>Speculative findings need softer wording and lower rank.</td></tr>
+        <tr><td>What is the blast radius?</td><td>One test box versus domain-wide compromise are different planets.</td></tr>
+        <tr><td>Is it on the KEV list?</td><td>Known-exploited issues jump the queue.</td></tr>
+    </table>
+
+    <h3>Plan safe validation</h3>
+
+    <p>
+        For each surviving candidate, decide the <em>least risky</em> way to prove it in the next phase. Often a
+        screenshot, a version fact, a harmless request, or a configuration excerpt is enough. Every validation step
+        should carry a stop condition set in advance: if the next action could change data, disrupt service, or expose
+        secrets, pause and confirm scope. You do not need to burn down the kitchen to prove the stove is on.
+    </p>
+
+    <p>
+        The output of this chapter is a ranked list of confirmed-or-plausible weaknesses, each with a validation plan —
+        the input to exploitation.
+    </p>
+
+    <p>
+        Next: Exploitation
+        <a href="./6-exploitation-intro.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: CVE and CVSS
+        <a href="./5-cve-and-cvss.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

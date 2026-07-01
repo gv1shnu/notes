@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Attribution</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Attribution</h2>
+
+    <p>
+        In a black-box test, the first real mistake is assuming a URL points where you think it does.
+        <code>shop.lab.example.com</code> might resolve to the client's own server, a shared CDN edge, a SaaS tenant they
+        do not own, or a cloud IP that was someone else's last week. Touching the wrong box is not a technicality — it is
+        the difference between a pentest and an intrusion. Attribution is proving a target is really in scope
+        <strong>before</strong> any packet with intent leaves your machine.
+    </p>
+
+    <p>
+        "It was in the same subnet" has never once worked as a legal defence. The subnet does not love you.
+    </p>
+
+    <h3>Resolve every IP, then find the owner</h3>
+
+    <p>
+        Start by resolving the host — all of it, because geo-DNS and round-robin love to hide addresses behind the first
+        answer:
+    </p>
+
+    <pre><code>$ dig +short shop.lab.example.com
+104.21.5.12
+172.67.20.9
+
+$ whois 104.21.5.12 | grep -iE 'orgname|netname'
+OrgName:  Cloudflare, Inc.
+NetName:  CLOUDFLARENET</code></pre>
+
+    <p>
+        That answer changes everything: you are talking to <strong>Cloudflare's edge, not the origin server</strong>.
+        Your later scans will describe the CDN, not the app behind it. Map each IP to its ASN and owner and label it —
+        client, CDN, or cloud provider.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Owner reads as…</th>
+            <th>Meaning</th>
+        </tr>
+        <tr><td>The client's own org / ASN</td><td>Likely a real origin host. In scope if listed.</td></tr>
+        <tr><td>A CDN (Cloudflare, Akamai, Fastly)</td><td>You see the edge. Origin discovery is a separate job.</td></tr>
+        <tr><td>A cloud provider (AWS, Azure, GCP)</td><td>Confirm the tenant is the client's; provider rules apply.</td></tr>
+    </table>
+
+    <h3>The rule: deny by default</h3>
+
+    <p>
+        Cross-check every resolved IP against the engagement's allowlist and forbidden list. If any address is outside
+        scope, in the forbidden list, or on shared infrastructure you cannot attribute, <strong>stop</strong>. And do it
+        again right before any active phase, not just once at the start — DNS drifts, and an in-scope name can quietly
+        start resolving to out-of-scope infrastructure between one day and the next.
+    </p>
+
+    <h3>Surface mapping (passive first)</h3>
+
+    <p>
+        With attribution settled, the map you built in this chapter — crt.sh subdomains, DNSDumpster hosts, archive.org's
+        old URLs — is your passive surface. Its size is the ceiling on everything later: an endpoint you never find is a
+        bug you never find. Only once you have squeezed the passive sources do you resolve those candidates and send them
+        a single, polite request to see which are alive. That step crosses from passive into active, so it runs under
+        scope control, capped, and stopped if a firewall starts answering for everyone.
+    </p>
+
+    <p>
+        (In the campaign tracker, a passive collector writes this inventory to <code>recon/inventory.json</code> and a
+        human reviews it before scanning. The review is the point; the file is just where it is written down.)
+    </p>
+
+    <p>
+        Next: Host discovery
+        <a href="./3-host-discovery.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Recon frameworks
+        <a href="./2-recon-frameworks.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

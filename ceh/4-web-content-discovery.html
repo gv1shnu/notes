@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Web content discovery</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Web content discovery</h2>
+
+    <p>
+        The visible site is the lobby. The job is the rest of the building: hidden directories, forgotten admin panels, a
+        <code>backup.zip</code> someone left in the web root, and — most valuable in modern apps — the API surface behind
+        the JavaScript. Two complementary moves get you there.
+    </p>
+
+    <h3>Brute-force the paths</h3>
+
+    <p>
+        A wordlist tool requests thousands of common paths and reports which exist. <code>ffuf</code> and
+        <code>gobuster</code> are the usual choices:
+    </p>
+
+    <pre><code>$ ffuf -u https://shop.lab.example.com/FUZZ -w common.txt -mc 200,301,401,403 -rate 50
+
+admin        [Status: 401, Size: 21]     # exists, needs auth — interesting
+backup       [Status: 200, Size: 90210]  # a directory listing? open it
+robots.txt   [Status: 200, Size: 142]
+api          [Status: 200, Size: 512]</code></pre>
+
+    <p>
+        This is loud, high-volume traffic against one host, so pace it (<code>-rate</code>) and watch for the target
+        pushing back with <code>429</code>s or a sudden wall of <code>403</code>s (the WAF waking up). Always read
+        <code>robots.txt</code> and <code>sitemap.xml</code> first — sites helpfully list the paths they want hidden.
+    </p>
+
+    <h3>Read the app's own JavaScript</h3>
+
+    <p>
+        Single-page apps hand you a gift: their frontend bundles literally contain the API endpoints they call. Fetching
+        and grepping that JavaScript is nearly passive and often richer than any wordlist:
+    </p>
+
+    <pre><code># pull endpoints out of a bundled app.js
+$ curl -s https://shop.lab.example.com/static/app.js | grep -oE '"/(api|v[0-9]|graphql)[^"]*"'
+"/api/v1/orders"
+"/api/v1/user/profile"
+"/api/v1/admin/users"
+"/graphql"</code></pre>
+
+    <p>
+        <code>/api/v1/admin/users</code> was never linked in the UI, but the JavaScript admitted it exists. Also probe
+        for <code>swagger.json</code>, <code>openapi.json</code>, and a GraphQL introspection query — any one of them
+        can hand you the entire API map at once.
+    </p>
+
+    <p>
+        The handoff: content discovery produces a list of <em>reachable</em> endpoints — login, search, cart,
+        <code>/api/v1/orders?id=…</code>, an admin panel. That list is where the web-attacks chapter begins.
+    </p>
+
+    <p>
+        Next: CVE and CVSS
+        <a href="./5-cve-and-cvss.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Web fingerprinting
+        <a href="./4-web-fingerprinting.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

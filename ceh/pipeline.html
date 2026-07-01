@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Pentesting Notes - Pipeline automation</title>
+</head>
+
+<body>
+    <p class="phase-kicker">Cross-cutting / Automation</p>
+    <h2>Pentest pipeline automation</h2>
+
+    <p>
+        The phase pages teach <em>what</em> to do manually. This page describes <em>how to wire phases together</em>
+        with Python so recon output becomes scan input, scan output becomes enum input, and so on — with human
+        checkpoints where judgment is required.
+    </p>
+
+    <aside class="meme">
+        Automate the clipboard, not the conscience. The pipeline collects and routes evidence; you still decide what
+        to validate, what is in scope, and what goes in the report.
+    </aside>
+
+    <h3>What automation is good for here</h3>
+
+    <table>
+        <tr>
+            <th>Automate</th>
+            <th>Keep manual</th>
+        </tr>
+        <tr>
+            <td>Subdomain collection, DNS resolve, dedupe</td>
+            <td>Deciding which hosts are worth deeper testing</td>
+        </tr>
+        <tr>
+            <td>Batch nmap from an inventory file</td>
+            <td>Interpreting weird firewall / CDN behaviour</td>
+        </tr>
+        <tr>
+            <td>Routing open ports → enum command checklists</td>
+            <td>Running invasive enum (lockouts, writes, sprays)</td>
+        </tr>
+        <tr>
+            <td>CVE lookup from version strings</td>
+            <td>False-positive triage and business risk ranking</td>
+        </tr>
+        <tr>
+            <td>Header crawls, TLS audits, report assembly</td>
+            <td>Exploitation, privesc, social engineering</td>
+        </tr>
+        <tr>
+            <td>JSONL campaign timeline</td>
+            <td>Final severity wording and client delivery</td>
+        </tr>
+    </table>
+
+    <h3>Scoring automation: the four-axis model</h3>
+
+    <p>
+        The table above is a verdict; this is the method behind it. Score any action — any tool, any script — on four
+        axes. The last axis is the one black-box work keeps forgetting: from the outside you cannot see internal impact,
+        so you can never fully bound the blast radius of what you automate.
+    </p>
+
+    <table>
+        <tr><th>Axis</th><th>Safe end</th><th>Scary end</th></tr>
+        <tr><td>Contact</td><td>Passive (third-party data only)</td><td>Active (your packets hit the target)</td></tr>
+        <tr><td>Effect</td><td>Read-only / idempotent</td><td>State-changing / irreversible</td></tr>
+        <tr><td>Fan-out</td><td>One attributed asset</td><td>Many discovered/guessed assets</td></tr>
+        <tr><td>Visibility</td><td>You can see the consequence</td><td>You cannot (black-box default)</td></tr>
+    </table>
+
+    <p>Those axes collapse into four tiers. Tag every phase script with exactly one:</p>
+
+    <ul>
+        <li><span class="tier-badge t1">TIER 1</span> &nbsp;Automate freely — passive + read-only.</li>
+        <li><span class="tier-badge t2">TIER 2</span> &nbsp;Automate behind a runtime scope gate + rate cap — active + read-only.</li>
+        <li><span class="tier-badge t3">TIER 3</span> &nbsp;Automate to <em>propose</em>, execute by hand — state-changing or wide fan-out.</li>
+        <li><span class="tier-badge t4">TIER 4</span> &nbsp;Never automate — irreversible + blind blast radius.</li>
+    </ul>
+
+    <aside class="meme">
+        The pipeline's job is to do all the Tier 1 and Tier 2 grunt work tirelessly, and to stop with its hands visible
+        at Tier 3. Anything Tier 4 doesn't get a script; it gets a human and a written stop condition.
+    </aside>
+
+    <div class="sim" id="sim-tier">
+        <h4><i class="fas fa-sliders"></i> Simulation: the automation tier classifier</h4>
+        <p class="sim-sub">Set the four axes for an action and see which tier it lands in — or hit a preset to see how
+            real tools score. This is the decision you make, consciously or not, every time you reach for a script.</p>
+
+        <div class="sim-grid">
+            <div>
+                <label>Contact</label>
+                <select id="t-contact">
+                    <option value="passive">Passive — only third-party data</option>
+                    <option value="active">Active — packets reach the target</option>
+                </select>
+            </div>
+            <div>
+                <label>Effect</label>
+                <select id="t-effect">
+                    <option value="read">Read-only / idempotent</option>
+                    <option value="write">State-changing / irreversible</option>
+                </select>
+            </div>
+            <div>
+                <label>Fan-out</label>
+                <select id="t-fanout">
+                    <option value="single">One attributed asset</option>
+                    <option value="many">Many discovered/guessed assets</option>
+                </select>
+            </div>
+            <div>
+                <label>Visibility of impact</label>
+                <select id="t-vis">
+                    <option value="seen">I can observe the consequence</option>
+                    <option value="blind">I am blind to internal impact</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="sim-presets">
+            <button class="ghost" data-preset="crtsh">crt.sh subdomain lookup</button>
+            <button class="ghost" data-preset="nmap">nmap -sC -sV sweep</button>
+            <button class="ghost" data-preset="ffuf">ffuf content discovery</button>
+            <button class="ghost" data-preset="sqlmap">sqlmap --level 5 --risk 3</button>
+            <button class="ghost" data-preset="autopwn">Metasploit db_autopwn</button>
+        </div>
+
+        <div class="sim-verdict" id="t-verdict">Set the axes above…</div>
+        <div class="sim-note" id="t-note"></div>
+    </div>
+
+    <p class="checkpoint">
+        <strong>Rule of thumb:</strong> a script may collect and correlate all day, but the moment an action changes
+        state or fans out across guessed assets, the script's job is to <em>write the plan</em>, not run it.
+    </p>
+
+    <h3>Architecture</h3>
+
+    <p>
+        One orchestrator (<code>scripts/pipeline.py</code>) runs phase scripts in order. Each phase reads a JSON
+        artifact from the previous step and writes its own. Scope checks and logging wrap every step.
+    </p>
+
+    <pre><code>scope.json
+    │
+    ▼
+┌─────────────┐     recon/inventory.json
+│    recon    │ ─────────────────────────►
+└─────────────┘
+    │  GATE: human reviews inventory
+    ▼
+┌─────────────┐     scans/summary.json
+│   scanning  │ ─────────────────────────►
+└─────────────┘
+    │  GATE: confirm scan intensity / targets
+    ▼
+┌─────────────┐     enum/details.json
+│ enumeration │ ── (+ enum/checklists/*.md dry-run)
+└─────────────┘
+    │  parallel: web_recon on :80/:443, tls_cert_audit
+    ▼
+┌─────────────┐     vuln/candidates.json
+│ vuln analysis│ ────────────────────────►
+└─────────────┘
+    │  GATE: triage — drop FPs, rank risk
+    ▼
+┌─────────────┐     validate/plans.json
+│  validation │ ── (plans only; proof is manual)
+└─────────────┘
+    │  GATE: human runs approved proofs in lab
+    ▼
+┌─────────────┐     findings.json
+│  reporting  │ ──► reports/draft.html
+└─────────────┘</code></pre>
+
+    <p>
+        Specialty pages (<a href="./7-malware.html">network</a>,
+        <a href="./8-web-servers.html">web</a>, <a href="./9-cloud.html">platform</a>) plug in as
+        <strong>parallel branches</strong> after scanning or enumeration — not a separate linear step after
+        exploitation.
+    </p>
+
+    <h3>Engagement data layout</h3>
+
+    <p>
+        All machine output lives under <code>data/&lt;engagement-id&gt;/</code> so notes stay separate from lab
+        artifacts. Copy <code>scope.json.example</code> to <code>data/&lt;engagement-id&gt;/scope.json</code>.
+    </p>
+
+    <pre><code>ceh/
+  data/
+    lab-2025-06/
+      scope.json
+      campaign.jsonl          # append-only timeline
+      checkpoints.json        # human gate approvals
+      recon/inventory.json
+      scans/summary.json
+      enum/details.json
+      vuln/candidates.json
+      validate/plans.json
+      findings.json
+      reports/draft.html
+  scripts/
+    pipeline.py               # orchestrator
+    campaign_log.py
+    validate_scope.py
+    ...                       # one script per phase (see scripts/README.md)</code></pre>
+
+    <h3>Artifact contracts</h3>
+
+    <p>
+        Each phase page lists its pipeline I/O file. Schemas are intentionally small JSON — extend fields as you
+        implement scripts.
+    </p>
+
+    <table>
+        <tr>
+            <th>File</th>
+            <th>Produced by</th>
+            <th>Minimum shape</th>
+        </tr>
+        <tr>
+            <td><code>recon/inventory.json</code></td>
+            <td><code>subdomain_enum.py</code></td>
+            <td><code>{ "domain", "hosts": [{ "host", "ips", "sources" }] }</code></td>
+        </tr>
+        <tr>
+            <td><code>scans/summary.json</code></td>
+            <td><code>port_scan_batch.py</code></td>
+            <td><code>{ "hosts": [{ "host", "ports": [{ "port", "proto", "service", "version" }] }] }</code></td>
+        </tr>
+        <tr>
+            <td><code>enum/details.json</code></td>
+            <td><code>service_enum.py</code></td>
+            <td><code>{ "hosts": [{ "host", "services": [{ "port", "findings": [] }] }] }</code></td>
+        </tr>
+        <tr>
+            <td><code>vuln/candidates.json</code></td>
+            <td><code>cve_lookup.py</code></td>
+            <td><code>{ "candidates": [{ "host", "issue", "cves", "validation_plan" }] }</code></td>
+        </tr>
+        <tr>
+            <td><code>validate/plans.json</code></td>
+            <td><code>validation_plan.py</code></td>
+            <td><code>{ "plans": [{ "id", "proof_method", "stop_condition", "cleanup" }] }</code></td>
+        </tr>
+        <tr>
+            <td><code>findings.json</code></td>
+            <td><code>finding_add.py</code> (manual CLI after proof)</td>
+            <td><code>{ "findings": [{ "title", "severity", "evidence", "impact", "fix" }] }</code></td>
+        </tr>
+    </table>
+
+    <h3>Human gates (checkpoints)</h3>
+
+    <p>
+        The pipeline pauses after phases marked <code>gate: true</code> until you approve in
+        <code>checkpoints.json</code> or pass <code>--force</code> in a lab-only run.
+    </p>
+
+    <ol class="pipeline">
+        <li>
+            <strong>After recon</strong>
+            <span>Review inventory — drop out-of-scope hosts, mark scan priorities.</span>
+        </li>
+        <li>
+            <strong>After scanning</strong>
+            <span>Confirm scan covered intended targets; note CDN/firewall blind spots.</span>
+        </li>
+        <li>
+            <strong>After vuln analysis</strong>
+            <span>Triage candidates — delete false positives before any validation talk.</span>
+        </li>
+        <li>
+            <strong>Before report</strong>
+            <span>Only confirmed findings via <code>finding_add.py</code>; run <code>redact_secrets.py</code>.</span>
+        </li>
+    </ol>
+
+    <h3>Running the pipeline</h3>
+
+    <pre><code># From ceh/
+pip install -r scripts/requirements.txt
+
+# Init engagement folder from example scope
+python scripts/pipeline.py init --engagement lab-2025-06 --scope scope.json.example
+
+# Dry-run: show planned steps, no subprocess calls
+python scripts/pipeline.py run --engagement lab-2025-06 --dry-run
+
+# Run one phase
+python scripts/pipeline.py run --engagement lab-2025-06 --phase recon
+
+# Run all automated phases (stops at gates)
+python scripts/pipeline.py run --engagement lab-2025-06
+
+# Approve a gate after review
+python scripts/pipeline.py approve --engagement lab-2025-06 --gate post_recon
+
+# Lab only: skip gates
+python scripts/pipeline.py run --engagement lab-2025-06 --force</code></pre>
+
+    <h3>How this connects to phase pages</h3>
+
+    <table>
+        <tr>
+            <th>Notes page</th>
+            <th>Pipeline script</th>
+            <th>Pipeline I/O block on page</th>
+        </tr>
+        <tr>
+            <td><a href="./2-recon-intro.html">Recon</a></td>
+            <td><code>subdomain_enum.py</code></td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td><a href="./3-port-scanning.html">Scanning</a></td>
+            <td><code>port_scan_batch.py</code></td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td><a href="./4-enumeration-intro.html">Enumeration</a></td>
+            <td><code>service_enum.py</code>, <code>http_spider_light.py</code></td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td><a href="./5-cve-and-cvss.html">Vuln analysis</a></td>
+            <td><code>cve_lookup.py</code>, <code>fp_triage.py</code></td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td><a href="./6-exploitation-intro.html">Exploitation</a></td>
+            <td><code>validation_plan.py</code> (plans only)</td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td><a href="./8-web-servers.html">Web</a></td>
+            <td><code>web_recon.py</code>, <code>header_scorecard.py</code></td>
+            <td>Branch after enum</td>
+        </tr>
+        <tr>
+            <td><a href="./9-cloud.html">Platform</a></td>
+            <td><code>cloud_audit.py</code>, <code>tls_cert_audit.py</code></td>
+            <td>Branch after enum</td>
+        </tr>
+        <tr>
+            <td><a href="./10-reporting.html">Reporting</a></td>
+            <td><code>report_builder.py</code>, <code>finding_add.py</code></td>
+            <td>Yes</td>
+        </tr>
+    </table>
+
+    <p class="checkpoint">
+        <strong>Rule:</strong> if a step is not in <code>scope.json</code> under
+        <code>allowed_techniques</code>, the pipeline skips it — even if the script exists.
+    </p>
+
+    <!--
+    TODO: Add screenshot of pipeline dry-run terminal output once scripts are implemented.
+    TODO: Add one worked example: data/lab-2025-06/ filled from a TryHackMe Starting Point box (redacted).
+    TODO: Optional future — Makefile or justfile wrapping pipeline.py run targets.
+    TODO: Optional future — GitHub Action that runs pipeline on schedule against lab scope only.
+    -->
+
+    <div class="page-nav">
+        <p>Prev <a href="./index.html">&lt;&lt;</a></p>
+        <p class="page-nav-next">Start phases <a href="./2-recon-intro.html">&gt;&gt;</a></p>
+    </div>
+
+    <script src="../home.js"></script>
+    <script src="../footer.js"></script>
+
+    <!-- ===== Tier classifier simulation ===== -->
+    <script>
+    (function () {
+        var contact = document.getElementById('t-contact');
+        var effect  = document.getElementById('t-effect');
+        var fanout  = document.getElementById('t-fanout');
+        var vis     = document.getElementById('t-vis');
+        var verdict = document.getElementById('t-verdict');
+        var note    = document.getElementById('t-note');
+        if (!contact) return;
+
+        var TIERS = {
+            1: {label: 'TIER 1 — automate freely', cls: 'ok',
+                why: 'Passive and read-only. You touch third-party data, not the target. Let the machine run.'},
+            2: {label: 'TIER 2 — automate behind a scope gate + rate cap', cls: 'ok',
+                why: 'Active but read-only. Safe in effect; fan-out is the hazard. Re-check scope per target, cap the rate, abort on WAF.'},
+            3: {label: 'TIER 3 — automate to PROPOSE, run by hand', cls: 'warn',
+                why: 'State-changing or wide fan-out. The script may build the command and the plan, but a human pulls the trigger and watches the target.'},
+            4: {label: 'TIER 4 — never automate', cls: 'bad',
+                why: 'Irreversible AND you are blind to internal impact. No script can responsibly consent to this on the target’s behalf.'}
+        };
+
+        var PRESETS = {
+            crtsh:   {contact:'passive', effect:'read',  fanout:'single', vis:'seen',
+                      msg:'crt.sh lookup: you query a public CT log. The target never hears from you.'},
+            nmap:    {contact:'active',  effect:'read',  fanout:'many',   vis:'seen',
+                      msg:'nmap -sC -sV: active read-only, but it fans out across hosts and -sC scripts can be chatty. Gate + cap.'},
+            ffuf:    {contact:'active',  effect:'read',  fanout:'many',   vis:'blind',
+                      msg:'ffuf content discovery: active, high-volume fan-out, and you can’t see the load you cause. Propose, then run watching the 429s.'},
+            sqlmap:  {contact:'active',  effect:'write', fanout:'single', vis:'blind',
+                      msg:'sqlmap --level 5 --risk 3: at high risk it issues stacked queries and can write files. State-changing + blind = do not unleash unattended.'},
+            autopwn: {contact:'active',  effect:'write', fanout:'many',   vis:'blind',
+                      msg:'db_autopwn: fires exploits across many hosts with unknowable downstream effect. The poster child for Tier 4.'}
+        };
+
+        function score() {
+            var c = contact.value, e = effect.value, f = fanout.value, v = vis.value, tier;
+            if (e === 'write' && v === 'blind') tier = 4;
+            else if (e === 'write' || f === 'many') tier = 3;
+            else if (c === 'active') tier = 2;
+            else tier = 1;
+            var t = TIERS[tier];
+            verdict.className = 'sim-verdict ' + t.cls;
+            verdict.textContent = t.label;
+            return t;
+        }
+        function render(extra) {
+            var t = score();
+            note.textContent = (extra ? extra + '  ' : '') + t.why;
+        }
+        [contact, effect, fanout, vis].forEach(function (el) {
+            el.addEventListener('change', function () { render(''); });
+        });
+        document.querySelectorAll('#sim-tier .sim-presets button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var p = PRESETS[b.getAttribute('data-preset')];
+                contact.value = p.contact; effect.value = p.effect;
+                fanout.value = p.fanout;   vis.value = p.vis;
+                render(p.msg);
+            });
+        });
+        render('');
+    })();
+    </script>
+
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Privilege escalation</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Privilege escalation</h2>
+
+    <p>
+        A foothold is usually a low-privilege account. Privilege escalation is showing whether that foothold can become
+        root, SYSTEM, or Domain Admin. The method is always the same: enumerate the machine thoroughly, spot one
+        misconfiguration, and use it. The automated helpers <code>LinPEAS</code> and <code>WinPEAS</code> run these
+        checks for you — but know what they are looking for.
+    </p>
+
+    <h3>Linux</h3>
+
+    <p>
+        A handful of commands surface most local privesc paths:
+    </p>
+
+    <pre><code>$ id                                   # what am I?
+$ sudo -l                              # what can I run as root?
+User labuser may run (root) NOPASSWD: /usr/bin/find
+
+$ find / -perm -4000 2>/dev/null       # SUID binaries (run as owner)
+/usr/bin/pkexec
+/usr/bin/find</code></pre>
+
+    <p>
+        That <code>sudo -l</code> result is a straight path to root: <a href="https://gtfobins.github.io/">GTFOBins</a>
+        shows that <code>find</code> can spawn a shell, and it is allowed to run as root with no password. Common Linux
+        vectors: weak <code>sudo</code> rules, SUID binaries, writable cron jobs, exposed secrets, world-writable
+        service files, and kernel exploits (last resort — they crash boxes).
+    </p>
+
+    <h3>Windows</h3>
+
+    <p>
+        The Windows equivalent starts with your privileges and the patch level:
+    </p>
+
+    <pre><code>C:\&gt; whoami /priv
+SeImpersonatePrivilege        Enabled
+
+C:\&gt; systeminfo | findstr /B "OS Version"</code></pre>
+
+    <p>
+        <code>SeImpersonatePrivilege</code> is a classic win — the "Potato" family of tools (e.g. PrintSpoofer) turns it
+        into SYSTEM. Other common vectors: unquoted service paths, weak service permissions (a service you can replace),
+        AlwaysInstallElevated, and stored credentials.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Look for</th>
+            <th>Because</th>
+        </tr>
+        <tr><td>sudo NOPASSWD / SUID (Linux)</td><td>Runs your code as root</td></tr>
+        <tr><td>Writable cron or service file</td><td>Your payload runs on a schedule, as root/SYSTEM</td></tr>
+        <tr><td>SeImpersonate (Windows)</td><td>Token impersonation to SYSTEM</td></tr>
+        <tr><td>Unquoted service path</td><td>Windows may execute your binary instead of the service</td></tr>
+        <tr><td>Secrets in config / history</td><td>Reused passwords open the next door</td></tr>
+    </table>
+
+    <p>
+        Prove it by reading a protected file or showing the elevated shell — then stop at the agreed boundary. You do not
+        need to dump <code>/etc/shadow</code> to prove you reached root.
+    </p>
+
+    <p>
+        Next: Attack chains
+        <a href="./6-attack-chains.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Password attacks
+        <a href="./6-passwords.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Mail, DNS, SNMP</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Mail, DNS, and SNMP</h2>
+
+    <p>
+        Beyond SMB and AD, a handful of everyday services leak more than they should. These are reachable from outside
+        more often than the internal ones, which makes them prime black-box targets.
+    </p>
+
+    <h3>SMTP — mail servers (25)</h3>
+
+    <p>
+        Old mail servers answer <code>VRFY</code> and <code>EXPN</code>, which confirm whether a username exists — a
+        quiet way to validate accounts:
+    </p>
+
+    <pre><code>$ nc 10.10.10.20 25
+220 mail.lab.example.com ESMTP Postfix
+VRFY jsmith
+252 2.0.0 jsmith
+VRFY nonexistent
+550 5.1.1 &lt;nonexistent&gt;: Recipient address rejected: User unknown</code></pre>
+
+    <p>
+        Two different responses = user enumeration. Also note the banner (software and version) and test whether the
+        server is an open relay — a real misconfiguration finding.
+    </p>
+
+    <h3>DNS — zone transfers (53)</h3>
+
+    <p>
+        A misconfigured name server will hand over its entire zone to anyone who asks. That is the jackpot: every record,
+        every subdomain, in one request:
+    </p>
+
+    <pre><code>$ dig axfr lab.example.com @ns1.lab.example.com
+
+lab.example.com.      IN  SOA  ns1.lab.example.com. ...
+lab.example.com.      IN  MX   10 mail.lab.example.com.
+shop.lab.example.com. IN  A    10.10.10.5
+vpn.lab.example.com.  IN  A    10.10.10.7
+dev.lab.example.com.  IN  A    10.10.10.9</code></pre>
+
+    <p>
+        Most servers refuse the transfer — and a refusal is a result too, worth one line in the notes. When it works,
+        it is the fastest subdomain list you will ever get.
+    </p>
+
+    <h3>SNMP — network devices (161/udp)</h3>
+
+    <p>
+        SNMP uses "community strings" as passwords, and far too many devices still ship with <code>public</code>. Guess
+        it and the device narrates itself — interfaces, routes, running software, sometimes credentials:
+    </p>
+
+    <pre><code>$ onesixtyone -c community.txt 10.10.10.30    # find the community string
+10.10.10.30 [public] Linux fileserver 5.4.0
+
+$ snmpwalk -v2c -c public 10.10.10.30
+SNMPv2-MIB::sysDescr.0 = STRING: Linux fileserver 5.4.0-generic
+IF-MIB::ifDescr.2 = STRING: eth0</code></pre>
+
+    <h3>NFS and FTP</h3>
+
+    <p>
+        Two more quick wins. <code>showmount -e &lt;host&gt;</code> lists NFS exports — look for world-readable or
+        writable paths and exposed backups. And FTP still allows anonymous login on plenty of hosts:
+        <code>ftp &lt;host&gt;</code>, user <code>anonymous</code>, and see what is sitting there.
+    </p>
+
+    <p>
+        Next: Web fingerprinting
+        <a href="./4-web-fingerprinting.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: SMB and Active Directory
+        <a href="./4-smb-and-ad.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Evasion</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>IDS, firewall, and honeypot awareness</h2>
+
+    <p>
+        Courses often frame this as "how do I sneak past the defences?" In a professional test the better question is
+        "which controls <em>see</em> this activity, and which do not?" Evasion is most useful rewritten as
+        <strong>control validation</strong> — the output is a map of detection gaps the blue team can close.
+    </p>
+
+    <h3>The three things in your way</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Control</th>
+            <th>What it does</th>
+        </tr>
+        <tr><td>Firewall</td><td>Allows or blocks traffic by rule. Explains "filtered" ports.</td></tr>
+        <tr><td>IDS / IPS</td><td>Watches for known-bad patterns; IPS can also block them.</td></tr>
+        <tr><td>Honeypot</td><td>A fake, attractive target that exists only to catch and study attackers.</td></tr>
+    </table>
+
+    <h3>Validate, don't just dodge</h3>
+
+    <p>
+        For a given scan or action, the valuable deliverable is which logs and alerts <em>should</em> have fired:
+    </p>
+
+    <ul>
+        <li>Windows: 4624 / 4625 (logon success/fail), 4688 (process created), Sysmon event 3 (network connection)</li>
+        <li>Linux: <code>auth.log</code>, <code>auditd</code></li>
+        <li>Network: an IDS alert on a port sweep, a firewall deny log</li>
+    </ul>
+
+    <p>
+        Then compare with what actually fired. A quiet SOC during a noisy scan is itself a finding. And stay alert for
+        honeypots — a host that is suspiciously open, with every port answering and nothing that behaves like a real
+        service, may be there to watch <em>you</em>.
+    </p>
+
+    <p>
+        A last caution: network actions can affect more than the target host. Confirm broadcast domains, monitoring,
+        rate limits, and out-of-scope systems before testing.
+    </p>
+
+    <p>
+        Next: Web servers
+        <a href="./8-web-servers.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Session hijacking
+        <a href="./7-session-hijacking.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

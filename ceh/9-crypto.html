@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Cryptography</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Cryptography</h2>
+
+    <p>
+        Cryptography rarely fails because someone broke the maths. It fails because of <strong>misuse</strong> — the
+        right algorithm used the wrong way, or the wrong algorithm used at all. As a tester you are looking for those
+        mistakes, not trying to crack AES.
+    </p>
+
+    <h3>What to look for</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Mistake</th>
+            <th>Why it hurts</th>
+        </tr>
+        <tr><td>Weak algorithms (MD5, SHA-1, DES)</td><td>Broken or brute-forceable; unfit for passwords or signatures</td></tr>
+        <tr><td>Bad randomness</td><td>Predictable tokens, keys, and session IDs</td></tr>
+        <tr><td>Homegrown crypto</td><td>Almost always weaker than the standard it replaced</td></tr>
+        <tr><td>Poor key storage</td><td>Keys in code or config defeat the whole scheme</td></tr>
+        <tr><td>Missing cert validation</td><td>TLS that does not check the certificate invites interception</td></tr>
+        <tr><td>Old TLS versions</td><td>Downgrade and known protocol weaknesses</td></tr>
+        <tr><td>Secrets committed to code</td><td>API keys and passwords in the repo history</td></tr>
+    </table>
+
+    <h3>Finding it</h3>
+
+    <p>
+        Most crypto findings surface from other phases. <code>testssl.sh</code> flags weak TLS and ciphers.
+        Fingerprinting reveals cookie and token structure (a base64 blob that decodes cleanly is worth a look). Source or
+        APK review turns up <code>md5(password)</code> and hardcoded keys:
+    </p>
+
+    <pre><code>$ grep -rniE 'md5|sha1|DES|ECB' src/
+src/auth.py:42:  pw_hash = hashlib.md5(password.encode()).hexdigest()</code></pre>
+
+    <p>
+        An MD5 password hash is a clean finding with a clean fix: use a slow, salted algorithm (bcrypt, scrypt, Argon2).
+        The OWASP cryptographic storage cheat sheet is the reference for what "right" looks like.
+    </p>
+
+    <p>
+        Next: Reporting
+        <a href="./10-reporting.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Cloud
+        <a href="./9-cloud.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

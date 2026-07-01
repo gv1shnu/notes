@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - DNS and subdomains</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>DNS and subdomains</h2>
+
+    <p>
+        A subdomain is a domain that is part of a larger one. If the main domain is <code>example.com</code>, then
+        <code>mail.example.com</code> and <code>blog.example.com</code> are subdomains. Each one may point at a different
+        server, and each server is a fresh piece of attack surface. Finding them, and the IPs behind them, reveals
+        hosting providers, CDNs, exposed services, and the technology in use.
+    </p>
+
+    <h3>nslookup — name to IP</h3>
+
+    <p>
+        The simplest lookup turns a hostname into an address:
+    </p>
+
+    <pre><code>$ nslookup shop.lab.example.com
+Server:   1.1.1.1
+Address:  1.1.1.1#53
+
+Non-authoritative answer:
+Name:     shop.lab.example.com
+Address:  10.10.10.5</code></pre>
+
+    <p>
+        One host, one IP. Do this for every name you find and the network starts to take shape. (<code>dig</code> does
+        the same job with more detail — covered in attribution.)
+    </p>
+
+    <h3>crt.sh — certificate transparency</h3>
+
+    <p>
+        Every time a site gets a TLS certificate, the certificate is published to public logs. Those logs are searchable,
+        and they leak subdomains for free — including internal-sounding ones the site never linked anywhere:
+    </p>
+
+    <pre><code>$ curl -s 'https://crt.sh/?q=%25.lab.example.com&output=json' | jq -r '.[].name_value' | sort -u
+admin.lab.example.com
+api.lab.example.com
+dev.lab.example.com
+shop.lab.example.com
+staging.lab.example.com
+vpn.lab.example.com</code></pre>
+
+    <p>
+        That <code>staging.</code> and <code>dev.</code> pair is exactly the kind of thing worth scanning later — test
+        environments are often weaker than production. This is passive: you queried a public log, not the target.
+    </p>
+
+    <h3>DNSDumpster and Netcraft</h3>
+
+    <p>
+        Two free web tools do a lot of passive DNS work in one screen.
+    </p>
+
+    <p>
+        <a href="https://dnsdumpster.com/">DNSDumpster</a> maps a domain's hosts: A and MX records, name servers, IP
+        addresses for each subdomain, server locations, and a visual graph of how they relate. From one lookup you often
+        walk away with mail servers, hosting regions, and a shortlist of live hosts.
+    </p>
+
+    <p>
+        <a href="https://sitereport.netcraft.com/">Netcraft</a>'s site report adds background: who administers the DNS,
+        whether a CDN like Cloudflare is in front, the server operating system, and the technology stack. A typical
+        report tells you something like "DNS on AWS, fronted by Cloudflare, Node.js hints" — before you have sent the
+        target a single packet.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Source</th>
+            <th>What you walk away with</th>
+        </tr>
+        <tr><td>nslookup / dig</td><td>IP for one hostname</td></tr>
+        <tr><td>crt.sh</td><td>Subdomain list from TLS certificate logs</td></tr>
+        <tr><td>DNSDumpster</td><td>A/MX/NS records, subdomain IPs, relationship map</td></tr>
+        <tr><td>Netcraft</td><td>Hosting, CDN, OS, and tech-stack hints</td></tr>
+    </table>
+
+    <p>
+        Cross-reference them. A subdomain that shows up in crt.sh but not DNSDumpster is worth a manual check — the gaps
+        between sources are often where the interesting hosts hide.
+    </p>
+
+    <p>
+        Next: People and usernames
+        <a href="./2-people-osint.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Search engines and dorks
+        <a href="./2-search-and-dorks.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

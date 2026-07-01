@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Auth and session</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Authentication and session</h2>
+
+    <p>
+        Most real-world web compromise begins at authentication, and it resists automation because so much of it is
+        logic, not payloads. Before poking, map the whole identity surface: login, registration, password reset, MFA,
+        "remember me", and logout. Then check how the session behaves across all of them.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Check</th>
+            <th>What good looks like</th>
+        </tr>
+        <tr><td>Cookie flags</td><td><code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code> all set (see <a href="./7-session-hijacking.html">session hijacking</a>)</td></tr>
+        <tr><td>Session rotation</td><td>A fresh token on login; the pre-login token stops working</td></tr>
+        <tr><td>Logout</td><td>Token invalidated server-side, not just dropped by the browser</td></tr>
+        <tr><td>Reset flow</td><td>Single-use, expiring, unguessable tokens; no user enumeration</td></tr>
+        <tr><td>Lockout</td><td>Throttling exists — but don't be the one who trips it on real users</td></tr>
+    </table>
+
+    <h3>Reset flows leak</h3>
+
+    <p>
+        Password reset is where developers keep their most creative mistakes: tokens in the URL, tokens that never
+        expire, and the immortal "we emailed the reset link… and also the new password… in plaintext." Test whether the
+        token is guessable, whether it expires, and whether the reset response quietly reveals which email addresses are
+        registered.
+    </p>
+
+    <h3>The lockout trap</h3>
+
+    <p>
+        Credential testing and password spraying are active and can lock out real users — a self-inflicted denial of
+        service. Confirm test accounts and the lockout policy in writing, then spray one password across many users with
+        long delays, never many passwords at one user.
+    </p>
+
+    <p>
+        Next: Access control and IDOR
+        <a href="./8-access-control.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Web servers
+        <a href="./8-web-servers.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>
