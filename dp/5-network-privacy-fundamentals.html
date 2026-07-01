@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Network Privacy Fundamentals</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Network Privacy Fundamentals</h2>
+
+<p>
+Before discussing VPNs, Tor, encrypted DNS, or proxies, it is important to understand
+how data travels across the Internet. Every request made by your browser follows a
+series of predictable steps before reaching the destination server.
+</p>
+
+<hr>
+
+<h3>A Typical Web Request</h3>
+
+<pre><code>You
+ │
+ ▼
+Browser
+ │
+ ▼
+Operating System
+ │
+ ▼
+Router
+ │
+ ▼
+Internet Service Provider (ISP)
+ │
+ ▼
+Internet
+ │
+ ▼
+Website
+</code></pre>
+
+<p>
+Every device involved in this journey can potentially observe some information about
+your connection. They may not see the same information, but each contributes to the
+overall picture.
+</p>
+
+<hr>
+
+<h3>IP Addresses</h3>
+
+<p>
+An IP address is the network address assigned to a device. It allows data to be routed
+between computers across the Internet, much like a postal address allows physical mail
+to reach a destination.
+</p>
+
+<pre><code>192.168.1.25  → Local (Private) Address
+
+203.122.x.x   → Public Address
+</code></pre>
+
+<p>
+Your home router usually assigns private IP addresses to devices inside your local
+network while your ISP assigns a public IP address that websites on the Internet see.
+</p>
+
+<hr>
+
+<h3>Private vs Public IP Addresses</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Private IP</th>
+<th>Public IP</th>
+</tr>
+
+<tr>
+<td>Used inside your local network.</td>
+<td>Visible on the Internet.</td>
+</tr>
+
+<tr>
+<td>Assigned by your router.</td>
+<td>Assigned by your ISP.</td>
+</tr>
+
+<tr>
+<td>Not directly reachable from outside.</td>
+<td>Used to communicate with remote servers.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>DNS</h3>
+
+<p>
+Humans prefer domain names such as <code>example.com</code>. Computers communicate
+using IP addresses. DNS (Domain Name System) translates one into the other.
+</p>
+
+<pre><code>Browser
+    │
+    ▼
+example.com
+    │
+DNS Query
+    ▼
+DNS Server
+    │
+Returns
+93.184.216.34
+    │
+    ▼
+Website
+</code></pre>
+
+<p>
+Without DNS, you would need to remember numerical IP addresses instead of domain names.
+</p>
+
+<hr>
+
+<h3>Who Can See What?</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Component</th>
+<th>Typically Knows</th>
+</tr>
+
+<tr>
+<td>Website</td>
+<td>Your public IP address, browser information and requests.</td>
+</tr>
+
+<tr>
+<td>ISP</td>
+<td>Your public IP address and the servers you connect to.</td>
+</tr>
+
+<tr>
+<td>DNS Provider</td>
+<td>Domains you request.</td>
+</tr>
+
+<tr>
+<td>Router</td>
+<td>Devices connected to your local network.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>HTTP vs HTTPS</h3>
+
+<p>
+HTTP sends web traffic in plaintext. HTTPS encrypts the communication between your
+browser and the website using TLS.
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>HTTP</th>
+<th>HTTPS</th>
+</tr>
+
+<tr>
+<td>Unencrypted</td>
+<td>Encrypted</td>
+</tr>
+
+<tr>
+<td>Easy to intercept on insecure networks.</td>
+<td>Protects data in transit.</td>
+</tr>
+
+<tr>
+<td>Should be avoided.</td>
+<td>Standard for modern websites.</td>
+</tr>
+
+</table>
+
+<p>
+HTTPS protects the contents of your communication but does not hide the fact that a
+connection exists.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Every network request passes through several systems before reaching its destination.
+Understanding IP addresses, DNS and HTTPS provides the foundation required to understand
+VPNs, encrypted DNS, Tor and other privacy technologies.
+</p>
+
+<p>
+The next chapter introduces VPNs, proxies and Tor, explaining what each technology
+protects, what it does not protect, and when each should be used.
+</p>
+
+<p>
+Next, VPNs, Proxies &amp; Tor <a href="./6-vpn-proxy-tor.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Browser Tracking <a href="./4-browser-tracking-fingerprinting.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

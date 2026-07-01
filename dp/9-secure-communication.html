@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Secure Communication</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Secure Communication</h2>
+
+<p>
+Every message travels through multiple systems before reaching its recipient. Privacy
+depends not only on who you are talking to, but also on who can observe, store or modify
+the communication along the way.
+</p>
+
+<p>
+Secure communication aims to protect three properties:
+</p>
+
+<ul>
+<li><strong>Confidentiality</strong> — only intended recipients can read the message.</li>
+<li><strong>Integrity</strong> — the message cannot be modified without detection.</li>
+<li><strong>Authenticity</strong> — you know who sent the message.</li>
+</ul>
+
+<hr>
+
+<h3>How Messages Travel</h3>
+
+<pre><code>You
+ │
+ ▼
+Internet
+ │
+ ▼
+Recipient
+</code></pre>
+
+<p>
+Without encryption, anyone with access to the communication path may be able to inspect
+its contents. Modern messaging services therefore encrypt messages before transmission.
+</p>
+
+<hr>
+
+<h3>Encryption in Transit</h3>
+
+<p>
+Encryption transforms readable plaintext into ciphertext. Only someone with the correct
+cryptographic key can recover the original message.
+</p>
+
+<pre><code>Plaintext
+     │
+Encryption
+     │
+     ▼
+Ciphertext
+     │
+Internet
+     │
+Decryption
+     ▼
+Plaintext
+</code></pre>
+
+<hr>
+
+<h3>End-to-End Encryption (E2EE)</h3>
+
+<p>
+End-to-end encryption means messages are encrypted on the sender's device and decrypted
+only on the recipient's device.
+</p>
+
+<pre><code>Sender
+   │
+Encrypt
+   │
+Internet
+   │
+Decrypt
+   ▼
+Recipient
+</code></pre>
+
+<p>
+The service provider transports the encrypted message but should not possess the keys
+required to read its contents.
+</p>
+
+<hr>
+
+<h3>Encryption in Transit vs End-to-End Encryption</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Feature</th><th>TLS (HTTPS)</th><th>End-to-End Encryption</th></tr>
+<tr><td>Protects data between you and the server</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Server can read message contents</td><td>Usually Yes</td><td>No (by design)</td></tr>
+<tr><td>Protects messages from intermediaries</td><td>Yes</td><td>Yes</td></tr>
+</table>
+
+<hr>
+
+<h3>Metadata</h3>
+
+<p>
+Even when message contents are encrypted, metadata often remains visible.
+</p>
+
+<pre><code>Encrypted
+---------
+Message Content
+
+Still Potentially Visible
+--------------------------
+Sender
+Recipient
+Time
+IP Address
+Device
+Message Size
+</code></pre>
+
+<p>
+Protecting content does not automatically hide communication patterns.
+</p>
+
+<hr>
+
+<h3>Verification</h3>
+
+<p>
+Many secure messaging applications allow users to verify encryption keys or safety
+numbers. Verification helps ensure that you are communicating with the intended person
+and not an attacker performing a man-in-the-middle attack.
+</p>
+
+<hr>
+
+<h3>Good Practices</h3>
+
+<ul>
+<li>Keep applications updated.</li>
+<li>Enable multi-factor authentication where available.</li>
+<li>Verify contacts for highly sensitive conversations.</li>
+<li>Be cautious when sharing files, screenshots and cloud backups.</li>
+<li>Remember that recipients can always copy or photograph messages.</li>
+</ul>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Secure communication protects message contents, but privacy also depends on metadata,
+device security and the people participating in the conversation.
+</p>
+
+<p>Next, Browser Hardening &amp; Safe Browsing <a href="./10-browser-hardening.html">&gt;&gt;</a></p>
+<p>Prev, Passwords &amp; Authentication <a href="./8-passwords-authentication.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

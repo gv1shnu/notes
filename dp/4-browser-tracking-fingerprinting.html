@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Browser Tracking & Fingerprinting</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Browser Tracking & Fingerprinting</h2>
+
+<p>
+Every time you visit a website, your browser exchanges information with the web server.
+Some of this information is required to display the page correctly. Other information is
+used to recognise returning visitors, measure engagement, personalise content, or build
+advertising profiles.
+</p>
+
+<p>
+Understanding how browsers are identified is essential because many modern tracking
+techniques work even when you never create an account.
+</p>
+
+<hr>
+
+<h3>What Happens When You Visit a Website?</h3>
+
+<pre><code>You
+ │
+ │ Request
+ ▼
+Website
+ │
+ │ HTML, CSS, JavaScript
+ ▼
+Browser
+</code></pre>
+
+<p>
+The browser sends information such as the requested URL, IP address, browser version,
+operating system, language preferences and many HTTP headers. The server responds with
+the web page and may also instruct the browser to store additional information.
+</p>
+
+<hr>
+
+<h3>Cookies</h3>
+
+<p>
+A cookie is a small piece of data stored by your browser on behalf of a website.
+The browser automatically sends matching cookies back whenever you revisit that site.
+</p>
+
+<pre><code>Visit #1
+
+Browser
+    │
+    ▼
+Website
+
+Set-Cookie:
+session=ABC123
+
+──────────────
+
+Visit #2
+
+Browser
+    │
+Cookie:
+session=ABC123
+    ▼
+Website
+</code></pre>
+
+<p>
+Cookies themselves are not malicious. They allow websites to remember logins, shopping
+carts and user preferences. Problems arise when cookies are used to track behaviour
+across many different websites.
+</p>
+
+<hr>
+
+<h3>First-party vs Third-party Cookies</h3>
+
+<p>
+Not every cookie comes from the website you intentionally visit.
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Type</th>
+<th>Created By</th>
+<th>Typical Purpose</th>
+</tr>
+
+<tr>
+<td>First-party</td>
+<td>The website you visit</td>
+<td>Login sessions, preferences, shopping carts</td>
+</tr>
+
+<tr>
+<td>Third-party</td>
+<td>Embedded advertising or analytics services</td>
+<td>Cross-site tracking and advertising</td>
+</tr>
+
+</table>
+
+<pre><code>example.com
+     │
+     ├── Images
+     ├── CSS
+     ├── JavaScript
+     └── ads.example-network.com
+               │
+               ▼
+       Third-party Cookie
+</code></pre>
+
+<hr>
+
+<h3>Browser Fingerprinting</h3>
+
+<p>
+Suppose cookies are disabled. Can websites still recognise the same browser?
+Often, yes.
+</p>
+
+<p>
+Browser fingerprinting identifies devices by combining dozens of seemingly harmless
+properties into a unique fingerprint.
+</p>
+
+<ul>
+<li>Operating system</li>
+<li>Browser version</li>
+<li>Screen resolution</li>
+<li>Time zone</li>
+<li>Language</li>
+<li>Installed fonts</li>
+<li>Graphics hardware</li>
+<li>Canvas rendering</li>
+<li>WebGL support</li>
+<li>Audio processing characteristics</li>
+</ul>
+
+<p>
+Individually these values are common. Combined together they often become highly unique.
+</p>
+
+<hr>
+
+<h3>Fingerprint Example</h3>
+
+<pre><code>Operating System
+Windows 11
+
+Browser
+Firefox 152
+
+Resolution
+2560 × 1440
+
+Language
+en-IN
+
+Time Zone
+UTC+5:30
+
+GPU
+RTX 3080
+
+────────────────────
+
+Combined
+↓
+
+Unique Browser Profile
+</code></pre>
+
+<p>
+Unlike cookies, browser fingerprints cannot simply be deleted because they are generated
+from characteristics of the browser and device.
+</p>
+
+<hr>
+
+<h3>Other Tracking Techniques</h3>
+
+<ul>
+<li><strong>Local Storage</strong> — stores larger amounts of browser data than cookies.</li>
+<li><strong>ETags</strong> — cache validation headers that may also identify returning visitors.</li>
+<li><strong>Browser Cache</strong> — previously downloaded resources reveal browsing behaviour.</li>
+<li><strong>Session Storage</strong> — temporary browser storage cleared after closing the tab.</li>
+<li><strong>Link Decoration</strong> — identifiers appended to URLs.</li>
+</ul>
+
+<hr>
+
+<h3>Can Incognito Mode Prevent Tracking?</h3>
+
+<p>
+Incognito or Private Browsing primarily prevents your own browser from storing local
+history after the session ends.
+</p>
+
+<p>
+It does <strong>not</strong> hide your IP address, prevent browser fingerprinting,
+make you anonymous, or stop websites from collecting information during that session.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Modern websites rarely rely on a single tracking technique. Instead, cookies, browser
+fingerprints, IP addresses and other identifiers are combined to recognise visitors
+with greater confidence.
+</p>
+
+<p>
+The next chapter explains IP addresses, DNS, and how internet traffic travels between
+your device and remote servers before introducing tools such as VPNs and Tor.
+</p>
+
+<p>
+Next, Network Privacy <a href="./5-network-privacy.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Threat Modeling <a href="./3-threat-modeling.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

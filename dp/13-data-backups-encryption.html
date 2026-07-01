@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Data Backups & Encryption</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Data Backups &amp; Encryption</h2>
+
+<p>
+Privacy is not only about preventing unauthorized access to information. It is also about
+ensuring that important data remains available when hardware fails, ransomware encrypts
+your files, or devices are lost or stolen.
+</p>
+
+<p>
+Backups and encryption solve different problems. A backup protects against data loss,
+while encryption protects against unauthorized access.
+</p>
+
+<hr>
+
+<h3>Backups vs Encryption</h3>
+
+<table border="1" cellpadding="8">
+
+<tr>
+<th>Backup</th>
+<th>Encryption</th>
+</tr>
+
+<tr>
+<td>Protects availability.</td>
+<td>Protects confidentiality.</td>
+</tr>
+
+<tr>
+<td>Recover files after accidental deletion.</td>
+<td>Prevent others from reading your files.</td>
+</tr>
+
+<tr>
+<td>Useful after hardware failure or ransomware.</td>
+<td>Useful if a device is lost or stolen.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>The 3-2-1 Backup Rule</h3>
+
+<p>
+A widely accepted backup strategy is the <strong>3-2-1 Rule</strong>.
+</p>
+
+<pre><code>3 Copies
+
+↓
+
+2 Different Storage Media
+
+↓
+
+1 Copy Stored Off-site
+</code></pre>
+
+<p>
+For example:
+</p>
+
+<ul>
+<li>Original files on your computer.</li>
+<li>External SSD or HDD.</li>
+<li>Encrypted cloud backup.</li>
+</ul>
+
+<p>
+This reduces the chance that a single hardware failure, theft or natural disaster destroys
+all copies of your data.
+</p>
+
+<hr>
+
+<h3>Full Disk Encryption</h3>
+
+<p>
+Full disk encryption encrypts every file stored on a drive. Without the correct credentials,
+the contents remain unreadable even if the storage device is removed from the computer.
+</p>
+
+<pre><code>Computer Stolen
+
+↓
+
+Drive Removed
+
+↓
+
+Encrypted Data
+
+↓
+
+Cannot Be Read
+Without Key
+</code></pre>
+
+<p>
+Most modern operating systems provide full disk encryption features. Once enabled, encryption
+works transparently after successful authentication.
+</p>
+
+<hr>
+
+<h3>Cloud Storage</h3>
+
+<p>
+Cloud storage improves availability by synchronizing files across multiple devices.
+However, synchronization is not the same as backup.
+</p>
+
+<pre><code>Delete File
+
+↓
+
+Cloud Sync
+
+↓
+
+Deletion Replicated
+Everywhere
+</code></pre>
+
+<p>
+If an unwanted change immediately synchronizes to every device, you may still need version
+history or separate backups to recover the original file.
+</p>
+
+<hr>
+
+<h3>Recovery Keys</h3>
+
+<p>
+Many encryption systems generate recovery keys during setup.
+These keys allow access to encrypted data if the normal authentication method becomes
+unavailable.
+</p>
+
+<p>
+Store recovery keys securely and separately from the encrypted device.
+Do not save the only recovery key on the same encrypted drive.
+</p>
+
+<hr>
+
+<h3>Ransomware</h3>
+
+<p>
+Ransomware encrypts files and demands payment for the decryption key.
+A reliable backup is usually the most effective recovery strategy.
+</p>
+
+<ul>
+<li>Keep offline or disconnected backups.</li>
+<li>Regularly test backup restoration.</li>
+<li>Do not assume backups are working until restoration has been verified.</li>
+</ul>
+
+<hr>
+
+<h3>What Should You Back Up?</h3>
+
+<ul>
+<li>Personal documents.</li>
+<li>Photos and videos.</li>
+<li>Password manager database.</li>
+<li>Important configuration files.</li>
+<li>Recovery keys.</li>
+<li>Personal projects.</li>
+</ul>
+
+<p>
+Applications can usually be reinstalled. Personal data is often irreplaceable.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Encryption protects data from unauthorized access, while backups protect data from loss.
+Both are necessary. An encrypted drive without backups can still lose data permanently,
+and unencrypted backups expose sensitive information if they fall into the wrong hands.
+</p>
+
+<p>
+Next, Privacy Myths &amp; Misconceptions
+<a href="./14-privacy-myths.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Operational Security
+<a href="./12-operational-security.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

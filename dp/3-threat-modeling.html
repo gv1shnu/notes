@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Threat Modeling</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Threat Modeling</h2>
+
+<p>
+Privacy advice without context is often misleading. Before choosing a browser, VPN,
+password manager, or anonymous communication platform, you must first understand
+what problem you are trying to solve.
+</p>
+
+<p>
+This process is known as <strong>threat modeling</strong>. Rather than asking
+"What is the best privacy tool?", ask "What am I protecting, who am I protecting it
+from, and what happens if I fail?"
+</p>
+
+<hr>
+
+<h3>What is a Threat Model?</h3>
+
+<p>
+A threat model is a structured way of identifying risks before choosing a solution.
+Every security and privacy decision should be based on a clearly defined threat model.
+</p>
+
+<pre><code>Asset
+    ↓
+What do I want to protect?
+
+Adversary
+    ↓
+Who wants it?
+
+Capability
+    ↓
+What resources do they have?
+
+Impact
+    ↓
+What happens if they succeed?</code></pre>
+
+<hr>
+
+<h3>Assets</h3>
+
+<p>
+An asset is anything valuable that you want to protect. Assets are not limited to
+files or passwords.
+</p>
+
+<ul>
+<li>Personal identity</li>
+<li>Passwords</li>
+<li>Financial information</li>
+<li>Private conversations</li>
+<li>Photos and documents</li>
+<li>Location history</li>
+<li>Professional reputation</li>
+<li>Research data</li>
+</ul>
+
+<hr>
+
+<h3>Adversaries</h3>
+
+<p>
+An adversary is any person or organisation that may collect, access or misuse your
+information.
+</p>
+
+<ul>
+<li>Cybercriminals</li>
+<li>Advertising companies</li>
+<li>Data brokers</li>
+<li>Scammers</li>
+<li>Malware authors</li>
+<li>Employers or schools (depending on context)</li>
+<li>Curious acquaintances</li>
+</ul>
+
+<p>
+Not every adversary has the same capabilities. A phishing scam and a sophisticated
+state-sponsored attacker operate very differently.
+</p>
+
+<hr>
+
+<h3>Capability</h3>
+
+<p>
+Capabilities describe what an adversary can realistically do.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Capability</th><th>Example</th></tr>
+<tr><td>Low</td><td>Guess weak passwords or search social media.</td></tr>
+<tr><td>Medium</td><td>Send phishing emails or deploy commodity malware.</td></tr>
+<tr><td>High</td><td>Purchase leaked databases, exploit vulnerabilities, perform targeted attacks.</td></tr>
+</table>
+
+<p>
+Overestimating capabilities leads to unnecessary complexity. Underestimating them
+creates unnecessary risk.
+</p>
+
+<hr>
+
+<h3>Impact</h3>
+
+<p>
+Finally, evaluate the consequences if your information is compromised.
+</p>
+
+<ul>
+<li>Minor inconvenience</li>
+<li>Financial loss</li>
+<li>Identity theft</li>
+<li>Reputational damage</li>
+<li>Loss of confidential data</li>
+<li>Personal safety</li>
+</ul>
+
+<p>
+The higher the impact, the more effort should be invested in protecting the asset.
+</p>
+
+<hr>
+
+<h3>Examples</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Person</th>
+<th>Primary Concern</th>
+<th>Likely Threat Model</th>
+</tr>
+
+<tr>
+<td>Student</td>
+<td>Advertising trackers</td>
+<td>Reduce data collection and improve account security.</td>
+</tr>
+
+<tr>
+<td>Software Developer</td>
+<td>Source code and credentials</td>
+<td>Protect repositories, passwords and development systems.</td>
+</tr>
+
+<tr>
+<td>Journalist</td>
+<td>Confidential sources</td>
+<td>Protect identities, communications and metadata.</td>
+</tr>
+
+<tr>
+<td>Business Owner</td>
+<td>Customer data</td>
+<td>Prevent breaches and ransomware.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+There is no universally "best" privacy setup. A solution that is appropriate for one
+person may be excessive or insufficient for another. Understanding your own threat
+model allows you to make informed decisions instead of blindly following online
+recommendations.
+</p>
+
+<p>
+The next chapter explores how websites identify visitors through cookies,
+browser fingerprinting and other tracking techniques.
+</p>
+
+<p>
+Next, Browser Tracking <a href="./4-browser-tracking.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Digital Footprint <a href="./2-your-digital-footprint.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

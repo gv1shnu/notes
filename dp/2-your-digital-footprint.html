@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Digital Privacy course notes.">
+    <title>Digital Privacy - Your Digital Footprint</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Your Digital Footprint</h2>
+
+<p>
+A digital footprint is the collection of information generated whenever you interact with
+technology. Every website you visit, every application you install, every message you send,
+and every online purchase contributes another piece of information about you.
+</p>
+
+<p>
+Many people assume their identity online is limited to their name or email address. In reality,
+your identity is built from hundreds of small attributes that, when combined, become highly
+identifying.
+</p>
+
+<hr>
+
+<h3>Your Digital Identity</h3>
+
+<p>
+Think of your identity as a collection of attributes rather than a single username.
+</p>
+
+<pre><code>You
+├── Name
+├── Email Address
+├── Phone Number
+├── Home Address
+├── IP Address
+├── Browser Fingerprint
+├── Device Identifier
+├── Cookies
+├── Search History
+├── Purchase History
+├── Location History
+└── Social Relationships
+</code></pre>
+
+<p>
+Removing one attribute rarely makes you anonymous. Modern systems correlate multiple identifiers
+to reconnect seemingly unrelated activities.
+</p>
+
+<hr>
+
+<h3>Explicit vs Implicit Information</h3>
+
+<p>
+Not all information is collected in the same way.
+</p>
+
+<p>
+<strong>Explicit information</strong> is data you intentionally provide.
+</p>
+
+<ul>
+<li>Name</li>
+<li>Email address</li>
+<li>Phone number</li>
+<li>Date of birth</li>
+<li>Shipping address</li>
+<li>Payment information</li>
+</ul>
+
+<p>
+<strong>Implicit information</strong> is generated automatically while using technology.
+</p>
+
+<ul>
+<li>Public IP address</li>
+<li>Browser fingerprint</li>
+<li>Screen resolution</li>
+<li>Installed fonts</li>
+<li>Operating system</li>
+<li>Language</li>
+<li>Time zone</li>
+<li>Mouse movement patterns</li>
+<li>Typing behaviour</li>
+<li>Approximate location</li>
+</ul>
+
+<p>
+Most tracking today relies more heavily on implicit information than explicit information.
+</p>
+
+<hr>
+
+<h3>Metadata</h3>
+
+<p>
+People usually think about the contents of their communications. Metadata often reveals just as
+much without reading the actual message.
+</p>
+
+<pre><code>Message
+
+Content
+--------
+"Meet me at 8."
+
+Metadata
+--------
+Sender
+Recipient
+Timestamp
+IP Address
+Device
+Location
+Network
+Frequency
+</code></pre>
+
+<p>
+Even when message contents are encrypted, metadata can reveal who communicates with whom,
+how often, and from where.
+</p>
+
+<hr>
+
+<h3>Correlation</h3>
+
+<p>
+Individual websites may know very little about you. Large tracking companies combine information
+from many different sources to build a much more complete profile.
+</p>
+
+<pre><code>Website A
+    │
+Cookie
+    │
+Tracking Network
+    │
+Website B
+    │
+Website C
+</code></pre>
+
+<p>
+This process is called <strong>correlation</strong>. Linking independent pieces of information
+is one of the primary techniques used for advertising, analytics, and identity resolution.
+</p>
+
+<hr>
+
+<h3>Passive vs Active Collection</h3>
+
+<p>
+Some information is collected automatically, while other information is collected because you
+choose to provide it.
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Passive Collection</th>
+    <th>Active Collection</th>
+</tr>
+<tr>
+    <td>IP Address</td>
+    <td>Account Registration</td>
+</tr>
+<tr>
+    <td>Browser Fingerprint</td>
+    <td>Social Media Posts</td>
+</tr>
+<tr>
+    <td>Cookies</td>
+    <td>Messages</td>
+</tr>
+<tr>
+    <td>Telemetry</td>
+    <td>Photos</td>
+</tr>
+<tr>
+    <td>Device Information</td>
+    <td>Payments</td>
+</tr>
+</table>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Privacy is rarely lost because of a single piece of information. Instead, multiple identifiers
+are linked together until they uniquely describe one individual.
+</p>
+
+<p>
+The next chapter introduces <strong>Threat Modeling</strong>, where you'll learn how to identify
+what needs protection, who you are protecting it from, and how those answers influence every
+privacy decision you make.
+</p>
+
+<p>
+Next, Threat Modeling <a href="./3-threat-modeling.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Introduction <a href="./1-introduction.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

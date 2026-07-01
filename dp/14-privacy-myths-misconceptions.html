@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Privacy Myths & Misconceptions</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Privacy Myths &amp; Misconceptions</h2>
+
+<p>
+The internet is full of oversimplified advice. Statements such as "Use a VPN and you're
+anonymous" or "I have nothing to hide" sound convincing, but they ignore how modern
+systems actually collect, correlate and analyse information.
+</p>
+
+<p>
+This chapter revisits common misconceptions using the concepts developed throughout this
+course: digital footprints, threat models, browser tracking, network privacy,
+authentication and operational security.
+</p>
+
+<hr>
+
+<h3>Myth 1 — "I Have Nothing to Hide"</h3>
+
+<p>
+Privacy is not about hiding wrongdoing. It is about deciding who has access to your
+personal information and under what circumstances.
+</p>
+
+<p>
+Most people lock their homes, protect financial records and expect private
+conversations to remain private. Digital privacy follows the same principle.
+</p>
+
+<hr>
+
+<h3>Myth 2 — "Incognito Mode Makes Me Anonymous"</h3>
+
+<p>
+Private browsing prevents your browser from storing local history after the session
+ends. It does not hide your IP address, prevent websites from identifying your browser,
+or stop your Internet Service Provider from seeing network connections.
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Incognito Mode Does</th>
+<th>Incognito Mode Does Not</th>
+</tr>
+
+<tr>
+<td>Delete local browsing history.</td>
+<td>Hide your IP address.</td>
+</tr>
+
+<tr>
+<td>Clear temporary cookies after closing.</td>
+<td>Prevent browser fingerprinting.</td>
+</tr>
+
+<tr>
+<td>Reduce local traces.</td>
+<td>Make you anonymous.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Myth 3 — "A VPN Makes Me Invisible"</h3>
+
+<p>
+A VPN changes where your traffic appears to originate, but it does not eliminate trust.
+Instead of trusting your ISP with some information, you are now trusting the VPN
+provider.
+</p>
+
+<pre><code>Without VPN
+
+You
+ │
+ISP
+ │
+Website
+
+────────────
+
+With VPN
+
+You
+ │
+VPN
+ │
+Website
+</code></pre>
+
+<p>
+VPNs improve privacy in many situations, but they are not anonymity tools.
+</p>
+
+<hr>
+
+<h3>Myth 4 — "HTTPS Means the Website Is Safe"</h3>
+
+<p>
+HTTPS confirms that your browser is communicating securely with the website it reached.
+It does not guarantee that the website itself is trustworthy.
+</p>
+
+<pre><code>https://malicious-example.com
+
+↓
+
+Encrypted Connection
+
+↓
+
+Still a Malicious Website
+</code></pre>
+
+<p>
+Always verify the domain name and reputation of a website before entering sensitive
+information.
+</p>
+
+<hr>
+
+<h3>Myth 5 — "Linux/macOS Cannot Get Malware"</h3>
+
+<p>
+No operating system is immune to malware.
+</p>
+
+<p>
+Different operating systems have different security architectures, market share and
+attack surfaces, but all software can contain vulnerabilities.
+</p>
+
+<p>
+Keeping systems updated and practicing safe browsing remain important regardless of
+the operating system you use.
+</p>
+
+<hr>
+
+<h3>Myth 6 — "Deleting a File Permanently Removes It"</h3>
+
+<p>
+Deleting a file usually removes references to the data rather than immediately
+overwriting every byte on the storage device.
+</p>
+
+<p>
+Recovery may still be possible until the storage space is reused or securely erased.
+</p>
+
+<hr>
+
+<h3>Myth 7 — "Strong Passwords Are Enough"</h3>
+
+<p>
+Strong passwords significantly improve security, but they cannot protect against every
+attack.
+</p>
+
+<ul>
+<li>Phishing can steal passwords.</li>
+<li>Malware can capture passwords.</li>
+<li>Database breaches expose passwords.</li>
+<li>Credential stuffing exploits password reuse.</li>
+</ul>
+
+<p>
+Multi-factor authentication provides an additional layer of protection.
+</p>
+
+<hr>
+
+<h3>Myth 8 — "Privacy Is All or Nothing"</h3>
+
+<p>
+Privacy exists on a spectrum.
+</p>
+
+<pre><code>No Protection
+
+↓
+
+Basic Security
+
+↓
+
+Good Privacy Practices
+
+↓
+
+Strong Privacy
+
+↓
+
+High Anonymity
+</code></pre>
+
+<p>
+Most people do not need perfect anonymity. They benefit substantially from reducing
+unnecessary data collection, separating identities and improving account security.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Privacy is not achieved through a single product or setting. It is the result of
+understanding realistic threats, recognising misinformation and applying layered
+defences appropriate for your own situation.
+</p>
+
+<p>
+Next, Building Your Personal Privacy Strategy
+<a href="./15-building-your-privacy-strategy.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Data Backups &amp; Encryption
+<a href="./13-data-backups-encryption.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

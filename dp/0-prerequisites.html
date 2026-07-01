@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Chapter 0: Prerequisites</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Chapter 0 — Prerequisites</h2>
+
+<p>
+Before discussing privacy, anonymity and security, it helps to establish a common
+vocabulary. Throughout this course, these terms will appear repeatedly. Understanding
+them now will make the remaining chapters easier to follow.
+</p>
+
+<hr>
+
+<h3>Client &amp; Server</h3>
+
+<p>
+Most online services follow a client-server model.
+</p>
+
+<pre><code>Client
+(Your Device)
+      │ Request
+      ▼
+Server
+(Website / Service)
+      │ Response
+      ▼
+Client
+</code></pre>
+
+<p>
+Your browser, phone or application acts as the <strong>client</strong>. The computer
+providing the service is the <strong>server</strong>.
+</p>
+
+<hr>
+
+<h3>Internet Protocol (IP) Address</h3>
+
+<p>
+An IP address identifies a device on a network. Devices inside your home usually have
+private IP addresses, while your Internet Service Provider assigns a public IP address
+used to communicate with the Internet.
+</p>
+
+<pre><code>Private IP
+192.168.x.x
+
+↓
+
+Router
+
+↓
+
+Public IP
+203.x.x.x
+</code></pre>
+
+<hr>
+
+<h3>Domain Name System (DNS)</h3>
+
+<p>
+Humans remember names such as <code>example.com</code>. Computers communicate using IP
+addresses. DNS translates domain names into IP addresses.
+</p>
+
+<pre><code>example.com
+      │
+DNS Lookup
+      ▼
+93.184.216.34
+</code></pre>
+
+<hr>
+
+<h3>Encryption</h3>
+
+<p>
+Encryption converts readable information into unreadable ciphertext. Only someone with
+the appropriate key can recover the original data.
+</p>
+
+<pre><code>Plaintext
+    │
+Encryption
+    ▼
+Ciphertext
+    │
+Decryption
+    ▼
+Plaintext
+</code></pre>
+
+<hr>
+
+<h3>Metadata</h3>
+
+<p>
+Metadata is information about data rather than the data itself.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Message Content</th><th>Metadata</th></tr>
+<tr>
+<td>"Meeting at 8 PM."</td>
+<td>Sender, recipient, time, IP address, device, message size.</td>
+</tr>
+</table>
+
+<p>
+Even when content is encrypted, metadata can still reveal communication patterns.
+</p>
+
+<hr>
+
+<h3>Authentication &amp; Authorization</h3>
+
+<p>
+Authentication verifies your identity. Authorization determines what you are allowed
+to do after your identity has been verified.
+</p>
+
+<pre><code>Login
+   │
+Authentication
+   │
+Identity Confirmed
+   │
+Authorization
+   │
+Access Granted
+</code></pre>
+
+<hr>
+
+<h3>Cookies</h3>
+
+<p>
+Cookies are small pieces of data stored by your browser on behalf of a website. They
+allow websites to remember login sessions, preferences and shopping carts, but they
+may also be used for tracking.
+</p>
+
+<hr>
+
+<h3>Browser Fingerprinting</h3>
+
+<p>
+A browser fingerprint is created by combining information such as browser version,
+screen resolution, installed fonts, language and graphics capabilities to distinguish
+one browser from another.
+</p>
+
+<hr>
+
+<h3>Telemetry</h3>
+
+<p>
+Telemetry is diagnostic or usage information automatically sent from software to its
+developer. It may include crash reports, feature usage statistics, device information
+or performance metrics.
+</p>
+
+<hr>
+
+<h3>Threat Model</h3>
+
+<p>
+A threat model describes what you want to protect, who you want to protect it from,
+how capable the adversary is, and the consequences if they succeed.
+</p>
+
+<pre><code>Asset
+   ↓
+Adversary
+   ↓
+Capability
+   ↓
+Impact
+</code></pre>
+
+<hr>
+
+<h3>Remember These Principles</h3>
+
+<ul>
+<li>Privacy controls information disclosure.</li>
+<li>Security protects information.</li>
+<li>Anonymity reduces identity linkage.</li>
+<li>No single tool solves every privacy problem.</li>
+<li>Your threat model determines the appropriate solution.</li>
+</ul>
+
+<hr>
+
+<h3>Before You Continue</h3>
+
+<p>
+You do not need to memorize every networking protocol or cryptographic algorithm to
+benefit from this course. Focus on understanding the relationships between systems,
+how information moves, and why different privacy techniques exist. The remaining
+chapters will build upon these foundations gradually.
+</p>
+
+<p>
+Next, Introduction
+<a href="./1-introduction.html">&gt;&gt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

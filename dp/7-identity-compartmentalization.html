@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Identity & Compartmentalization</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Identity &amp; Compartmentalization</h2>
+
+<p>
+One of the biggest privacy mistakes is using the same identity everywhere.
+If every service knows your real name, primary email address, phone number,
+device and payment method, it becomes trivial to correlate your activities.
+</p>
+
+<p>
+Compartmentalization is the practice of separating different parts of your
+digital life so that compromising one identity does not automatically expose
+the others.
+</p>
+
+<hr>
+
+<h3>One Identity vs Multiple Identities</h3>
+
+<pre><code>Everything Uses One Identity
+
+Gaming
+      │
+Shopping
+      │
+Banking
+      │
+Social Media
+      │
+Forums
+      │
+Primary Email
+      │
+Real Name
+</code></pre>
+
+<p>
+If one account is breached or your email address appears in a public data leak,
+many unrelated accounts become easier to identify or attack.
+</p>
+
+<p>A compartmentalized approach looks very different.</p>
+
+<pre><code>Banking
+└── Identity A
+
+Work
+└── Identity B
+
+Gaming
+└── Identity C
+
+Online Communities
+└── Identity D
+</code></pre>
+
+<hr>
+
+<h3>Separate What Matters</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Category</th><th>Recommendation</th></tr>
+<tr><td>Email</td><td>Use different addresses or aliases for different purposes.</td></tr>
+<tr><td>Usernames</td><td>Avoid reusing the same username everywhere.</td></tr>
+<tr><td>Passwords</td><td>Every account should have a unique password.</td></tr>
+<tr><td>Phone Numbers</td><td>Only provide one when genuinely required.</td></tr>
+<tr><td>Browsers</td><td>Use separate browser profiles for different identities.</td></tr>
+</table>
+
+<hr>
+
+<h3>Email Aliases</h3>
+
+<p>
+Your primary email address often becomes the key used to connect many online
+accounts. Reusing it everywhere increases the impact of a single breach.
+</p>
+
+<pre><code>Primary Email
+        │
+        ├── Banking
+        ├── Shopping
+        ├── Forums
+        ├── Newsletters
+        └── Social Media
+
+↓
+
+One Leak
+↓
+
+Many Accounts Become Linked
+</code></pre>
+
+<p>
+Instead, consider separate addresses or email aliases for banking, shopping,
+personal communication and disposable registrations.
+</p>
+
+<hr>
+
+<h3>Browser Profiles</h3>
+
+<p>
+Modern browsers allow multiple profiles, each with its own cookies, history,
+extensions and saved logins.
+</p>
+
+<pre><code>Browser
+
+├── Personal
+├── Work
+├── Development
+└── Research
+</code></pre>
+
+<p>
+This prevents unrelated websites from sharing the same browser state and
+reduces accidental cross-contamination between identities.
+</p>
+
+<hr>
+
+<h3>What Not to Mix</h3>
+
+<ul>
+<li>Personal and work accounts.</li>
+<li>Anonymous forums and real-name social media.</li>
+<li>Research activities and everyday browsing.</li>
+<li>Disposable registrations and important accounts.</li>
+</ul>
+
+<hr>
+
+<h3>Trade-offs</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Benefit</th><th>Cost</th></tr>
+<tr><td>Reduced account linkage</td><td>More accounts to manage.</td></tr>
+<tr><td>Smaller impact from breaches.</td><td>Additional organisation.</td></tr>
+<tr><td>Improved privacy.</td><td>Less convenience.</td></tr>
+</table>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Privacy is not only about hiding information. It is also about preventing
+different pieces of information from being linked together. Separating
+identities, email addresses, browser profiles and passwords limits how much
+can be learned if one account is compromised.
+</p>
+
+<p>
+Next, Passwords &amp; Authentication <a href="./8-passwords-authentication.html">&gt;&gt;</a></p>
+<p>
+Prev, VPNs, Proxies &amp; Tor <a href="./6-vpns-proxies-tor.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

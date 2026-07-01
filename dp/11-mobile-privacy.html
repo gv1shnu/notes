@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Mobile Privacy</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Mobile Privacy</h2>
+
+<p>
+Smartphones have become the most personal computing devices we own. They contain our
+contacts, conversations, photos, location history, financial applications and
+authentication tokens. Protecting a phone is therefore as important as protecting a
+computer.
+</p>
+
+<p>
+Unlike desktop systems, mobile devices continuously collect contextual information such
+as location, nearby Wi-Fi networks, Bluetooth devices and sensor data. Understanding
+what is collected helps you make informed privacy decisions.
+</p>
+
+<hr>
+
+<h3>What Does Your Phone Know?</h3>
+
+<pre><code>Smartphone
+
+├── Contacts
+├── Messages
+├── Photos
+├── Call History
+├── Location
+├── Microphone
+├── Camera
+├── App Usage
+├── Device Identifiers
+└── Network Information
+</code></pre>
+
+<p>
+Not every application requires access to every category of information. Grant only the
+permissions necessary for an application's intended function.
+</p>
+
+<hr>
+
+<h3>Application Permissions</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Permission</th><th>Grant When</th></tr>
+<tr><td>Location</td><td>The app genuinely needs navigation or nearby results.</td></tr>
+<tr><td>Camera</td><td>You intend to capture photos or scan documents.</td></tr>
+<tr><td>Microphone</td><td>Voice communication or audio recording is expected.</td></tr>
+<tr><td>Contacts</td><td>You trust the app and understand why it needs them.</td></tr>
+<tr><td>Files</td><td>The app must open or save local documents.</td></tr>
+</table>
+
+<p><strong>Threat Model Check:</strong> Ask yourself, "If this permission were leaked, what could someone learn about me?"</p>
+
+<hr>
+
+<h3>Location Privacy</h3>
+
+<p>
+Many operating systems allow location access to be granted only while the application
+is in use. This generally provides better privacy than permanent background access.
+</p>
+
+<pre><code>Always Allow      ✘
+
+While Using App   ✔
+
+Never             ✔ (when unnecessary)
+</code></pre>
+
+<hr>
+
+<h3>Bluetooth & Wi-Fi</h3>
+
+<p>
+Wireless radios reveal nearby devices and networks. Keep Bluetooth disabled when it is
+not actively being used, and remove old paired devices that are no longer needed.
+</p>
+
+<p>
+Avoid connecting automatically to unknown public Wi-Fi networks.
+</p>
+
+<hr>
+
+<h3>App Stores</h3>
+
+<ul>
+<li>Install applications from trusted sources.</li>
+<li>Review permissions before installation.</li>
+<li>Read update notes for significant permission changes.</li>
+<li>Remove applications you no longer use.</li>
+</ul>
+
+<hr>
+
+<h3>Operating System Updates</h3>
+
+<p>
+Security updates frequently patch vulnerabilities that are already known publicly.
+Delaying updates increases the window during which attackers can exploit those flaws.
+</p>
+
+<hr>
+
+<h3>Device Lock</h3>
+
+<p>
+A strong device passcode protects locally stored information if the phone is lost or
+stolen.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Method</th><th>Recommendation</th></tr>
+<tr><td>6+ Digit PIN</td><td>Good</td></tr>
+<tr><td>Alphanumeric Passcode</td><td>Best</td></tr>
+<tr><td>Fingerprint / Face Unlock</td><td>Convenient secondary authentication.</td></tr>
+</table>
+
+<hr>
+
+<h3>Backups</h3>
+
+<p>
+Cloud backups provide convenience but may include sensitive information. Review what is
+being backed up and whether end-to-end encryption is available for that data.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Mobile privacy depends on understanding what information your phone collects and
+carefully managing permissions, updates, device security and installed applications.
+Convenience and privacy often involve trade-offs, so evaluate each permission in the
+context of your own threat model.
+</p>
+
+<p>Next, Operational Security (OPSEC) <a href="./12-operational-security.html">&gt;&gt;</a></p>
+<p>Prev, Browser Hardening &amp; Safe Browsing <a href="./10-browser-hardening.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

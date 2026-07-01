@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - Browser Hardening & Safe Browsing</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Browser Hardening &amp; Safe Browsing</h2>
+
+<p>
+Your web browser is one of the most exposed applications on your computer.
+Almost every online activity—banking, shopping, email, research and social media—
+passes through it. Hardening your browser reduces unnecessary data exposure and
+limits opportunities for attackers.
+</p>
+
+<p>
+Browser hardening does not mean making the browser anonymous. It means configuring
+it to minimise tracking, reduce attack surface and avoid unsafe behaviour.
+</p>
+
+<hr>
+
+<h3>The Browser Attack Surface</h3>
+
+<pre><code>User
+   │
+   ▼
+Browser
+   ├── Cookies
+   ├── JavaScript
+   ├── Extensions
+   ├── Downloads
+   ├── Saved Passwords
+   ├── Site Permissions
+   └── Network Requests
+</code></pre>
+
+<p>
+Every enabled feature increases functionality, but also increases the amount of
+information available to websites and the number of components that could contain
+security vulnerabilities.
+</p>
+
+<hr>
+
+<h3>Keep Your Browser Updated</h3>
+
+<p>
+Modern browsers receive frequent security updates. Many attacks rely on exploiting
+known vulnerabilities that have already been patched.
+</p>
+
+<ul>
+<li>Enable automatic updates.</li>
+<li>Restart the browser after updates.</li>
+<li>Avoid unsupported browser versions.</li>
+</ul>
+
+<hr>
+
+<h3>Browser Extensions</h3>
+
+<p>
+Extensions can improve productivity, but they execute with significant privileges
+inside the browser.
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Good Practice</th>
+<th>Avoid</th>
+</tr>
+
+<tr>
+<td>Install only necessary extensions.</td>
+<td>Installing dozens of extensions "just in case".</td>
+</tr>
+
+<tr>
+<td>Review requested permissions.</td>
+<td>Granting access to every website without checking.</td>
+</tr>
+
+<tr>
+<td>Remove unused extensions.</td>
+<td>Leaving abandoned extensions installed.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Cookies & Site Data</h3>
+
+<p>
+Cookies are useful for login sessions and user preferences, but they also enable
+tracking across browsing sessions.
+</p>
+
+<p>
+Consider periodically clearing site data for websites that do not require long-term
+sessions. Logging out of services when they are no longer needed also reduces
+persistent tracking.
+</p>
+
+<hr>
+
+<h3>Site Permissions</h3>
+
+<p>
+Modern browsers ask permission before granting access to sensitive resources.
+Only approve permissions that are genuinely required.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Permission</th><th>Example Risk</th></tr>
+<tr><td>Location</td><td>Reveals approximate physical location.</td></tr>
+<tr><td>Camera</td><td>Video capture.</td></tr>
+<tr><td>Microphone</td><td>Audio capture.</td></tr>
+<tr><td>Notifications</td><td>Spam or misleading alerts.</td></tr>
+<tr><td>Clipboard</td><td>Access to copied information.</td></tr>
+</table>
+
+<hr>
+
+<h3>Downloads</h3>
+
+<p>
+Treat downloaded files as untrusted until proven otherwise.
+</p>
+
+<ul>
+<li>Download software from official sources whenever possible.</li>
+<li>Be cautious with executable files.</li>
+<li>Verify file hashes when publishers provide them.</li>
+<li>Avoid disabling browser security warnings.</li>
+</ul>
+
+<hr>
+
+<h3>Phishing</h3>
+
+<p>
+Many successful attacks do not exploit software vulnerabilities—they exploit people.
+</p>
+
+<p>
+Before entering credentials, check:</p>
+
+<ul>
+<li>Is the domain name correct?</li>
+<li>Was the link expected?</li>
+<li>Does the page request unusual information?</li>
+<li>Is there unnecessary urgency or pressure?</li>
+</ul>
+
+<pre><code>login.example.com      ✔
+
+login-example.com      ✘
+
+example-login.com      ✘
+</code></pre>
+
+<hr>
+
+<h3>Browser Profiles</h3>
+
+<p>
+Separate browser profiles help isolate different activities.
+</p>
+
+<pre><code>Browser
+
+├── Personal
+├── Work
+├── Banking
+└── Research
+</code></pre>
+
+<p>
+Each profile maintains separate cookies, history, saved logins and settings,
+reducing accidental information leakage between activities.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A hardened browser reduces unnecessary exposure but does not replace good
+security practices. Keeping software updated, limiting extensions, reviewing
+permissions and recognising phishing attempts together provide a much stronger
+defence than relying on a single privacy feature.
+</p>
+
+<p>
+Next, Mobile Privacy <a href="./11-mobile-privacy.html">&gt;&gt;</a>
+</p>
+
+<p>
+Prev, Secure Communication <a href="./9-secure-communication.html">&lt;&lt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

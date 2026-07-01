@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Digital Privacy course notes.">
+<title>Digital Privacy - VPNs, Proxies & Tor</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>VPNs, Proxies &amp; Tor</h2>
+
+<p>
+Terms such as <strong>VPN</strong>, <strong>Proxy</strong> and <strong>Tor</strong> are often used
+interchangeably. They are not the same technology and they solve different problems.
+Choosing the wrong tool usually comes from misunderstanding your threat model.
+</p>
+
+<hr>
+
+<h3>Without Any Privacy Tool</h3>
+
+<pre><code>You
+ │
+ ▼
+ISP
+ │
+ ▼
+Website
+</code></pre>
+
+<p>
+Your ISP knows the destination you connect to, while the website sees your public IP
+address and browser information.
+</p>
+
+<hr>
+
+<h3>Virtual Private Network (VPN)</h3>
+
+<p>
+A VPN creates an encrypted tunnel between your device and a VPN server. Instead of
+connecting directly to a website, your traffic first passes through the VPN provider.
+</p>
+
+<pre><code>You
+ │
+Encrypted Tunnel
+ │
+ ▼
+VPN Provider
+ │
+ ▼
+Website
+</code></pre>
+
+<p>
+The website now sees the VPN server's IP address instead of yours. However, the VPN
+provider can potentially observe your traffic leaving its network, making trust in the
+provider important.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Entity</th><th>What It Typically Sees</th></tr>
+<tr><td>ISP</td><td>You are connected to a VPN server.</td></tr>
+<tr><td>VPN Provider</td><td>Your IP address and outbound connections.</td></tr>
+<tr><td>Website</td><td>VPN server IP instead of your home IP.</td></tr>
+</table>
+
+<hr>
+
+<h3>Proxy Servers</h3>
+
+<p>
+A proxy forwards requests on your behalf. Unlike a VPN, most proxies only redirect
+traffic from a single application rather than the entire operating system.
+</p>
+
+<pre><code>Browser
+ │
+ ▼
+Proxy
+ │
+ ▼
+Website
+</code></pre>
+
+<p>
+Many proxies do not encrypt traffic. They are commonly used for testing, development,
+or accessing services from another network location, rather than providing strong
+privacy guarantees.
+</p>
+
+<hr>
+
+<h3>The Tor Network</h3>
+
+<p>
+Tor routes traffic through multiple volunteer-operated relays before it reaches the
+destination website.
+</p>
+
+<pre><code>You
+ │
+ ▼
+Entry Relay
+ │
+ ▼
+Middle Relay
+ │
+ ▼
+Exit Relay
+ │
+ ▼
+Website
+</code></pre>
+
+<p>
+Each relay only knows its immediate neighbour. No single relay simultaneously knows
+both your identity and your final destination. This layered routing is known as
+<strong>onion routing</strong>.
+</p>
+
+<hr>
+
+<h3>Comparison</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Feature</th>
+<th>VPN</th>
+<th>Proxy</th>
+<th>Tor</th>
+</tr>
+
+<tr>
+<td>Encrypts traffic</td>
+<td>Yes</td>
+<td>Usually No</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>Changes visible IP</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>Protects entire system</td>
+<td>Usually Yes</td>
+<td>Usually No</td>
+<td>Browser/Application</td>
+</tr>
+
+<tr>
+<td>Requires trust in one provider</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No single relay</td>
+</tr>
+
+<tr>
+<td>Performance</td>
+<td>Fast</td>
+<td>Fast</td>
+<td>Generally slower</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Common Misconceptions</h3>
+
+<ul>
+<li><strong>"A VPN makes me anonymous."</strong> — No. It changes who you trust; it does not eliminate trust.</li>
+<li><strong>"Incognito mode hides my IP."</strong> — No. Private browsing only affects local browser storage.</li>
+<li><strong>"Tor is only for criminals."</strong> — No. It is a legitimate anonymity network used by journalists, researchers, activists and ordinary users.</li>
+<li><strong>"HTTPS and VPNs are the same."</strong> — No. HTTPS encrypts traffic between your browser and a website. A VPN encrypts traffic between your device and the VPN server.</li>
+</ul>
+
+<hr>
+
+<h3>Which One Should You Use?</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Goal</th><th>Recommended Tool</th></tr>
+<tr><td>Protect traffic on public Wi-Fi</td><td>VPN</td></tr>
+<tr><td>Route one application through another server</td><td>Proxy</td></tr>
+<tr><td>Maximise anonymity</td><td>Tor</td></tr>
+<tr><td>Access geo-restricted services</td><td>VPN or Proxy (where permitted)</td></tr>
+</table>
+
+<p>
+The correct choice depends entirely on your threat model discussed earlier. No single
+technology is universally superior.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Privacy tools change what different parties can observe, but they do not make you
+invisible. Understanding who can see your activity before and after using a tool is
+more important than memorising product names.
+</p>
+
+<p>Next, Identity &amp; Compartmentalization <a href="./7-identity-compartmentalization.html">&gt;&gt;</a></p>
+<p>Prev, Network Privacy Fundamentals <a href="./5-network-privacy-fundamentals.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>
