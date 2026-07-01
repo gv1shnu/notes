@@ -44,6 +44,96 @@
         the actual row.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 640 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparison of a B-tree index seek against a full table scan when looking up TenZ">
+            <text x="10" y="18" font-size="13" font-weight="700" fill="var(--accent)" font-family="Inter, sans-serif">Index seek (B-tree) — O(log n)</text>
+
+            <g font-family="JetBrains Mono, monospace" font-size="12">
+                <!-- root -->
+                <rect x="220" y="26" width="200" height="36" rx="6" fill="var(--header)" stroke="var(--border)"/>
+                <text x="320" y="49" text-anchor="middle">root: [A–L | M–R | S–Z]</text>
+
+                <!-- edges -->
+                <line x1="320" y1="62" x2="130" y2="96" stroke="var(--muted)" stroke-width="1.5"/>
+                <line x1="320" y1="62" x2="320" y2="96" stroke="var(--muted)" stroke-width="1.5"/>
+                <line x1="320" y1="62" x2="510" y2="96" stroke="var(--accent)" stroke-width="3"/>
+
+                <!-- children -->
+                <rect x="60"  y="96" width="140" height="36" rx="6" fill="var(--header)" stroke="var(--border)" opacity="0.55"/>
+                <text x="130" y="119" text-anchor="middle" opacity="0.55">A – L</text>
+
+                <rect x="250" y="96" width="140" height="36" rx="6" fill="var(--header)" stroke="var(--border)" opacity="0.55"/>
+                <text x="320" y="119" text-anchor="middle" opacity="0.55">M – R</text>
+
+                <rect x="440" y="96" width="140" height="36" rx="6" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)" stroke-width="2"/>
+                <text x="510" y="119" text-anchor="middle" fill="var(--accent)" font-weight="700">S – Z</text>
+
+                <!-- leaf -->
+                <line x1="510" y1="132" x2="510" y2="166" stroke="var(--accent)" stroke-width="3"/>
+                <rect x="420" y="166" width="180" height="36" rx="6" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)" stroke-width="2"/>
+                <text x="510" y="189" text-anchor="middle" fill="var(--accent)" font-weight="700">…, TenZ, Trent, …</text>
+
+                <!-- row -->
+                <line x1="510" y1="202" x2="510" y2="236" stroke="var(--accent)" stroke-width="3"/>
+                <rect x="410" y="236" width="200" height="36" rx="6" fill="var(--accent)" stroke="var(--accent)"/>
+                <text x="510" y="259" text-anchor="middle" fill="#fff" font-weight="700">row: TenZ, score 842</text>
+            </g>
+
+            <text x="510" y="292" text-anchor="middle" font-size="12" fill="var(--accent)" font-weight="700" font-family="Inter, sans-serif">3 comparisons: root → branch → leaf</text>
+
+            <line x1="0" y1="312" x2="640" y2="312" stroke="var(--border)"/>
+
+            <text x="10" y="335" font-size="13" font-weight="700" fill="var(--muted)" font-family="Inter, sans-serif">Full table scan (no index) — O(n)</text>
+
+            <g font-family="JetBrains Mono, monospace" font-size="11">
+                <!-- 8 sequential row checks, only the last matches -->
+                <g>
+                    <rect x="10"  y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="45" y="370" text-anchor="middle">Aria</text>
+                    <text x="45" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="90" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="125" y="370" text-anchor="middle">Bo</text>
+                    <text x="125" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="170" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="205" y="370" text-anchor="middle">Cy</text>
+                    <text x="205" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="250" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="285" y="370" text-anchor="middle">Del</text>
+                    <text x="285" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="330" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="365" y="370" text-anchor="middle">Eska</text>
+                    <text x="365" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="410" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="445" y="370" text-anchor="middle">Fin</text>
+                    <text x="445" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="490" y="350" width="70" height="32" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                    <text x="525" y="370" text-anchor="middle">Gio</text>
+                    <text x="525" y="396" text-anchor="middle" fill="#dc2626">✕</text>
+                </g>
+                <g>
+                    <rect x="570" y="350" width="70" height="32" rx="5" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)" stroke-width="2"/>
+                    <text x="605" y="370" text-anchor="middle" fill="var(--accent)" font-weight="700">TenZ</text>
+                    <text x="605" y="396" text-anchor="middle" fill="var(--accent)" font-weight="700">✓</text>
+                </g>
+            </g>
+
+            <text x="10" y="418" font-size="11" fill="var(--muted)" font-family="Inter, sans-serif" font-style="italic">7 misses before the 8th comparison finally matches — every row has to be checked, in order.</text>
+        </svg>
+        <p class="viz-caption">Same lookup, two strategies: the index rules out two-thirds of the tree in one hop, while a full scan has no choice but to check rows one by one.</p>
+    </div>
+
     <hr>
 
     <h3>Creating an index</h3>

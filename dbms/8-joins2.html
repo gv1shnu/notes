@@ -23,6 +23,21 @@
         Returns only the rows where there is a match in <strong>both</strong> tables.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Venn diagram for INNER JOIN">
+            <text x="150" y="14" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="var(--accent)">INNER JOIN</text>
+            <circle cx="115" cy="90" r="65" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <circle cx="185" cy="90" r="65" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <path d="M 150,35.23 A 65,65 0 0,0 150,144.77 A 65,65 0 0,0 150,35.23 Z" fill="var(--accent)" fill-opacity="0.85"/>
+            <text x="150" y="95" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#fff">6</text>
+            <text x="88" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--muted)">0</text>
+            <text x="212" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--muted)">0</text>
+            <text x="115" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">players</text>
+            <text x="185" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">squads</text>
+        </svg>
+        <p class="viz-caption">Only the 6 matched rows survive. FaZe_suk (no squad) and Gen.G (no players) both fall outside the overlap, so both are dropped.</p>
+    </div>
+
     <p>
         <strong>Question:</strong> Show each player's username and their squad name.
     </p>
@@ -90,6 +105,21 @@ INNER JOIN squads ON players.squad_id = squads.squad_id;
         Returns <strong>all rows from the left table</strong>, plus matching rows from the right table.
         If there's no match on the right side, the result shows NULL for those columns.
     </p>
+
+    <div class="viz">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Venn diagram for LEFT JOIN">
+            <text x="150" y="14" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="var(--accent)">LEFT JOIN</text>
+            <circle cx="115" cy="90" r="65" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="185" cy="90" r="65" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <path d="M 150,35.23 A 65,65 0 0,0 150,144.77 A 65,65 0 0,0 150,35.23 Z" fill="var(--accent)" fill-opacity="0.85"/>
+            <text x="150" y="95" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#fff">6</text>
+            <text x="88" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--text)">1</text>
+            <text x="212" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--muted)">0</text>
+            <text x="115" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">players</text>
+            <text x="185" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">squads</text>
+        </svg>
+        <p class="viz-caption">All of <strong>players</strong> is preserved (shaded circle): FaZe_suk appears with NULL squad_name. Gen.G, outside the players circle entirely, is dropped.</p>
+    </div>
 
     <p>
         <strong>Question:</strong> Show all players, even those without a squad.
@@ -163,6 +193,21 @@ LEFT JOIN squads ON players.squad_id = squads.squad_id;
         Returns <strong>all rows from the right table</strong>, plus matching rows from the left table.
         If there's no match on the left side, the result shows NULL for those columns.
     </p>
+
+    <div class="viz">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Venn diagram for RIGHT JOIN">
+            <text x="150" y="14" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="var(--accent)">RIGHT JOIN</text>
+            <circle cx="115" cy="90" r="65" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <circle cx="185" cy="90" r="65" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2"/>
+            <path d="M 150,35.23 A 65,65 0 0,0 150,144.77 A 65,65 0 0,0 150,35.23 Z" fill="var(--accent)" fill-opacity="0.85"/>
+            <text x="150" y="95" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#fff">6</text>
+            <text x="88" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--muted)">0</text>
+            <text x="212" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--text)">1</text>
+            <text x="115" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">players</text>
+            <text x="185" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">squads</text>
+        </svg>
+        <p class="viz-caption">All of <strong>squads</strong> is preserved (shaded circle): Gen.G appears with NULL username. FaZe_suk, outside the squads circle entirely, is dropped.</p>
+    </div>
 
     <p>
         <strong>Question:</strong> Show all squads, even those with no players registered yet.
@@ -241,6 +286,21 @@ RIGHT JOIN squads ON players.squad_id = squads.squad_id;
         Returns <strong>all rows from both tables</strong>.
         Where there's no match, NULL fills the gap on whichever side is missing.
     </p>
+
+    <div class="viz">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Venn diagram for FULL OUTER JOIN">
+            <text x="150" y="14" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="var(--accent)">FULL OUTER JOIN</text>
+            <circle cx="115" cy="90" r="65" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="185" cy="90" r="65" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2"/>
+            <path d="M 150,35.23 A 65,65 0 0,0 150,144.77 A 65,65 0 0,0 150,35.23 Z" fill="var(--accent)" fill-opacity="0.85"/>
+            <text x="150" y="95" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#fff">6</text>
+            <text x="88" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--text)">1</text>
+            <text x="212" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--text)">1</text>
+            <text x="115" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">players</text>
+            <text x="185" y="183" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="var(--text)">squads</text>
+        </svg>
+        <p class="viz-caption">Both circles fully shaded: everyone is kept. FaZe_suk and Gen.G each show up once, with NULL filling in the missing side.</p>
+    </div>
 
     <p>
         <strong>Question:</strong> Show all players and all squads — matched where possible,

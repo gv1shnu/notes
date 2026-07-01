@@ -59,6 +59,46 @@
 <code><span style="color:#0099ff;">ROLLBACK</span>;   -- undo everything since BEGIN</code>
 </pre>
 
+    <div class="viz">
+        <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Transaction state machine from Active through Partially Committed to Committed or Aborted">
+            <defs>
+                <marker id="txArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="var(--text)"/>
+                </marker>
+            </defs>
+
+            <g font-family="Inter, sans-serif" font-size="13" font-weight="700">
+                <line x1="10" y1="125" x2="35" y2="125" stroke="var(--text)" stroke-width="2" marker-end="url(#txArrow)"/>
+                <text x="12" y="115" font-size="10.5" font-weight="400" fill="var(--muted)">BEGIN</text>
+
+                <rect x="35" y="100" width="120" height="50" rx="8" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+                <text x="95" y="130" text-anchor="middle" fill="var(--text)">Active</text>
+
+                <line x1="155" y1="125" x2="255" y2="125" stroke="var(--text)" stroke-width="2" marker-end="url(#txArrow)"/>
+                <text x="205" y="115" text-anchor="middle" font-size="10" font-weight="400" fill="var(--muted)">last statement runs</text>
+
+                <rect x="255" y="100" width="170" height="50" rx="8" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+                <text x="340" y="130" text-anchor="middle" fill="var(--text)" font-size="12">Partially Committed</text>
+
+                <line x1="425" y1="112" x2="490" y2="65" stroke="#16a34a" stroke-width="2" marker-end="url(#txArrow)"/>
+                <text x="455" y="80" text-anchor="middle" font-size="10" font-weight="400" fill="#16a34a">log flushed</text>
+
+                <rect x="490" y="30" width="130" height="50" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+                <text x="555" y="60" text-anchor="middle" fill="#166534">Committed</text>
+
+                <line x1="425" y1="140" x2="490" y2="185" stroke="#dc2626" stroke-width="2" marker-end="url(#txArrow)"/>
+                <text x="470" y="205" text-anchor="middle" font-size="10" font-weight="400" fill="#dc2626">crash before flush</text>
+
+                <path d="M 95,150 Q 95,215 490,205" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#txArrow)"/>
+                <text x="280" y="230" text-anchor="middle" font-size="10" font-weight="400" fill="#dc2626">failure / ROLLBACK</text>
+
+                <rect x="490" y="160" width="130" height="50" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                <text x="555" y="190" text-anchor="middle" fill="#991b1b">Aborted</text>
+            </g>
+        </svg>
+        <p class="viz-caption">Only two exits exist. Committed is reached solely once the log is durably flushed (Durability); every other path — from either state — leads to Aborted, and the undo log unwinds it as if BEGIN never happened (Atomicity).</p>
+    </div>
+
     <hr>
 
     <h3>ACID</h3>

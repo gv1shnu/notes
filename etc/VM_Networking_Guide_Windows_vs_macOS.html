@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Virtual Machine Networking Guide</title>
+        <style>
+                body {
+                        font-family: Arial, sans-serif;
+                        max-width: 1100px;
+                        margin: auto;
+                        padding: 30px;
+                        line-height: 1.65
+                }
+
+                .tab {
+                        display: inline-block;
+                        padding: 10px 18px;
+                        background: #eee;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        margin-right: 8px
+                }
+
+                .tab.active {
+                        background: #333;
+                        color: #fff
+                }
+
+                .panel {
+                        display: none;
+                        margin-top: 20px
+                }
+
+                .panel.active {
+                        display: block
+                }
+
+                pre {
+                        background: #f5f5f5;
+                        padding: 12px;
+                        border-radius: 6px;
+                        overflow: auto
+                }
+
+                table {
+                        border-collapse: collapse;
+                        width: 100%
+                }
+
+                th,
+                td {
+                        border: 1px solid #ccc;
+                        padding: 8px
+                }
+
+                .note {
+                        background: #fff8dc;
+                        border-left: 5px solid #e6b800;
+                        padding: 10px
+                }
+        </style>
+        <script>
+                function show(id) {
+                        document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+                        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+                        document.getElementById(id).classList.add('active');
+                        document.getElementById(id + 'btn').classList.add('active');
+                }
+                window.onload = () => show('mac');
+        </script>
+</head>
+
+<body>
+        <h1>Virtual Machine Networking: Windows vs macOS</h1>
+
+        <p>This guide focuses on a practical question:</p>
+        <blockquote><b>Can my VM use one network while my host uses another?</b></blockquote>
+
+        <h2>Hardware Limitation (Most Important Concept)</h2>
+
+        <pre>
+Physical Network Interfaces
+
+1 Wi-Fi Adapter
+        ↓
+Can join ONE Wi-Fi network
+
+2 Physical Interfaces
+(Wi-Fi + USB Tether)
+        ↓
+Can join TWO independent networks
+</pre>
+
+        <p>A virtual machine has <b>virtual</b> network adapters. They ultimately depend on the host computer's physical
+                adapters. VMware or VirtualBox cannot create an extra Wi-Fi radio.</p>
+
+        <h2>Quick Decision Table</h2>
+
+        <table>
+                <tr>
+                        <th>Host Hardware</th>
+                        <th>Host Network</th>
+                        <th>VM Network</th>
+                        <th>Possible?</th>
+                </tr>
+                <tr>
+                        <td>1 Wi-Fi</td>
+                        <td>Home Wi-Fi</td>
+                        <td>Same Wi-Fi</td>
+                        <td>✅</td>
+                </tr>
+                <tr>
+                        <td>1 Wi-Fi</td>
+                        <td>Home Wi-Fi</td>
+                        <td>Phone Hotspot</td>
+                        <td>❌</td>
+                </tr>
+                <tr>
+                        <td>Wi-Fi + USB Tether</td>
+                        <td>Home Wi-Fi</td>
+                        <td>Phone</td>
+                        <td>✅</td>
+                </tr>
+                <tr>
+                        <td>Wi-Fi + Ethernet</td>
+                        <td>Wi-Fi</td>
+                        <td>Ethernet</td>
+                        <td>✅</td>
+                </tr>
+                <tr>
+                        <td>Wi-Fi + USB Wi-Fi Dongle</td>
+                        <td>Wi-Fi</td>
+                        <td>Phone Hotspot</td>
+                        <td>✅</td>
+                </tr>
+        </table>
+
+        <div>
+                <span id="macbtn" class="tab" onclick="show('mac')">VMware Fusion (macOS)</span>
+                <span id="winbtn" class="tab" onclick="show('win')">VirtualBox / VMware (Windows)</span>
+        </div>
+
+        <div id="mac" class="panel">
+                <h2>VMware Fusion on macOS</h2>
+
+                <h3>Network Modes</h3>
+                <ul>
+                        <li><b>NAT (Share with my Mac)</b> – VM shares the Mac's connection.</li>
+                        <li><b>Bridged</b> – VM appears as another computer on the same LAN.</li>
+                        <li><b>Host-only</b> – No internet.</li>
+                </ul>
+
+                <h3>Important Limitation</h3>
+
+                <div class="note">
+                        A Mac with only one built-in Wi-Fi adapter cannot stay connected to Office Wi-Fi while the VM
+                        connects to an iPhone hotspot.
+                        This is a hardware limitation, not a VMware Fusion limitation.
+                </div>
+
+                <h3>Examples</h3>
+
+                <pre>
+Mac → Office Wi-Fi
+VM  → Office Wi-Fi
+✔ Works
+</pre>
+
+                <pre>
+Mac → iPhone Hotspot
+VM  → NAT
+✔ Works
+</pre>
+
+                <pre>
+Mac → Office Wi-Fi
+VM  → iPhone Hotspot
+(One Wi-Fi Adapter)
+✘ Impossible
+</pre>
+
+                <h3>Shared Folders</h3>
+
+                <pre>
+Host Folder
+~/Downloads/VM
+
+        ▲
+        │
+Shared Folder
+        │
+        ▼
+
+Kali Linux
+Firefox
+wget
+curl
+</pre>
+
+                <p>Linux guests usually access VMware shared folders under <code>/mnt/hgfs</code>.</p>
+
+        </div>
+
+        <div id="win" class="panel">
+
+                <h2>VirtualBox / VMware on Windows</h2>
+
+                <p>Windows has the same single Wi-Fi limitation, but it is more flexible because you can easily add USB
+                        tethering, Ethernet, or a second Wi-Fi adapter.</p>
+
+                <h3>Recommended Setup</h3>
+
+                <pre>
+Home Wi-Fi
+      │
+Windows Host
+├── Steam
+├── Netflix
+└── Valorant
+
+Phone USB Tether
+      │
+Virtual Machine
+├── Firefox
+├── JDownloader
+└── Downloads
+</pre>
+
+                <h3>Network Modes</h3>
+                <ul>
+                        <li>NAT - easiest internet access.</li>
+                        <li>Bridged - VM becomes another device on the LAN.</li>
+                        <li>Host-only - isolated network.</li>
+                </ul>
+
+                <h3>Shared Folders</h3>
+
+                <pre>
+D:\VMDownloads
+
+       ▲
+       │
+Shared Folder
+       │
+       ▼
+
+Browser inside VM
+</pre>
+
+                <p>VirtualBox Windows guests access shares via <code>\\VBOXSVR\</code>. VMware guests access them via
+                        <code>\\vmware-host\Shared Folders</code>.</p>
+
+        </div>
+
+        <h2>Which Network Mode Should You Choose?</h2>
+
+        <table>
+                <tr>
+                        <th>Goal</th>
+                        <th>Mode</th>
+                </tr>
+                <tr>
+                        <td>Simple internet</td>
+                        <td>NAT</td>
+                </tr>
+                <tr>
+                        <td>VM appears on LAN</td>
+                        <td>Bridged</td>
+                </tr>
+                <tr>
+                        <td>Only host ↔ VM communication</td>
+                        <td>Host-only</td>
+                </tr>
+                <tr>
+                        <td>VM on another physical network</td>
+                        <td>Bridge to another physical adapter (USB tether, Ethernet, second Wi-Fi)</td>
+                </tr>
+        </table>
+
+        <h2>Common Misconceptions</h2>
+
+        <ul>
+                <li>❌ A VM has its own Wi-Fi hardware.</li>
+                <li>❌ Bridged mode creates a second Wi-Fi connection.</li>
+                <li>❌ NAT lets you choose a different internet connection.</li>
+                <li>✅ A VM always depends on the host's physical network interfaces.</li>
+        </ul>
+
+</body>
+
+</html>

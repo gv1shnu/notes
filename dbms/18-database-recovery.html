@@ -68,6 +68,60 @@
         and which didn't — and that single fact drives everything that follows.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline of write-ahead log records, dirty pages in memory, and a crash before pages reach disk">
+            <defs>
+                <marker id="walArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"/>
+                </marker>
+            </defs>
+
+            <line x1="20" y1="130" x2="660" y2="130" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#walArrow)"/>
+            <text x="665" y="134" font-size="11" fill="var(--muted)" font-family="Inter, sans-serif">time</text>
+
+            <g font-family="JetBrains Mono, monospace" font-size="10.5">
+                <!-- above-axis: BEGIN + memory state -->
+                <line x1="60" y1="100" x2="60" y2="130" stroke="var(--border)"/>
+                <rect x="20" y="72" width="80" height="28" rx="5" fill="var(--header)" stroke="var(--border)"/>
+                <text x="60" y="90" text-anchor="middle">BEGIN T1</text>
+
+                <line x1="255" y1="100" x2="255" y2="130" stroke="var(--border)"/>
+                <rect x="185" y="72" width="140" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6"/>
+                <text x="255" y="90" text-anchor="middle">mem: TenZ→700</text>
+
+                <line x1="450" y1="100" x2="450" y2="130" stroke="var(--border)"/>
+                <rect x="380" y="72" width="140" height="28" rx="5" fill="#dbeafe" stroke="#3b82f6"/>
+                <text x="450" y="90" text-anchor="middle">mem: Zekken→600</text>
+
+                <!-- below-axis: log writes -->
+                <line x1="155" y1="130" x2="155" y2="160" stroke="var(--border)"/>
+                <rect x="85" y="160" width="140" height="28" rx="5" fill="#fef3c7" stroke="#f59e0b"/>
+                <text x="155" y="178" text-anchor="middle">LOG LSN101</text>
+
+                <line x1="350" y1="130" x2="350" y2="160" stroke="var(--border)"/>
+                <rect x="280" y="160" width="140" height="28" rx="5" fill="#fef3c7" stroke="#f59e0b"/>
+                <text x="350" y="178" text-anchor="middle">LOG LSN102</text>
+
+                <line x1="545" y1="130" x2="545" y2="160" stroke="var(--border)"/>
+                <rect x="475" y="160" width="140" height="28" rx="5" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="545" y="178" text-anchor="middle">LOG LSN103 COMMIT</text>
+            </g>
+
+            <!-- crash -->
+            <line x1="640" y1="55" x2="640" y2="205" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="640" y="45" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626" font-family="Inter, sans-serif">CRASH</text>
+
+            <rect x="20" y="225" width="620" height="65" rx="8" fill="var(--header)" stroke="var(--border)"/>
+            <text x="330" y="248" text-anchor="middle" font-size="12" fill="var(--text)" font-family="Inter, sans-serif">
+                Neither dirty page ever reached disk before the crash —
+            </text>
+            <text x="330" y="266" text-anchor="middle" font-size="12" fill="var(--text)" font-family="Inter, sans-serif">
+                but the log shows LSN103 COMMIT, so on restart, <tspan font-weight="700" fill="var(--accent)">redo</tspan> replays 101 and 102 anyway.
+            </text>
+        </svg>
+        <p class="viz-caption">The log record always lands durably first (write-<em>ahead</em> logging). A crash right after COMMIT is survivable only because the log, not the data page, is the source of truth.</p>
+    </div>
+
     <hr>
 
     <h3>Redo and undo</h3>
@@ -107,10 +161,10 @@
         ARIES algorithm:
     </p>
 
-    <ol>
-        <li><strong>Analysis</strong> — read forward from the last checkpoint to find which transactions were in flight and which pages were dirty.</li>
-        <li><strong>Redo</strong> — repeat history, re-applying every logged change so the database matches its state at the moment of the crash.</li>
-        <li><strong>Undo</strong> — roll back the transactions that never committed, leaving only durable, committed work.</li>
+    <ol class="pipeline">
+        <li><strong>Analysis</strong><span>Read forward from the last checkpoint to find which transactions were in flight and which pages were dirty.</span></li>
+        <li><strong>Redo</strong><span>Repeat history, re-applying every logged change so the database matches its state at the moment of the crash.</span></li>
+        <li><strong>Undo</strong><span>Roll back the transactions that never committed, leaving only durable, committed work.</span></li>
     </ol>
 
     <hr>

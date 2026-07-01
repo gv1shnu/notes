@@ -30,6 +30,56 @@
         <tr><td>5</td><td>f0rsakeN</td><td>3</td><td>PRX</td><td>APAC</td></tr>
     </table>
 
+    <div class="viz">
+        <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decomposing the wide players-and-teams table into separate players and teams tables">
+            <text x="10" y="18" font-size="12" font-weight="700" fill="var(--muted)" font-family="Inter, sans-serif">BEFORE — one wide table</text>
+
+            <rect x="10" y="26" width="290" height="150" rx="8" fill="var(--header)" stroke="var(--border)"/>
+            <g font-family="JetBrains Mono, monospace" font-size="10.5">
+                <text x="20" y="46" font-weight="700" fill="var(--muted)">player_id  username  team_id  team_name  team_region</text>
+
+                <rect x="185" y="54" width="105" height="20" fill="#fef3c7"/>
+                <text x="20" y="68">1          TenZ      1        Sentinels  NA</text>
+
+                <rect x="185" y="79" width="105" height="20" fill="#fef3c7"/>
+                <text x="20" y="93">2          Zekken    1        Sentinels  NA</text>
+
+                <text x="20" y="118">5          f0rsakeN  3        PRX        APAC</text>
+            </g>
+            <text x="238" y="150" text-anchor="middle" font-size="10" fill="#92400e" font-family="Inter, sans-serif" font-style="italic">duplicated together, every time</text>
+
+            <defs>
+                <marker id="normArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)"/>
+                </marker>
+            </defs>
+            <line x1="305" y1="100" x2="340" y2="100" stroke="var(--accent)" stroke-width="2" marker-end="url(#normArrow)"/>
+            <text x="322" y="90" text-anchor="middle" font-size="10" fill="var(--accent)" font-weight="700" font-family="Inter, sans-serif">split</text>
+
+            <text x="350" y="18" font-size="12" font-weight="700" fill="var(--muted)" font-family="Inter, sans-serif">AFTER — one fact, one place</text>
+
+            <rect x="350" y="26" width="160" height="90" rx="8" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="430" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent)" font-family="Inter, sans-serif">players</text>
+            <g font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--text)">
+                <text x="360" y="64">player_id (PK)</text>
+                <text x="360" y="82">username</text>
+                <text x="360" y="100" font-weight="700" fill="var(--accent)">team_id (FK)</text>
+            </g>
+
+            <rect x="460" y="150" width="170" height="90" rx="8" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="545" y="168" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent)" font-family="Inter, sans-serif">teams</text>
+            <g font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--text)">
+                <text x="470" y="188" font-weight="700" fill="var(--accent)">team_id (PK)</text>
+                <text x="470" y="206">team_name</text>
+                <text x="470" y="224">team_region</text>
+            </g>
+
+            <path d="M 460,100 Q 500,120 500,148" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#normArrow)"/>
+            <text x="520" y="130" font-size="10.5" fill="var(--accent)" font-weight="700" font-family="Inter, sans-serif">references</text>
+        </svg>
+        <p class="viz-caption">"Sentinels, NA" moves to a single row in teams. Rename the team once, and every player referencing team_id 1 sees the change — the update anomaly is gone by construction.</p>
+    </div>
+
     <p>"Sentinels, NA" is written once per player. That single duplication causes three anomalies:</p>
 
     <ul>
