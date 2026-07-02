@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - IoT and OT</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>IoT and OT</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        IoT (connected devices) and OT (operational technology — industrial control systems) share one overriding
+        constraint: the devices can be <strong>fragile or safety-impacting</strong>. A scan that would be routine against
+        a web server can knock a PLC offline, and in an OT environment that can have physical consequences. Caution here
+        is not politeness; it is safety.
+    </p>
+
+    <h3>What to check</h3>
+
+    <ul>
+        <li>Default credentials — the classic sticker-on-the-device password</li>
+        <li>Outdated firmware with known vulnerabilities</li>
+        <li>Exposed management interfaces reachable from the network</li>
+        <li>Weak or missing network segmentation between IT and OT</li>
+        <li>Insecure protocols (many industrial protocols have no authentication at all)</li>
+        <li>Vendor update gaps — devices that are never patched</li>
+    </ul>
+
+    <p>
+        If it has an app, a cloud account, and a password printed on a sticker, it has a personality and probably a CVE.
+    </p>
+
+    <h3>How to test it — carefully</h3>
+
+    <p>
+        Without dedicated hardware or a test rig, IoT and especially OT work is often <strong>literature and
+        configuration review</strong> rather than active probing: check firmware versions against advisories, review
+        network segmentation on paper, and confirm which protocols are in use. When active testing is in scope, it
+        happens on a lab replica or in a maintenance window with the owners watching — never improvised against live
+        equipment. MITRE ATT&amp;CK for ICS is the reference for what matters in these environments.
+    </p>
+
+    <p>
+        Next: Cloud
+        <a href="./9-cloud.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Mobile
+        <a href="./9-mobile.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

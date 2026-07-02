@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Box types</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Box types</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        Hats describe intent. <strong>Boxes</strong> describe something different: how much the tester knows before they
+        start. It is a knob on the engagement, set by the client, not a description of the person.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Box</th>
+            <th>Starting knowledge</th>
+            <th>Simulates</th>
+        </tr>
+        <tr>
+            <td><strong>White-box</strong></td>
+            <td>Full internal knowledge: source code, architecture, credentials.</td>
+            <td>A malicious insider, or a thorough audit.</td>
+        </tr>
+        <tr>
+            <td><strong>Black-box</strong></td>
+            <td>Nothing but a name or a URL.</td>
+            <td>An outside attacker with no help.</td>
+        </tr>
+        <tr>
+            <td><strong>Grey-box</strong></td>
+            <td>Partial knowledge, such as a normal user account.</td>
+            <td>A regular user who turns hostile, or a phished employee.</td>
+        </tr>
+    </table>
+
+    <p>
+        These notes lean towards the <strong>black-box</strong> view, because it is the hardest and most honest starting
+        point: you begin with almost nothing, and everything you later do is built from what you discover yourself. An
+        endpoint you never find is a vulnerability you never test, so the early phases carry more weight than they first
+        appear to.
+    </p>
+
+    <p>
+        Keep the two ideas separate in your head. Hats are about intent and legality; boxes are about how much the tester
+        knows going in. Different knobs, same machine.
+    </p>
+
+    <p>
+        Next: Methodology
+        <a href="./1-methodology.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Hats and teams
+        <a href="./1-hats-and-teams.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

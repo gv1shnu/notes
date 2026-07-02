@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Methodology</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Methodology</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        A pentest reads like a campaign, not a bag of random commands. Each phase consumes the previous phase's output
+        and produces the next phase's input. Recon says "I found doors." Scanning says "I checked the locks."
+        Exploitation says "one lock is made of noodles." Reporting says "please buy a real lock." In that order.
+    </p>
+
+    <h3>The phases</h3>
+
+    <ol>
+        <li><strong>Rules of engagement</strong> — get written scope, target list, time window, allowed techniques, and
+            reporting format. Everything downstream depends on this.</li>
+        <li><strong>Reconnaissance</strong> — collect public facts: domains, subdomains, IP ranges, people, technologies,
+            exposed services.</li>
+        <li><strong>Scanning</strong> — touch approved systems carefully to map live hosts, ports, and service versions.</li>
+        <li><strong>Enumeration</strong> — go deeper on each service: users, shares, configs, identity surfaces.</li>
+        <li><strong>Vulnerability analysis</strong> — turn raw findings into a ranked shortlist of likely weaknesses,
+            minus false positives.</li>
+        <li><strong>Exploitation</strong> — validate impact inside scope. Prove the issue with the smallest blast radius,
+            do not cosplay as a disaster movie.</li>
+        <li><strong>Network, web, and platform checks</strong> — the specialty branches: sniffing, web apps, wireless,
+            cloud, and so on. They run in parallel, not strictly after exploitation.</li>
+        <li><strong>Reporting and cleanup</strong> — deliver evidence, risk, reproduction, and fixes; remove test
+            artifacts; confirm a retest.</li>
+    </ol>
+
+    <p>
+        Written as a pipeline, the whole campaign is one line:
+    </p>
+
+    <pre><code>scope -> recon -> scan -> enumerate -> analyze -> validate -> report -> retest</code></pre>
+
+    <h3>The campaign tracker</h3>
+
+    <p>
+        Because each phase hands a file to the next, the handoffs can be automated. These notes ship a small set of
+        Python scripts (see <a href="./pipeline.html">the tracker</a>) that route each phase's output into the next and
+        log a timeline, with human approval gates between phases. Treat it as <strong>bookkeeping that keeps the campaign
+        straight</strong> — handy, but never the point. The thinking, the scope calls, and the actual testing stay
+        yours. The phase pages that follow teach the manual work first; the tracker just remembers it.
+    </p>
+
+    <p>
+        Next: Reconnaissance
+        <a href="./2-recon-intro.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Box types
+        <a href="./1-box-types.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

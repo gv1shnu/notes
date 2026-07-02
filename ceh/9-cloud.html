@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Cloud</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Cloud</h2>
+    <p><strong>Difficulty:</strong> Hard</p>
+
+    <p>
+        Cloud is now the primary external surface for many targets, and cloud findings rarely come from exploits — they
+        come from <strong>identity and configuration</strong>. Public storage, weak IAM, exposed keys, permissive
+        security groups, missing logging, and open databases are the bread and butter. The single most common one is a
+        storage bucket set to public.
+    </p>
+
+    <h3>How public is that bucket?</h3>
+
+    <p>
+        A bucket's access policy decides what an anonymous attacker can do with no credentials at all. Set the policy and
+        run the two commands an attacker would try — list the contents, and download a file.
+    </p>
+
+    <div class="sim" id="s3-sim">
+        <div class="sim-toolbar" style="margin-bottom:.3rem;">
+            <span style="font-size:.82rem;color:var(--muted);font-weight:600;">Bucket policy:</span>
+            <button class="ghost" data-acl="private">Private</button>
+            <button class="ghost" data-acl="read">Public read</button>
+            <button class="ghost" data-acl="list">Public list + read</button>
+        </div>
+        <div class="sim-out" id="s3-out"></div>
+        <div class="sim-verdict" id="s3-verdict"></div>
+    </div>
+
+    <p>
+        "Public read" already leaks any file whose name is guessed or leaked. "Public list" is worse — the attacker can
+        enumerate every object and then download all of them. This is exactly how customer data ends up on the news, with
+        no exploit involved.
+    </p>
+
+    <h3>Beyond storage</h3>
+
+    <ul>
+        <li>IAM — over-permissioned roles, especially anything with <code>AdministratorAccess</code></li>
+        <li>Exposed access keys committed to code or leaked in the app</li>
+        <li>Security groups open to <code>0.0.0.0/0</code> on databases and admin ports</li>
+        <li>Missing CloudTrail / audit logging</li>
+        <li>Unmanaged secrets and vulnerable machine images</li>
+    </ul>
+
+    <p>
+        Anonymous, read-only checks (like the public-bucket test) are safe to run. Anything using credentials touches a
+        live account — where a mistake means real cost, state change, or lockout — so it stays under tight scope.
+    </p>
+
+    <p>
+        Next: Cryptography
+        <a href="./9-crypto.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: IoT and OT
+        <a href="./9-iot-ot.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        (function () {
+            var sim = document.getElementById('s3-sim');
+            var out = document.getElementById('s3-out');
+            var verdict = document.getElementById('s3-verdict');
+
+            var CASES = {
+                private: {
+                    ls: 'An error occurred (AccessDenied) when calling ListObjectsV2',
+                    cp: 'An error occurred (AccessDenied) when calling GetObject',
+                    lsOk: false, cpOk: false,
+                    v: ['ok', 'Locked down: anonymous users get nothing. This is the safe setting.']
+                },
+                read: {
+                    ls: 'An error occurred (AccessDenied) when calling ListObjectsV2',
+                    cp: 'download: s3://lab-backups/db-2025.sql to ./db-2025.sql',
+                    lsOk: false, cpOk: true,
+                    v: ['warn', 'Public read: cannot list, but ANY file whose name is known or guessed is downloadable.']
+                },
+                list: {
+                    ls: '2025-06-01  db-2025.sql\n2025-06-01  customers.csv\n2025-06-01  config.ini',
+                    cp: 'download: s3://lab-backups/customers.csv to ./customers.csv',
+                    lsOk: true, cpOk: true,
+                    v: ['bad', 'Public list + read: an anonymous attacker enumerates every object and downloads all of it.']
+                }
+            };
+
+            function show(acl) {
+                var c = CASES[acl];
+                out.innerHTML =
+                    '<span class="m">$ aws s3 ls s3://lab-backups --no-sign-request</span>\n' +
+                    '<span class="' + (c.lsOk ? 'g' : 's') + '">' + c.ls + '</span>\n\n' +
+                    '<span class="m">$ aws s3 cp s3://lab-backups/customers.csv . --no-sign-request</span>\n' +
+                    '<span class="' + (c.cpOk ? 'g' : 's') + '">' + c.cp + '</span>';
+                verdict.className = 'sim-verdict ' + c.v[0];
+                verdict.textContent = c.v[1];
+            }
+            sim.querySelectorAll('button[data-acl]').forEach(function (b) {
+                b.addEventListener('click', function () { show(b.getAttribute('data-acl')); });
+            });
+            show('private');
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

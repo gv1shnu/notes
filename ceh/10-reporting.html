@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Reporting</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Reporting</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        Reporting is where the pentest becomes useful. A finding is not "I ran a tool." A finding is a clear risk with
+        evidence, affected assets, business impact, reproduction steps, and a fix. Everything in the earlier phases only
+        matters if it lands here in a form someone can act on.
+    </p>
+
+    <h3>Report shape</h3>
+
+    <ol>
+        <li>Executive summary (for a non-technical reader)</li>
+        <li>Scope and rules of engagement</li>
+        <li>Methodology and timeline</li>
+        <li>Risk-rating method</li>
+        <li>Findings, ordered by severity</li>
+        <li>Evidence and reproduction notes</li>
+        <li>Remediation guidance</li>
+        <li>Appendix: raw scan data, tool versions, target inventory</li>
+    </ol>
+
+    <h3>The finding template</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Field</th>
+            <th>What to write</th>
+        </tr>
+        <tr><td>Title</td><td>Short and specific. "Public S3 bucket exposes invoices" beats "Cloud issue."</td></tr>
+        <tr><td>Severity</td><td>Critical / High / Medium / Low / Info, with reasoning, not vibes.</td></tr>
+        <tr><td>Affected assets</td><td>Hosts, URLs, accounts, apps, regions, components.</td></tr>
+        <tr><td>Evidence</td><td>Requests, responses, command output, timestamps, the test account used.</td></tr>
+        <tr><td>Impact</td><td>What an attacker could do, and why the business should care.</td></tr>
+        <tr><td>Fix</td><td>Concrete remediation and a quick way to validate it.</td></tr>
+    </table>
+
+    <h3>A worked example</h3>
+
+    <pre><code>Title:      Unauthenticated SMB share exposes backup archive
+Severity:   High
+Affected:   10.10.10.45 (filesrv.lab.local), TCP/445
+Evidence:   enum4linux-ng share listing; smbclient dir of //filesrv/backups
+Impact:     Any network user can read backup.zip containing legacy app config
+            with database credentials.
+Reproduce:  1. enum4linux-ng -A 10.10.10.45
+            2. smbclient //10.10.10.45/backups -N
+            3. get backup.zip   (lab only; deleted after test)
+Fix:        Disable guest/anonymous access; ACL shares to authenticated users;
+            rotate the exposed credentials.
+Retest:     Confirm the share requires valid domain auth; verify rotation ticket.</code></pre>
+
+    <h3>Evidence rules</h3>
+
+    <ul>
+        <li>Capture enough proof to be reproducible.</li>
+        <li>Redact secrets, personal data, tokens, and unnecessary customer data.</li>
+        <li>Keep timestamps and test-account names.</li>
+        <li>Do not paste giant raw dumps into the main report — use the appendix.</li>
+        <li>Separate facts from assumptions.</li>
+    </ul>
+
+    <p>
+        A screenshot without context is just a ransom note from your past self. Write the finding so a developer who was
+        never in the room can reproduce and fix it.
+    </p>
+
+    <p>
+        Next: Cleanup and blind spots
+        <a href="./10-cleanup-and-blindspots.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Cryptography
+        <a href="./9-crypto.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

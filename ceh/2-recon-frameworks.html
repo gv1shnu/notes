@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Recon frameworks</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Recon frameworks</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        Doing each lookup by hand is fine for a few hosts. When there are dozens, a framework keeps the results organised
+        and repeatable. <a href="https://github.com/lanmaster53/recon-ng">Recon-ng</a> is the classic one: a
+        web-reconnaissance framework with independent modules and a built-in database, styled after Metasploit's console.
+    </p>
+
+    <h3>Module categories</h3>
+
+    <p>
+        Modules are grouped in a marketplace by what they do:
+    </p>
+
+    <ul>
+        <li><strong>discovery</strong> — find new things (interesting files, related hosts)</li>
+        <li><strong>recon</strong> — the bulk: domains &rarr; hosts, hosts &rarr; ports, contacts, credentials</li>
+        <li><strong>import</strong> — bring in your own lists</li>
+        <li><strong>exploitation</strong> — light interaction with found services</li>
+        <li><strong>reporting</strong> — export the database to CSV, HTML, and so on</li>
+    </ul>
+
+    <h3>A workspace, start to finish</h3>
+
+    <p>
+        Everything lives in a named workspace, and results accumulate in tables you can query. A minimal end-to-end run:
+    </p>
+
+    <pre><code>$ recon-ng
+[recon-ng][default] > marketplace install all
+[recon-ng][default] > workspaces create acme
+[recon-ng][acme] > db insert domains
+domain (TEXT) > example.com
+
+[recon-ng][acme] > modules load recon/domains-hosts/hackertarget
+[recon-ng][acme][hackertarget] > run
+[*] example.com => 34 hosts found
+
+[recon-ng][acme][hackertarget] > back
+[recon-ng][acme] > show hosts
+[recon-ng][acme] > db export csv recon_output.csv</code></pre>
+
+    <p>
+        Load a module, point it at the domain, run it, and the discovered hosts land in the <code>hosts</code> table.
+        Chain a few modules and the database fills with subdomains, IPs, and contacts — then export it as the input for
+        the scanning phase.
+    </p>
+
+    <p>
+        The handoff is the point: whatever hosts end up in the database, filtered to what is in scope, become the target
+        list you scan next.
+    </p>
+
+    <p>
+        Next: Attribution
+        <a href="./2-attribution.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: People and usernames
+        <a href="./2-people-osint.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

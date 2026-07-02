@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Attack chains</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="./sim.js"></script>
+</head>
+
+<body>
+    <h2>Attack chains</h2>
+    <p><strong>Difficulty:</strong> Hard</p>
+
+    <p>
+        Real compromise is rarely one big exploit. It is a <strong>chain</strong> of small, individually-boring steps
+        where each one unlocks the next. No single link is dramatic; the path is. Understanding chaining is what
+        separates "I found some issues" from "here is how an attacker reaches your crown jewels."
+    </p>
+
+    <h3>Walk a chain</h3>
+
+    <p>
+        Step through a typical chain from an anonymous position on the network to root on a server. Watch how the access
+        level climbs — <em>none</em> to <em>user</em> to <em>root</em> — one modest misconfiguration at a time.
+    </p>
+
+    <div id="chain-sim"></div>
+
+    <p>
+        Notice that none of those steps was a zero-day. A readable share, a password left in a config file, credential
+        reuse, and one <code>sudo</code> rule — each is a shrug on its own, and together they are a full compromise. That
+        is why the report ranks the <em>chain</em>, not just the isolated findings.
+    </p>
+
+    <h3>Post-exploitation, kept sane</h3>
+
+    <p>
+        Once you have access, the questions are: what can this identity reach, what sensitive data is exposed, what
+        systems can it influence, and what would a real attacker do next? Answer them, document the boundary, and stop.
+        Reaching root is the proof; ransacking the machine is not part of the job.
+    </p>
+
+    <h3>Safe validation, per finding</h3>
+
+    <p>
+        Each finding type has a minimal proof and a stop condition, decided before you act:
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Finding</th>
+            <th>Minimal proof</th>
+            <th>Stop condition</th>
+        </tr>
+        <tr><td>SQL injection</td><td>Boolean diff or a single-row select</td><td>No data dump</td></tr>
+        <tr><td>Default creds</td><td>One login screenshot</td><td>No password change</td></tr>
+        <tr><td>Privilege escalation</td><td>Read one protected file / show the shell</td><td>No persistence</td></tr>
+        <tr><td>SSRF</td><td>A callback to a listener you control</td><td>No cloud-account pivot</td></tr>
+    </table>
+
+    <p>
+        (In the campaign tracker, a helper turns each candidate into a plan like this — proof method, stop condition,
+        cleanup — but a human runs the actual proof. The plan is bookkeeping; the judgement is yours.)
+    </p>
+
+    <p>
+        Next: Malware
+        <a href="./7-malware.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Privilege escalation
+        <a href="./6-privilege-escalation.html">&lt;&lt;</a>
+    </p>
+
+    <script>
+        DSASim({
+            mount: 'chain-sim',
+            setup: function (stage) {
+                var STEPS = [
+                    { node: 'recon',    label: 'Recon',        note: 'host 10.10.10.12 found',           access: 'none' },
+                    { node: 'scan',     label: 'Scan',         note: '445/SMB is open',                  access: 'none' },
+                    { node: 'enum',     label: 'Enumerate',    note: "null session lists 'backups' (read)", access: 'none' },
+                    { node: 'loot',     label: 'Loot',         note: 'backups/config.ini holds DB creds', access: 'none' },
+                    { node: 'reuse',    label: 'Reuse creds',  note: 'same creds log into SSH as jsmith', access: 'user' },
+                    { node: 'privesc',  label: 'Privesc',      note: 'sudo -l: NOPASSWD find  ->  root',  access: 'root' }
+                ];
+                var frames = STEPS.map(function (s, i) {
+                    return { caption: s.note, upto: i, access: s.access };
+                });
+                frames.unshift({ caption: 'An anonymous attacker on the network. Access: none.', upto: -1, access: 'none' });
+
+                var ACCESS = { none: 'hl-dim', user: 'hl-gold', root: 'hl-red' };
+
+                return {
+                    frames: frames,
+                    legend: [
+                        { cls: 'hl-orange', label: 'current step' },
+                        { cls: 'hl-green',  label: 'done' },
+                        { color: '#c62828', label: 'access: root' }
+                    ],
+                    render: function (fr) {
+                        stage.style.display = 'block';
+                        var chain = STEPS.map(function (s, i) {
+                            var cls = i < fr.upto ? 'hl-green' : (i === fr.upto ? 'hl-orange' : 'hl-dim');
+                            return '<span class="sim-cell ' + cls + '" style="width:auto;min-width:78px;padding:.3rem .5rem;' +
+                                   'height:auto;font-size:.72rem;">' + s.label + '</span>';
+                        }).join('<span style="color:#bbb;">&rarr;</span>');
+                        var badge = '<span class="sim-cell ' + ACCESS[fr.access] + '" style="width:auto;padding:.2rem .6rem;height:auto;">' +
+                                    fr.access + '</span>';
+                        stage.innerHTML =
+                            '<div style="display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;justify-content:center;">' + chain + '</div>' +
+                            '<div style="text-align:center;margin-top:.9rem;font-family:\'JetBrains Mono\',monospace;font-size:.8rem;">' +
+                            'access level: ' + badge + '</div>';
+                    }
+                };
+            }
+        });
+    </script>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

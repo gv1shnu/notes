@@ -6,110 +6,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Vishnu Gandarapu</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>CEH Notes - Vishnu Gandarapu</title>
 </head>
 
 <body>
     <a href="../index.html"><i class="fas fa-home"></i></a>
+    <h1>Ethical Hacking</h1>
+    <p>Finding vulnerabilities in a live system, with permission, and reporting them well.</p>
+
+    <section>
+        <h2>Contents</h2>
+
+        <h3>1 &middot; Foundations</h3>
+        <ol>
+            <li><a href="./1-introduction.html">Introduction</a></li>
+            <li><a href="./1-hats-and-teams.html">Hats and teams</a></li>
+            <li><a href="./1-box-types.html">Box types</a></li>
+            <li><a href="./1-methodology.html">Methodology</a></li>
+        </ol>
+
+        <h3>2 &middot; Reconnaissance</h3>
+        <ol>
+            <li><a href="./2-recon-intro.html">Reconnaissance intro</a></li>
+            <li><a href="./2-search-and-dorks.html">Search engines and Google dorks</a></li>
+            <li><a href="./2-dns-and-subdomains.html">DNS and subdomains</a></li>
+            <li><a href="./2-people-osint.html">People and usernames</a></li>
+            <li><a href="./2-recon-frameworks.html">Recon frameworks</a></li>
+            <li><a href="./2-attribution.html">Attribution</a></li>
+        </ol>
+
+        <h3>3 &middot; Scanning</h3>
+        <ol>
+            <li><a href="./3-host-discovery.html">Host discovery</a></li>
+            <li><a href="./3-port-scanning.html">Port scanning</a> &mdash; interactive</li>
+            <li><a href="./3-service-and-os.html">Service and OS detection</a></li>
+        </ol>
+
+        <h3>4 &middot; Enumeration</h3>
+        <ol>
+            <li><a href="./4-enumeration-intro.html">Enumeration intro</a></li>
+            <li><a href="./4-smb-and-ad.html">SMB and Active Directory</a></li>
+            <li><a href="./4-mail-dns-snmp.html">Mail, DNS, and SNMP</a></li>
+            <li><a href="./4-web-fingerprinting.html">Web fingerprinting</a></li>
+            <li><a href="./4-web-content-discovery.html">Web content discovery</a></li>
+        </ol>
+
+        <h3>5 &middot; Vulnerability analysis</h3>
+        <ol>
+            <li><a href="./5-cve-and-cvss.html">CVE and CVSS</a> &mdash; interactive</li>
+            <li><a href="./5-triage-and-risk.html">Triage and risk</a></li>
+        </ol>
+
+        <h3>6 &middot; Exploitation</h3>
+        <ol>
+            <li><a href="./6-exploitation-intro.html">Exploitation intro</a></li>
+            <li><a href="./6-passwords.html">Password attacks</a></li>
+            <li><a href="./6-privilege-escalation.html">Privilege escalation</a></li>
+            <li><a href="./6-attack-chains.html">Attack chains</a> &mdash; interactive</li>
+        </ol>
+
+        <h3>7 &middot; Network and perimeter</h3>
+        <ol>
+            <li><a href="./7-malware.html">Malware</a></li>
+            <li><a href="./7-sniffing.html">Sniffing</a></li>
+            <li><a href="./7-social-engineering.html">Social engineering</a></li>
+            <li><a href="./7-dos.html">Denial of service</a></li>
+            <li><a href="./7-session-hijacking.html">Session hijacking</a> &mdash; interactive</li>
+            <li><a href="./7-evasion.html">Evasion</a></li>
+        </ol>
+
+        <h3>8 &middot; Web attacks</h3>
+        <ol>
+            <li><a href="./8-web-servers.html">Web servers</a></li>
+            <li><a href="./8-auth-and-session.html">Authentication and session</a></li>
+            <li><a href="./8-access-control.html">Access control and IDOR</a> &mdash; interactive</li>
+            <li><a href="./8-sql-injection.html">SQL injection</a> &mdash; interactive</li>
+            <li><a href="./8-xss.html">Cross-site scripting</a> &mdash; interactive</li>
+            <li><a href="./8-injection-and-ssrf.html">Injection and SSRF</a></li>
+        </ol>
+
+        <h3>9 &middot; Platform attacks</h3>
+        <ol>
+            <li><a href="./9-wireless.html">Wireless</a></li>
+            <li><a href="./9-mobile.html">Mobile</a></li>
+            <li><a href="./9-iot-ot.html">IoT and OT</a></li>
+            <li><a href="./9-cloud.html">Cloud</a> &mdash; interactive</li>
+            <li><a href="./9-crypto.html">Cryptography</a></li>
+        </ol>
+
+        <h3>10 &middot; Reporting</h3>
+        <ol>
+            <li><a href="./10-reporting.html">Reporting</a></li>
+            <li><a href="./10-cleanup-and-blindspots.html">Cleanup and blind spots</a></li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Appendix</h2>
+        <ul>
+            <li><a href="./pipeline.html">Campaign tracker</a> &mdash; optional Python automation that routes each
+                phase's output into the next and logs a timeline. Bookkeeping, not the point.</li>
+        </ul>
+    </section>
+
     <p>
-        Ethical hacking or Pentesting is the art of finding vulnerabilities in a
-        live system and reporting the exploits to the respective organisation as part of the contract or
-        as a participant in the bug bounty program hosted by the organisation (white-hat), for monetary or reputation
-        purposes.
-
-        The second last part matters a lot.
-        If you find vulnerabilities and don't report, it's a grey moral zone.
-        Adding to this, if you find bugs outside of the scope described in bug bounty program, it won't be fruitful, for
-        you.
-        Usually, withholding such information is individual's loss, as organisations do pay handsomely if the hole and
-        proposed fix is legit.
-
-        However, if you disclose the discovery to malicious third party or act maliciously (black-hat) using the
-        obtained information, you're eligible to be in jail.
-
-        Between those two extremes sit the grey-hats: they hack without permission — which is still illegal — but without
-        a black-hat's malice, often disclosing the flaw afterwards (sometimes only after asking for a fee). Good
-        intentions don't make unauthorised access legal, and that's what keeps them grey rather than white.
-    </p>
-
-    <p>
-        On the other hand, large organisations often operate this process of pentesting and defence using various teams.
-    </p>
-
-    <p>Types of teams:</p>
-
-    <ul>
-        <li>Red team - offense. Team responsible for finding holes and reporting to Blue team.</li>
-        <li>Blue team - defence. Team responsible for fixing these holes as reported by Red team.</li>
-        <li>Purple team - all rounders/hybrid. Team responsible for assisting both teams for immediate fixes.</li>
-    </ul>
-
-    <p>Types of participants:</p>
-
-    <ul>
-        <li>
-            Black hats - Criminals. E.g., Kevin Mitnick.
-            <br>Common activities
-            <ul>
-                <li>Ransomware</li>
-                <li>Phishing</li>
-                <li>Credential theft</li>
-                <li>Malware deployment</li>
-                <li>Selling stolen databases</li>
-            </ul>
-        </li>
-        <li>White hats - Professionals. E.g., Bug hunters, Red team, Consultant.</li>
-        <li>
-            Grey hats - Hack without authorisation but without malicious intent, and usually disclose what they find
-            afterwards (sometimes for a fee). E.g., an uninvited bug-finder who reports the hole later. (A disgruntled
-            employee acting maliciously isn't a grey-hat — that's a black-hat insider by another name.)
-        </li>
-        <li>
-            State-Sponsored / APT Groups. E.g. Lazarus Group.
-            <br>Common activities
-            <ul>
-                <li>Disruption of enemy's national infrastructure</li>
-                <li>Spying, and Surveillance</li>
-                <li>Selling stolen databases</li>
-            </ul>
-        </li>
-        <li>Red hats - Vigilantes.</li>
-        <li>
-            Hacktivists - Individuals bent on exposing scandals and thwarting dictatorship. E.g., Anonymous.
-            <br>Common activities
-            <ul>
-                <li>DDoS attacks</li>
-                <li>Leaks</li>
-                <li>Protest campaigns</li>
-            </ul>
-        </li>
-        <li>Script Kiddie / Green hat - Beginners / Amateurs - Us.</li>
-    </ul>
-
-    <p>
-        Adding to the above, there are 3 types of penetration testing (pentesting) — classified not by the hacker's
-        intent but by how much the tester is told up front:
-    </p>
-
-    <ul>
-        <li>White-box - the tester gets full internal knowledge: source code, architecture, credentials.</li>
-        <li>Black-box - the tester is given nothing, simulating an outside attacker working from scratch.</li>
-        <li>Grey-box - the tester gets partial knowledge, e.g., a normal user account, simulating a logged-in user or an insider.</li>
-    </ul>
-
-    <p>
-        <strong>Note:</strong> these are "box", not "hat". A hat describes the hacker's intent and legality; a box
-        describes how much the tester knows going in. Mixing the two up is a common slip.
-    </p>
-
-    <p>
-        Next <a href="./recon.html">&gt;&gt;</a>
+        Start here: <a href="./1-introduction.html">Introduction &gt;&gt;</a>
     </p>
 
     <script src="../footer.js"></script>
-  <script src="/comments.js" defer></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+
+    <!--
+    =============================================================================
+    PLANNING NOTES (carried over from the original notes; not yet built)
+    =============================================================================
+    TODO: rules-of-engagement.html — a fill-in template page:
+      - Client name, test window, emergency contact, stop conditions
+      - In-scope / out-of-scope assets (domains, IPs, apps, cloud accounts)
+      - Allowed techniques (active scan y/n, cred testing y/n, social eng y/n)
+      - Forbidden actions (DoS, prod data exfil, password spray on prod accounts)
+      - Evidence handling (what to redact, where to store artifacts)
+      - Sign-off block (who approved, date)
+      DEMO: redacted real or fictional SOW excerpt (names removed).
+
+    TODO: PRACTICE PATH section:
+      - Lab VMs: DVWA, Metasploitable3, OWASP WebGoat, GOAD (AD), CloudGoat
+      - Platforms: TryHackMe Starting Point, HackTheBox Academy, PortSwigger labs
+      - One "campaign notebook" per box: paste scope -> recon -> ... -> report draft
+
+    PYTHON TOOLKIT INDEX (see scripts/ and pipeline.html tracker):
+      | Script              | Phase         | Purpose                          |
+      | validate_scope.py   | RoE           | Block out-of-scope targets       |
+      | campaign_log.py     | All           | Engagement timeline              |
+      | subdomain_enum.py   | Recon         | Passive subdomain collection     |
+      | port_scan_batch.py  | Scanning      | Wrap nmap, parse XML             |
+      | service_enum.py     | Enumeration   | Route open ports to checklists   |
+      | cve_lookup.py       | Vuln analysis | Map versions -> CVE shortlist    |
+      | report_builder.py   | Reporting     | JSONL findings -> HTML/PDF draft |
+    =============================================================================
+    -->
 </body>
 
 </html>

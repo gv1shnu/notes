@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Enumeration intro</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Enumeration</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        Scanning told us a service is <em>there</em>. Enumeration asks it to <em>talk</em>. Scanning says "SMB is open on
+        445." Enumeration asks "which shares, users, groups, policies, and permissions will that SMB service reveal?" It
+        is the same target, questioned more closely.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Input</th>
+            <th>Output</th>
+        </tr>
+        <tr>
+            <td>Open services and versions from scanning</td>
+            <td>Users, groups, shares, domains, naming patterns</td>
+        </tr>
+        <tr>
+            <td>Protocol hints (SMB, LDAP, SMTP…)</td>
+            <td>Service configuration clues and auth methods</td>
+        </tr>
+        <tr>
+            <td>Any approved test accounts</td>
+            <td>Misconfiguration candidates for the next phase</td>
+        </tr>
+    </table>
+
+    <h3>The line you do not cross yet</h3>
+
+    <p>
+        Enumeration is the phase where read-only ends and state-change begins, so it deserves a rule of its own:
+        <strong>enumeration should not mutate the target.</strong> Reading a banner, listing a share, querying a
+        directory — fine. But if a tool writes a file, changes a setting, or triggers account lockouts, it needs explicit
+        approval first. Credential-based enumeration in particular can lock out real users, which is a denial of service
+        you inflicted on yourself.
+    </p>
+
+    <h3>External vs internal</h3>
+
+    <p>
+        Where you are standing decides what you can enumerate. From the outside, the reachable surface is mostly web
+        (80/443), mail (25), and DNS (53). The rich internal services — SMB, LDAP, Active Directory — usually only open
+        up <em>after</em> you have a foothold inside the network (the "assume breach" position). This chapter covers
+        both: the internal identity services first, then the external web enumeration you can do from anywhere.
+    </p>
+
+    <p>
+        Next: SMB and Active Directory
+        <a href="./4-smb-and-ad.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Service and OS detection
+        <a href="./3-service-and-os.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - People OSINT</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>People and usernames</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        People are part of the attack surface — not to pry into their private lives, but because employees leak
+        <strong>professional</strong> facts that matter: email formats, usernames, job titles, and the technologies they
+        mention. Those feed later phases (email patterns become spray lists; a job posting reveals the tech stack).
+    </p>
+
+    <h3>Username checks — Sherlock</h3>
+
+    <p>
+        <a href="https://github.com/sherlock-project/sherlock">Sherlock</a> takes a username and checks a long static
+        list of sites for a matching profile URL:
+    </p>
+
+    <pre><code>$ sherlock johndoe
+[*] Checking username johndoe on:
+[+] GitHub: https://github.com/johndoe
+[+] Instagram: https://instagram.com/johndoe
+[+] Reddit: https://reddit.com/user/johndoe
+[+] Twitter: https://twitter.com/johndoe
+[*] Search completed with 4 results</code></pre>
+
+    <p>
+        One username often ties together several accounts, which confirms naming habits and sometimes reveals a personal
+        GitHub with work-related code in it.
+    </p>
+
+    <h3>Email and name patterns</h3>
+
+    <p>
+        Most organisations use one predictable email format. Confirm it once from any public address and you can generate
+        the rest from a staff list:
+    </p>
+
+    <pre><code>first.last@company.com     ->  jane.doe@company.com
+flast@company.com          ->  jdoe@company.com
+first@company.com          ->  jane@company.com</code></pre>
+
+    <p>
+        A confirmed pattern plus employee names from LinkedIn or a conference page gives you a set of likely valid
+        accounts — useful later, and handled carefully, because credential testing against real accounts is governed by
+        the rules of engagement.
+    </p>
+
+    <h3>What to collect (and what not to)</h3>
+
+    <ul>
+        <li>Email format and known addresses</li>
+        <li>Usernames and handles that recur across sites</li>
+        <li>Roles and reporting lines (who would plausibly hold access)</li>
+        <li>Tech mentioned in job posts, talks, and public repos</li>
+    </ul>
+
+    <p>
+        Stop at professional, relevant, publicly available facts. Digging for personal weaknesses to pressure someone is
+        not recon; it is harassment with extra steps. If a fact does not help a later phase, it does not belong in your
+        notes.
+    </p>
+
+    <p>
+        Next: Recon frameworks
+        <a href="./2-recon-frameworks.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: DNS and subdomains
+        <a href="./2-dns-and-subdomains.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

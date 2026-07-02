@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Wireless</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Wireless</h2>
+    <p><strong>Difficulty:</strong> Hard</p>
+
+    <p>
+        The platform chapters cover different surfaces — wireless, mobile, IoT, cloud, crypto — but the mental model is
+        the same each time: identify assets, understand trust boundaries, find weak configuration, validate safely, and
+        report the business risk. Wireless is where that model meets radio and physical proximity.
+    </p>
+
+    <h3>What to check</h3>
+
+    <ul>
+        <li>Encryption in use — open, WEP (broken), WPA2, WPA3</li>
+        <li>Weak or default pre-shared keys</li>
+        <li>WPS left enabled (a known shortcut past the passphrase)</li>
+        <li>Guest network isolation — can a guest reach the internal network?</li>
+        <li>Rogue and evil-twin access points impersonating the real SSID</li>
+        <li>Whether Wi-Fi bridges into sensitive internal segments</li>
+    </ul>
+
+    <p>
+        A quick survey with a tool like <code>airodump-ng</code> lists nearby SSIDs, their encryption, and connected
+        clients:
+    </p>
+
+    <pre><code>BSSID              PWR  ENC   CIPHER  AUTH  ESSID
+AA:BB:CC:00:11:22  -42  WPA2  CCMP    PSK   CorpWiFi
+AA:BB:CC:00:11:23  -44  OPN                 CorpGuest</code></pre>
+
+    <p>
+        The open <code>CorpGuest</code> is worth a careful look: the real question is not "can I join it" but "once
+        joined, can I reach anything I shouldn't?" Wireless testing needs the right hardware and, often, physical
+        presence — if you do not have a dedicated test radio, document the methodology and the limitation rather than
+        improvising on production gear.
+    </p>
+
+    <p>
+        Next: Mobile
+        <a href="./9-mobile.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Injection and SSRF
+        <a href="./8-injection-and-ssrf.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

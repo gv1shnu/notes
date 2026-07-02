@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Service and OS detection</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Service and OS detection</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        A port number is only a hint. Port 80 is <em>usually</em> a web server and port 22 is <em>usually</em> SSH, but
+        "usually" does not go in a report. Service detection confirms what is actually running by reading banners and
+        protocol behaviour. This is where <code>8080</code> stops being "some random web thing" and becomes evidence.
+    </p>
+
+    <h3>Version detection</h3>
+
+    <p>
+        <code>-sV</code> probes each open port and reports the product and version:
+    </p>
+
+    <pre><code>$ sudo nmap -sV -p 22,80,443 10.10.10.5
+
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+80/tcp  open  http     nginx 1.18.0 (Ubuntu)
+443/tcp open  ssl/http nginx 1.18.0 (Ubuntu)</code></pre>
+
+    <p>
+        Now you have real leads: an nginx 1.18.0 web server on Ubuntu, and an OpenSSH version you can check against known
+        issues later. Each open service tells its own story:
+    </p>
+
+    <ul>
+        <li>Service name and product, with a version string if exposed</li>
+        <li>The TLS certificate's subject and SANs (which leak more hostnames)</li>
+        <li>HTTP title, <code>Server</code> header, redirects, and status codes</li>
+        <li>Protocol-specific banners: SMB, FTP, SMTP, RDP, database greetings</li>
+    </ul>
+
+    <h3>Safe NSE scripts</h3>
+
+    <p>
+        Nmap's scripting engine adds targeted checks. The default set (<code>-sC</code>) is safe; some categories are
+        not. Start safe:
+    </p>
+
+    <pre><code>$ sudo nmap -sV -sC -p 443 10.10.10.5
+| ssl-cert: Subject: commonName=shop.lab.example.com
+| Subject Alternative Name: DNS:shop.lab.example.com, DNS:api.lab.example.com
+| ssl-enum-ciphers:
+|   TLSv1.2: (weak ciphers found)</code></pre>
+
+    <p>
+        That certificate just handed you another subdomain (<code>api.</code>) and a TLS weakness to note. Categories
+        matter: <code>-sC</code> runs "safe" and "default" scripts, but <code>--script vuln</code> or the
+        <code>intrusive</code> and <code>exploit</code> categories actively poke at services and can break them — never
+        the automatic choice.
+    </p>
+
+    <h3>OS detection</h3>
+
+    <p>
+        <code>-O</code> guesses the operating system from TTL values, TCP window sizes, and how the stack behaves. It is
+        a guess, not gospel:
+    </p>
+
+    <pre><code>$ sudo nmap -O 10.10.10.5
+Running: Linux 5.X
+OS details: Linux 5.4 - 5.15
+Network Distance: 2 hops</code></pre>
+
+    <p>
+        Open-port patterns and banners refine the guess: Windows, Linux, a network appliance, a printer, a camera, or a
+        cloud load balancer each leave different fingerprints.
+    </p>
+
+    <h3>The edge is not the origin</h3>
+
+    <p>
+        On an internet-facing target you are usually scanning a CDN/WAF edge, not the real server, so the versions and
+        headers may belong to Cloudflare rather than the app. If the engagement needs the true origin, origin discovery
+        is its own small quest: historical DNS, leaked SPF/MX records pointing at direct-connect hosts, misconfigured
+        subdomains that resolve straight through, and later, SSRF from the app itself. Until you have proven otherwise,
+        label a result <em>edge</em> — half of all "the server behaved weirdly" notes are just the CDN.
+    </p>
+
+    <h3>Raw vs interpretation</h3>
+
+    <p>
+        Keep the two apart. Raw says "443 open, nginx 1.18." Interpretation says "web app candidate — check TLS, headers,
+        auth, and tech stack next." And always record a confidence level, so a soft guess never becomes a loud claim in
+        the report.
+    </p>
+
+    <p>
+        Next: Enumeration
+        <a href="./4-enumeration-intro.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Port scanning
+        <a href="./3-port-scanning.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - Sniffing</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Sniffing</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        Sniffing is capturing traffic to understand protocols or prove sensitive data exposure. It usually assumes you
+        are already on the network — a foothold, or a local LAN position — so it lives in the "assume breach" side of a
+        black-box test.
+    </p>
+
+    <h3>Plaintext vs encrypted</h3>
+
+    <p>
+        The whole point lands in one comparison. An old plaintext protocol hands you the credentials directly:
+    </p>
+
+    <pre><code>$ tshark -r capture.pcap -Y 'ftp.request.command == "PASS"'
+FTP  USER labuser
+FTP  PASS Summer2024!</code></pre>
+
+    <p>
+        Over TLS, the same login is just noise — you see the handshake and the certificate, but the payload is
+        encrypted:
+    </p>
+
+    <pre><code>$ tshark -r capture.pcap -Y 'tls.handshake.type == 11'
+TLSv1.3  Certificate  CN=shop.lab.example.com
+(application data: encrypted)</code></pre>
+
+    <h3>What makes a finding</h3>
+
+    <ul>
+        <li>Plaintext credentials on the wire (FTP, Telnet, HTTP Basic)</li>
+        <li>Weak or downgraded TLS</li>
+        <li>Insecure legacy protocols still in use</li>
+        <li>Missing network segmentation — traffic you should not be able to see</li>
+        <li>Noisy broadcast protocols leaking hostnames and users</li>
+    </ul>
+
+    <p>
+        In Wireshark, <em>Statistics → Protocol Hierarchy</em> is a fast way to see what is talking on a segment, and
+        "Follow Stream" reconstructs a whole conversation. Capture is passive; the finding is "this data crosses the
+        network unprotected," proven with a redacted snippet.
+    </p>
+
+    <p>
+        Next: Social engineering
+        <a href="./7-social-engineering.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Malware
+        <a href="./7-malware.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

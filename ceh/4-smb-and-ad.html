@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ========== META INFORMATION ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+
+    <title>Pentesting Notes - SMB and AD</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>SMB and Active Directory</h2>
+    <p><strong>Difficulty:</strong> Hard</p>
+
+    <p>
+        In Windows-heavy networks, SMB (file sharing, port 445) and Active Directory (identity, via LDAP and Kerberos)
+        are the map. Enumerating them well often decides the whole engagement, because they expose users, shares, and the
+        relationships an attacker walks to reach admin.
+    </p>
+
+    <h3>SMB shares and users</h3>
+
+    <p>
+        A null (anonymous) session sometimes reveals shares and accounts without any credentials.
+        <code>enum4linux-ng</code> (the maintained rewrite of enum4linux) rolls the common checks into one:
+    </p>
+
+    <pre><code>$ enum4linux-ng -A 10.10.10.12
+
+[+] Domain: LAB   Domain SID: S-1-5-21-...
+[+] Shares:
+      backups     READ, WRITE
+      IPC$        (no access)
+[+] Users:
+      administrator, jsmith, svc_sql, guest</code></pre>
+
+    <p>
+        A writable <code>backups</code> share and a service account (<code>svc_sql</code>) are both leads. List and read
+        a share directly with <code>smbclient</code>, or sweep many hosts with <code>NetExec</code> (the current tool;
+        it replaced CrackMapExec):
+    </p>
+
+    <pre><code>$ smbclient -L //10.10.10.12 -N          # list shares, no password
+$ nxc smb 10.10.10.12 -u '' -p '' --shares
+SMB  10.10.10.12  445  DC01  backups  READ,WRITE
+SMB  10.10.10.12  445  DC01  IPC$</code></pre>
+
+    <h3>LDAP and the directory</h3>
+
+    <p>
+        LDAP (389) is the directory's query language. Even an anonymous bind can leak the naming context and, sometimes,
+        the whole user list:
+    </p>
+
+    <pre><code>$ ldapsearch -x -H ldap://10.10.10.12 -b "" -s base namingContexts
+namingContexts: DC=lab,DC=local</code></pre>
+
+    <h3>The AD mindset</h3>
+
+    <p>
+        Active Directory is not a list of users; it is a graph of who can act on whom. What you are hunting for:
+    </p>
+
+    <ul>
+        <li>Domain and account naming patterns</li>
+        <li>Password policy and lockout thresholds (before you ever test a password)</li>
+        <li>Service accounts and their SPNs (Kerberoasting targets)</li>
+        <li>Group memberships, especially excessive or nested ones</li>
+        <li>SMB signing and trust relationships</li>
+    </ul>
+
+    <p>
+        <code>BloodHound</code> collects this graph and finds the shortest path from a low-privilege account to Domain
+        Admin — the relationships a human would take hours to trace by hand. Collecting the data is read-only; walking
+        the path is exploitation, and comes later.
+    </p>
+
+    <p>
+        Enumeration must not mutate the target. Null-session reads are safe; anything that writes to a share, changes a
+        setting, or risks a lockout needs explicit approval.
+    </p>
+
+    <p>
+        Next: Mail, DNS, and SNMP
+        <a href="./4-mail-dns-snmp.html">&gt;&gt;</a>
+    </p>
+
+    <p>
+        Previous: Enumeration intro
+        <a href="./4-enumeration-intro.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>
