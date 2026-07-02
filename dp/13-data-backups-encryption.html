@@ -12,6 +12,7 @@
 <body>
 
 <h2>Data Backups &amp; Encryption</h2>
+<p><strong>Difficulty:</strong> Medium</p>
 
 <p>
 Privacy is not only about preventing unauthorized access to information. It is also about
@@ -118,6 +119,47 @@ works transparently after successful authentication.
 
 <hr>
 
+<h3>VeraCrypt</h3>
+
+<p>
+The built-in options (BitLocker on Windows, FileVault on macOS) encrypt the whole system
+drive but are tied to that operating system. VeraCrypt — the actively maintained successor to
+TrueCrypt — is cross-platform and open-source, and adds a capability the built-in tools lack:
+<strong>container encryption</strong>.
+</p>
+
+<p>
+Its specialities:
+</p>
+
+<ul>
+<li>
+<strong>Encrypted containers.</strong> VeraCrypt creates a single file that behaves like a
+virtual encrypted disk. Mount it with the password and it appears as an ordinary drive;
+unmount it and it is once again an opaque, meaningless blob. You can carry that container on
+a USB stick or store it in the cloud, and it opens on Windows, macOS or Linux.
+</li>
+<li>
+<strong>Vendor-independent full-volume encryption.</strong> It can also encrypt entire
+partitions or system drives without relying on the OS vendor — useful when you cannot use, or
+would rather not trust, the built-in option.
+</li>
+<li>
+<strong>Hidden volumes.</strong> A second encrypted volume can be concealed inside the first,
+so that revealing one password need not reveal that the other even exists — a form of
+plausible deniability.
+</li>
+</ul>
+
+<p>
+<strong>The catch:</strong> VeraCrypt protects data <em>at rest</em> only. While a container is
+mounted, its contents are exactly as exposed as any other open file, so unmount it when you are
+done. And, as with all such tools, there is no recovery key — lose the password and the data is
+gone.
+</p>
+
+<hr>
+
 <h3>Cloud Storage</h3>
 
 <p>
@@ -141,6 +183,71 @@ Everywhere
 If an unwanted change immediately synchronizes to every device, you may still need version
 history or separate backups to recover the original file.
 </p>
+
+<p>
+There is a second problem with cloud storage: the provider — and anyone who compromises it —
+can read whatever you upload. Full disk encryption does not help here, because the files are
+decrypted the moment they leave your drive for the cloud.
+</p>
+
+<hr>
+
+<h3>Cryptomator</h3>
+
+<p>
+Cryptomator closes that gap by encrypting files on your device <em>before</em> they ever reach
+the cloud folder. It creates a vault inside your Dropbox, Google Drive or OneDrive folder; you
+unlock it locally and work with your files normally, while what actually syncs to the provider
+is per-file ciphertext with encrypted filenames.
+</p>
+
+<p>
+Its specialities:
+</p>
+
+<ul>
+<li>
+<strong>Transparent, per-file encryption.</strong> Each file is encrypted individually rather
+than inside one large container, so the cloud can still sync only the files that changed. You
+keep efficient incremental sync while the provider sees nothing readable.
+</li>
+<li>
+<strong>Provider-agnostic and open-source.</strong> It works with any service that syncs a
+folder, and — like Bitwarden and VeraCrypt — its code is public and auditable.
+</li>
+<li>
+<strong>Zero-knowledge.</strong> The password never leaves your device; the provider stores
+only encrypted blobs.
+</li>
+</ul>
+
+<p>
+<strong>VeraCrypt or Cryptomator?</strong> They solve neighbouring problems and are easy to
+confuse:
+</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th></th>
+<th>VeraCrypt</th>
+<th>Cryptomator</th>
+</tr>
+<tr>
+<td>Built for</td>
+<td>A single portable encrypted container</td>
+<td>Cloud sync of many small files</td>
+</tr>
+<tr>
+<td>Best when</td>
+<td>Encrypting local drives or removable media</td>
+<td>Keeping a cloud provider from reading your files</td>
+</tr>
+<tr>
+<td>Structure</td>
+<td>One large volume file</td>
+<td>Many individually encrypted files</td>
+</tr>
+</table>
 
 <hr>
 
@@ -201,7 +308,7 @@ and unencrypted backups expose sensitive information if they fall into the wrong
 
 <p>
 Next, Privacy Myths &amp; Misconceptions
-<a href="./14-privacy-myths.html">&gt;&gt;</a>
+<a href="./14-privacy-myths-misconceptions.html">&gt;&gt;</a>
 </p>
 
 <p>
