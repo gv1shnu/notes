@@ -48,6 +48,93 @@
         depict them &mdash; entanglement isn't a property either qubit holds alone.)
     </p>
 
+    <div class="viz" id="bloch-viz">
+        <svg viewBox="0 0 300 232" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Interactive Bloch sphere showing a single qubit state as a vector">
+            <ellipse cx="115" cy="112" rx="90" ry="29" fill="none" stroke="var(--border)" stroke-width="1"/>
+            <circle cx="115" cy="112" r="90" fill="#ffffff" stroke="var(--border)" stroke-width="1.5"/>
+            <line x1="115" y1="16" x2="115" y2="208" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="25" y1="112" x2="205" y2="112" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="115" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--text)">|0&#10217;</text>
+            <text x="115" y="224" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--text)">|1&#10217;</text>
+            <line id="bloch-vec" x1="115" y1="112" x2="115" y2="22" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle id="bloch-tip" cx="115" cy="22" r="5" fill="var(--accent)"/>
+        </svg>
+        <div class="viz-controls">
+            <label>&theta; <input type="range" id="bloch-theta" min="0" max="180" value="0"></label>
+            <label>&phi; <input type="range" id="bloch-phi" min="0" max="360" value="0"></label>
+        </div>
+        <div class="viz-controls">
+            <button data-state="0,0">|0&#10217;</button>
+            <button data-state="180,0">|1&#10217;</button>
+            <button data-state="90,0">|+&#10217;</button>
+            <button data-state="90,180">|&minus;&#10217;</button>
+            <button data-gate="H">H</button>
+            <button data-gate="X">X</button>
+            <button data-gate="Z">Z</button>
+            <button data-gate="S">S</button>
+        </div>
+        <p class="viz-caption viz-readout" id="bloch-readout"></p>
+        <p class="viz-caption">Latitude sets P(0)/P(1); longitude is phase. |+&#10217; and |&minus;&#10217; share the
+            same histogram yet sit on opposite sides &mdash; that difference is phase. Note Z and S move the vector
+            without changing P(0)/P(1) at the equator.</p>
+    </div>
+
+    <script>
+    (function () {
+        var R = 90, cx = 115, cy = 112, cosA = 0.949, sinA = 0.315, DEG = Math.PI / 180;
+        var vec = { x: 0, y: 0, z: 1 };
+        var vecEl = document.getElementById('bloch-vec');
+        var tipEl = document.getElementById('bloch-tip');
+        var out = document.getElementById('bloch-readout');
+        var sT = document.getElementById('bloch-theta');
+        var sP = document.getElementById('bloch-phi');
+
+        function draw() {
+            var sx = cx + R * vec.x;
+            var sy = cy - R * (vec.z * cosA + vec.y * sinA);
+            vecEl.setAttribute('x2', sx.toFixed(1));
+            vecEl.setAttribute('y2', sy.toFixed(1));
+            tipEl.setAttribute('cx', sx.toFixed(1));
+            tipEl.setAttribute('cy', sy.toFixed(1));
+            var p0 = (1 + vec.z) / 2;
+            var phi = Math.atan2(vec.y, vec.x) / DEG;
+            if (phi < 0) phi += 360;
+            out.textContent = 'P(0) = ' + p0.toFixed(2) + '   P(1) = ' + (1 - p0).toFixed(2) +
+                '   phase = ' + phi.toFixed(0) + '°';
+        }
+        function fromAngles(theta, phi) {
+            var t = theta * DEG, p = phi * DEG;
+            vec.x = Math.sin(t) * Math.cos(p);
+            vec.y = Math.sin(t) * Math.sin(p);
+            vec.z = Math.cos(t);
+            syncSliders(); draw();
+        }
+        function syncSliders() {
+            var theta = Math.acos(Math.max(-1, Math.min(1, vec.z))) / DEG;
+            var phi = Math.atan2(vec.y, vec.x) / DEG; if (phi < 0) phi += 360;
+            sT.value = Math.round(theta); sP.value = Math.round(phi);
+        }
+        function gate(g) {
+            var x = vec.x, y = vec.y, z = vec.z, p;
+            if (g === 'X') { vec.y = -y; vec.z = -z; }            // rotate pi about x
+            else if (g === 'Z') { vec.x = -x; vec.y = -y; }        // rotate pi about z
+            else if (g === 'H') { vec.x = z; vec.y = -y; vec.z = x; } // swap x,z
+            else if (g === 'S') { p = 90 * DEG; vec.x = x * Math.cos(p) - y * Math.sin(p); vec.y = x * Math.sin(p) + y * Math.cos(p); }
+            syncSliders(); draw();
+        }
+        sT.addEventListener('input', function () { fromAngles(+sT.value, +sP.value); });
+        sP.addEventListener('input', function () { fromAngles(+sT.value, +sP.value); });
+        Array.prototype.forEach.call(document.querySelectorAll('#bloch-viz button'), function (b) {
+            b.addEventListener('click', function () {
+                if (b.dataset.state) { var a = b.dataset.state.split(','); fromAngles(+a[0], +a[1]); }
+                else if (b.dataset.gate) { gate(b.dataset.gate); }
+            });
+        });
+        draw();
+    })();
+    </script>
+
     <h3>Phase: the equator's secret</h3>
     <p>
         &#124;+&#10217; and &#124;&minus;&#10217; both measure 50/50 &mdash; identical histograms &mdash; yet they sit on

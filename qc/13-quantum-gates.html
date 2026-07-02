@@ -67,6 +67,35 @@
         superposition, then steering it with interference.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Gates as moves between qubit states on a circle">
+            <circle cx="150" cy="105" r="78" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+            <circle cx="228" cy="105" r="5" fill="var(--text)"/>
+            <text x="240" y="109" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--text)">|0&#10217;</text>
+            <circle cx="72" cy="105" r="5" fill="var(--text)"/>
+            <text x="40" y="109" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--text)">|1&#10217;</text>
+            <circle cx="150" cy="27" r="5" fill="var(--text)"/>
+            <text x="140" y="20" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--text)">|+&#10217;</text>
+            <circle cx="150" cy="183" r="5" fill="var(--text)"/>
+            <text x="140" y="203" font-family="JetBrains Mono, monospace" font-size="13" fill="var(--text)">|&minus;&#10217;</text>
+            <path d="M 224 90 A 90 90 0 0 0 162 30" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#gArrow)"/>
+            <text x="196" y="46" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#16a34a">H</text>
+            <path d="M 228 118 A 78 78 0 0 1 78 118" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#gArrow)"/>
+            <text x="150" y="196" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#2563eb" opacity="0">X</text>
+            <text x="150" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#2563eb">X: flip |0&#10217;&harr;|1&#10217;</text>
+            <defs>
+                <marker id="gArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="var(--text)"/>
+                </marker>
+            </defs>
+        </svg>
+        <p class="viz-caption">A gate is a <em>move</em> on this circle. <span style="color:#2563eb;font-weight:600;">X</span>
+            (NOT) swaps |0&#10217; and |1&#10217;. <span style="color:#16a34a;font-weight:600;">H</span> rotates |0&#10217;
+            a quarter-turn to |+&#10217; &mdash; the 50/50 superposition. Because every gate is unitary, every arrow can be
+            run backwards.</p>
+    </div>
+
     <p>
         <strong>Why it matters:</strong> Qiskit ships dozens of gates, but once you see them as matrices multiplying a
         vector, a gate you've never met is just a multiplication you haven't done yet. The interesting power, though,

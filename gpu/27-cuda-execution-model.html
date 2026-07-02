@@ -87,6 +87,36 @@ cudaMemcpy(h_x, d_x, N*<span style="color:#0099ff;">sizeof</span>(<span style="c
 cudaFree(d_x); free(h_x);                     <span style="color:#888;">// clean up</span>
 </code></pre>
 
+    <div class="viz">
+        <svg viewBox="0 0 380 218" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="CUDA hierarchy: a grid contains blocks, each block contains threads">
+            <rect x="10" y="10" width="360" height="198" rx="8" fill="#fafafa" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="22" y="28" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="var(--text)">Grid</text>
+            <g>
+                <rect x="200" y="40" width="150" height="70" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.3"/>
+                <rect x="200" y="122" width="150" height="70" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.3"/>
+                <rect x="24" y="122" width="150" height="70" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.3"/>
+                <rect x="24" y="40" width="150" height="70" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                <text x="30" y="55" font-family="Inter, sans-serif" font-size="10.5" font-weight="700" fill="#1e40af">Block</text>
+            </g>
+            <g fill="#2563eb">
+                <circle cx="42" cy="72" r="4"/><circle cx="60" cy="72" r="4"/><circle cx="78" cy="72" r="4"/>
+                <circle cx="96" cy="72" r="4"/><circle cx="114" cy="72" r="4"/><circle cx="132" cy="72" r="4"/>
+                <circle cx="150" cy="72" r="4"/>
+                <circle cx="42" cy="92" r="4"/><circle cx="60" cy="92" r="4"/><circle cx="78" cy="92" r="4"/>
+                <circle cx="96" cy="92" r="4"/><circle cx="114" cy="92" r="4"/><circle cx="132" cy="92" r="4"/>
+                <circle cx="150" cy="92" r="4"/>
+            </g>
+            <text x="42" y="108" font-family="Inter, sans-serif" font-size="9" fill="var(--muted)">threads</text>
+            <text x="264" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="#93a3b8">Block</text>
+            <text x="99" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="#93a3b8">Block</text>
+            <text x="275" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="#93a3b8">Block</text>
+        </svg>
+        <p class="viz-caption">The kernel runs once <em>per thread</em> (the dots). Threads are packed into
+            <strong>blocks</strong>, and blocks tile the <strong>grid</strong>. Blocks are sized in multiples of 32 &mdash;
+            one <strong>warp</strong> &mdash; because the hardware schedules 32 threads in lockstep.</p>
+    </div>
+
     <p>
         Next, the CUDA keywords. <a href="./28-cuda-keywords.html">&gt;&gt;</a>
     </p>

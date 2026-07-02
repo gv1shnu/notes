@@ -31,6 +31,38 @@
         </tr>
     </table>
 
+    <div class="viz">
+        <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="A bounded ring buffer with a producer write pointer and consumer read pointer">
+            <g font-family="JetBrains Mono, monospace" font-size="12">
+                <rect x="30" y="55" width="42" height="42" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+                <rect x="72" y="55" width="42" height="42" rx="4" fill="#cfe8ff" stroke="var(--border)" stroke-width="1.5"/>
+                <text x="93" y="81" text-anchor="middle" fill="var(--text)">d1</text>
+                <rect x="114" y="55" width="42" height="42" rx="4" fill="#cfe8ff" stroke="var(--border)" stroke-width="1.5"/>
+                <text x="135" y="81" text-anchor="middle" fill="var(--text)">d2</text>
+                <rect x="156" y="55" width="42" height="42" rx="4" fill="#cfe8ff" stroke="var(--border)" stroke-width="1.5"/>
+                <text x="177" y="81" text-anchor="middle" fill="var(--text)">d3</text>
+                <rect x="198" y="55" width="42" height="42" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+                <rect x="240" y="55" width="42" height="42" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+                <rect x="282" y="55" width="42" height="42" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+            </g>
+            <line x1="51" y1="120" x2="51" y2="100" stroke="#0d9488" stroke-width="2" marker-end="url(#pcA)"/>
+            <text x="51" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#0d9488">consumer</text>
+            <line x1="219" y1="120" x2="219" y2="100" stroke="#2563eb" stroke-width="2" marker-end="url(#pcB)"/>
+            <text x="219" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#2563eb">producer</text>
+            <text x="30" y="40" font-family="Inter, sans-serif" font-size="11" fill="var(--muted)">read next &rarr;</text>
+            <text x="300" y="40" font-family="Inter, sans-serif" font-size="11" fill="var(--muted)">&larr; write next</text>
+            <defs>
+                <marker id="pcA" markerWidth="9" markerHeight="9" refX="4" refY="1" orient="auto"><path d="M0,6 L4,0 L8,6 Z" fill="#0d9488"/></marker>
+                <marker id="pcB" markerWidth="9" markerHeight="9" refX="4" refY="1" orient="auto"><path d="M0,6 L4,0 L8,6 Z" fill="#2563eb"/></marker>
+            </defs>
+        </svg>
+        <p class="viz-caption">The queue is a fixed ring of slots. The <span style="color:#2563eb;font-weight:600;">producer</span>
+            writes ahead; the <span style="color:#0d9488;font-weight:600;">consumer</span> reads behind. The gap between the
+            two pointers is the backlog &mdash; and if the producer laps the consumer (writes into an unread slot), data is
+            overwritten. That's why a full buffer must block or drop.</p>
+    </div>
+
     When the queue overflows, the strategy depends on what the data is for:
 
     <table border="1" cellpadding="10">

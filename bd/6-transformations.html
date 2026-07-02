@@ -55,6 +55,31 @@ lines.flatMap(<span style="color:#0099ff;">lambda</span> line: line.split(<span 
         None of these have run yet. They just build the lineage.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 400 108" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Transformations build a lazy DAG that has not executed yet">
+            <g font-family="JetBrains Mono, monospace" font-size="11">
+                <rect x="12" y="34" width="76" height="34" rx="5" fill="#fff" stroke="var(--border)" stroke-width="1.3" stroke-dasharray="4 3"/>
+                <text x="50" y="55" text-anchor="middle" fill="var(--muted)">data</text>
+                <rect x="130" y="34" width="76" height="34" rx="5" fill="#fff" stroke="var(--border)" stroke-width="1.3" stroke-dasharray="4 3"/>
+                <text x="168" y="55" text-anchor="middle" fill="var(--muted)">map</text>
+                <rect x="248" y="34" width="76" height="34" rx="5" fill="#fff" stroke="var(--border)" stroke-width="1.3" stroke-dasharray="4 3"/>
+                <text x="286" y="55" text-anchor="middle" fill="var(--muted)">filter</text>
+                <text x="360" y="55" font-size="20" fill="var(--border)">&hellip;</text>
+            </g>
+            <g stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 3" fill="none">
+                <line x1="88" y1="51" x2="128" y2="51" marker-end="url(#txA)"/>
+                <line x1="206" y1="51" x2="246" y2="51" marker-end="url(#txA)"/>
+            </g>
+            <text x="200" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="var(--muted)">recorded recipe &mdash; nothing has run</text>
+            <text x="200" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="var(--muted)">(dashed = lazy, not yet executed)</text>
+            <defs><marker id="txA" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--border)"/></marker></defs>
+        </svg>
+        <p class="viz-caption">Each transformation only appends a step to the recipe &mdash; a lazy chain (a DAG). The
+            whole thing is bookkeeping until something demands a result. Compare the next page, where an
+            <strong>action</strong> lights this graph up and runs it.</p>
+    </div>
+
     <p>
         Next, actions. <a href="./7-actions.html">&gt;&gt;</a>
     </p>

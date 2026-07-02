@@ -26,6 +26,36 @@
 
     Shared <code>count = 0</code>. Each thread does <code>count = count + 1</code>. Expected after both: <strong>2</strong>.
 
+    <div class="viz">
+        <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Two threads interleave read and write on a shared counter, losing an increment">
+            <text x="70" y="18" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="var(--text)">Thread A</text>
+            <text x="230" y="18" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="var(--text)">Thread B</text>
+            <text x="340" y="18" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">count</text>
+            <line x1="70" y1="26" x2="70" y2="190" stroke="var(--border)" stroke-width="1"/>
+            <line x1="230" y1="26" x2="230" y2="190" stroke="var(--border)" stroke-width="1"/>
+            <rect x="26" y="34" width="88" height="26" rx="4" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+            <text x="70" y="51" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#991b1b">read &rarr; 0</text>
+            <rect x="186" y="70" width="88" height="26" rx="4" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+            <text x="230" y="87" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#991b1b">read &rarr; 0</text>
+            <rect x="26" y="106" width="88" height="26" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="70" y="123" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--text)">write 1</text>
+            <rect x="186" y="142" width="88" height="26" rx="4" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="230" y="159" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--text)">write 1</text>
+            <g font-family="JetBrains Mono, monospace" font-size="12" fill="var(--text)">
+                <text x="340" y="51" text-anchor="middle">0</text>
+                <text x="340" y="87" text-anchor="middle">0</text>
+                <text x="340" y="123" text-anchor="middle">1</text>
+                <text x="340" y="159" text-anchor="middle" font-weight="700">1</text>
+            </g>
+            <text x="340" y="186" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#dc2626">not 2!</text>
+        </svg>
+        <p class="viz-caption">Both threads <span style="color:#dc2626;font-weight:600;">read 0 before either writes</span>,
+            so each computes 0+1 and stores 1. B's write lands on top of A's &mdash; one increment is silently lost. The
+            fix is to make read-modify-write <strong>atomic</strong> (a lock or an atomic add) so the second thread can't
+            read until the first has written.</p>
+    </div>
+
     <table border="1" cellpadding="10">
         <tr>
             <th>Step</th>

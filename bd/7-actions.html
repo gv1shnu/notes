@@ -58,6 +58,34 @@ rdd.take(3)       <span style="color:#888;"># first 3 elements</span>
         The pattern: build with transformations (lazy), then fire one action to make it run.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 430 108" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="An action fires the whole lazy DAG and returns a result to the driver">
+            <g font-family="JetBrains Mono, monospace" font-size="11">
+                <rect x="10" y="34" width="66" height="34" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4"/>
+                <text x="43" y="55" text-anchor="middle" fill="#166534">data</text>
+                <rect x="110" y="34" width="66" height="34" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4"/>
+                <text x="143" y="55" text-anchor="middle" fill="#166534">map</text>
+                <rect x="210" y="34" width="66" height="34" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4"/>
+                <text x="243" y="55" text-anchor="middle" fill="#166534">filter</text>
+                <rect x="310" y="30" width="80" height="42" rx="5" fill="#f5b301" stroke="#b5850a" stroke-width="1.6"/>
+                <text x="350" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" fill="#7a5a05">collect()</text>
+                <text x="350" y="62" text-anchor="middle" font-size="9" fill="#7a5a05">action</text>
+            </g>
+            <g stroke="#16a34a" stroke-width="1.8" fill="none">
+                <line x1="76" y1="51" x2="108" y2="51" marker-end="url(#acA)"/>
+                <line x1="176" y1="51" x2="208" y2="51" marker-end="url(#acA)"/>
+                <line x1="276" y1="51" x2="308" y2="51" marker-end="url(#acA)"/>
+            </g>
+            <text x="200" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#166534">action fires &rarr; the whole chain runs, result to driver</text>
+            <text x="235" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="var(--muted)">(solid = now executing)</text>
+            <defs><marker id="acA" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#16a34a"/></marker></defs>
+        </svg>
+        <p class="viz-caption">The same graph from the previous page, now <em>live</em>. One action &mdash;
+            <code>collect()</code>, <code>count()</code>, <code>show()</code> &mdash; pulls on the end of the chain, and
+            only then does Spark execute every recorded step and hand the result back to the driver.</p>
+    </div>
+
     <p>
         Next, foreach. <a href="./8-foreach.html">&gt;&gt;</a>
     </p>

@@ -46,6 +46,38 @@
         is what "resilient" buys you.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 400 196" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="One logical RDD split into partitions spread across cluster nodes, with lineage">
+            <text x="16" y="20" font-family="Inter, sans-serif" font-size="11" fill="var(--muted)">one RDD (logical) &mdash; split into partitions across nodes</text>
+            <g font-family="JetBrains Mono, monospace" font-size="11">
+                <rect x="16" y="30" width="118" height="70" rx="6" fill="#f3f4f6" stroke="var(--border)" stroke-width="1.3"/>
+                <text x="24" y="46" font-family="Inter, sans-serif" font-size="10" fill="var(--muted)">Node 1</text>
+                <rect x="26" y="52" width="44" height="38" rx="3" fill="#cfe8ff" stroke="var(--border)"/><text x="48" y="75" text-anchor="middle" fill="var(--text)">P0</text>
+                <rect x="78" y="52" width="44" height="38" rx="3" fill="#cfe8ff" stroke="var(--border)"/><text x="100" y="75" text-anchor="middle" fill="var(--text)">P1</text>
+                <rect x="141" y="30" width="118" height="70" rx="6" fill="#f3f4f6" stroke="var(--border)" stroke-width="1.3"/>
+                <text x="149" y="46" font-family="Inter, sans-serif" font-size="10" fill="var(--muted)">Node 2</text>
+                <rect x="175" y="52" width="44" height="38" rx="3" fill="#cfe8ff" stroke="var(--border)"/><text x="197" y="75" text-anchor="middle" fill="var(--text)">P2</text>
+                <rect x="266" y="30" width="118" height="70" rx="6" fill="#f3f4f6" stroke="var(--border)" stroke-width="1.3"/>
+                <text x="274" y="46" font-family="Inter, sans-serif" font-size="10" fill="var(--muted)">Node 3</text>
+                <rect x="300" y="52" width="44" height="38" rx="3" fill="#fecaca" stroke="#dc2626"/><text x="322" y="75" text-anchor="middle" fill="#991b1b">P3</text>
+            </g>
+            <g font-family="Inter, sans-serif" font-size="11">
+                <rect x="16" y="130" width="80" height="30" rx="5" fill="#fff" stroke="var(--border)"/><text x="56" y="150" text-anchor="middle" fill="var(--text)">source</text>
+                <rect x="150" y="130" width="80" height="30" rx="5" fill="#fff" stroke="var(--border)"/><text x="190" y="150" text-anchor="middle" fill="var(--text)">map</text>
+                <rect x="284" y="130" width="100" height="30" rx="5" fill="#fff" stroke="var(--border)"/><text x="334" y="150" text-anchor="middle" fill="var(--text)">this RDD</text>
+                <line x1="96" y1="145" x2="148" y2="145" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#rddA)"/>
+                <line x1="230" y1="145" x2="282" y2="145" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#rddA)"/>
+            </g>
+            <text x="16" y="182" font-family="Inter, sans-serif" font-size="10.5" fill="#16a34a">lineage &rarr; lost P3 is recomputed from its recipe, not from a backup</text>
+            <defs><marker id="rddA" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--muted)"/></marker></defs>
+        </svg>
+        <p class="viz-caption">The dataset is one logical thing but physically a set of <strong>partitions</strong> spread
+            across nodes and crunched in parallel. If a node dies and P3 is lost, Spark replays the recorded
+            <strong>lineage</strong> (source&rarr;map&rarr;&hellip;) to rebuild just that partition &mdash; no replication
+            needed. That's "resilient."</p>
+    </div>
+
     <p>
         Next, SparkSession &amp; SparkContext. <a href="./4-sparksession-sparkcontext.html">&gt;&gt;</a>
     </p>

@@ -14,6 +14,7 @@
 
 <body>
     <h2>The disease: functional decomposition</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
     <p>
         Architecture is always an act of <strong>decomposition</strong> &mdash; you take one big idea and break it into
         building blocks. The only question is: decompose by <em>what</em>?
@@ -49,6 +50,32 @@
         <em>"If that is your architecture, the project has already failed &mdash; in past tense, before anyone wrote
         the first line of code."</em>
     </p>
+
+    <div class="viz">
+        <svg viewBox="0 0 380 180" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="One change touches all three functional blocks at once">
+            <rect x="120" y="14" width="140" height="32" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+            <text x="190" y="35" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#92400e">change: add tax rule</text>
+            <g font-family="Inter, sans-serif" font-size="13" font-weight="600">
+                <rect x="24" y="118" width="96" height="44" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                <text x="72" y="145" text-anchor="middle" fill="#991b1b">Billing</text>
+                <rect x="142" y="118" width="96" height="44" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                <text x="190" y="145" text-anchor="middle" fill="#991b1b">Shipping</text>
+                <rect x="260" y="118" width="96" height="44" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                <text x="308" y="145" text-anchor="middle" fill="#991b1b">Invoicing</text>
+            </g>
+            <g stroke="#dc2626" stroke-width="2" fill="none">
+                <line x1="160" y1="46" x2="80" y2="114" marker-end="url(#fd)"/>
+                <line x1="190" y1="46" x2="190" y2="114" marker-end="url(#fd)"/>
+                <line x1="220" y1="46" x2="300" y2="114" marker-end="url(#fd)"/>
+            </g>
+            <defs><marker id="fd" markerWidth="9" markerHeight="9" refX="4" refY="6" orient="auto"><path d="M0,0 L8,0 L4,7 Z" fill="#dc2626"/></marker></defs>
+        </svg>
+        <p class="viz-caption">A single business change &mdash; adding a tax rule &mdash; has to be threaded through
+            Billing <em>and</em> Shipping <em>and</em> Invoicing, because each "does" a function that the change cuts
+            across. Decompose by function and change lands everywhere at once. That is the failure, baked in before any
+            code.</p>
+    </div>
 
     <p>
         Next, why it fails. <a href="./2-why-it-fails.html">&gt;&gt;</a>

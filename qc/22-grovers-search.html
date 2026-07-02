@@ -65,6 +65,72 @@
         winner a little more likely. Do it ~&radic;N times and the winner dominates the measurement.
     </p>
 
+    <div class="viz" id="grover-viz">
+        <svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Grover amplitude amplification bar chart">
+            <line x1="20" y1="120" x2="440" y2="120" stroke="var(--border)" stroke-width="1"/>
+            <line id="grover-mean" x1="20" y1="120" x2="440" y2="120" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="446" y="123" font-family="JetBrains Mono, monospace" font-size="9" fill="#dc2626">avg</text>
+            <g id="grover-bars"></g>
+        </svg>
+        <div class="viz-controls">
+            <button class="primary" id="grover-step">Apply one iteration</button>
+            <button id="grover-reset">Reset</button>
+            <label>N <select id="grover-n"><option>4</option><option>8</option><option selected>16</option><option>32</option></select></label>
+        </div>
+        <p class="viz-caption viz-readout" id="grover-readout"></p>
+        <p class="viz-caption">Winner in gold. Bars are signed amplitudes (the oracle flips the winner below the red
+            average line; diffusion reflects everything across it). Keep stepping past the optimum and watch P(winner)
+            <em>fall</em> again &mdash; amplitude overshoots certainty and oscillates.</p>
+    </div>
+
+    <script>
+    (function () {
+        var barsG = document.getElementById('grover-bars');
+        var meanLine = document.getElementById('grover-mean');
+        var out = document.getElementById('grover-readout');
+        var N = 16, amp = [], winner = 5, iter = 0;
+        var X0 = 24, W = 412, BASE = 120, SCALE = 150;
+
+        function reset() {
+            N = +document.getElementById('grover-n').value;
+            winner = Math.floor(N / 3);
+            amp = []; for (var i = 0; i < N; i++) amp.push(1 / Math.sqrt(N));
+            iter = 0; render();
+        }
+        function step() {
+            amp[winner] = -amp[winner];                       // oracle
+            var mean = amp.reduce(function (a, b) { return a + b; }, 0) / N;
+            for (var i = 0; i < N; i++) amp[i] = 2 * mean - amp[i]; // diffusion
+            iter++; render();
+        }
+        function render() {
+            var bw = W / N, pad = bw * 0.18;
+            var mean = amp.reduce(function (a, b) { return a + b; }, 0) / N;
+            meanLine.setAttribute('y1', BASE - mean * SCALE);
+            meanLine.setAttribute('y2', BASE - mean * SCALE);
+            barsG.innerHTML = '';
+            for (var i = 0; i < N; i++) {
+                var h = amp[i] * SCALE, x = X0 + i * bw + pad, w = bw - 2 * pad;
+                var y = h >= 0 ? BASE - h : BASE, hh = Math.abs(h);
+                var r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                r.setAttribute('x', x.toFixed(1)); r.setAttribute('y', y.toFixed(1));
+                r.setAttribute('width', Math.max(1, w).toFixed(1)); r.setAttribute('height', hh.toFixed(1));
+                r.setAttribute('rx', '1.5');
+                r.setAttribute('fill', i === winner ? '#f5b301' : '#93c5fd');
+                barsG.appendChild(r);
+            }
+            var opt = Math.round(Math.PI / 4 * Math.sqrt(N));
+            out.textContent = 'iteration ' + iter + ' / optimum ≈ ' + opt +
+                '   ·   P(winner) = ' + (amp[winner] * amp[winner] * 100).toFixed(1) + '%';
+        }
+        document.getElementById('grover-step').addEventListener('click', step);
+        document.getElementById('grover-reset').addEventListener('click', reset);
+        document.getElementById('grover-n').addEventListener('change', reset);
+        reset();
+    })();
+    </script>
+
     <p>
         <strong>The catch worth knowing:</strong> more isn't better. Overshoot the ~&radic;N iterations and the amplitude
         sails <em>past</em> certainty and starts shrinking again &mdash; the probability oscillates. For 4 items, exactly

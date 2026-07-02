@@ -43,6 +43,39 @@
         A circular wait. The naive fix &mdash; "everyone drop your locks" &mdash; just becomes a grab-frenzy that may not help.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Deadlock as a cycle: thread A holds lock 1 wants lock 2, thread B holds lock 2 wants lock 1">
+            <defs>
+                <marker id="dlArr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+                    <path d="M0,0 L7,3 L0,6 Z" fill="var(--text)"/>
+                </marker>
+                <marker id="dlArrR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+                    <path d="M0,0 L7,3 L0,6 Z" fill="#dc2626"/>
+                </marker>
+            </defs>
+            <circle cx="60" cy="105" r="26" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="60" y="110" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="var(--text)">A</text>
+            <circle cx="300" cy="105" r="26" fill="var(--header)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="300" y="110" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="var(--text)">B</text>
+            <rect x="152" y="14" width="56" height="34" rx="4" fill="#fff" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="180" y="36" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="var(--text)">Lock 1</text>
+            <rect x="152" y="162" width="56" height="34" rx="4" fill="#fff" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="180" y="184" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="var(--text)">Lock 2</text>
+            <line x1="158" y1="40" x2="82" y2="92" stroke="var(--text)" stroke-width="2" marker-end="url(#dlArr)"/>
+            <text x="96" y="58" font-family="Inter, sans-serif" font-size="10.5" fill="var(--muted)">holds</text>
+            <line x1="80" y1="122" x2="156" y2="168" stroke="#dc2626" stroke-width="2" marker-end="url(#dlArrR)"/>
+            <text x="86" y="166" font-family="Inter, sans-serif" font-size="10.5" fill="#dc2626">waits</text>
+            <line x1="202" y1="168" x2="278" y2="122" stroke="var(--text)" stroke-width="2" marker-end="url(#dlArr)"/>
+            <text x="248" y="166" font-family="Inter, sans-serif" font-size="10.5" fill="var(--muted)">holds</text>
+            <line x1="280" y1="92" x2="204" y2="40" stroke="#dc2626" stroke-width="2" marker-end="url(#dlArrR)"/>
+            <text x="250" y="58" font-family="Inter, sans-serif" font-size="10.5" fill="#dc2626">waits</text>
+        </svg>
+        <p class="viz-caption">Follow the arrows and they close into a loop: A&rarr;Lock&nbsp;2&rarr;B&rarr;Lock&nbsp;1&rarr;A.
+            That <strong>cycle</strong> is the deadlock. Break the cycle &mdash; force a fixed lock order so the two red
+            "waits" edges can't both exist &mdash; and no loop can form.</p>
+    </div>
+
     <br>
     <strong>Solution</strong>
 
