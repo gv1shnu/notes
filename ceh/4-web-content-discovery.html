@@ -66,6 +66,27 @@ $ curl -s https://shop.lab.example.com/static/app.js | grep -oE '"/(api|v[0-9]|g
         <code>/api/v1/orders?id=…</code>, an admin panel. That list is where the web-attacks chapter begins.
     </p>
 
+    <h3>Decision tree &mdash; find the hidden surface</h3>
+
+    <p>
+        Spend the free, nearly-passive wins before you make noise, then read the status codes the brute force hands
+        back:
+    </p>
+
+    <pre><code>Target web app
+│
+├─ FREE wins first (nearly passive)
+│     ├─ robots.txt / sitemap.xml → paths they tried to hide
+│     ├─ grep the app.js bundle for "/api/…" → hidden endpoints
+│     └─ swagger.json / openapi.json / GraphQL introspection
+│
+└─ Then brute-force paths (loud)  →  ffuf / gobuster -w wordlist
+      │
+      ├─ 200        → exists → open it
+      ├─ 401 / 403  → exists but gated → interesting
+      ├─ 301 / 302  → follow the redirect
+      └─ 429 / wall of 403 → WAF waking up → slow down (-rate)</code></pre>
+
     <p>
         Next: CVE and CVSS
         <a href="./5-cve-and-cvss.html">&gt;&gt;</a>

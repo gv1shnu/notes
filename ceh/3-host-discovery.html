@@ -78,6 +78,26 @@ Nmap done: 256 IP addresses (3 hosts up) scanned in 3.20 seconds</code></pre>
         live host look dead.
     </p>
 
+    <h3>Decision tree &mdash; is the host really down?</h3>
+
+    <p>
+        The whole trap of this phase in one picture. Silence is not proof of absence &mdash; decide
+        <em>why</em> a host is quiet before you cross it off.
+    </p>
+
+    <pre><code>Ping sweep first:  sudo nmap -sn 10.10.10.0/24
+│
+├─ Replies on ANY probe (ICMP / SYN-ACK / ARP)
+│     → Host is UP → port-scan it
+│
+└─ Total silence   (remember: silence ≠ absent)
+      │
+      ├─ Recon / DNS say it should exist
+      │     → sudo nmap -Pn   (assume up, skip discovery)
+      │
+      └─ Nothing suggests it exists
+            → drop it from the live-host list</code></pre>
+
     <p>
         Next: Port scanning
         <a href="./3-port-scanning.html">&gt;&gt;</a>

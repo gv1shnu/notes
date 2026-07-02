@@ -61,6 +61,28 @@
         live account — where a mistake means real cost, state change, or lockout — so it stays under tight scope.
     </p>
 
+    <h3>Decision tree &mdash; identity and config, not exploits</h3>
+
+    <p>
+        Cloud findings come from misconfiguration. Run the anonymous, read-only checks freely; anything using
+        credentials touches a live account:
+    </p>
+
+    <pre><code>Cloud target — check config, not exploits
+│
+├─ Storage bucket → how public?   (anonymous = safe to test)
+│     ├─ private            → nothing leaks  ✓
+│     ├─ public READ        → any known/guessed filename downloads
+│     └─ public LIST + READ → enumerate ALL objects → mass leak
+│
+├─ IAM → over-permissioned roles (AdministratorAccess)?
+├─ Access keys leaked in code / the app?
+├─ Security groups open 0.0.0.0/0 on DB / admin ports?
+└─ CloudTrail / audit logging missing?
+
+Read-only checks: safe.  Anything using creds touches a live
+account (cost, state change, lockout) → keep it tightly scoped.</code></pre>
+
     <p>
         Next: Cryptography
         <a href="./9-crypto.html">&gt;&gt;</a>

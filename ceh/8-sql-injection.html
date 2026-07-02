@@ -73,6 +73,29 @@
         <code>--dump</code> to do it for you.
     </p>
 
+    <h3>Decision tree &mdash; which technique proves it?</h3>
+
+    <p>
+        Once input clearly reaches SQL, what the app <em>shows you back</em> decides the cheapest way to prove it:
+    </p>
+
+    <pre><code>Input reaches SQL — what does the app reveal?
+│
+├─ Shows DB error messages?
+│     └─ yes → ERROR-BASED   (a leaked error confirms injection)
+│
+├─ Reflects query results on the page?
+│     └─ yes → UNION-BASED   (SELECT extra columns) — heavier
+│
+└─ No errors, no visible output → BLIND
+      ├─ page differs on true vs false
+      │     → BOOLEAN blind   (AND 1=1  vs  AND 1=2)
+      └─ page looks identical either way
+            → TIME-BASED blind  (SLEEP(5) → response lags)
+
+Proof, not plunder:  boolean diff / timing / one error.
+Don't point --dump at it unless scope demands data proof.</code></pre>
+
     <p>
         Next: Cross-site scripting
         <a href="./8-xss.html">&gt;&gt;</a>

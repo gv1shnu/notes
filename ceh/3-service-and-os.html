@@ -101,6 +101,28 @@ Network Distance: 2 hops</code></pre>
         the report.
     </p>
 
+    <h3>Decision tree &mdash; route each service to its next move</h3>
+
+    <p>
+        Version detection turns open ports into leads. This is the router that sends each confirmed service to the
+        right enumeration page &mdash; run <code>sudo nmap -sV -sC</code> first, then branch:
+    </p>
+
+    <pre><code>Open port confirmed → sudo nmap -sV -sC
+│
+├─ 80 / 443 / 8080  (http, ssl/http)
+│     → web fingerprint + content discovery (whatweb, ffuf)
+│
+├─ 445 / 139  (SMB)          → enum4linux-ng, smbclient, nxc
+├─ 389 / 636  (LDAP)         → ldapsearch, BloodHound
+├─ 22 (SSH) / 21 (FTP)       → banner → check version for CVEs
+├─ 25 (SMTP) / 53 (DNS) / 161 (SNMP) → mail-dns-snmp checks
+├─ 3306 / 5432 / 1433  (DB)  → greeting, default creds
+│
+└─ Want NSE scripts?
+      ├─ -sC  (safe / default)        → always fine
+      └─ --script vuln / intrusive    → can break things → get scope</code></pre>
+
     <p>
         Next: Enumeration
         <a href="./4-enumeration-intro.html">&gt;&gt;</a>

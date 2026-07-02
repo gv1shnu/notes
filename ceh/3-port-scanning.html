@@ -230,6 +230,37 @@ PORT    STATE         SERVICE
         bookkeeping.)
     </p>
 
+    <h3>Decision tree &mdash; which scan, and how to read it</h3>
+
+    <p>
+        Two decisions live on this page: what to send, and what the reply means. First, picking the scan:
+    </p>
+
+    <pre><code>What am I allowed to send, and how hard?
+│
+├─ Have root / sudo?
+│     ├─ yes → -sS   (SYN, half-open, quiet, fast)   ← default
+│     └─ no  → -sT   (full connect, logged, slower)
+│
+├─ Need UDP services? (DNS 53, SNMP 161, NTP 123)
+│     → add -sU on a SHORT port list   (UDP is slow)
+│
+└─ How hard can I push?
+      ├─ healthy lab / internal        → -T4
+      ├─ fragile gear (printers, ICS)  → -T2 / -T1
+      └─ stay quiet                    → -T1 + --max-rate</code></pre>
+
+    <p>
+        Then reading the <code>STATE</code> column &mdash; each verdict routes to a different next move:
+    </p>
+
+    <pre><code>Port STATE says…
+│
+├─ open              → a service is listening → -sV next
+├─ closed            → host reachable, nothing here → ignore
+├─ filtered          → firewall ate the probe → note it, don't claim
+└─ open|filtered (UDP) → "couldn't tell" → targeted follow-up</code></pre>
+
     <p>
         Next: Service and OS detection
         <a href="./3-service-and-os.html">&gt;&gt;</a>

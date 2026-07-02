@@ -48,6 +48,26 @@ AA:BB:CC:00:11:23  -44  OPN                 CorpGuest</code></pre>
         improvising on production gear.
     </p>
 
+    <h3>Decision tree &mdash; the ENC column decides the attack</h3>
+
+    <p>
+        Read the encryption column from the <code>airodump-ng</code> survey and the path follows:
+    </p>
+
+    <pre><code>Survey with airodump-ng → read the ENC column
+│
+├─ OPN (open)   → join, then test isolation:
+│                 can a guest reach the internal network?
+├─ WEP          → broken; crackable in minutes (legacy only)
+├─ WPA2-PSK     → capture the handshake → offline dict on the PSK
+│                 (weak / default passphrase = the whole game)
+├─ WPA3-SAE     → PSK dictionary attack largely dead →
+│                 check for downgrade / transition-mode to WPA2
+└─ WPS enabled? → shortcut PAST the passphrase (PIN attack)
+
+No test radio? Document the methodology + limitation.
+Don't improvise on production gear.</code></pre>
+
     <p>
         Next: Mobile
         <a href="./9-mobile.html">&gt;&gt;</a>

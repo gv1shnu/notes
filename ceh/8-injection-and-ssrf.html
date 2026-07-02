@@ -78,6 +78,27 @@ fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/role-
         one file read over a directory sweep. The smallest convincing proof is both safer and more professional.
     </p>
 
+    <h3>Decision tree &mdash; which sink, which safe proof</h3>
+
+    <p>
+        Same theme every time: follow the input to the dangerous sink, then use the smallest proof that sink allows:
+    </p>
+
+    <pre><code>Untrusted input reaches a dangerous sink — which one?
+│
+├─ …a system shell  →  COMMAND INJECTION
+│     → prove with timing (; sleep 5) or a DNS callback
+│       never rm / destructive commands
+│
+├─ …a file path  →  PATH TRAVERSAL
+│     → read ONE harmless expected file (../../etc/passwd)
+│       then stop — don't sweep for secrets
+│
+└─ …an outbound request  →  SSRF
+      → make it hit a listener you control (proof)
+      → cloud? reach 169.254.169.254 metadata → role name
+        stop at the role name; don't pivot with the creds</code></pre>
+
     <p>
         Next: Wireless
         <a href="./9-wireless.html">&gt;&gt;</a>

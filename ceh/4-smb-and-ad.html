@@ -83,6 +83,30 @@ namingContexts: DC=lab,DC=local</code></pre>
         setting, or risks a lockout needs explicit approval.
     </p>
 
+    <h3>Decision tree &mdash; working an SMB/AD host</h3>
+
+    <p>
+        The order that keeps enumeration read-only until you decide to cross a line:
+    </p>
+
+    <pre><code>SMB / AD host found (445, 389)
+│
+├─ Try a null (anonymous) session
+│     ├─ works   → enum4linux-ng -A  → shares, users, policy
+│     └─ blocked → note it; come back once you have creds
+│
+├─ Shares reachable?
+│     ├─ READ  → smbclient // …  → hunt configs, secrets
+│     └─ WRITE → payload-drop path → flag it, needs scope
+│
+├─ Have ANY credentials? (null-user, cracked, sprayed)
+│     → nxc smb &lt;net&gt; -u u -p p --shares --users
+│
+└─ Map the graph, don't guess it
+      → BloodHound   (collection = read-only)
+      → shortest path: low priv → Domain Admin
+      → walking that path = exploitation, later</code></pre>
+
     <p>
         Next: Mail, DNS, and SNMP
         <a href="./4-mail-dns-snmp.html">&gt;&gt;</a>

@@ -68,6 +68,26 @@
         need to steal anyone's cookies to prove cookies are stealable. Remove any stored markers you leave behind.
     </p>
 
+    <h3>Decision tree &mdash; context and kind</h3>
+
+    <p>
+        Two questions shape every XSS: <em>where</em> the input lands (which picks the payload) and <em>how</em> it comes
+        back (which names the kind):
+    </p>
+
+    <pre><code>My input appears on the page
+│
+├─ WHERE does it land?  (context picks the payload)
+│     ├─ HTML body      → &lt;script&gt;… / &lt;img src=x onerror=…&gt;
+│     ├─ HTML attribute → break out:  "&gt;  then a tag
+│     └─ JS string      → close the quote / ;  then code
+│
+└─ HOW does it come back?  (this is the "kind")
+      ├─ bounced straight back in the response → REFLECTED
+      ├─ saved, served to OTHER users later    → STORED  (worst)
+      └─ client-side JS writes it unsafely     → DOM-based
+            → prove with alert(1); remove any stored markers</code></pre>
+
     <p>
         Next: Injection and SSRF
         <a href="./8-injection-and-ssrf.html">&gt;&gt;</a>

@@ -74,6 +74,29 @@
         the input to exploitation.
     </p>
 
+    <h3>Decision tree &mdash; from scanner output to a ranked finding</h3>
+
+    <p>
+        The pipeline that turns a scanner's confident list into something a human will stand behind:
+    </p>
+
+    <pre><code>Scanner says "VULNERABLE"
+│
+├─ Real, or just a version-banner match?
+│     ├─ only a banner guess      → likely FALSE POSITIVE → drop/soften
+│     └─ vulnerable path reachable → keep as a candidate
+│
+└─ Kept it? Rank by CONTEXT, not CVSS alone
+      ├─ Reachable?         no  → lower
+      ├─ Auth required?     no  → higher
+      ├─ Exploit reliable?  no  → soften wording, lower
+      ├─ Blast radius?      domain-wide → higher
+      └─ On CISA KEV list?  yes → jump the queue
+                             │
+                             ▼
+              Ranked list + a least-risky
+              validation plan per finding</code></pre>
+
     <p>
         Next: Exploitation
         <a href="./6-exploitation-intro.html">&gt;&gt;</a>

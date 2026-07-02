@@ -77,6 +77,30 @@ C:\&gt; systeminfo | findstr /B "OS Version"</code></pre>
         need to dump <code>/etc/shadow</code> to prove you reached root.
     </p>
 
+    <h3>Decision tree &mdash; from foothold to root/SYSTEM</h3>
+
+    <p>
+        Enumerate first (<code>LinPEAS</code> / <code>WinPEAS</code>), then take the first path that fits &mdash; the
+        common ones, cheapest and least destructive at the top:
+    </p>
+
+    <pre><code>Low-priv shell → enumerate (LinPEAS / WinPEAS)
+│
+├─ LINUX  (goal: root)
+│     ├─ sudo -l shows a NOPASSWD binary → GTFOBins → root
+│     ├─ SUID binary (find / -perm -4000) → GTFOBins
+│     ├─ writable cron / service file → your code runs as root
+│     ├─ secrets in config / history → reused creds
+│     └─ nothing else → kernel exploit (last resort — crashes boxes)
+│
+└─ WINDOWS  (goal: SYSTEM)
+      ├─ whoami /priv → SeImpersonate → Potato / PrintSpoofer
+      ├─ unquoted service path → drop a binary in the gap
+      ├─ weak service perms → replace the service exe
+      ├─ AlwaysInstallElevated → install a malicious .msi as SYSTEM
+      └─ stored creds → reuse
+            → prove with ONE protected file, then STOP</code></pre>
+
     <p>
         Next: Attack chains
         <a href="./6-attack-chains.html">&gt;&gt;</a>
