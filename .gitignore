@@ -1,1 +1,9 @@
 .DS_Store
+
+# Python build artifacts
+__pycache__/
+*.pyc
+
+# Pentest engagement artifacts (keep data/README.md)
+ceh/data/*/
+!ceh/data/README.md
