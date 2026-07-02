@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Backup Strategy</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Backup Strategy</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+A backup strategy is not simply copying files onto another drive. An effective backup
+system answers three questions:
+</p>
+
+<ul>
+<li>How many copies exist?</li>
+<li>How often are they updated?</li>
+<li>How quickly can they be restored?</li>
+</ul>
+
+<p>
+The objective is to survive mistakes, hardware failures, accidental deletion and
+disasters without permanently losing valuable information.
+</p>
+
+<hr>
+
+<h3>Recovery Objectives</h3>
+
+<p>Before designing backups, determine acceptable data loss and downtime.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Question</th><th>Example</th></tr>
+<tr><td>How much data can I lose?</td><td>One hour, one day, one week?</td></tr>
+<tr><td>How quickly must I recover?</td><td>Immediately or within several days?</td></tr>
+</table>
+
+<p>
+A family photo archive and an active software project rarely have the same recovery
+requirements.
+</p>
+
+<hr>
+
+<h3>Full, Incremental &amp; Differential</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Method</th><th>Characteristics</th></tr>
+<tr><td>Full</td><td>Copies every selected file. Simplest to restore, slowest to create.</td></tr>
+<tr><td>Incremental</td><td>Copies only changes since the previous backup. Fast and space efficient.</td></tr>
+<tr><td>Differential</td><td>Copies changes since the last full backup. Faster restoration than incremental.</td></tr>
+</table>
+
+<pre><code>Monday    Full
+
+Tuesday   Incremental
+
+Wednesday Incremental
+
+Thursday  Incremental
+
+Friday    Full
+</code></pre>
+
+<hr>
+
+<h3>Versioning</h3>
+
+<p>
+Replacing yesterday's backup with today's backup removes the ability to recover older
+versions of a file.
+</p>
+
+<pre><code>report.docx
+
+Version 1
+    ↓
+Version 2
+    ↓
+Version 3
+</code></pre>
+
+<p>
+Versioned backups preserve previous revisions, allowing accidental edits or deletions
+to be reversed.
+</p>
+
+<hr>
+
+<h3>Snapshots</h3>
+
+<p>
+A snapshot records the state of a filesystem at a specific point in time. It allows
+the archive to be viewed or restored exactly as it existed when the snapshot was taken.
+</p>
+
+<pre><code>Filesystem
+
+├── Snapshot A
+├── Snapshot B
+└── Snapshot C
+</code></pre>
+
+<hr>
+
+<h3>Hot vs Cold Backups</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Hot Backup</th><th>Cold Backup</th></tr>
+<tr><td>Created while data is in use.</td><td>Created while the system is offline.</td></tr>
+<tr><td>Minimal interruption.</td><td>Maximum consistency.</td></tr>
+</table>
+
+<p>
+Choose the method appropriate for the workload being protected.
+</p>
+
+<hr>
+
+<h3>Test Your Backups</h3>
+
+<p>
+A backup that has never been restored should not automatically be considered reliable.
+Verification should include periodic restoration tests.
+</p>
+
+<pre><code>Create Backup
+      ↓
+Verify
+      ↓
+Restore Test
+      ↓
+Document Results
+</code></pre>
+
+<hr>
+
+<h3>Common Mistakes</h3>
+
+<ul>
+<li>Keeping every backup on one physical drive.</li>
+<li>Never testing recovery.</li>
+<li>Backing up corrupted or temporary files unnecessarily.</li>
+<li>Assuming cloud synchronization replaces backups.</li>
+<li>Ignoring backup logs and failed jobs.</li>
+</ul>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+The quality of a backup strategy is measured during recovery, not during creation.
+Successful archives are built around reliable restoration, version history and regular
+verification rather than simply accumulating additional copies.
+</p>
+
+<p>Next, Data Integrity <a href="./10-data-integrity.html">&gt;&gt;</a></p>
+<p>Prev, Storage Media <a href="./8-storage-media.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

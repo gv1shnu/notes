@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Data Integrity</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Data Integrity</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Storing data is only half the challenge. The other half is ensuring that the data remains
+correct and readable years later. Files can become corrupted without obvious warning due
+to failing hardware, transmission errors, software bugs or media degradation.
+</p>
+
+<p>
+Data integrity is the practice of detecting corruption before it results in permanent
+information loss.
+</p>
+
+<hr>
+
+<h3>What Is Data Integrity?</h3>
+
+<pre><code>Original File
+      │
+Store
+      │
+Read Later
+      │
+Verify
+      ▼
+Identical Data
+</code></pre>
+
+<p>
+Integrity means that a file retrieved in the future is exactly the same as the file that
+was originally stored.
+</p>
+
+<hr>
+
+<h3>Silent Data Corruption</h3>
+
+<p>
+Not every storage failure is obvious. Sometimes a file changes without producing an error
+message. This is known as <strong>silent data corruption</strong>.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Possible Cause</th><th>Example</th></tr>
+<tr><td>Failing storage media</td><td>Unreadable sectors.</td></tr>
+<tr><td>Faulty memory</td><td>Incorrect data written to disk.</td></tr>
+<tr><td>Transfer errors</td><td>Corrupted copies.</td></tr>
+<tr><td>Software bugs</td><td>Unexpected file modification.</td></tr>
+</table>
+
+<hr>
+
+<h3>Checksums</h3>
+
+<p>
+A checksum is a value calculated from the contents of a file. If the contents change,
+the checksum changes as well.
+</p>
+
+<pre><code>Original File
+      │
+SHA-256
+      ▼
+A94F...
+
+Verify Later
+      │
+SHA-256
+      ▼
+A94F...
+
+Match ✔
+</code></pre>
+
+<p>
+Checksums allow archives to be verified periodically without manually opening every file.
+</p>
+
+<hr>
+
+<h3>Bit Rot</h3>
+
+<p>
+Bit rot refers to the gradual corruption of stored data over long periods. Although
+modern storage devices are reliable, long-term archives should still be monitored.
+</p>
+
+<pre><code>Store File
+
+↓
+
+Years Pass
+
+↓
+
+Verify Integrity
+</code></pre>
+
+<hr>
+
+<h3>SMART Monitoring</h3>
+
+<p>
+Many storage devices provide Self-Monitoring, Analysis and Reporting Technology (SMART)
+statistics that indicate drive health.
+</p>
+
+<ul>
+<li>Reallocated sectors</li>
+<li>Read errors</li>
+<li>Power-on hours</li>
+<li>Temperature</li>
+<li>Pending sectors</li>
+</ul>
+
+<p>
+Monitoring trends is often more useful than reacting only after complete failure.
+</p>
+
+<hr>
+
+<h3>Filesystem Scrubbing</h3>
+
+<p>
+Some filesystems periodically verify stored data by reading blocks and comparing them
+against stored integrity information. This process is commonly called <strong>scrubbing</strong>.
+</p>
+
+<pre><code>Read Data
+     │
+Verify
+     │
+Repair (if possible)
+</code></pre>
+
+<p>
+Scrubbing detects corruption that might otherwise remain unnoticed for years.
+</p>
+
+<hr>
+
+<h3>Verification Schedule</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Archive Type</th><th>Suggested Verification</th></tr>
+<tr><td>Active Projects</td><td>Monthly</td></tr>
+<tr><td>Personal Archives</td><td>Every 6–12 months</td></tr>
+<tr><td>Cold Storage</td><td>During periodic maintenance</td></tr>
+</table>
+
+<p>
+The exact schedule depends on the value of the archive and the reliability requirements.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+An archive should not simply be stored and forgotten. Regular integrity verification,
+health monitoring and checksum validation help ensure that valuable information remains
+unchanged and recoverable for many years.
+</p>
+
+<p>Next, Privacy &amp; Security <a href="./11-privacy-security.html">&gt;&gt;</a></p>
+<p>Prev, Backup Strategy <a href="./9-backup-strategy.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

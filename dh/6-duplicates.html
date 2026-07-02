@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Duplicates & Deduplication</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Duplicates &amp; Deduplication</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+As digital collections grow, duplicate files become inevitable. They waste storage,
+increase backup times, clutter search results and make archives more difficult to
+maintain. Understanding how duplicates are identified is an important step toward
+building an efficient digital archive.
+</p>
+
+<hr>
+
+<h3>What Is a Duplicate?</h3>
+
+<p>
+Not every similar-looking file is actually a duplicate.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td>Exact Duplicate</td><td>Two files with identical contents.</td></tr>
+<tr><td>Near Duplicate</td><td>Similar files with small differences.</td></tr>
+<tr><td>Version</td><td>A newer or older revision of a document.</td></tr>
+<tr><td>Copy</td><td>A manually duplicated file with a different name.</td></tr>
+</table>
+
+<hr>
+
+<h3>Why File Names Are Not Enough</h3>
+
+<pre><code>holiday.jpg
+holiday (1).jpg
+holiday-final.jpg
+IMG_1024.jpg
+</code></pre>
+
+<p>
+Different names do not necessarily mean different files. Likewise, two files with the
+same name may contain completely different data.
+</p>
+
+<hr>
+
+<h3>Checksums &amp; Hashes</h3>
+
+<p>
+A checksum (or hash) is a short digital fingerprint calculated from a file's contents.
+If two files produce the same cryptographic hash, they are overwhelmingly likely to be
+identical.
+</p>
+
+<pre><code>File A
+   │
+SHA-256
+   ▼
+4F7A...
+
+File B
+   │
+SHA-256
+   ▼
+4F7A...
+
+↓
+
+Same Contents
+</code></pre>
+
+<p>
+Hashes are calculated from the data itself, not from the filename or location.
+</p>
+
+<hr>
+
+<h3>Near Duplicates</h3>
+
+<p>
+Near duplicates cannot usually be detected with ordinary hashes because their contents
+are not exactly the same.
+</p>
+
+<ul>
+<li>Resized photographs.</li>
+<li>Compressed versions of the same video.</li>
+<li>Edited documents.</li>
+<li>Different image quality levels.</li>
+<li>Different audio bitrates.</li>
+</ul>
+
+<p>
+These require similarity detection rather than exact matching.
+</p>
+
+<hr>
+
+<h3>Deduplication</h3>
+
+<p>
+Deduplication removes unnecessary copies while preserving a single copy of the data.
+</p>
+
+<pre><code>10 Copies
+
+↓
+
+Deduplication
+
+↓
+
+1 Stored Copy
+</code></pre>
+
+<p>
+Some storage systems perform deduplication automatically by storing identical blocks of
+data only once.
+</p>
+
+<hr>
+
+<h3>Hard Links vs Symbolic Links</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Type</th><th>Purpose</th></tr>
+<tr><td>Hard Link</td><td>Multiple directory entries referencing the same file data.</td></tr>
+<tr><td>Symbolic Link</td><td>A pointer to another file or directory.</td></tr>
+</table>
+
+<p>
+These mechanisms reduce unnecessary duplication without creating additional copies of
+the underlying data.
+</p>
+
+<hr>
+
+<h3>Should Everything Be Deduplicated?</h3>
+
+<p>
+No. Different versions of a document or project often represent important history.
+Removing them blindly can permanently destroy useful information.
+</p>
+
+<pre><code>Delete?
+
+↓
+
+Exact Duplicate?
+      │
+ Yes ─┴─ No
+ │        │
+Remove   Review
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Deduplication is about reducing unnecessary repetition without losing valuable
+information. Exact duplicates are good candidates for removal, while versions and
+near duplicates should be reviewed carefully before deletion.
+</p>
+
+<p>Next, Compression &amp; Archiving <a href="./7-compression.html">&gt;&gt;</a></p>
+<p>Prev, Metadata <a href="./5-metadata.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

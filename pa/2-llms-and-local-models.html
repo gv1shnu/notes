@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Personal Computing - LLMs & Local Models</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>LLMs &amp; Local Models</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+Every AI assistant is powered by one or more <strong>Large Language Models (LLMs)</strong>.
+These models understand natural language, reason about information and generate responses.
+Choosing where the model runs—locally or in the cloud—is one of the most important design
+decisions when building a personal AI assistant.
+</p>
+
+<hr>
+
+<h3>What is an LLM?</h3>
+
+<pre><code>You
+ │
+Question
+ │
+ ▼
+Large Language Model
+ │
+Reasoning
+ │
+ ▼
+Response
+</code></pre>
+
+<p>
+An LLM predicts the most appropriate sequence of tokens based on the information it has
+received. It does not inherently know your files, applications or personal history unless
+that information is provided through memory or external tools.
+</p>
+
+<hr>
+
+<h3>Cloud vs Local Models</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Cloud Model</th><th>Local Model</th></tr>
+<tr><td>Runs on a remote provider.</td><td>Runs on your own hardware.</td></tr>
+<tr><td>Minimal local hardware required.</td><td>Requires CPU, GPU or both.</td></tr>
+<tr><td>Easy to start.</td><td>Greater control over data.</td></tr>
+<tr><td>Internet connection required.</td><td>Can operate offline.</td></tr>
+</table>
+
+<hr>
+
+<h3>Hybrid Architecture</h3>
+
+<p>
+Many practical assistants combine both approaches.</p>
+
+<pre><code>You
+ │
+ ▼
+AI Assistant
+ │
+ ├── Local LLM
+ │      │
+ │   Personal Files
+ │
+ └── Cloud LLM
+        │
+ General Knowledge
+</code></pre>
+
+<p>
+Sensitive work remains local, while cloud services can be used selectively for tasks that
+benefit from larger models.
+</p>
+
+<hr>
+
+<h3>What the Model Does Not Do</h3>
+
+<p>
+The language model is only one component of the assistant.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Capability</th><th>Provided By</th></tr>
+<tr><td>Reasoning</td><td>LLM</td></tr>
+<tr><td>Remembering documents</td><td>Memory system</td></tr>
+<tr><td>Opening applications</td><td>Tool layer</td></tr>
+<tr><td>Searching files</td><td>Filesystem integration</td></tr>
+<tr><td>Automation</td><td>Workflow engine</td></tr>
+</table>
+
+<hr>
+
+<h3>Running Models Locally</h3>
+
+<p>
+Modern consumer hardware is capable of running increasingly capable language models.
+Performance depends on available memory, processor architecture and GPU acceleration.
+The goal is not necessarily to match the largest cloud models, but to achieve useful,
+private and responsive assistance.
+</p>
+
+<pre><code>Computer
+   │
+Local Runtime
+   │
+Language Model
+   │
+AI Assistant
+</code></pre>
+
+<hr>
+
+<h3>Our Reference Architecture</h3>
+
+<pre><code>                 You
+                  │
+                  ▼
+          AI Assistant
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+    Local Model        Cloud Model
+        │                   │
+   Personal Tasks    General Knowledge
+</code></pre>
+
+<p>
+In the next chapter we will give the assistant long-term memory so that it can remember
+your documents, projects and previous interactions instead of treating every conversation
+as completely new.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+The language model is the reasoning engine of a personal AI assistant, but it is not the
+entire assistant. Memory, tools, automation and local data are equally important. The
+most capable systems combine these components into a single architecture tailored to the
+user's own computing environment.
+</p>
+
+<p>Next, Memory &amp; Context <a href="./3-memory-and-context.html">&gt;&gt;</a></p>
+<p>Prev, Why Build a Personal AI? <a href="./1-why-personal-ai.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

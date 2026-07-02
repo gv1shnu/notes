@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Personal Computing - Safety & Permissions</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Safety &amp; Permissions</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+A capable AI assistant should not have unrestricted access to your computer. The same
+tools that make it useful can also make it dangerous if used without limits. Safety is
+therefore a system design requirement rather than an optional feature.
+</p>
+
+<hr>
+
+<h3>Principle of Least Privilege</h3>
+
+<p>
+Grant the assistant only the permissions required for its current task.</p>
+
+<pre><code>
+AI Assistant
+     │
+Read Files ✔
+Search ✔
+Summarize ✔
+
+Delete Files ✘
+Modify Firewall ✘
+Format Disk ✘
+</code></pre>
+
+<hr>
+
+<h3>Permission Levels</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Level</th><th>Examples</th></tr>
+<tr><td>Read</td><td>Search files, inspect logs, summarize documents.</td></tr>
+<tr><td>Write</td><td>Create notes, rename files, update indexes.</td></tr>
+<tr><td>Administrative</td><td>Install software, restart services, modify system settings.</td></tr>
+<tr><td>Destructive</td><td>Delete data, remove snapshots, erase storage.</td></tr>
+</table>
+
+<hr>
+
+<h3>Approval Workflow</h3>
+
+<pre><code>
+Request
+   │
+Risk Assessment
+   │
+Needs Approval?
+   │
+Yes
+   │
+User Reviews
+   │
+Execute
+</code></pre>
+
+<p>
+High-impact actions should never execute silently.
+</p>
+
+<hr>
+
+<h3>Audit Logs</h3>
+
+<p>
+Every significant action should be recorded for later review.</p>
+
+<pre><code>
+Time
+User
+Requested Action
+Tools Used
+Result
+</code></pre>
+
+<p>
+Logs improve transparency and simplify troubleshooting.
+</p>
+
+<hr>
+
+<h3>Sandboxing</h3>
+
+<p>
+Where practical, new workflows should first execute inside isolated environments before
+being allowed to affect production data.</p>
+
+<pre><code>
+AI
+ │
+Sandbox
+ │
+Verify
+ │
+Production
+</code></pre>
+
+<hr>
+
+<h3>Recovering From Mistakes</h3>
+
+<ul>
+<li>Version important files.</li>
+<li>Keep reliable backups.</li>
+<li>Support undo operations where possible.</li>
+<li>Test automation before broad deployment.</li>
+</ul>
+
+<hr>
+
+<h3>Security Architecture</h3>
+
+<pre><code>
+                 User
+                  │
+                  ▼
+          Permission Manager
+                  │
+      ┌───────────┼───────────┐
+      │           │           │
+ Read Only    Approval    Administrator
+      │           │           │
+      └───────────┼───────────┘
+                  ▼
+             Tool Layer
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Trustworthy assistants are built around clear permissions, explicit approvals and
+complete transparency. The objective is not maximum automation, but reliable automation
+that keeps the user in control of important decisions.
+</p>
+
+<p>Next, Building Your Personal Assistant <a href="./12-building-your-personal-assistant.html">&gt;&gt;</a></p>
+<p>Prev, Managing Your Homelab <a href="./10-managing-your-homelab.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Metadata</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Metadata</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Every digital file contains information about itself in addition to its contents.
+This information is known as <strong>metadata</strong>. While users often focus on
+filenames and folders, metadata provides important details about when, where and how
+a file was created or modified.
+</p>
+
+<p>
+Good archive management depends on understanding metadata because it improves searching,
+sorting, verification and long-term preservation.
+</p>
+
+<hr>
+
+<h3>What is Metadata?</h3>
+
+<pre><code>File
+
+├── Contents
+└── Metadata
+
+        ├── Name
+        ├── Size
+        ├── Type
+        ├── Created Date
+        ├── Modified Date
+        ├── Permissions
+        └── Attributes
+</code></pre>
+
+<p>
+Metadata describes a file. It is not usually the information stored inside the file
+itself, but information about that file.
+</p>
+
+<hr>
+
+<h3>Common Metadata</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Metadata</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>Filename</td>
+<td>Human-readable identifier.</td>
+</tr>
+
+<tr>
+<td>File Size</td>
+<td>Storage occupied by the file.</td>
+</tr>
+
+<tr>
+<td>Creation Time</td>
+<td>When the file was created.</td>
+</tr>
+
+<tr>
+<td>Modified Time</td>
+<td>Most recent modification.</td>
+</tr>
+
+<tr>
+<td>File Type</td>
+<td>PDF, JPEG, MP4, ZIP, etc.</td>
+</tr>
+
+<tr>
+<td>Permissions</td>
+<td>Who may read or modify the file.</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Photograph Metadata (EXIF)</h3>
+
+<p>
+Digital cameras and smartphones often embed EXIF metadata inside photographs.
+</p>
+
+<pre><code>Photo.jpg
+
+↓
+
+EXIF
+
+├── Camera Model
+├── Date
+├── Time
+├── Resolution
+├── GPS Coordinates*
+├── Exposure
+└── Lens Information
+</code></pre>
+
+<p>
+Location information may reveal where a photograph was taken. Before sharing images,
+consider whether this information should remain attached.
+</p>
+
+<hr>
+
+<h3>File Timestamps</h3>
+
+<p>
+Operating systems commonly maintain multiple timestamps for files.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Timestamp</th><th>Purpose</th></tr>
+<tr><td>Created</td><td>When the file first appeared.</td></tr>
+<tr><td>Modified</td><td>When contents last changed.</td></tr>
+<tr><td>Accessed</td><td>When the file was last opened.</td></tr>
+</table>
+
+<p>
+These timestamps help sort archives chronologically and identify recently modified data.
+</p>
+
+<hr>
+
+<h3>Metadata Is Not Always Reliable</h3>
+
+<p>
+Metadata can be edited, lost or regenerated when files are copied between devices or
+converted into different formats.
+</p>
+
+<ul>
+<li>ZIP archives may change timestamps.</li>
+<li>Image editors may remove EXIF information.</li>
+<li>Cloud services may modify metadata during synchronization.</li>
+<li>Copying files can change creation dates.</li>
+</ul>
+
+<hr>
+
+<h3>Metadata vs File Contents</h3>
+
+<pre><code>Metadata
+
+"What is this file?"
+
+↓
+
+Contents
+
+"What information does it contain?"
+</code></pre>
+
+<p>
+Both are valuable. Metadata helps manage an archive, while the contents provide the
+actual information you wish to preserve.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Metadata makes large collections searchable and manageable. Understanding timestamps,
+EXIF information, permissions and file attributes allows you to organize, preserve and
+share data more effectively while avoiding accidental information disclosure.
+</p>
+
+<p>Next, Duplicates &amp; Deduplication <a href="./6-duplicates.html">&gt;&gt;</a></p>
+<p>Prev, File Organization <a href="./4-file-organization.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

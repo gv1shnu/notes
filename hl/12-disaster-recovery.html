@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Labs - Disaster Recovery</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Disaster Recovery</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Failures are inevitable. Hard drives fail, operating systems become corrupted, services
+stop working and users make mistakes. Disaster recovery is the process of restoring your
+homelab to a working state with minimal data loss and downtime.
+</p>
+
+<hr>
+
+<h3>What Can Go Wrong?</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Failure</th><th>Example</th></tr>
+<tr><td>Hardware</td><td>Disk or power supply failure.</td></tr>
+<tr><td>Software</td><td>Broken update or misconfiguration.</td></tr>
+<tr><td>User Error</td><td>Accidental deletion.</td></tr>
+<tr><td>Security</td><td>Compromised service.</td></tr>
+<tr><td>Environment</td><td>Fire, water or theft.</td></tr>
+</table>
+
+<hr>
+
+<h3>Recovery Priorities</h3>
+
+<pre><code>Hardware
+    ↓
+Hypervisor
+    ↓
+Virtual Machines
+    ↓
+Containers
+    ↓
+Application Data
+</code></pre>
+
+<p>
+Restore the underlying platform before restoring the services that depend on it.
+</p>
+
+<hr>
+
+<h3>What Should Be Backed Up?</h3>
+
+<ul>
+<li>Configuration files.</li>
+<li>Virtual machine images.</li>
+<li>Container volumes.</li>
+<li>Databases.</li>
+<li>User documents and media.</li>
+<li>Automation workflows.</li>
+</ul>
+
+<hr>
+
+<h3>Recovery Documentation</h3>
+
+<p>
+Keep a simple recovery document describing how the homelab is assembled.</p>
+
+<pre><code>Recovery Notes
+
+Server IP
+Administrator Accounts
+Storage Layout
+Backup Locations
+Installed Services
+Restore Order
+</code></pre>
+
+<hr>
+
+<h3>Practice Restoring</h3>
+
+<p>
+A recovery plan should be tested periodically.</p>
+
+<pre><code>Create Backup
+      ↓
+Simulate Failure
+      ↓
+Restore
+      ↓
+Verify
+</code></pre>
+
+<p>
+Testing exposes missing files and undocumented steps before a real emergency occurs.
+</p>
+
+<hr>
+
+<h3>The Running Homelab</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Home Server
+    │
+Restore Hypervisor
+    │
+Restore VMs
+    │
+Restore Containers
+    │
+Restore Data
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Disaster recovery is more than backups. It includes planning, documentation, testing and
+a repeatable restoration process. A homelab that can be rebuilt quickly is far more
+valuable than one that merely stores backups.
+</p>
+
+<p>Next, Building Your Homelab <a href="./13-building-your-homelab.html">&gt;&gt;</a></p>
+<p>Prev, Monitoring &amp; Maintenance <a href="./11-monitoring-maintenance.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

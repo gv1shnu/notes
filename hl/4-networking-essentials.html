@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Networking Essentials</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Networking Essentials</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+Every homelab depends on a functioning network. Virtual machines, containers, storage
+servers and client devices communicate through the local network before they ever reach
+the Internet. Understanding a few core networking concepts makes operating a homelab
+significantly easier.
+</p>
+
+<hr>
+
+<h3>A Typical Home Network</h3>
+
+<pre><code>              Internet
+                  │
+             ISP Router
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+    Home Server         Switch / Wi-Fi
+        │             ┌──────┼──────┐
+        │          Desktop Laptop Phone
+</code></pre>
+
+<p>
+The home server becomes another device on your local network, just like your laptop or
+phone.
+</p>
+
+<hr>
+
+<h3>Private IP Addresses</h3>
+
+<p>
+Devices inside your home usually receive private IP addresses that are only valid within
+your local network.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Example</th><th>Purpose</th></tr>
+<tr><td>192.168.x.x</td><td>Common home networks.</td></tr>
+<tr><td>10.x.x.x</td><td>Larger private networks.</td></tr>
+<tr><td>172.16–31.x.x</td><td>Private addressing.</td></tr>
+</table>
+
+<hr>
+
+<h3>DHCP vs Static IP</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>DHCP</th><th>Static IP</th></tr>
+<tr><td>Assigned automatically.</td><td>Configured manually or reserved.</td></tr>
+<tr><td>Good for client devices.</td><td>Preferred for servers.</td></tr>
+</table>
+
+<p>
+Giving your homelab server a predictable address makes it easier to access services and
+configure other systems.
+</p>
+
+<hr>
+
+<h3>DNS</h3>
+
+<p>
+Remembering names is easier than remembering IP addresses.</p>
+
+<pre><code>media.home
+      │
+DNS
+      ▼
+192.168.1.20
+</code></pre>
+
+<p>
+Local DNS allows services to be reached using meaningful names instead of numeric
+addresses.
+</p>
+
+<hr>
+
+<h3>Switches and Wi-Fi</h3>
+
+<p>
+A network switch connects wired devices, while a wireless access point connects Wi-Fi
+devices. Both become part of the same local network when configured appropriately.
+</p>
+
+<hr>
+
+<h3>Ports</h3>
+
+<p>
+Multiple services can run on the same server because each listens on a different network
+port.
+</p>
+
+<pre><code>Server
+ ├── Web App      :80
+ ├── HTTPS        :443
+ ├── SSH          :22
+ └── Media Server :8096
+</code></pre>
+
+<p>
+A single IP address can therefore host many different applications.
+</p>
+
+<hr>
+
+<h3>Document Your Network</h3>
+
+<pre><code>192.168.1.10  Home Server
+192.168.1.20  NAS
+192.168.1.30  Desktop
+192.168.1.40  Printer
+</code></pre>
+
+<p>
+Maintaining a simple inventory makes troubleshooting and future expansion much easier.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A homelab does not require advanced networking knowledge, but understanding IP
+addresses, DNS, ports and basic network layout provides a strong foundation for every
+service deployed later in this course.
+</p>
+
+<p>Next, Virtual Machines <a href="./5-virtual-machines.html">&gt;&gt;</a></p>
+<p>Prev, Storage Planning <a href="./3-storage-planning.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

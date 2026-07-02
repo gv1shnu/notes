@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Reverse Proxies</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Reverse Proxies</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+As your homelab grows, you may have dozens of services running on different ports.
+A reverse proxy provides a single entry point, forwarding incoming requests to the
+appropriate application while hiding the internal complexity.
+</p>
+
+<hr>
+
+<h3>Without a Reverse Proxy</h3>
+
+<pre><code>192.168.1.10:3000
+192.168.1.10:8080
+192.168.1.10:8096
+192.168.1.10:9443
+192.168.1.10:2283
+</code></pre>
+
+<p>
+Remembering ports quickly becomes inconvenient as more applications are deployed.
+</p>
+
+<hr>
+
+<h3>With a Reverse Proxy</h3>
+
+<pre><code>media.home
+cloud.home
+vault.home
+photos.home
+
+        │
+        ▼
+Reverse Proxy
+        │
+────────┼────────
+        │
+ Docker Services
+</code></pre>
+
+<p>
+Users access friendly names while the reverse proxy routes requests internally.
+</p>
+
+<hr>
+
+<h3>How It Works</h3>
+
+<pre><code>User
+  │
+HTTPS Request
+  │
+Reverse Proxy
+  │
+───────────────
+│ Match Host  │
+───────────────
+  │
+Forward Request
+  │
+Application
+</code></pre>
+
+<p>
+The application never communicates directly with the user. Every request first passes
+through the reverse proxy.
+</p>
+
+<hr>
+
+<h3>Benefits</h3>
+
+<ul>
+<li>One public entry point.</li>
+<li>Readable hostnames instead of ports.</li>
+<li>Centralized HTTPS configuration.</li>
+<li>Simpler authentication integration.</li>
+<li>Easier expansion as new services are added.</li>
+</ul>
+
+<hr>
+
+<h3>Typical Homelab Layout</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Reverse Proxy
+    │
+├── Cloud
+├── Media
+├── Password Manager
+├── Dashboard
+└── Monitoring
+</code></pre>
+
+<hr>
+
+<h3>Internal vs External Access</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Internal</th><th>External</th></tr>
+<tr><td>Accessible only on the local network.</td><td>Accessible through the Internet if configured.</td></tr>
+<tr><td>Suitable for private services.</td><td>Requires additional security measures.</td></tr>
+</table>
+
+<p>
+Many homelabs intentionally expose only a small number of carefully selected services.
+</p>
+
+<hr>
+
+<h3>Growing the Homelab</h3>
+
+<pre><code>Today
+
+3 Services
+
+↓
+
+Next Year
+
+15 Services
+
+↓
+
+Reverse Proxy
+continues routing
+without changing
+how users connect.
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Reverse proxies simplify access to self-hosted applications by providing a single,
+organized gateway. They improve usability, centralize request handling and prepare the
+homelab for secure growth as additional services are deployed.
+</p>
+
+<p>Next, Monitoring &amp; Maintenance <a href="./11-monitoring-maintenance.html">&gt;&gt;</a></p>
+<p>Prev, Self-Hosting Services <a href="./9-self-hosting-services.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

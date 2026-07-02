@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Downloaders — Download managers</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>Download managers</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        yt-dlp and gallery-dl know <em>specific sites</em>. A download manager doesn't care what the file is &mdash; it
+        cares that the download <strong>finishes</strong>. Its whole job is the unglamorous stuff: resume after your
+        Wi-Fi blinks, split one file across many connections to go faster, and queue a hundred links so you can walk
+        away.
+    </p>
+
+    <h3>Terminal (all free, all scriptable)</h3>
+    <table border="1" cellpadding="10">
+        <tr><th>Tool</th><th>For</th><th>Starter</th></tr>
+        <tr><td><code>wget</code></td><td>simple grabs, mirroring a whole site</td><td><code>wget -r -np URL</code></td></tr>
+        <tr><td><code>curl</code></td><td>scripted transfers, APIs</td><td><code>curl -O URL</code></td></tr>
+        <tr><td bgcolor="lightgreen"><code>aria2</code></td><td>the fast one &mdash; multi-connection, torrents, metalink</td><td><code>aria2c -x16 -s16 URL</code></td></tr>
+    </table>
+
+    <h3>GUI (free, cross-platform)</h3>
+    <table border="1" cellpadding="10">
+        <tr><th>Tool</th><th>Note</th></tr>
+        <tr><td>JDownloader</td><td>link grabber; pulls whole pages of links, handles file hosters</td></tr>
+        <tr><td>Free Download Manager (FDM)</td><td>clean all-rounder, Windows / macOS / Linux / Android</td></tr>
+        <tr><td>Motrix</td><td>a friendly face on aria2 (MIT-licensed)</td></tr>
+        <tr><td>Persepolis</td><td>another aria2 front-end (GPL)</td></tr>
+        <tr><td>qBittorrent</td><td>torrents, free, genuinely no ads</td></tr>
+    </table>
+
+    <h3>Android</h3>
+    <table border="1" cellpadding="10">
+        <tr><th>App</th><th>Note</th></tr>
+        <tr><td>Seal</td><td>yt-dlp with a touch UI &mdash; free, open-source</td></tr>
+        <tr><td>NewPipe</td><td>lightweight YouTube client with downloads &mdash; free, open-source</td></tr>
+        <tr><td>aria2 via Termux</td><td>the terminal stack, on your phone &mdash; free</td></tr>
+        <tr><td bgcolor="#fff7ed">ADM (Advanced Download Manager)</td><td>free with ads; a paid "Pro" removes them <strong>(paid tier)</strong></td></tr>
+        <tr><td bgcolor="#fff7ed">1DM</td><td>free; "1DM+" is a <strong>paid</strong> unlock</td></tr>
+    </table>
+
+    <h3>A word on the famous paid one</h3>
+    <p>
+        On Windows, <strong>IDM (Internet Download Manager)</strong> is the name everyone knows &mdash; and it's
+        <strong>paid</strong> (shareware, a one-off licence). It's fine software, but the free stack above
+        (aria2 / FDM / JDownloader) covers the same ground &mdash; resume, acceleration, queues &mdash; without the
+        cheque. This section deliberately stays on the free/open-source side; IDM is mentioned only so you know the free
+        tools aren't a downgrade.
+    </p>
+
+    <p>
+        <strong>Rule of thumb:</strong> reach for a manager when the <em>file</em> is the problem (huge, flaky link,
+        many at once), and for yt-dlp / gallery-dl when the <em>site</em> is the problem.
+    </p>
+
+    <p>
+        Next, a legend. <a href="./fitgirl-repacks.html">&gt;&gt;</a>
+    </p>
+    <p>
+        Prev, browser extensions. <a href="./browser-extensions.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Labs - Monitoring & Maintenance</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Monitoring &amp; Maintenance</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+A homelab is not a "set it and forget it" system. Services require updates, storage
+needs to be monitored and failures should be detected before they become outages.
+Monitoring provides visibility, while maintenance keeps the infrastructure reliable.
+</p>
+
+<hr>
+
+<h3>What Should You Monitor?</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Component</th><th>Examples</th></tr>
+<tr><td>CPU</td><td>Utilization, temperature.</td></tr>
+<tr><td>Memory</td><td>Usage and available RAM.</td></tr>
+<tr><td>Storage</td><td>Capacity, SMART health, errors.</td></tr>
+<tr><td>Network</td><td>Bandwidth, latency, availability.</td></tr>
+<tr><td>Services</td><td>Running status and response time.</td></tr>
+</table>
+
+<hr>
+
+<h3>Monitoring Flow</h3>
+
+<pre><code>Server
+   │
+Collect Metrics
+   │
+Dashboard
+   │
+Alert
+   │
+Fix Problem
+</code></pre>
+
+<hr>
+
+<h3>Routine Maintenance</h3>
+
+<ul>
+<li>Install security and software updates.</li>
+<li>Review storage usage.</li>
+<li>Check backup jobs.</li>
+<li>Verify system logs.</li>
+<li>Remove unused services.</li>
+<li>Test recovery procedures.</li>
+</ul>
+
+<hr>
+
+<h3>Maintenance Schedule</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Task</th><th>Suggested Frequency</th></tr>
+<tr><td>Review dashboards</td><td>Weekly</td></tr>
+<tr><td>Install updates</td><td>Monthly</td></tr>
+<tr><td>Verify backups</td><td>Monthly</td></tr>
+<tr><td>Check drive health</td><td>Monthly</td></tr>
+<tr><td>Clean obsolete data</td><td>Quarterly</td></tr>
+</table>
+
+<hr>
+
+<h3>Logs</h3>
+
+<p>
+Application and system logs explain what happened before, during and after an issue.
+Rather than deleting logs immediately, retain them long enough to investigate problems
+and identify recurring failures.
+</p>
+
+<pre><code>Service
+   │
+Logs
+   │
+Analysis
+   │
+Resolution
+</code></pre>
+
+<hr>
+
+<h3>Alerts</h3>
+
+<p>
+Monitoring becomes more valuable when it notifies you of meaningful events instead of
+requiring constant manual observation.
+</p>
+
+<ul>
+<li>Disk almost full.</li>
+<li>Service unavailable.</li>
+<li>Backup failed.</li>
+<li>High CPU temperature.</li>
+<li>Network disconnected.</li>
+</ul>
+
+<hr>
+
+<h3>Our Running Homelab</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Reverse Proxy
+    │
+Docker Services
+    │
+Monitoring
+    │
+Dashboard & Alerts
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Monitoring helps you understand the health of your homelab, while maintenance keeps it
+dependable over time. Small, regular maintenance tasks are easier than recovering from
+major failures caused by neglect.
+</p>
+
+<p>Next, Disaster Recovery <a href="./12-disaster-recovery.html">&gt;&gt;</a></p>
+<p>Prev, Reverse Proxies <a href="./10-reverse-proxies.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

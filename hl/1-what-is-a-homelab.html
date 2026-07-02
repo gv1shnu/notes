@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - What is a Homelab?</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>What is a Homelab?</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+A <strong>homelab</strong> is a personal computing environment used for learning,
+experimentation and hosting services. Instead of renting every service from a cloud
+provider, you build and operate your own infrastructure using hardware that you own.
+</p>
+
+<p>
+A homelab can be as small as an old desktop computer or as large as several dedicated
+servers connected through a home network. The objective is not size—it is control,
+learning and flexibility.
+</p>
+
+<hr>
+
+<h3>A Typical Homelab</h3>
+
+<pre><code>                 Internet
+                     │
+                ISP Router
+                     │
+              ───────────────
+                     │
+               Home Server
+                     │
+      ┌──────────────┼──────────────┐
+      │              │              │
+ Virtual Machines  Containers     Storage
+      │              │              │
+ Nextcloud        Jellyfin      Backups
+</code></pre>
+
+<p>
+This architecture will be expanded throughout the course as new technologies are
+introduced.
+</p>
+
+<hr>
+
+<h3>Why Build a Homelab?</h3>
+
+<ul>
+<li>Learn system administration without affecting production systems.</li>
+<li>Experiment with operating systems and networking.</li>
+<li>Host personal services under your control.</li>
+<li>Centralize files, media and backups.</li>
+<li>Prepare an environment for automation and local AI.</li>
+</ul>
+
+<hr>
+
+<h3>Common Uses</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Category</th><th>Examples</th></tr>
+<tr><td>Learning</td><td>Linux, Docker, Kubernetes, networking.</td></tr>
+<tr><td>Development</td><td>Testing applications before deployment.</td></tr>
+<tr><td>Media</td><td>Streaming music, films and photos.</td></tr>
+<tr><td>Storage</td><td>Personal cloud, NAS and backups.</td></tr>
+<tr><td>Automation</td><td>Scheduled tasks and home automation.</td></tr>
+</table>
+
+<hr>
+
+<h3>Homelab vs Cloud</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Homelab</th><th>Cloud</th></tr>
+<tr><td>You manage the infrastructure.</td><td>Provider manages the infrastructure.</td></tr>
+<tr><td>Higher initial hardware cost.</td><td>Recurring subscription costs.</td></tr>
+<tr><td>Complete control.</td><td>Convenience and scalability.</td></tr>
+</table>
+
+<hr>
+
+<h3>What You Do Not Need</h3>
+
+<ul>
+<li>An enterprise server rack.</li>
+<li>Expensive networking equipment.</li>
+<li>Dozens of virtual machines.</li>
+<li>Professional experience.</li>
+</ul>
+
+<p>
+Many successful homelabs begin with a single computer and grow gradually as requirements
+change.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A homelab is a platform for experimentation and self-hosting. It allows you to learn
+modern infrastructure technologies safely while building services that you control. In
+the next chapter, we will choose suitable hardware and understand the trade-offs between
+different platforms.
+</p>
+
+<p>
+Next, Choosing Hardware <a href="./2-choosing-hardware.html">&gt;&gt;</a>
+</p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

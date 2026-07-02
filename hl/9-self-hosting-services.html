@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Self-Hosting Services</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Self-Hosting Services</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Building a server is only the beginning. The real value of a homelab comes from the
+services it provides. Self-hosting means running applications on infrastructure that
+you control instead of relying entirely on third-party providers.
+</p>
+
+<hr>
+
+<h3>What Can You Self-Host?</h3>
+
+<pre><code>Home Server
+      │
+Docker
+      │
+├── Personal Cloud
+├── Media
+├── Password Manager
+├── Monitoring
+├── Automation
+└── Dashboards
+</code></pre>
+
+<p>
+Most modern self-hosted applications are distributed as containers, making deployment
+and updates straightforward.
+</p>
+
+<hr>
+
+<h3>Common Categories</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Category</th><th>Purpose</th></tr>
+<tr><td>Personal Cloud</td><td>Store and synchronize files.</td></tr>
+<tr><td>Media Server</td><td>Stream music, movies and TV shows.</td></tr>
+<tr><td>Password Manager</td><td>Manage credentials securely.</td></tr>
+<tr><td>Document Management</td><td>Archive and search scanned documents.</td></tr>
+<tr><td>Monitoring</td><td>Observe system health and availability.</td></tr>
+<tr><td>Automation</td><td>Connect applications and automate tasks.</td></tr>
+</table>
+
+<hr>
+
+<h3>A Typical Service Stack</h3>
+
+<pre><code>Users
+   │
+Reverse Proxy
+   │
+───────────────
+│ Cloud       │
+│ Media       │
+│ Passwords   │
+│ Automation  │
+│ Monitoring  │
+───────────────
+</code></pre>
+
+<p>
+Applications remain independent while sharing the same underlying server.
+</p>
+
+<hr>
+
+<h3>Why Self-Host?</h3>
+
+<ul>
+<li>Centralize your personal services.</li>
+<li>Customize applications to your workflow.</li>
+<li>Reduce dependence on multiple providers.</li>
+<li>Learn modern infrastructure technologies.</li>
+<li>Create a foundation for future automation and AI.</li>
+</ul>
+
+<hr>
+
+<h3>Trade-offs</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Benefit</th><th>Responsibility</th></tr>
+<tr><td>Greater control.</td><td>Maintain updates.</td></tr>
+<tr><td>Custom configuration.</td><td>Troubleshoot issues.</td></tr>
+<tr><td>Local ownership.</td><td>Monitor uptime and backups.</td></tr>
+</table>
+
+<hr>
+
+<h3>Our Running Homelab</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Home Server
+    │
+Docker
+    │
+├── Personal Cloud
+├── Media Server
+├── Password Manager
+├── Dashboard
+└── Monitoring
+</code></pre>
+
+<p>
+In the next chapter these services will be placed behind a reverse proxy so they can
+be reached through simple, memorable addresses.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Self-hosting transforms a server into a useful platform. Rather than installing
+applications directly on your personal computer, services are centralized, easier to
+maintain and accessible to multiple devices across your network.
+</p>
+
+<p>Next, Reverse Proxies <a href="./10-reverse-proxies.html">&gt;&gt;</a></p>
+<p>Prev, Network Attached Storage <a href="./8-network-attached-storage.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

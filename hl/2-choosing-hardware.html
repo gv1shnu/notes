@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Choosing Hardware</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Choosing Hardware</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+One of the biggest misconceptions about homelabs is that they require expensive enterprise
+servers. In reality, the best hardware is the hardware that satisfies your requirements
+while remaining affordable, reliable and efficient.
+</p>
+
+<hr>
+
+<h3>Start With Your Goal</h3>
+
+<p>Choose hardware based on what you intend to run.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Goal</th><th>Suggested Hardware</th></tr>
+<tr><td>Learning Linux</td><td>Old laptop or desktop.</td></tr>
+<tr><td>Docker services</td><td>Mini PC.</td></tr>
+<tr><td>Virtual machines</td><td>Modern desktop with 32 GB+ RAM.</td></tr>
+<tr><td>Media server</td><td>CPU with hardware video encoding support.</td></tr>
+<tr><td>Large storage</td><td>Desktop with multiple drive bays.</td></tr>
+</table>
+
+<hr>
+
+<h3>Common Platforms</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Platform</th><th>Advantages</th><th>Limitations</th></tr>
+<tr><td>Repurposed PC</td><td>Low cost, easy to upgrade.</td><td>Higher power usage.</td></tr>
+<tr><td>Mini PC</td><td>Quiet, efficient, compact.</td><td>Limited expansion.</td></tr>
+<tr><td>Rack Server</td><td>Enterprise features.</td><td>Noise, heat and power consumption.</td></tr>
+<tr><td>Single-board Computer</td><td>Very efficient.</td><td>Limited performance.</td></tr>
+</table>
+
+<hr>
+
+<h3>CPU</h3>
+
+<p>
+Virtualization and containers benefit from multiple CPU cores. Hardware virtualization
+extensions (Intel VT-x / AMD-V) should be enabled in firmware when available.
+</p>
+
+<pre><code>More Services
+      ↓
+More CPU Cores
+</code></pre>
+
+<hr>
+
+<h3>Memory (RAM)</h3>
+
+<p>
+RAM is usually exhausted before CPU resources in a growing homelab.
+</p>
+
+<ul>
+<li>8 GB – Learning.</li>
+<li>16 GB – Small homelab.</li>
+<li>32 GB – Comfortable virtualization.</li>
+<li>64 GB+ – Multiple virtual machines and services.</li>
+</ul>
+
+<hr>
+
+<h3>Storage</h3>
+
+<p>
+Separate the operating system from large data whenever possible.</p>
+
+<pre><code>SSD
+ └── Operating System
+ └── Virtual Machines
+
+HDD
+ └── Media
+ └── Backups
+ └── Archives
+</code></pre>
+
+<hr>
+
+<h3>Networking</h3>
+
+<p>
+A reliable Gigabit Ethernet connection is recommended for servers. Wi-Fi is suitable
+for experimentation but wired networking generally offers lower latency and greater
+stability.
+</p>
+
+<hr>
+
+<h3>Power & Noise</h3>
+
+<p>
+Remember that a homelab may run continuously.</p>
+
+<ul>
+<li>Lower power usage reduces operating cost.</li>
+<li>Quiet systems are easier to live with.</li>
+<li>Good airflow extends component lifespan.</li>
+</ul>
+
+<hr>
+
+<h3>Upgrade Gradually</h3>
+
+<pre><code>Old PC
+   ↓
+Add RAM
+   ↓
+Install SSD
+   ↓
+Add Storage
+   ↓
+Expand Services
+</code></pre>
+
+<p>
+Avoid purchasing hardware for future requirements that may never arise. Upgrade when
+your workload demands it.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+The best homelab hardware is the system that meets your current needs while leaving room
+to grow. Begin with modest equipment, learn the fundamentals and expand your
+infrastructure as your experience and requirements increase.
+</p>
+
+<p>Next, Storage Planning <a href="./3-storage-planning.html">&gt;&gt;</a></p>
+<p>Prev, What is a Homelab? <a href="./1-what-is-a-homelab.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Personal Computing - Voice Interfaces</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Voice Interfaces</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Typing is not always the most natural way to interact with a computer. Voice interfaces
+allow a personal AI assistant to receive spoken commands, hold conversations and respond
+using synthesized speech. Combined with the language model, memory and tools developed
+earlier in this course, voice becomes another input and output channel rather than a
+separate system.
+</p>
+
+<hr>
+
+<h3>The Voice Pipeline</h3>
+
+<pre><code>Your Voice
+     │
+Speech Recognition
+     │
+Language Model
+     │
+Reasoning
+     │
+Tools & Memory
+     │
+Text Response
+     │
+Speech Synthesis
+     │
+Spoken Reply
+</code></pre>
+
+<p>
+Each stage performs a specific task before passing information to the next component.
+</p>
+
+<hr>
+
+<h3>Core Components</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>Wake Word (optional)</td><td>Activates the assistant.</td></tr>
+<tr><td>Speech Recognition (STT)</td><td>Converts speech into text.</td></tr>
+<tr><td>Language Model</td><td>Reasons about the request.</td></tr>
+<tr><td>Tool Layer</td><td>Performs approved actions.</td></tr>
+<tr><td>Speech Synthesis (TTS)</td><td>Converts text into speech.</td></tr>
+</table>
+
+<hr>
+
+<h3>Example Conversation</h3>
+
+<pre><code>User:
+"Summarize today's research."
+
+        │
+
+Speech → Text
+
+        │
+
+AI Assistant
+
+        │
+
+Knowledge Base
+
+        │
+
+Summary
+
+        │
+
+Text → Speech
+</code></pre>
+
+<hr>
+
+<h3>Beyond Simple Commands</h3>
+
+<p>
+A capable assistant maintains conversational context instead of treating every spoken
+sentence as an isolated command.
+</p>
+
+<pre><code>User:
+"Open my virtualization notes."
+
+User:
+"Summarize the third section."
+
+User:
+"Create a task list from that."
+</code></pre>
+
+<p>
+The assistant understands that "that" refers to the previously opened document.
+</p>
+
+<hr>
+
+<h3>Where Voice Is Useful</h3>
+
+<ul>
+<li>Hands-free operation.</li>
+<li>Accessibility.</li>
+<li>Quick searches.</li>
+<li>Managing the homelab while away from the keyboard.</li>
+<li>Daily briefings and reminders.</li>
+</ul>
+
+<hr>
+
+<h3>Privacy Considerations</h3>
+
+<ul>
+<li>Process speech locally whenever practical.</li>
+<li>Avoid continuously recording conversations.</li>
+<li>Clearly indicate when the assistant is listening.</li>
+<li>Require confirmation for sensitive actions.</li>
+</ul>
+
+<hr>
+
+<h3>Our Assistant Architecture</h3>
+
+<pre><code>Voice
+Text
+Images
+    │
+    ▼
+AI Assistant
+    │
+Language Model
+    │
+Memory + Tools
+    │
+Actions
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Voice is simply another interface to the same intelligent system. By combining speech
+recognition, reasoning, memory and speech synthesis, a personal AI assistant becomes
+more natural to use without sacrificing transparency or user control.
+</p>
+
+<p>Next, Managing Your Homelab <a href="./10-managing-your-homelab.html">&gt;&gt;</a></p>
+<p>Prev, Computer Vision <a href="./8-computer-vision.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

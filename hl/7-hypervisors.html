@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Hypervisors</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Hypervisors</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+A hypervisor is software that creates and manages virtual machines. It controls how
+physical hardware is shared between multiple guest operating systems while keeping them
+isolated from one another. Every virtualization platform relies on a hypervisor.
+</p>
+
+<hr>
+
+<h3>Where the Hypervisor Fits</h3>
+
+<pre><code>Applications
+      │
+Guest Operating Systems
+      │
+──────────────
+ Hypervisor
+──────────────
+      │
+Physical Hardware
+</code></pre>
+
+<p>
+The hypervisor acts as the layer between hardware and virtual machines.
+</p>
+
+<hr>
+
+<h3>Type 1 vs Type 2</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Type 1</th><th>Type 2</th></tr>
+<tr><td>Runs directly on hardware.</td><td>Runs on an existing operating system.</td></tr>
+<tr><td>Common in servers.</td><td>Common on desktops and laptops.</td></tr>
+<tr><td>Better performance and scalability.</td><td>Easier to install for learning.</td></tr>
+</table>
+
+<pre><code>Type 1
+
+Hardware
+   │
+Hypervisor
+   │
+VMs
+
+
+Type 2
+
+Hardware
+   │
+Host OS
+   │
+Hypervisor
+   │
+VMs
+</code></pre>
+
+<hr>
+
+<h3>Common Hypervisors</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Platform</th><th>Typical Use</th></tr>
+<tr><td>Proxmox VE</td><td>Dedicated homelab servers.</td></tr>
+<tr><td>VMware Workstation / Fusion</td><td>Desktop virtualization.</td></tr>
+<tr><td>Hyper-V</td><td>Windows hosts.</td></tr>
+<tr><td>KVM</td><td>Linux virtualization.</td></tr>
+<tr><td>VirtualBox</td><td>Learning and experimentation.</td></tr>
+</table>
+
+<hr>
+
+<h3>Resource Management</h3>
+
+<p>
+The hypervisor schedules CPU time, allocates memory, presents virtual hardware and
+manages virtual storage for every guest operating system.
+</p>
+
+<pre><code>CPU
+RAM
+Storage
+Network
+     │
+Hypervisor
+     │
+VM1 VM2 VM3
+</code></pre>
+
+<hr>
+
+<h3>Snapshots and Cloning</h3>
+
+<p>
+Many hypervisors allow virtual machines to be cloned or restored from snapshots.
+These features reduce deployment time and simplify experimentation.
+</p>
+
+<pre><code>Create VM
+    ↓
+Snapshot
+    ↓
+Experiment
+    ↓
+Restore
+</code></pre>
+
+<hr>
+
+<h3>Choosing a Hypervisor</h3>
+
+<ul>
+<li>Desktop learning → Type 2 platforms.</li>
+<li>Dedicated server → Type 1 platforms.</li>
+<li>Many virtual machines → Enterprise-style hypervisors.</li>
+<li>Occasional testing → Simpler desktop solutions.</li>
+</ul>
+
+<hr>
+
+<h3>The Running Homelab</h3>
+
+<pre><code>Internet
+     │
+Router
+     │
+Home Server
+     │
+Hypervisor
+     │
+├── Ubuntu Server
+├── Windows
+└── Kali Linux
+</code></pre>
+
+<p>
+In the next chapter we will begin moving beyond virtual machines by introducing
+centralized storage using a Network Attached Storage (NAS).
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Hypervisors make virtualization possible by sharing hardware efficiently while keeping
+virtual machines isolated. Choosing the appropriate platform depends on whether the
+system is intended for experimentation, daily development or long-term server hosting.
+</p>
+
+<p>Next, Network Attached Storage <a href="./8-network-attached-storage.html">&gt;&gt;</a></p>
+<p>Prev, Containers <a href="./6-containers.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

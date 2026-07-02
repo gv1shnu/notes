@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Downloaders — FitGirl repacks</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>FitGirl repacks</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        Every scene has a legend, and in the world of "that game is 90 GB and I have a 100 GB SSD," the legend is
+        <strong>FitGirl</strong> &mdash; a <em>repacker</em>. The job: take a game and squeeze the install down to a
+        fraction of its size, so a 70 GB monster arrives as a ~20 GB download. It is, unapologetically, a compression
+        magic show, and it deserves a page here on the strength of the engineering alone.
+    </p>
+
+    <blockquote>
+        <strong>Let's be adults about it up top:</strong> these are <strong>pirated</strong> games &mdash; cracked
+        copies of software someone else paid engineers to build. This page is a museum plaque, not a menu: no links, no
+        how-to, no shopping list. We're here to gawk at the compression, and to say the obvious &mdash; if a game is
+        worth an hour of your CPU screaming, it's worth buying when you can. Developers don't eat compression ratios.
+    </blockquote>
+
+    <h3>The actual wizardry (this is the fun part)</h3>
+    <p>
+        How do you make a game <em>half</em> its size losslessly, when Steam already zipped it? Games are full of data
+        that's only <em>lightly</em> squashed &mdash; audio, textures, video &mdash; plus mountains of repetition. The
+        trick is roughly:
+    </p>
+    <table border="1" cellpadding="10">
+        <tr><th>Move</th><th>What it buys</th></tr>
+        <tr><td>Precompression</td><td>undo the game's own weak compression first, so a <em>real</em> compressor can see the raw redundancy underneath</td></tr>
+        <tr><td bgcolor="lightgreen">Deduplication</td><td>the same asset appears a hundred times &mdash; store it once, reference it everywhere</td></tr>
+        <tr><td>Heavy LZMA / delta packing</td><td>then crush the result with a slow, aggressive compressor tuned for size over speed</td></tr>
+    </table>
+    <p>
+        The catch is conservation of misery: all that size you didn't download, you pay back in <strong>CPU time at
+        install</strong>. The bytes have to be reconstructed from their mathematical dust, and your processor does the
+        rebuilding.
+    </p>
+
+    <h3>The experience, honestly</h3>
+    <ul>
+        <li><strong>"Selective download"</strong> &mdash; skip the nine language packs you'll never hear. Genuinely thoughtful.</li>
+        <li><strong>The install bar</strong> &mdash; a progress meter that has induced more existential dread than any horror game it's unpacking. It says 43%. It has said 43% for eleven minutes. It is lying, or it isn't. You'll find out together.</li>
+        <li><strong>Your fans</strong> &mdash; achieving liftoff. The running joke writes itself: FitGirl is single-handedly responsible for a generation deciding it was finally time to upgrade the CPU.</li>
+    </ul>
+
+    <p>
+        So: admire the compression, tip your hat to a genuinely clever pipeline, and remember the plaque. The math is
+        beautiful; the legality is not. Buy the games you love &mdash; the fans will thank you, and so will the people
+        who made them.
+    </p>
+
+    <p>
+        Back to <a href="./index.html">contents</a>. <a href="./index.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

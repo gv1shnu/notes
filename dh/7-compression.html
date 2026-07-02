@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Compression & Archiving</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Compression &amp; Archiving</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Compression reduces the amount of storage required by data, while archiving combines
+multiple files into a single container. Although these concepts are closely related,
+they solve different problems and are often confused.
+</p>
+
+<hr>
+
+<h3>Compression vs Archiving</h3>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Compression</th>
+<th>Archiving</th>
+</tr>
+<tr>
+<td>Reduces file size.</td>
+<td>Combines multiple files.</td>
+</tr>
+<tr>
+<td>May use CPU time.</td>
+<td>Improves organization.</td>
+</tr>
+<tr>
+<td>Can be applied to a single file.</td>
+<td>Usually stores directories or collections.</td>
+</tr>
+</table>
+
+<pre><code>Files
+  │
+Archive
+  ▼
+archive.tar
+
+archive.tar
+  │
+Compression
+  ▼
+archive.tar.zst
+</code></pre>
+
+<hr>
+
+<h3>Lossless vs Lossy Compression</h3>
+
+<p>
+Compression algorithms are generally divided into two categories.
+</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Lossless</th><th>Lossy</th></tr>
+<tr><td>Original data is recovered perfectly.</td><td>Some information is discarded.</td></tr>
+<tr><td>ZIP, 7z, Zstandard, Gzip</td><td>JPEG, MP3, AAC, H.264</td></tr>
+</table>
+
+<p>
+Archives and backups should normally use <strong>lossless</strong> compression.
+</p>
+
+<hr>
+
+<h3>When Compression Helps</h3>
+
+<ul>
+<li>Text files</li>
+<li>Source code</li>
+<li>CSV files</li>
+<li>Log files</li>
+<li>Virtual machine exports</li>
+<li>Database dumps</li>
+</ul>
+
+<pre><code>100 MB Text
+
+↓
+
+Compress
+
+↓
+
+18 MB Archive
+</code></pre>
+
+<hr>
+
+<h3>When Compression Does Not Help</h3>
+
+<p>
+Many modern media formats are already compressed.
+</p>
+
+<ul>
+<li>JPEG images</li>
+<li>MP3 and AAC audio</li>
+<li>MP4 videos</li>
+<li>Most game assets</li>
+</ul>
+
+<pre><code>movie.mp4
+
+↓
+
+ZIP
+
+↓
+
+Almost No Change
+</code></pre>
+
+<p>
+Attempting to recompress these files often wastes CPU time while saving little storage.
+</p>
+
+<hr>
+
+<h3>Common Archive Formats</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Format</th><th>Typical Use</th></tr>
+<tr><td>ZIP</td><td>Universal compatibility.</td></tr>
+<tr><td>7z</td><td>High compression ratios.</td></tr>
+<tr><td>TAR</td><td>Archive multiple files (commonly on Unix-like systems).</td></tr>
+<tr><td>TAR + Zstandard</td><td>Fast compression and decompression.</td></tr>
+<tr><td>RAR</td><td>Widely used but proprietary.</td></tr>
+</table>
+
+<hr>
+
+<h3>Compression Trade-offs</h3>
+
+<pre><code>Higher Compression
+        ▲
+        │
+ Smaller Files
+        │
+More CPU Time
+</code></pre>
+
+<p>
+Maximum compression is not always the best choice. Faster algorithms often provide a
+better balance between storage savings and processing time.
+</p>
+
+<hr>
+
+<h3>Archive Organization</h3>
+
+<p>
+Instead of storing thousands of unrelated files in one archive, create archives with a
+clear purpose.
+</p>
+
+<pre><code>Archives/
+
+├── Photos_2025.7z
+├── Tax_Records.zip
+├── Thesis_Backup.tar.zst
+└── Drivers_Collection.zip
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Compression reduces storage requirements, while archiving improves organization.
+Choosing the appropriate format depends on the type of data, desired compatibility,
+performance requirements and long-term preservation goals.
+</p>
+
+<p>Next, Storage Media <a href="./8-storage-media.html">&gt;&gt;</a></p>
+<p>Prev, Duplicates &amp; Deduplication <a href="./6-duplicates.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

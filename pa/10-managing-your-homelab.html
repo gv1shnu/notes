@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Personal Computing - Managing Your Homelab</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Managing Your Homelab</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+The previous course explained how to build a homelab. This chapter focuses on how a
+personal AI assistant can operate alongside that infrastructure. Rather than replacing
+administrative judgment, the assistant observes the environment, gathers information,
+suggests actions and automates routine operational tasks.
+</p>
+
+<hr>
+
+<h3>The AI Operations Assistant</h3>
+
+<pre><code>
+            You
+             │
+             ▼
+      AI Operations Assistant
+             │
+ ┌───────────┼────────────┐
+ │           │            │
+ Hypervisor Containers  Storage
+ │           │            │
+ Logs      Services    Network
+</code></pre>
+
+<p>
+The assistant becomes a single interface for understanding the overall health of the
+environment.
+</p>
+
+<hr>
+
+<h3>Typical Questions</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>You Ask</th><th>Assistant Action</th></tr>
+<tr><td>Which VM uses the most RAM?</td><td>Collects and summarizes metrics.</td></tr>
+<tr><td>Why is storage almost full?</td><td>Analyzes disks and large files.</td></tr>
+<tr><td>Which services are offline?</td><td>Checks service status.</td></tr>
+<tr><td>Did last night's backup succeed?</td><td>Reviews backup logs.</td></tr>
+<tr><td>Summarize today's alerts.</td><td>Aggregates monitoring events.</td></tr>
+</table>
+
+<hr>
+
+<h3>Monitoring Workflow</h3>
+
+<pre><code>
+Metrics
+Logs
+Alerts
+    │
+    ▼
+AI Analysis
+    │
+Prioritize
+Explain
+Recommend
+    │
+Daily Report
+</code></pre>
+
+<hr>
+
+<h3>Routine Administrative Tasks</h3>
+
+<ul>
+<li>Review resource utilization.</li>
+<li>Detect failed services.</li>
+<li>Summarize system logs.</li>
+<li>Check storage growth.</li>
+<li>Verify backups.</li>
+<li>Recommend updates.</li>
+</ul>
+
+<hr>
+
+<h3>Automation With Approval</h3>
+
+<p>
+Low-risk tasks can execute automatically, while operational changes that affect running
+services should require confirmation.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Automatic</th><th>Confirmation Required</th></tr>
+<tr><td>Collect metrics.</td><td>Restart virtual machines.</td></tr>
+<tr><td>Generate reports.</td><td>Apply updates.</td></tr>
+<tr><td>Check backups.</td><td>Delete snapshots.</td></tr>
+<tr><td>Search logs.</td><td>Modify firewall rules.</td></tr>
+</table>
+
+<hr>
+
+<h3>Daily Homelab Briefing</h3>
+
+<pre><code>
+07:00
+
+CPU: Normal
+Memory: 63%
+Storage: 81%
+Backups: Successful
+Updates: 3 Available
+Alerts: None Critical
+</code></pre>
+
+<p>
+Instead of opening multiple dashboards, the assistant provides a concise operational
+summary with links to relevant details when needed.
+</p>
+
+<hr>
+
+<h3>Updated Assistant Architecture</h3>
+
+<pre><code>
+                 You
+                  │
+                  ▼
+            AI Assistant
+                  │
+      ┌───────────┼────────────┐
+      │           │            │
+ Filesystem  Knowledge Base  Homelab
+      │           │            │
+      └───────────┼────────────┘
+                  ▼
+          Recommendations
+          & Approved Actions
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A personal AI assistant is an effective operations companion. It continuously gathers
+information from the homelab, explains what is happening, highlights potential problems
+and automates repetitive administrative work while leaving critical decisions under
+human control.
+</p>
+
+<p>Next, Safety &amp; Permissions <a href="./11-safety-and-permissions.html">&gt;&gt;</a></p>
+<p>Prev, Voice Interfaces <a href="./9-voice-interface.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

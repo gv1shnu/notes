@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Downloaders — yt-dlp</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>yt-dlp</h2>
+    <p><strong>Difficulty:</strong> Easy</p>
+
+    <p>
+        The one tool to install first. <strong>yt-dlp</strong> is the maintained successor to youtube-dl, and despite
+        the name it pulls video and audio from <strong>a thousand-plus sites</strong> &mdash; not just YouTube, but
+        Vimeo, Twitch, SoundCloud, most news sites, and anywhere a &lt;video&gt; tag hides. It's a single command that
+        has quietly replaced a dozen sketchy "download this video" websites.
+    </p>
+
+    <h3>Install</h3>
+    <p>
+        It's one binary or one pip install, on every OS &mdash; Windows, macOS, Linux, and Android (via Termux).
+    </p>
+    <pre><code><span style="color:#888;"># pick one</span>
+pip install yt-dlp
+brew install yt-dlp        <span style="color:#888;"># macOS</span>
+winget install yt-dlp      <span style="color:#888;"># Windows</span>
+sudo apt install yt-dlp    <span style="color:#888;"># Debian/Ubuntu</span></code></pre>
+    <p>
+        Install <strong>ffmpeg</strong> alongside it &mdash; yt-dlp uses it to merge separate video/audio streams and to
+        convert formats. Without ffmpeg you'll get whichever single stream already exists, which is usually not the good
+        one.
+    </p>
+
+    <h3>The commands worth memorising</h3>
+    <pre><code>yt-dlp URL                          <span style="color:#888;"># grab the best quality it can</span>
+yt-dlp -F URL                       <span style="color:#888;"># list every available format first</span>
+yt-dlp -f "bv*+ba/b" URL            <span style="color:#888;"># best video + best audio, merged</span>
+yt-dlp -x --audio-format mp3 URL    <span style="color:#888;"># audio only, as mp3</span>
+yt-dlp -S "res:1080,ext:mp4" URL    <span style="color:#888;"># prefer 1080p mp4</span>
+yt-dlp -o "%(title)s.%(ext)s" URL   <span style="color:#888;"># name the file sensibly</span></code></pre>
+
+    <h3>Why it beats the website buttons</h3>
+    <table border="1" cellpadding="10">
+        <tr><th>Feature</th><th>What it does</th></tr>
+        <tr><td>Playlists / channels</td><td>hand it a playlist URL, it grabs the lot</td></tr>
+        <tr><td bgcolor="lightgreen"><code>--download-archive</code></td><td>records what it fetched, so re-running skips duplicates &mdash; ideal for "subscribe to a channel"</td></tr>
+        <tr><td><code>--embed-subs</code></td><td>bakes subtitles into the file</td></tr>
+        <tr><td><code>--sponsorblock-remove all</code></td><td>strips sponsor segments on the way in</td></tr>
+    </table>
+
+    <p>
+        <strong>The catch:</strong> sites change their guts constantly, and a download that worked yesterday can break
+        today. The fix is always the same &mdash; update: <code>yt-dlp -U</code> (or re-pip). And the obvious one:
+        download what you have the right to. yt-dlp is a faithful pipe; where the water goes is on you.
+    </p>
+
+    <p>Free, Unlicense (public domain). Runs anywhere.</p>
+
+    <p>
+        Next, gallery-dl for images. <a href="./gallery-dl.html">&gt;&gt;</a>
+    </p>
+    <p>
+        Back to <a href="./index.html">contents</a>. <a href="./index.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

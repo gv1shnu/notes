@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Network Attached Storage</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Network Attached Storage (NAS)</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+As a homelab grows, storing files on individual computers becomes increasingly difficult
+to manage. A <strong>Network Attached Storage (NAS)</strong> system provides centralized
+storage that can be accessed by multiple devices over the local network.
+</p>
+
+<hr>
+
+<h3>What is a NAS?</h3>
+
+<pre><code>Desktop
+     │
+Laptop ├────► NAS ◄──── Phone
+     │
+Media Player
+</code></pre>
+
+<p>
+Instead of copying files between devices, they are stored in one location and shared
+across the network.
+</p>
+
+<hr>
+
+<h3>Why Use a NAS?</h3>
+
+<ul>
+<li>Centralize documents, media and backups.</li>
+<li>Reduce duplicate files.</li>
+<li>Share files between users and devices.</li>
+<li>Simplify backup management.</li>
+<li>Provide storage for virtual machines and containers.</li>
+</ul>
+
+<hr>
+
+<h3>Typical NAS Contents</h3>
+
+<pre><code>NAS
+
+├── Documents
+├── Media
+├── Photos
+├── Projects
+├── Backups
+├── VirtualMachines
+└── Shared
+</code></pre>
+
+<hr>
+
+<h3>Access Protocols</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Protocol</th><th>Typical Use</th></tr>
+<tr><td>SMB</td><td>Windows and mixed environments.</td></tr>
+<tr><td>NFS</td><td>Linux and Unix systems.</td></tr>
+<tr><td>AFP</td><td>Legacy macOS environments.</td></tr>
+<tr><td>FTP/SFTP</td><td>Remote file transfer.</td></tr>
+</table>
+
+<hr>
+
+<h3>NAS Is Not a Backup</h3>
+
+<p>
+A NAS improves storage management, but it does not automatically protect against
+accidental deletion, hardware failure or disasters.
+</p>
+
+<pre><code>Original Data
+      │
+     NAS
+      │
+Still Needs
+Backup
+</code></pre>
+
+<p>
+Treat the NAS as primary storage unless independent backups also exist.
+</p>
+
+<hr>
+
+<h3>Running Services From a NAS</h3>
+
+<p>
+Many NAS platforms can host applications directly.</p>
+
+<pre><code>NAS
+
+├── File Sharing
+├── Media Server
+├── Photo Library
+├── Backup Jobs
+└── Containers
+</code></pre>
+
+<p>
+Small homelabs often begin with a NAS that later expands into a more complete server
+environment.
+</p>
+
+<hr>
+
+<h3>Our Running Homelab</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Home Server
+    │
+Hypervisor
+    │
+Ubuntu VM
+    │
+Docker
+    │
+─────────────
+      │
+      ▼
+     NAS
+      │
+Media
+Backups
+Projects
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A NAS centralizes storage and simplifies file sharing across a homelab. It complements
+virtual machines and containers by providing reliable shared storage, but it should
+always be paired with a proper backup strategy.
+</p>
+
+<p>Next, Self-Hosting Services <a href="./9-self-hosting-services.html">&gt;&gt;</a></p>
+<p>Prev, Hypervisors <a href="./7-hypervisors.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vishnu Gandarapu - developer notes.">
+    <title>Downloaders — gallery-dl</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <h2>gallery-dl</h2>
+    <p><strong>Difficulty:</strong> Medium</p>
+
+    <p>
+        yt-dlp is for things that move; <strong>gallery-dl</strong> is for things that don't. It's the image-and-gallery
+        counterpart &mdash; point it at a profile, board, or album and it pulls every picture at full resolution, in
+        order, with sane filenames. It speaks the layouts of <strong>Twitter/X, Instagram, Reddit, Pixiv, DeviantArt,
+        imgur, Danbooru</strong>, and a long tail of others.
+    </p>
+
+    <h3>Install &amp; basics</h3>
+    <pre><code>pip install gallery-dl
+
+gallery-dl URL                <span style="color:#888;"># download the whole gallery</span>
+gallery-dl -g URL             <span style="color:#888;"># just print the media URLs, download nothing</span>
+gallery-dl --range "1-20" URL <span style="color:#888;"># only the first 20 items</span></code></pre>
+
+    <h3>The part that trips people: auth</h3>
+    <p>
+        Half of what's worth grabbing sits behind a login. gallery-dl doesn't want your password &mdash; it borrows your
+        browser's <strong>cookies</strong>, so it's you asking, logged in as you.
+    </p>
+    <pre><code>gallery-dl --cookies-from-browser firefox URL</code></pre>
+    <p>
+        For anything recurring, a config file at <code>~/.config/gallery-dl/config.json</code> lets you set output
+        folders, rename patterns, and per-site credentials once instead of retyping flags forever.
+    </p>
+
+    <table border="1" cellpadding="10">
+        <tr><th>Reality</th><th>What to do</th></tr>
+        <tr><td>Rate limits / soft bans</td><td>slow down &mdash; <code>--sleep</code> between requests; don't hammer</td></tr>
+        <tr><td bgcolor="orange">Login-walled content</td><td>use <code>--cookies-from-browser</code>; only what your account can already see</td></tr>
+        <tr><td>Site changed its layout</td><td>update: <code>pip install -U gallery-dl</code></td></tr>
+    </table>
+
+    <p>
+        <strong>The catch:</strong> a public profile and a re-publishable one are different things. gallery-dl makes
+        <em>collecting</em> trivial; whether you may keep or repost is a separate question the tool won't ask you.
+    </p>
+
+    <p>Free, GPLv2. Cross-platform.</p>
+
+    <p>
+        Next, the point-and-click helpers. <a href="./browser-extensions.html">&gt;&gt;</a>
+    </p>
+    <p>
+        Prev, yt-dlp. <a href="./yt-dlp.html">&lt;&lt;</a>
+    </p>
+
+    <script src="../footer.js"></script>
+    <script src="../home.js"></script>
+    <script src="/comments.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Virtual Machines</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Virtual Machines</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+A virtual machine (VM) is a software-defined computer that runs on top of another
+computer. It behaves like a separate physical machine with its own operating system,
+memory, storage and network interfaces.
+</p>
+
+<hr>
+
+<h3>Why Use Virtual Machines?</h3>
+
+<p>
+Virtual machines allow multiple operating systems to share the same hardware while
+remaining isolated from one another.
+</p>
+
+<pre><code>Physical Server
+      │
+Hypervisor
+      │
+├── Ubuntu VM
+├── Windows VM
+└── Kali VM
+</code></pre>
+
+<hr>
+
+<h3>Benefits</h3>
+
+<ul>
+<li>Experiment safely without affecting the host operating system.</li>
+<li>Run multiple operating systems simultaneously.</li>
+<li>Create isolated environments for testing.</li>
+<li>Take snapshots before major changes.</li>
+<li>Move virtual machines between compatible hosts.</li>
+</ul>
+
+<hr>
+
+<h3>Virtual Hardware</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Physical Hardware</th><th>Virtual Equivalent</th></tr>
+<tr><td>CPU</td><td>vCPU</td></tr>
+<tr><td>RAM</td><td>Virtual Memory Allocation</td></tr>
+<tr><td>Disk</td><td>Virtual Disk Image</td></tr>
+<tr><td>NIC</td><td>Virtual Network Adapter</td></tr>
+</table>
+
+<hr>
+
+<h3>Resource Allocation</h3>
+
+<p>
+Virtual machines share the host's resources. Allocating excessive CPU cores or memory to
+one VM reduces what remains available for the host and other guests.
+</p>
+
+<pre><code>Host
+
+16 GB RAM
+
+↓
+
+Ubuntu VM 4 GB
+
+Windows VM 8 GB
+
+Host 4 GB
+</code></pre>
+
+<hr>
+
+<h3>Networking Modes</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Mode</th><th>Purpose</th></tr>
+<tr><td>NAT</td><td>Guest accesses the network through the host.</td></tr>
+<tr><td>Bridged</td><td>Guest appears as an independent device on the LAN.</td></tr>
+<tr><td>Host-only</td><td>Communication only with the host.</td></tr>
+</table>
+
+<p>
+Bridged networking is commonly used for servers that should be reachable by other
+devices on the local network.
+</p>
+
+<hr>
+
+<h3>Snapshots</h3>
+
+<pre><code>Install OS
+     ↓
+Snapshot
+     ↓
+Experiment
+     ↓
+Restore (if needed)
+</code></pre>
+
+<p>
+Snapshots allow you to return a VM to an earlier state after configuration mistakes or
+failed experiments.
+</p>
+
+<hr>
+
+<h3>Shared Folders</h3>
+
+<p>
+Many virtualization platforms allow selected folders to be shared between the host and
+guest operating systems. This simplifies file exchange without relying on removable
+media or network transfers.
+</p>
+
+<hr>
+
+<h3>When to Use a VM</h3>
+
+<ul>
+<li>Learning a new operating system.</li>
+<li>Testing software.</li>
+<li>Hosting isolated services.</li>
+<li>Running legacy applications.</li>
+<li>Cybersecurity labs.</li>
+</ul>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Virtual machines provide flexibility and isolation while making efficient use of modern
+hardware. They form one of the core building blocks of a homelab and prepare the way for
+the next topic: containers.
+</p>
+
+<p>Next, Containers <a href="./6-containers.html">&gt;&gt;</a></p>
+<p>Prev, Networking Essentials <a href="./4-networking-essentials.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

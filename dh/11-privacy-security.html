@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Data Hoarding course notes.">
+<title>Data Hoarding - Privacy & Security</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Privacy &amp; Security</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+Large digital archives often contain financial records, personal photographs, research,
+creative work, software licenses and other irreplaceable information. Protecting an
+archive is not only about preventing data loss—it is also about ensuring that only
+authorized people can access or modify it.
+</p>
+
+<hr>
+
+<h3>Confidentiality, Integrity &amp; Availability</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Objective</th><th>Archive Example</th></tr>
+<tr><td>Confidentiality</td><td>Only authorized users can read private files.</td></tr>
+<tr><td>Integrity</td><td>Files remain accurate and unmodified.</td></tr>
+<tr><td>Availability</td><td>The archive can be accessed when needed.</td></tr>
+</table>
+
+<p>
+A well-managed archive balances all three objectives rather than focusing on only one.
+</p>
+
+<hr>
+
+<h3>Access Control</h3>
+
+<p>
+Not every archive should be accessible to every user or device.
+</p>
+
+<pre><code>Archive
+   │
+   ├── Personal
+   ├── Shared
+   └── Public
+</code></pre>
+
+<p>
+Separate collections according to who requires access. This simplifies collaboration
+while reducing accidental exposure.
+</p>
+
+<hr>
+
+<h3>Read-Only Archives</h3>
+
+<p>
+Completed collections that rarely change can benefit from read-only storage or
+write-protected media. Preventing accidental modification is often as valuable as
+preventing unauthorized access.
+</p>
+
+<hr>
+
+<h3>Encryption for Archives</h3>
+
+<p>
+Archives stored on portable drives or transported between locations may benefit from
+encryption. Encryption protects data if the storage device is lost or stolen.
+</p>
+
+<pre><code>Archive
+    │
+Encrypt
+    ▼
+Encrypted Archive
+    │
+Correct Key
+    ▼
+Accessible Data
+</code></pre>
+
+<p>
+Store recovery information separately and periodically confirm that encrypted archives
+can still be opened.
+</p>
+
+<hr>
+
+<h3>Sharing Archives</h3>
+
+<p>
+Before sharing an archive, review what it contains.
+</p>
+
+<ul>
+<li>Remove temporary files.</li>
+<li>Exclude unnecessary duplicates.</li>
+<li>Check embedded metadata.</li>
+<li>Verify licenses before redistributing software.</li>
+<li>Share only the required subset of files.</li>
+</ul>
+
+<hr>
+
+<h3>Physical Protection</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Risk</th><th>Mitigation</th></tr>
+<tr><td>Water</td><td>Store backups in protective containers.</td></tr>
+<tr><td>Heat</td><td>Avoid prolonged exposure to high temperatures.</td></tr>
+<tr><td>Shock</td><td>Handle mechanical drives carefully.</td></tr>
+<tr><td>Theft</td><td>Keep portable archives secured when not in use.</td></tr>
+</table>
+
+<hr>
+
+<h3>Documentation</h3>
+
+<p>
+Large collections become difficult to understand over time. Maintain simple
+documentation describing folder structure, naming conventions, backup schedules,
+storage locations and restoration procedures.
+</p>
+
+<pre><code>Archive
+   │
+README.md
+Inventory.csv
+Checksums.txt
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+An archive should remain private, trustworthy and accessible. Good archive security
+comes from sensible access control, careful sharing, physical protection and clear
+documentation rather than relying on a single technology.
+</p>
+
+<p>Next, Building a Digital Archive <a href="./12-building-a-digital-archive.html">&gt;&gt;</a></p>
+<p>Prev, Data Integrity <a href="./10-data-integrity.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

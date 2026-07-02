@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Containers</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Containers</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+Containers package an application together with its libraries and configuration while
+sharing the host operating system's kernel. Unlike virtual machines, containers do not
+emulate an entire computer, making them lightweight and fast to start.
+</p>
+
+<hr>
+
+<h3>Virtual Machine vs Container</h3>
+
+<pre><code>Virtual Machine
+
+Hardware
+   │
+Hypervisor
+   │
+Guest OS
+   │
+Application
+
+
+Container
+
+Hardware
+   │
+Host OS
+   │
+Container Engine
+   │
+Application
+</code></pre>
+
+<p>
+Virtual machines virtualize hardware. Containers virtualize the application environment.
+Both have important roles in a homelab.
+</p>
+
+<hr>
+
+<h3>Why Containers Became Popular</h3>
+
+<ul>
+<li>Start in seconds.</li>
+<li>Lower memory usage than virtual machines.</li>
+<li>Easy deployment and replacement.</li>
+<li>Consistent behaviour across systems.</li>
+<li>Ideal for hosting many small services.</li>
+</ul>
+
+<hr>
+
+<h3>A Typical Container Host</h3>
+
+<pre><code>Home Server
+      │
+Container Engine
+      │
+├── Nextcloud
+├── Jellyfin
+├── Vaultwarden
+├── Uptime Kuma
+└── Homepage
+</code></pre>
+
+<p>
+Each application runs independently even though they share the same operating system.
+</p>
+
+<hr>
+
+<h3>Images and Containers</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Term</th><th>Description</th></tr>
+<tr><td>Image</td><td>A reusable application template.</td></tr>
+<tr><td>Container</td><td>A running instance created from an image.</td></tr>
+</table>
+
+<pre><code>Image
+   │
+Create
+   ▼
+Container
+</code></pre>
+
+<hr>
+
+<h3>Persistent Data</h3>
+
+<p>
+Applications often need to keep files even after the container is replaced.</p>
+
+<pre><code>Container
+     │
+Volume
+     ▼
+Photos
+Database
+Configuration
+</code></pre>
+
+<p>
+Persistent volumes separate application data from the application itself, making upgrades
+and replacements much simpler.
+</p>
+
+<hr>
+
+<h3>When to Use a Container</h3>
+
+<ul>
+<li>Web applications.</li>
+<li>Media servers.</li>
+<li>Monitoring tools.</li>
+<li>Personal cloud services.</li>
+<li>Automation platforms.</li>
+</ul>
+
+<hr>
+
+<h3>When a Virtual Machine Is Better</h3>
+
+<ul>
+<li>Running another operating system.</li>
+<li>Kernel-level experimentation.</li>
+<li>Strong operating system isolation.</li>
+<li>Legacy software requiring a different OS.</li>
+</ul>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Containers and virtual machines complement each other rather than compete. Containers
+excel at deploying applications efficiently, while virtual machines provide complete
+operating system isolation. Most modern homelabs make use of both technologies.
+</p>
+
+<p>Next, Hypervisors <a href="./7-hypervisors.html">&gt;&gt;</a></p>
+<p>Prev, Virtual Machines <a href="./5-virtual-machines.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

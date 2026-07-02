@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Labs - Building Your Homelab</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Building Your Homelab</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+This chapter combines everything introduced throughout the course into a practical
+deployment plan. Rather than installing every service immediately, build your homelab
+in stages so that each layer is understood before the next is added.
+</p>
+
+<hr>
+
+<h3>Stage 1 — Hardware</h3>
+
+<pre><code>Internet
+    │
+Router
+    │
+Home Server
+</code></pre>
+
+<p>Install the operating system or hypervisor, update firmware and verify storage health.</p>
+
+<hr>
+
+<h3>Stage 2 — Virtualization</h3>
+
+<pre><code>Home Server
+     │
+Hypervisor
+     │
+├── Ubuntu Server VM
+├── Windows VM
+└── Test VM
+</code></pre>
+
+<p>Create separate virtual machines for different workloads instead of placing everything
+into one operating system.</p>
+
+<hr>
+
+<h3>Stage 3 — Containers</h3>
+
+<pre><code>Ubuntu VM
+     │
+Docker
+     │
+├── Dashboard
+├── Media
+├── Personal Cloud
+└── Password Manager
+</code></pre>
+
+<p>Deploy applications independently so updates or failures affect only the relevant service.</p>
+
+<hr>
+
+<h3>Stage 4 — Shared Storage</h3>
+
+<pre><code>Desktop
+Laptop
+Phone
+    │
+    ▼
+   NAS
+    │
+Media
+Backups
+Projects
+</code></pre>
+
+<p>Move large datasets and shared files to centralized storage.</p>
+
+<hr>
+
+<h3>Stage 5 — Networking</h3>
+
+<ul>
+<li>Assign static addresses to servers.</li>
+<li>Configure local DNS names.</li>
+<li>Place services behind a reverse proxy.</li>
+<li>Document the network layout.</li>
+</ul>
+
+<hr>
+
+<h3>Stage 6 — Reliability</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Area</th><th>Action</th></tr>
+<tr><td>Backups</td><td>Automate and verify regularly.</td></tr>
+<tr><td>Monitoring</td><td>Track system health and uptime.</td></tr>
+<tr><td>Updates</td><td>Apply routinely.</td></tr>
+<tr><td>Recovery</td><td>Test restoration procedures.</td></tr>
+</table>
+
+<hr>
+
+<h3>The Finished Homelab</h3>
+
+<pre><code>                 Internet
+                     │
+                  Router
+                     │
+              Reverse Proxy
+                     │
+              Home Server
+                     │
+                Hypervisor
+                     │
+     ┌───────────────┼────────────────┐
+     │               │                │
+ Ubuntu VM      Windows VM        Test VM
+     │
+   Docker
+     │
+ ├── Personal Cloud
+ ├── Media Server
+ ├── Password Manager
+ ├── Dashboard
+ ├── Monitoring
+ └── Automation
+     │
+     ▼
+     NAS
+</code></pre>
+
+<hr>
+
+<h3>Preparing for the Future</h3>
+
+<p>
+This infrastructure is suitable not only for self-hosted applications but also for
+future expansion into local AI, workflow automation, home automation and personal
+knowledge management. As your requirements grow, new services can be added without
+changing the overall architecture.
+</p>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A successful homelab evolves gradually. By combining careful hardware selection,
+virtualization, containers, centralized storage, networking and maintenance, you create
+a reliable platform that supports experimentation and real-world services for years.
+</p>
+
+<p>Next, Resources <a href="./14-resources.html">&gt;&gt;</a></p>
+<p>Prev, Disaster Recovery <a href="./12-disaster-recovery.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

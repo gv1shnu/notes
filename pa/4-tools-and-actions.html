@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Personal Computing - Tools & Actions</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Tools &amp; Actions</h2>
+<p><strong>Difficulty:</strong> Intermediate</p>
+
+<p>
+A language model can reason, explain and plan, but it cannot directly interact with your
+computer. To become a useful assistant it must be connected to <strong>tools</strong> that
+perform actions such as searching files, launching applications or checking the status of
+your homelab.
+</p>
+
+<hr>
+
+<h3>Reasoning vs Acting</h3>
+
+<table border="1" cellpadding="8">
+<tr><th>Language Model</th><th>Tool</th></tr>
+<tr><td>Explains how to rename files.</td><td>Renames approved files.</td></tr>
+<tr><td>Suggests a backup strategy.</td><td>Starts a backup task.</td></tr>
+<tr><td>Identifies a storage issue.</td><td>Reads disk usage statistics.</td></tr>
+<tr><td>Plans a workflow.</td><td>Executes the workflow.</td></tr>
+</table>
+
+<hr>
+
+<h3>The Tool Layer</h3>
+
+<pre><code>                You
+                 │
+                 ▼
+          Language Model
+                 │
+          Decide Next Step
+                 │
+      ┌──────────┼──────────┐
+      │          │          │
+ Filesystem   Browser   Homelab
+      │          │          │
+      └──────────┼──────────┘
+                 ▼
+            Action Result
+</code></pre>
+
+<p>
+The language model decides <em>what</em> should happen. Tools perform <em>how</em> it
+happens and return the results.
+</p>
+
+<hr>
+
+<h3>Typical Tools</h3>
+
+<ul>
+<li>Filesystem search and organization.</li>
+<li>Calendar management.</li>
+<li>Email summaries.</li>
+<li>Web browser automation.</li>
+<li>Terminal commands.</li>
+<li>Virtual machine management.</li>
+<li>Container management.</li>
+<li>Media library indexing.</li>
+</ul>
+
+<hr>
+
+<h3>A Typical Interaction</h3>
+
+<pre><code>User:
+"Find all PDFs about networking."
+
+        │
+
+Language Model
+        │
+
+Filesystem Tool
+        │
+
+Matching Files
+        │
+
+Language Model
+        │
+
+Summarized Response
+</code></pre>
+
+<hr>
+
+<h3>Planning Before Acting</h3>
+
+<p>
+Many requests require multiple steps. A capable assistant plans the sequence before
+executing it.</p>
+
+<pre><code>Goal
+
+↓
+
+Find Files
+
+↓
+
+Filter
+
+↓
+
+Summarize
+
+↓
+
+Present Results
+</code></pre>
+
+<hr>
+
+<h3>Safe Actions</h3>
+
+<p>
+Not every action should execute automatically.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Usually Safe</th><th>Requires Approval</th></tr>
+<tr><td>Search files.</td><td>Delete files.</td></tr>
+<tr><td>Read documents.</td><td>Move large collections.</td></tr>
+<tr><td>Check VM status.</td><td>Stop production services.</td></tr>
+<tr><td>Summarize notes.</td><td>Overwrite existing data.</td></tr>
+</table>
+
+<hr>
+
+<h3>Expanding the Architecture</h3>
+
+<pre><code>                You
+                 │
+                 ▼
+          AI Assistant
+                 │
+         Decision Engine
+                 │
+      ┌──────────┼──────────┐
+      │          │          │
+ Memory      Language     Tools
+               Model
+      │          │          │
+      └──────────┼──────────┘
+                 ▼
+             Your Computer
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+A personal AI assistant becomes useful when it combines reasoning with controlled
+interaction. The language model plans and interprets, while tools perform actions in a
+safe, auditable manner. In the next chapter we will build the assistant's first major
+capability: understanding and managing files and folders.
+</p>
+
+<p>Next, Managing Files &amp; Folders <a href="./5-filesystem-management.html">&gt;&gt;</a></p>
+<p>Prev, Memory &amp; Context <a href="./3-memory-and-context.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>

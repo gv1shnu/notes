@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Labs course notes.">
+<title>Home Labs - Storage Planning</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<h2>Storage Planning</h2>
+<p><strong>Difficulty:</strong> Beginner</p>
+
+<p>
+Storage is the foundation of every homelab. Applications can be reinstalled, but data
+often cannot be replaced. Designing storage before deploying services makes future
+expansion much easier.
+</p>
+
+<hr>
+
+<h3>Think Beyond Capacity</h3>
+
+<p>When selecting storage, consider more than just terabytes.</p>
+
+<table border="1" cellpadding="8">
+<tr><th>Factor</th><th>Why It Matters</th></tr>
+<tr><td>Capacity</td><td>How much data can be stored.</td></tr>
+<tr><td>Performance</td><td>Application responsiveness.</td></tr>
+<tr><td>Reliability</td><td>Long-term operation.</td></tr>
+<tr><td>Expandability</td><td>Future growth.</td></tr>
+<tr><td>Cost</td><td>Total cost of ownership.</td></tr>
+</table>
+
+<hr>
+
+<h3>Separate Workloads</h3>
+
+<pre><code>Server
+
+├── SSD
+│   ├── Operating System
+│   ├── Containers
+│   └── Virtual Machines
+│
+└── HDD
+    ├── Media
+    ├── Documents
+    ├── Backups
+    └── Archives
+</code></pre>
+
+<p>
+Keeping frequently accessed data on SSDs while storing bulk data on HDDs balances
+performance and cost.
+</p>
+
+<hr>
+
+<h3>Plan for Growth</h3>
+
+<p>
+A homelab often expands faster than expected. Leave unused drive bays, SATA ports or
+M.2 slots available if possible.
+</p>
+
+<pre><code>Today
+
+2 TB
+
+↓
+
+Next Year
+
+6 TB
+
+↓
+
+Three Years
+
+20 TB
+</code></pre>
+
+<hr>
+
+<h3>Keep Data Organized</h3>
+
+<p>
+Separate storage according to purpose rather than placing everything in a single
+directory.
+</p>
+
+<pre><code>Storage/
+
+├── Backups/
+├── Media/
+├── Projects/
+├── VirtualMachines/
+└── Shared/
+</code></pre>
+
+<hr>
+
+<h3>Shared Storage</h3>
+
+<p>
+As your homelab grows, multiple devices may need access to the same files. A central
+storage location avoids maintaining separate copies on every computer.
+</p>
+
+<pre><code>Desktop
+      │
+Laptop ├──► Shared Storage
+      │
+Phone
+</code></pre>
+
+<hr>
+
+<h3>Leave Free Space</h3>
+
+<p>
+Running a drive completely full reduces flexibility and can negatively affect
+performance. Maintain free capacity for updates, snapshots and temporary files.
+</p>
+
+<hr>
+
+<h3>Document Your Layout</h3>
+
+<p>
+Even a simple text file describing where important data is stored can save considerable
+time during upgrades or troubleshooting.
+</p>
+
+<pre><code>README.md
+
+OS  → SSD
+
+Media → HDD1
+
+Backups → HDD2
+</code></pre>
+
+<hr>
+
+<h3>Key Takeaway</h3>
+
+<p>
+Good storage planning focuses on organization and future growth as much as capacity.
+Design a structure that separates workloads, keeps important data centralized and can
+expand without major reorganization.
+</p>
+
+<p>Next, Networking Essentials <a href="./4-networking-essentials.html">&gt;&gt;</a></p>
+<p>Prev, Choosing Hardware <a href="./2-choosing-hardware.html">&lt;&lt;</a></p>
+
+<script src="../footer.js"></script>
+<script src="../home.js"></script>
+<script src="/comments.js" defer></script>
+
+</body>
+</html>
