@@ -50,6 +50,43 @@
 
     </table>
 
+    <div class="viz">
+        <svg viewBox="0 0 440 128" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Venn cheat sheet for INNER, LEFT, RIGHT and FULL OUTER joins">
+            <defs><clipPath id="lens"><circle cx="13" cy="0" r="22"/></clipPath></defs>
+            <g transform="translate(58,50)">
+                <g clip-path="url(#lens)"><circle cx="-13" cy="0" r="22" fill="var(--accent)" opacity="0.55"/></g>
+                <circle cx="-13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+                <circle cx="13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+            </g>
+            <g transform="translate(168,50)">
+                <circle cx="-13" cy="0" r="22" fill="var(--accent)" opacity="0.55"/>
+                <circle cx="-13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+                <circle cx="13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+            </g>
+            <g transform="translate(278,50)">
+                <circle cx="13" cy="0" r="22" fill="var(--accent)" opacity="0.55"/>
+                <circle cx="-13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+                <circle cx="13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+            </g>
+            <g transform="translate(388,50)">
+                <circle cx="-13" cy="0" r="22" fill="var(--accent)" opacity="0.55"/>
+                <circle cx="13" cy="0" r="22" fill="var(--accent)" opacity="0.55"/>
+                <circle cx="-13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+                <circle cx="13" cy="0" r="22" fill="none" stroke="var(--text)" stroke-width="1.3"/>
+            </g>
+            <g font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="var(--text)" text-anchor="middle">
+                <text x="58" y="108">INNER</text>
+                <text x="168" y="108">LEFT</text>
+                <text x="278" y="108">RIGHT</text>
+                <text x="388" y="108">FULL OUTER</text>
+            </g>
+        </svg>
+        <p class="viz-caption">The whole family in one glance (left circle = first table, right = second): INNER keeps
+            only the overlap, LEFT and RIGHT keep one whole side plus the overlap, FULL OUTER keeps everything. Pick the
+            shading that matches the rows you refuse to lose.</p>
+    </div>
+
     <h3>Using Aliases to Write Cleaner JOINs</h3>
 
     <p>

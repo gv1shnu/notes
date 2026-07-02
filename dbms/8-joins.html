@@ -229,6 +229,35 @@
         Here, that link is <strong>squad_id</strong>.
     </p>
 
+    <div class="viz">
+        <svg viewBox="0 0 400 190" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Rows of players matched to rows of squads on the shared squad_id key">
+            <g font-family="JetBrains Mono, monospace" font-size="11">
+                <rect x="20" y="34" width="150" height="120" rx="5" fill="#fff" stroke="var(--border)" stroke-width="1.3"/>
+                <rect x="20" y="34" width="150" height="24" rx="5" fill="var(--header)" stroke="var(--border)" stroke-width="1.3"/>
+                <text x="95" y="51" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" fill="var(--text)">players</text>
+                <text x="30" y="76">TenZ</text><text x="150" y="76" text-anchor="end" fill="var(--accent)">1</text>
+                <text x="30" y="106">Zekken</text><text x="150" y="106" text-anchor="end" fill="var(--accent)">2</text>
+                <text x="30" y="136">wardell</text><text x="150" y="136" text-anchor="end" fill="var(--accent)">3</text>
+                <rect x="250" y="34" width="130" height="120" rx="5" fill="#fff" stroke="var(--border)" stroke-width="1.3"/>
+                <rect x="250" y="34" width="130" height="24" rx="5" fill="var(--header)" stroke="var(--border)" stroke-width="1.3"/>
+                <text x="315" y="51" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" fill="var(--text)">squads</text>
+                <text x="258" y="76" fill="var(--accent)">1</text><text x="372" y="76" text-anchor="end">Sentinels</text>
+                <text x="258" y="106" fill="var(--accent)">2</text><text x="372" y="106" text-anchor="end">LOUD</text>
+                <text x="258" y="136" fill="var(--accent)">3</text><text x="372" y="136" text-anchor="end">NRG</text>
+            </g>
+            <g stroke="var(--accent)" stroke-width="1.6">
+                <line x1="170" y1="72" x2="250" y2="72"/>
+                <line x1="170" y1="102" x2="250" y2="102"/>
+                <line x1="170" y1="132" x2="250" y2="132"/>
+            </g>
+            <text x="210" y="24" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="var(--accent)">squad_id</text>
+        </svg>
+        <p class="viz-caption">A JOIN walks the two tables and stitches together rows whose <strong>squad_id</strong>
+            matches &mdash; TenZ's <code>1</code> finds Sentinels, Zekken's <code>2</code> finds LOUD. The key is the
+            thread; everything else about joins is just what to do with rows that <em>don't</em> find a partner.</p>
+    </div>
+
     <p>
         Next: Joins contd.
         <a href="./8-joins2.html">&gt;&gt;</a>
