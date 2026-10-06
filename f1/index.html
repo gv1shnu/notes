@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>f1 — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="f1" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>f1: APEX TV</h1>
+    <span class="stamp wip">in progress</span>
+  </div>
+  <p class="sub">gv1shnu/f1 · Three.js + Node WebSocket · 6 commits · Sep–Oct 2026 · apex-tv-f1.onrender.com</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">A browser multiplayer racing game: drive a procedural circuit with cockpit/hood/chase cameras, engine audio, lap timing, and a live leaderboard — up to 16 drivers in a room.</p>
+  <p>The interesting part isn't the car, it's the <span class="hl">netcode</span>: making other players' cars move smoothly over a lossy WebSocket while the server stays the authority on laps.</p>
+
+  <!-- EDIT: netcode model -->
+  <h2>The networking model</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 220" role="img" aria-label="client runs physics at 60Hz, server validates and broadcasts snapshots at 20Hz, clients interpolate">
+      <rect class="box" x="20" y="80" width="170" height="70" rx="6"/><text class="lbl mid" x="105" y="104">client physics</text><text class="lbl-s mid" x="105" y="124">60 fixed steps/s</text><text class="lbl-s mid" x="105" y="142">local, responsive</text>
+      <path class="arr" d="M192 100 H260"/><text class="lbl-s mid" x="226" y="90">state</text>
+      <rect class="fillbox" x="262" y="70" width="190" height="90" rx="6"/><text class="lbl mid" x="357" y="96">server</text><text class="lbl-s mid" x="357" y="116">validates state + lap progress</text><text class="lbl-s mid" x="357" y="136">owns rooms (≤16)</text><text class="lbl-s mid" x="357" y="154">broadcasts snapshots</text>
+      <path class="arr" d="M454 115 H522"/><text class="lbl-s mid" x="488" y="105">20 Hz</text>
+      <rect class="box" x="524" y="80" width="190" height="70" rx="6"/><text class="lbl mid" x="619" y="104">other clients</text><text class="lbl-s mid" x="619" y="124">SnapshotBuffer</text><text class="lbl-s mid" x="619" y="142">interpolate +100 ms</text>
+      <path class="arr-d" d="M619 152 V185 H105 V152"/><text class="lbl-r" x="300" y="180">each peer's car is rendered a little in the past, smoothly between snapshots</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="F1-01">local physics for feel, server authority for fairness, interpolation for smoothness</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What shaped it</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Responsiveness vs. authority.</b> Physics runs locally at 60 Hz so steering feels instant; the server validates and only broadcasts at 20 Hz, so it stays the source of truth for lap times.</li>
+      <li><b>Smoothing lossy snapshots.</b> Peers are rendered ~100 ms in the past and interpolated between the last two snapshots, so jitter and drops don't make cars teleport.</li>
+      <li><b>Fair laps need invalidation rules.</b> Leaving the track, respawning, reversing through checkpoints, or pausing the tab voids the timed lap.</li>
+      <li><b>Cars got stuck off-track.</b> An early sticky wall was replaced with an off-track prompt + auto-respawn (and an R-to-respawn key).</li>
+      <li><b>No runtime CDN.</b> The client bundles pinned deps into hashed <code>dist/</code> assets, so a CDN outage can't break the game.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>testing a multiplayer game</h4>
+        A soak test runs 60 local clients for 2 minutes; a race-recording harness drives 3 independent WebSocket clients with automated controls and separate racing lines to capture a real race on video.
+      </div>
+      <div class="margin">honest status: a practice prototype — no car-car collisions, no server-owned physics, no touch/gamepad yet.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Client</th><td>Three.js; cockpit/hood/chase cameras; engine audio; a shared circuit/physics module; <code>/#debug</code> overlay</td></tr>
+    <tr><th>Server</th><td>Node WebSocket; static hosting; rooms (<code>ROOM_CAPACITY</code> 1–32); state validation; 20 Hz snapshots; <code>/healthz</code></td></tr>
+    <tr><th>Tick rates</th><td>client physics 60 Hz · server snapshots 20 Hz · peer interpolation delay 100 ms</td></tr>
+    <tr><th>Tests</th><td>unit (physics, input, protocol, server), Playwright e2e (Chromium/Firefox/WebKit), soak (60 clients)</td></tr>
+    <tr><th>Deploy</th><td>multi-stage Dockerfile + Render blueprint → <a href="https://apex-tv-f1.onrender.com">apex-tv-f1.onrender.com</a> (one process; replicas need shared room routing)</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

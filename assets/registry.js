@@ -168,5 +168,13 @@ window.NOTEBOOK = {
       stack: ["FastAPI", "Celery", "YOLO/ByteTrack", "React"],
       pages: [ { file: "index", title: "Cover & scope" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // f1
+      slug: "f1", name: "f1 · APEX TV", shelf: "games", status: "wip",
+      tagline: "A browser multiplayer racer where the real work is the netcode: local 60Hz physics, 20Hz server snapshots, interpolated peers.",
+      url: "https://github.com/gv1shnu/f1", live: "https://apex-tv-f1.onrender.com",
+      start: "2026-09-06", end: "2026-10-05", commits: 6,
+      stack: ["Three.js", "Node", "WebSocket"],
+      pages: [ { file: "index", title: "Cover & netcode" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

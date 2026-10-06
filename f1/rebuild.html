@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>f1 — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="f1" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">6 Sep</span><span class="what">Initial commit: APEX TV — web multiplayer F1 game</span><br>The game + netcode in one go.</li>
+    <li><span class="when">6 Sep</span><span class="what">deployment: Dockerfile, Render blueprint, prod caching · pin Node ≥20</span></li>
+    <li class="big"><span class="when">6 Sep</span><span class="what">fix car getting stuck off-track; add R to respawn → remove sticky wall, add off-track prompt + auto-respawn</span><br>The off-track handling went through two iterations in a day.</li>
+    <li class="big"><span class="when">5 Oct</span><span class="what">Improve multiplayer reliability and add race recording</span><br>Netcode hardening + the 3-client recording harness.</li>
+  </ol>
+  <p class="margin">The repo description is just "in-progress" — it's a prototype, and the notes reflect that honestly.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Local 60 Hz physics, server 20 Hz snapshots</td><td>instant feel + authoritative laps + manageable bandwidth</td><td>server doesn't own physics (yet), so it can't fully stop cheating</td></tr>
+    <tr><td>Interpolate peers 100 ms in the past</td><td>smooth over jitter and dropped packets</td><td>you see others slightly delayed</td></tr>
+    <tr><td>Shared circuit/track module client+server</td><td>one source of truth for geometry and validation</td><td>must stay in sync across the wire</td></tr>
+    <tr><td>Auto-respawn over a sticky wall</td><td>a wall trapped cars; a prompt + respawn keeps play flowing</td><td>respawn voids the lap</td></tr>
+    <tr><td>Bundle pinned deps into hashed assets</td><td>no runtime CDN dependency; cacheable</td><td>a build step before serving</td></tr>
+    <tr><td>Rooms in one process</td><td>simple; fine for a prototype</td><td>horizontal scaling needs shared room routing</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Smoothness</b>: do remote cars glide, or teleport, under packet loss?</li>
+    <li><b>Lap integrity</b>: are off-track / reversed / paused laps correctly invalidated?</li>
+    <li><b>Soak</b>: 60 clients × 2 min without a memory/socket blowup.</li>
+    <li><b>Cross-browser</b>: Playwright passes on Chromium, Firefox, WebKit.</li>
+    <li><b>Frame timing</b> via <code>/#debug</code>; server health via <code>/healthz</code>.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Server-owned (authoritative) physics for real anti-cheat.</li>
+    <li>Car-to-car collisions.</li>
+    <li>Touch and gamepad controls.</li>
+    <li>Shared room routing so multiple replicas can scale out.</li>
+    <li>More circuits / car tuning.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Shared track + physics</b><br>A circuit module and a 60 Hz fixed-step car model that both the client renders and the server can validate against.</li>
+    <li><b>Local game loop</b><br>Three.js scene, three cameras, input, engine audio; drive single-player first.</li>
+    <li><b>Protocol</b><br>Define state/peer message shapes and validators; a sequence number and server time on every snapshot.</li>
+    <li><b>Server rooms</b><br>Node WebSocket server: assign drivers to rooms (≤ capacity), validate incoming state + lap progress, broadcast snapshots at 20 Hz; <code>/healthz</code>.</li>
+    <li><b>Snapshot buffer</b><br>Client-side: align clocks by a running-min offset, keep ~20 snapshots, sample at <code>now − 100 ms</code>, interpolate position/angle; flush on reset.</li>
+    <li><b>Lap rules</b><br>Start-line-forward timing, ordered checkpoints, invalidation on off-track/respawn/reverse/pause; a leaderboard HUD.</li>
+    <li><b>Robustness</b><br>Reconnect logic + watchdog; off-track prompt + auto-respawn; bundle pinned deps into hashed assets.</li>
+    <li><b>Test + ship</b><br>Unit + Playwright + a soak harness + a scripted-client race recorder; Dockerfile + Render blueprint.</li>
+  </ol>
+
+</main>
+</body>
+</html>

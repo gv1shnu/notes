@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>f1 — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="f1" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">shared physics, a snapshot buffer, and server-side rooms</p>
+
+  <!-- EDIT: module map -->
+  <h2>Client modules (public/js/)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>file</th><th>job</th></tr>
+    <tr><td><code>main.js</code> / <code>boot.js</code></td><td>game loop, wiring, start flow</td></tr>
+    <tr><td><code>circuit.js</code> / <code>track.js</code></td><td>procedural circuit geometry + the shared track model (also used server-side for validation)</td></tr>
+    <tr><td><code>car.js</code></td><td>the local physics (60 Hz fixed step)</td></tr>
+    <tr><td><code>input.js</code></td><td>keyboard controls (WASD/arrows, space, C, R, M)</td></tr>
+    <tr><td><code>network.js</code></td><td>WebSocket client: reconnect, send cadence, sequence/tick tracking, watchdog</td></tr>
+    <tr><td><code>protocol.js</code></td><td>shared constants + validators (<code>validState</code>, <code>validPeer</code>, <code>cleanName</code>)</td></tr>
+    <tr><td><code>snapshots.js</code></td><td>the SnapshotBuffer: store, discard stale, interpolate</td></tr>
+    <tr><td><code>race.js</code> / <code>hud.js</code> / <code>audio.js</code></td><td>lap logic, leaderboard HUD, engine samples</td></tr>
+  </table></div>
+
+  <!-- EDIT: snapshot buffer -->
+  <h2>The SnapshotBuffer (the heart of the smoothing)</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">push(state, serverTime, seq, received):
+  drop out-of-order (seq ≤ last)
+  offset = min(offset, received − serverTime)   // clock align
+  reset boundary clears the buffer
+  keep at most 20 snapshots
+
+sample(now):
+  time = now − offset − delay        // delay = 100ms
+  drop snapshots older than `time` (keep ≥ 2)
+  interpolate x/z linearly between the two around `time`
+  angles via normalizeAngle</div>
+    <div>
+      <p>Each peer is drawn at <code>now − 100 ms</code>, so there are almost always two real snapshots bracketing that moment to interpolate between — the car glides instead of snapping.</p>
+      <p class="margin">the clock offset is tracked as a running minimum, which self-corrects for latency without a handshake.</p>
+      <p class="small">a change in the <code>reset</code> flag flushes the buffer so a respawn doesn't interpolate across a teleport.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: server -->
+  <h2>Server &amp; rooms</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 180" role="img" aria-label="server validates client state, assigns rooms, broadcasts at 20Hz">
+      <rect class="box" x="20" y="60" width="150" height="60" rx="6"/><text class="lbl-s mid" x="95" y="86">client state</text><text class="lbl-s mid" x="95" y="104">+ lap claims</text>
+      <path class="arr" d="M172 90 H220"/>
+      <rect class="fillbox" x="222" y="45" width="190" height="90" rx="6"/><text class="lbl-s mid" x="317" y="70">validate</text><text class="lbl-s mid" x="317" y="90">validState / track model</text><text class="lbl-s mid" x="317" y="110">lap progress in order</text>
+      <path class="arr" d="M414 90 H462"/>
+      <rect class="box" x="464" y="55" width="150" height="70" rx="6"/><text class="lbl-s mid" x="539" y="82">room (≤16)</text><text class="lbl-s mid" x="539" y="102">drivers + leaderboard</text>
+      <path class="arr" d="M616 90 H664"/>
+      <rect class="box" x="666" y="60" width="150" height="60" rx="6"/><text class="lbl-s mid" x="741" y="86">snapshot 20Hz</text><text class="lbl-s mid" x="741" y="104">to every peer</text>
+      <text class="lbl-r" x="222" y="160">lost connections auto-reconnect into a fresh session (maybe another room)</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="F1-02">rooms live in one process → multiple replicas would need shared room routing</figcaption>
+  </figure>
+
+  <!-- EDIT: lap validity -->
+  <h2>Lap validity</h2>
+  <ul class="dash">
+    <li>Timing starts only when you cross the start line <b>forward</b>; the circuit must be completed in checkpoint order.</li>
+    <li>Off-track, respawn, reversing through checkpoints, or a paused (backgrounded) tab <b>invalidate</b> the current lap.</li>
+    <li>Cross the start line again to begin a fresh attempt.</li>
+  </ul>
+
+  <!-- EDIT: testing harness -->
+  <h2>Testing a real-time game</h2>
+  <ul class="dash">
+    <li><b>Unit</b>: physics, input, protocol, server (<code>npm test</code>).</li>
+    <li><b>e2e</b>: Playwright across Chromium/Firefox/WebKit.</li>
+    <li><b>Soak</b> (<code>scripts/soak.mjs</code>): 60 local clients for 2 minutes — shakes out room/memory/socket issues.</li>
+    <li><b>Churn</b> (<code>scripts/churn.mjs</code>): rapid join/leave.</li>
+    <li><b>Record</b> (<code>scripts/record-race.mjs</code>): 3 scripted WebSocket clients with separate racing lines → a WebM capture + results.</li>
+    <li><code>/healthz</code> reports room counts, memory, socket queues; <code>/#debug</code> shows frame timing + renderer resource counts.</li>
+  </ul>
+
+</main>
+</body>
+</html>
