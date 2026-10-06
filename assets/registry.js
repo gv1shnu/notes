@@ -40,5 +40,13 @@ window.NOTEBOOK = {
       stack: ["Python", "python-pptx", "Ollama"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // txt2sql2txt
+      slug: "txt2sql2txt", name: "txt2sql2txt", shelf: "data", status: "deployed",
+      tagline: "Two-way English ⇄ SQL in one static page, with an offline engine and real Postgres in the browser.",
+      url: "https://github.com/gv1shnu/txt2sql2txt", live: "http://www.vishnugandarapu.in/txt2sql2txt/",
+      start: "2026-09-19", end: "2026-09-19", commits: 1,
+      stack: ["HTML/JS", "PGlite", "node-sql-parser"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

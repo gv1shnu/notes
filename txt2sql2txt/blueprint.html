@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>txt2sql2txt — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="txt2sql2txt" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">two tabs, two engines each, one in-browser database</p>
+
+  <!-- EDIT: main flow -->
+  <h2>Request flow</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 400" role="img" aria-label="Text to SQL and SQL to text flows with offline and LLM engines, results run on PGlite">
+      <!-- left: text to sql -->
+      <text class="lbl-t" x="30" y="36">Text → SQL</text>
+      <rect class="box" x="30" y="56" width="180" height="50" rx="6"/><text class="lbl mid" x="120" y="86">question</text>
+      <path class="arr" d="M210 81 H260"/>
+      <path class="box" d="M330 46 L400 81 L330 116 L260 81 Z"/><text class="lbl-s mid" x="330" y="86">engine?</text>
+      <path class="arr" d="M330 46 V24 H470"/><text class="lbl-s" x="340" y="18">offline</text>
+      <rect class="box" x="472" y="4" width="240" height="44" rx="6"/><text class="lbl mid" x="592" y="31">textToSqlOffline() regex</text>
+      <path class="arr-d red" d="M712 26 H780"/><text class="lbl-r" x="784" y="32">no match → "switch to LLM"</text>
+      <path class="arr" d="M330 116 V140 H470"/><text class="lbl-s" x="340" y="134">LLM</text>
+      <rect class="box" x="472" y="118" width="240" height="44" rx="6"/><text class="lbl mid" x="592" y="145">callLLM(schema + request)</text>
+      <path class="arr" d="M592 48 V70 M592 118 V100"/>
+      <rect class="fillbox" x="502" y="70" width="180" height="30" rx="4"/><text class="lbl-s mid" x="592" y="90">SQL (stripFence)</text>
+      <path class="arr" d="M682 85 H820 V200"/>
+      <!-- right: sql to text -->
+      <text class="lbl-t" x="30" y="236">SQL → Text</text>
+      <rect class="box" x="30" y="256" width="180" height="50" rx="6"/><text class="lbl mid" x="120" y="286">query</text>
+      <path class="arr" d="M210 281 H260"/>
+      <path class="box" d="M330 246 L400 281 L330 316 L260 281 Z"/><text class="lbl-s mid" x="330" y="286">engine?</text>
+      <path class="arr" d="M400 281 H470"/><text class="lbl-s" x="410" y="272">offline</text>
+      <rect class="box" x="472" y="256" width="240" height="50" rx="6"/><text class="lbl mid" x="592" y="278">astify(sql, postgresql)</text><text class="lbl-s mid" x="592" y="297">→ explainStatement(ast)</text>
+      <path class="arr" d="M330 316 V350 H470"/><text class="lbl-s" x="340" y="344">LLM</text>
+      <rect class="box" x="472" y="330" width="240" height="44" rx="6"/><text class="lbl mid" x="592" y="357">"patient database teacher"</text>
+      <path class="arr" d="M712 281 H760 M712 352 H760 V300"/>
+      <rect class="fillbox" x="762" y="266" width="200" height="44" rx="6"/><text class="lbl mid" x="862" y="293">miniMarkdown → page</text>
+      <!-- pglite -->
+      <rect class="box" x="760" y="200" width="200" height="50" rx="6"/><text class="lbl mid" x="860" y="222">Run ▶ on PGlite</text><text class="lbl-s mid" x="860" y="241">renderRows(result)</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="T2S-02">offline is the default path in both directions</figcaption>
+  </figure>
+
+  <!-- EDIT: offline explainer -->
+  <h2>Offline SQL → text: walking the AST</h2>
+  <div class="cols">
+    <div>
+      <p><code>new NodeSQLParser.Parser().astify(sql, {database:"postgresql"})</code> returns one AST or an array (multiple statements,
+        joined with <code>---</code>). Then <code>explainStatement</code> switches on <code>ast.type</code>:</p>
+      <ul class="dash">
+        <li><b>select</b>: summary line + one bullet per clause: Distinct, Selects, From (with joins), WHERE, GROUP BY, HAVING, ORDER BY, LIMIT</li>
+        <li><b>insert</b>: table, columns, number of value rows</li>
+        <li><b>update / delete</b>: table, SET pairs, WHERE; with no WHERE it shouts <em>"all rows — no filter!"</em></li>
+        <li>anything else: one-line summary + "use the LLM engine"</li>
+      </ul>
+    </div>
+    <div class="card wrap">OP_WORDS maps operators to English:
+=  → "is"      != / &lt;&gt; → "is not"
+&gt;  → "is greater than" …
+litText()  literal / column ref → text
+aggrText() COUNT(x) → "the count of x"
+condText() recursive for AND / OR trees</div>
+  </div>
+
+  <!-- EDIT: pattern engine -->
+  <h2>Offline text → SQL: four patterns, in order</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>#</th><th>regex shape</th><th>example</th><th>output</th></tr>
+    <tr><td>1</td><td><code>top N &lt;table&gt; by &lt;col&gt;</code></td><td>top 5 customers by spend</td><td><code>SELECT * … ORDER BY spend DESC LIMIT 5</code></td></tr>
+    <tr><td>2</td><td><code>how many | count of | number of &lt;t&gt; [where …]</code></td><td>count of orders</td><td><code>SELECT COUNT(*) AS count FROM orders</code></td></tr>
+    <tr><td>3</td><td><code>avg|sum|min|max|total &lt;col&gt; of &lt;t&gt; [by &lt;col&gt;]</code></td><td>average total of orders by status</td><td><code>SELECT status, AVG(total) … GROUP BY status</code></td></tr>
+    <tr><td>4</td><td><code>show|list|get|all &lt;t&gt; [where …]</code></td><td>list customers where country = US</td><td><code>SELECT * … WHERE country = 'US'</code></td></tr>
+  </table>
+  </div>
+  <p><code>resolveTable(word)</code> maps the word to a real table from the <code>CREATE TABLE</code>s in the schema box:
+    exact → naive plural (±s) → substring → raw word. <code>naiveWhere</code> rewrites "is / is not / greater than / at least…"
+    to operators and quotes a bare word on the right side (keeping its case).</p>
+
+  <!-- EDIT: pglite + llm -->
+  <h2>In-browser Postgres + provider adapter</h2>
+  <div class="cols">
+    <div>
+      <h4>PGlite lifecycle</h4>
+      <ol>
+        <li>first load: <code>await import(PGLITE_URL)</code> (lazy, so the page opens fast)</li>
+        <li>every dataset/file load: a <b>fresh</b> in-memory <code>new PGlite()</code></li>
+        <li><code>db.exec(sql)</code> runs schema + seed</li>
+        <li><code>extractDDL</code> copies the <code>CREATE TABLE…;</code> blocks into the schema box, which becomes LLM context</li>
+      </ol>
+      <p class="small">samples.js sets <code>window.SAMPLE_DATASETS</code> via a script tag, so it works even from <code>file://</code> (no fetch, no CORS).</p>
+    </div>
+    <div>
+      <h4><code>callLLM(system, user)</code>: three shapes</h4>
+      <ul class="dash">
+        <li><b>OpenAI-compatible</b> (OpenAI, OpenRouter, Groq): one code path, Bearer key; OpenRouter also gets <code>HTTP-Referer</code> + <code>X-Title</code></li>
+        <li><b>Anthropic</b>: <code>/v1/messages</code> + <code>anthropic-dangerous-direct-browser-access</code> header for CORS</li>
+        <li><b>Gemini</b>: <code>:generateContent?key=</code> with <code>system_instruction</code></li>
+      </ul>
+      <p class="small">localStorage keys: <code>stx_provider</code>, <code>stx_model_&lt;p&gt;</code>, <code>stx_key_&lt;p&gt;</code>, <code>stx_theme</code>.</p>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>txt2sql2txt — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="txt2sql2txt" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>txt2sql2txt</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/txt2sql2txt · one HTML file · 1 commit · 19 Sep 2026 · vishnugandarapu.in/txt2sql2txt</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Students learning SQL get stuck in two directions: "how do I write this question as SQL?" and
+    "what does this query I was handed actually do?"</p>
+  <p>I wanted one page that does both, <span class="hl">runs the query against a real Postgres</span>, costs nothing to host,
+    and costs nothing to use for the common cases.</p>
+
+  <!-- EDIT: constraints drawn -->
+  <h2>The constraint that shaped everything</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 250" role="img" aria-label="GitHub Pages is static, so everything moves to the browser">
+      <rect class="box" x="30" y="40" width="220" height="150" rx="8"/>
+      <text class="lbl-b mid" x="140" y="72">GitHub Pages</text>
+      <text class="lbl mid" x="140" y="104">static files only</text>
+      <text class="lbl mid" x="140" y="130">✗ no server</text>
+      <text class="lbl mid" x="140" y="156">✗ can't hide an API key</text>
+      <path class="arr" d="M254 115 H340"/>
+      <text class="lbl-r" x="262" y="104">so…</text>
+      <rect class="fillbox" x="344" y="20" width="520" height="200" rx="8"/>
+      <text class="lbl-b" x="364" y="50">everything happens in the visitor's browser</text>
+      <text class="lbl" x="364" y="84">① SQL parser → offline explainer (node-sql-parser, CDN)</text>
+      <text class="lbl" x="364" y="114">② regex patterns → offline text-to-SQL</text>
+      <text class="lbl" x="364" y="144">③ Postgres compiled to WebAssembly (PGlite)</text>
+      <text class="lbl" x="364" y="174">④ LLM called directly with the visitor's own key</text>
+      <text class="lbl-s" x="364" y="202">key stored only in localStorage, sent only to that provider</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="T2S-01">free hosting, zero backend, keys never touch a server I own</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>SQL → text is a parsing problem</b>, not an AI problem. An AST walk gives a deterministic, instant, clause-by-clause explanation.</li>
+      <li><b>Text → SQL is the hard direction.</b> Rules only cover common shapes ("count of orders", "top 5 customers by spend"); arbitrary English over an arbitrary schema needs a model.</li>
+      <li>Free reasoning models (e.g. deepseek-r1 on OpenRouter) wrap answers in <code>&lt;think&gt;</code> blocks, which must be stripped.</li>
+    </ul>
+    <div class="note blue">
+      <h4>engine choice per direction</h4>
+      Offline is the default for both. When the pattern engine doesn't recognise the phrasing it <i>says so</i> and
+      suggests switching to LLM, rather than guessing.
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Files</th><td><code>index.html</code> (UI + all logic, ~39 KB), <code>samples.js</code> (3 datasets), <code>.nojekyll</code></td></tr>
+    <tr><th>Libraries (CDN)</th><td><code>node-sql-parser@5.4.0</code> (postgresql UMD), <code>@electric-sql/pglite@0.2.17</code> (ES module, imported lazily)</td></tr>
+    <tr><th>LLM providers</th><td>free: OpenRouter <code>:free</code> models, Groq, Gemini · paid: Anthropic, OpenAI</td></tr>
+    <tr><th>Sample data</th><td>E-commerce (customers/orders/order_items), Library, HR</td></tr>
+    <tr><th>Deployed</th><td>GitHub Pages, <code>main</code> / root → <a href="http://www.vishnugandarapu.in/txt2sql2txt/">vishnugandarapu.in/txt2sql2txt</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>
