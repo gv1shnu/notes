@@ -88,5 +88,13 @@ window.NOTEBOOK = {
       stack: ["Python", "Flask", "ProjectDiscovery"],
       pages: [ { file: "index", title: "Cover & scope" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // finder
+      slug: "finder", name: "finder", shelf: "ai", status: "local",
+      tagline: "Offline natural-language agent for your files and desktop: the model plans, plain code acts.",
+      url: "https://github.com/gv1shnu/finder", live: null,
+      start: "2026-09-19", end: "2026-09-19", commits: 8,
+      stack: ["Python", "Ollama", "SQLite"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

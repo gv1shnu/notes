@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>finder — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="finder" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">a small pipeline: natural language → structured plan → handler</p>
+
+  <!-- EDIT: plan contract -->
+  <h2>The plan contract</h2>
+  <p><code>router.parse_plan</code> turns a prompt into an ordered list of validated steps, so one request runs several actions:</p>
+  <div class="card wrap">{ "steps": [
+    { "action": "find_image", "query": "photoshoot",
+      "after": "2026-01-01", "before": "2026-01-31" },
+    { "action": "open_app", "app": "paint" }
+] }</div>
+  <div class="table-wrap"><table>
+    <tr><th>action</th><th>fields</th><th>handler</th></tr>
+    <tr><td>find_image / find_video / find_document</td><td>query, optional after/before (YYYY-MM-DD)</td><td>handlers/search.py</td></tr>
+    <tr><td>open_app</td><td>app</td><td>handlers/apps.py (fuzzy launch)</td></tr>
+    <tr><td>veracrypt_create</td><td>size_gb (prompts for the password itself)</td><td>handlers/veracrypt.py</td></tr>
+    <tr><td>shell</td><td>task — any other job</td><td>handlers/shell.py (propose → confirm → run)</td></tr>
+    <tr><td>unknown</td><td>—</td><td>reported, skipped</td></tr>
+  </table></div>
+  <p><code>cli._run_request</code> dispatches each step in order, prints a header when there's more than one, and <b>continues past a failed step</b> so "open paint" still runs when the search finds nothing.</p>
+
+  <!-- EDIT: indexing -->
+  <h2>Indexing pipeline</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 250" role="img" aria-label="per file: skip if unchanged, caption or extract, embed, upsert">
+      <rect class="box" x="20" y="100" width="150" height="54" rx="6"/><text class="lbl mid" x="95" y="124">file under scan_dirs</text><text class="lbl-s mid" x="95" y="142">walk once</text>
+      <path class="arr" d="M172 127 H212"/>
+      <path class="box" d="M275 95 L330 127 L275 159 L220 127 Z"/><text class="lbl-s mid" x="275" y="131">mtime new?</text>
+      <path class="arr-d red" d="M275 95 V60 H360"/><text class="lbl-r" x="285" y="52">no → skip (incremental)</text>
+      <path class="arr" d="M330 127 H370"/>
+      <rect class="fillbox" x="372" y="80" width="220" height="94" rx="6"/>
+      <text class="lbl mid" x="482" y="104">caption / extract</text>
+      <text class="lbl-s mid" x="482" y="126">image → vision model sees it</text>
+      <text class="lbl-s mid" x="482" y="144">video → frame (ffmpeg ~25%) → caption</text>
+      <text class="lbl-s mid" x="482" y="162">doc → extract text (capped)</text>
+      <path class="arr" d="M594 127 H634"/>
+      <rect class="box" x="636" y="100" width="160" height="54" rx="6"/><text class="lbl mid" x="716" y="122">embed</text><text class="lbl-s mid" x="716" y="142">filename + "\n" + caption</text>
+      <path class="arr" d="M798 127 H838"/>
+      <rect class="box" x="840" y="100" width="130" height="54" rx="6"/><text class="lbl mid" x="905" y="122">store.upsert</text><text class="lbl-s mid" x="905" y="142">SQLite row</text>
+      <text class="lbl-r" x="372" y="210">then prune rows whose file no longer exists · filename carries intent, so it's part of the embed</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="FND-02">the caption (not the pixels) is what gets embedded and searched</figcaption>
+  </figure>
+
+  <!-- EDIT: search + recognition -->
+  <h2>Search &amp; the recognition fix</h2>
+  <div class="cols">
+    <div>
+      <h4>Search</h4>
+      <p>Query text → same embed model → cosine similarity in numpy over all rows. Sub-second for a personal library (tens of thousands of items).
+        Date phrases become an <code>mtime</code> range. Isolated behind <code>store.search</code> so an ANN index can replace it later.</p>
+      <p class="margin">mtime, not EXIF: good for "files from that month", not authoritative for when a photo was taken. EXIF dating is on the roadmap.</p>
+    </div>
+    <div>
+      <h4>Stopping name hallucination</h4>
+      <p>The captioner receives the filename + a parsed <code>source_handle</code> as identity context. The prompt: map a handle to a real person for portraits; name a recognizable fictional character + franchise; <b>never</b> invent a celebrity from appearance; strip the "Here is a description…" preamble.</p>
+      <div class="card wrap">palaktiwarii_…jpg
+  before: "Kiara Advani"   ✗
+  after:  "Palak Tiwari"   ✓</div>
+    </div>
+  </div>
+
+  <!-- EDIT: shell safety -->
+  <h2>The <code>shell</code> hatch &amp; its safety</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 160" role="img" aria-label="shell action: propose, risk-flag, confirm, run">
+      <rect class="box" x="10" y="50" width="150" height="54"/><text class="lbl mid" x="85" y="74">task description</text><text class="lbl-s mid" x="85" y="92">"zip the pdfs…"</text>
+      <path class="arr" d="M162 77 H200"/>
+      <rect class="box" x="202" y="50" width="160" height="54"/><text class="lbl mid" x="282" y="74">LLM proposes</text><text class="lbl-s mid" x="282" y="92">ONE OS command</text>
+      <path class="arr" d="M364 77 H402"/>
+      <rect class="fillbox" x="404" y="50" width="160" height="54"/><text class="lbl mid" x="484" y="74">show + risk flag</text><text class="lbl-s mid" x="484" y="92">explanation</text>
+      <path class="arr" d="M566 77 H604"/>
+      <path class="box" d="M670 45 L720 77 L670 109 L620 77 Z"/><text class="lbl-s mid" x="668" y="81">confirm?</text>
+      <path class="arr" d="M720 77 H770"/><rect class="box" x="772" y="50" width="110" height="54"/><text class="lbl mid" x="827" y="80">run</text>
+      <path class="arr-d red" d="M668 45 V18 H540"/><text class="lbl-r" x="420" y="14">default NO → skipped</text>
+    </svg>
+    </div>
+    <figcaption>arbitrary execution by design, but every side effect is gated behind a human approving the exact command</figcaption>
+  </figure>
+  <p class="small">VeraCrypt keeps its own handler (not folded into <code>shell</code>) only for the safer password UX: on macOS/Linux VeraCrypt prompts directly, so the secret never enters finder's process, shell history, or the process list.</p>
+
+  <!-- EDIT: module map -->
+  <h2>Module map</h2>
+  <div class="table-wrap"><table>
+    <tr><th>module</th><th>job</th></tr>
+    <tr><td><code>cli.py</code></td><td>arg parsing, command dispatch, step runner</td></tr>
+    <tr><td><code>router.py</code></td><td>prompt → validated plan</td></tr>
+    <tr><td><code>llm.py</code></td><td>Ollama client: generate (text+vision), embed, JSON parse</td></tr>
+    <tr><td><code>indexer.py</code> / <code>extract.py</code> / <code>video.py</code></td><td>walk + caption/extract + frame grab</td></tr>
+    <tr><td><code>store.py</code></td><td>SQLite vector store + cosine search</td></tr>
+    <tr><td><code>platform.py</code> + <code>handlers/</code></td><td>OS calls; one module per action</td></tr>
+  </table></div>
+
+</main>
+</body>
+</html>

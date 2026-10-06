@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>finder — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="finder" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">one day, eight commits, v0.1 → full feature set</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log (all 19 Sep 2026)</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">07:53</span><span class="what">offline local NL file &amp; action agent (v0.1)</span><span class="sha">af2736f</span><br>
+      22 files, +1,275. Router, find_image (vision captions + embeddings), find_document, open_app, veracrypt_create, SQLite vector index, docs.</li>
+    <li class="big"><span class="when">08:01</span><span class="what">multi-action plans, general shell action, date-filtered search</span><span class="sha">9510ade</span><br>
+      Planner returns an ordered list; a generic <code>shell</code> action for anything off-menu; after/before mtime bounds with soft fallback.</li>
+    <li><span class="when">08:19</span><span class="what">terminal preview cards (SVG)</span><span class="sha">2a83b58</span><br>Deterministic offline SVG mockups for the README.</li>
+    <li class="big"><span class="when">08:41</span><span class="what">feed filename/handle context to captioner, stop name hallucination</span><span class="sha">a0bf4e2</span><br>The identity fix (decision 10).</li>
+    <li><span class="when">09:19</span><span class="what">default vision_model to qwen2.5vl:32b</span><span class="sha">e144f5e</span><br>Strongest VLM that fits 48 GB; documented that it doesn't beat gemma3+handle on real-person ID.</li>
+    <li class="big"><span class="when">09:31</span><span class="what">index and search videos (find_video)</span><span class="sha">f24e0b3</span><br>ffmpeg frame (~25% in) → caption → <code>kind='video'</code>; <code>--kind</code> flag.</li>
+    <li><span class="when">09:40</span><span class="what">fix(cli): show video count in status</span><span class="sha">d7b5006</span></li>
+    <li><span class="when">09:46</span><span class="what">polish repo, refresh docs &amp; previews</span><span class="sha">a8fea02</span></li>
+  </ol>
+  <p class="margin">The repo keeps its own <code>docs/DECISIONS.md</code> — a numbered, dated decision log with trade-offs and validation runs. These notes lean on it.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Key decisions (condensed from DECISIONS.md)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>decision</th><th>why</th></tr>
+    <tr><td>1</td><td>Local LLM for intent routing</td><td>flows too varied for rules; stays offline</td></tr>
+    <tr><td>2</td><td>Vision-captioning, not CLIP</td><td>avoids torch; reuses an installed multimodal model</td></tr>
+    <tr><td>3</td><td><code>nomic-embed-text</code> embeddings</td><td>one small model, same runtime; filename prepended</td></tr>
+    <tr><td>4</td><td>SQLite + numpy cosine</td><td>no services; sub-second at personal scale; swappable</td></tr>
+    <tr><td>5</td><td>Incremental index by mtime</td><td>"iterative yet efficient"</td></tr>
+    <tr><td>6</td><td>VeraCrypt prompts for its own password</td><td>secret never enters finder's process</td></tr>
+    <tr><td>7</td><td>Plans, not single intents</td><td>real requests bundle actions</td></tr>
+    <tr><td>8</td><td>General <code>shell</code> action</td><td>not capped at a fixed menu; human approves every command</td></tr>
+    <tr><td>10</td><td>Filename/handle context, forbid guessed names</td><td>kills identity hallucination</td></tr>
+    <tr><td>11</td><td>Video = single representative frame</td><td>offline, ~10 s/clip; multi-frame is next</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it (from the validation runs)</h2>
+  <ul class="dash">
+    <li><b>find_document</b>: "expense tracker of 2025" ranked the budget doc at <b>82%</b> vs a decoy at <b>49%</b>.</li>
+    <li><b>find_image</b>: "kids playing in rain" was the top hit on a synthetic set.</li>
+    <li><b>date filter</b>: same query scoped to March 2026 → no matches; Jan 2026 → matched.</li>
+    <li><b>shell safety</b>: "delete everything in …" was flagged RISKY and skipped when declined.</li>
+    <li><b>incremental</b>: second index run skipped 3/3 unchanged files.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending (roadmap)</h2>
+  <ul class="checks">
+    <li>Multi-frame video sampling for better recall.</li>
+    <li>OCR for scanned PDFs / screenshots (text extraction only today).</li>
+    <li>EXIF-based photo dating instead of mtime.</li>
+    <li>A smaller default vision model so the first index isn't slow.</li>
+    <li>Optional ANN index (sqlite-vec / FAISS) past ~100k items.</li>
+    <li>Unit tests for the router contract and <code>store.search</code>.</li>
+    <li>More system actions (mount/unmount VeraCrypt, screenshots) on the same router+handler pattern.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Ollama + models</b><br>Pull a router (gemma3), a vision model (qwen2.5vl), and <code>nomic-embed-text</code>.</li>
+    <li><b>Store</b><br>SQLite table (path, kind, caption, mtime, size, vector blob); <code>upsert</code>, <code>search</code> (numpy cosine), prune.</li>
+    <li><b>Indexer</b><br>Walk scan_dirs; skip unchanged mtime; caption images (and video frames via ffmpeg) with the vision model; extract doc text; embed <code>filename + caption</code>.</li>
+    <li><b>Router</b><br>One prompt → strict JSON plan (list of steps); validate each step against the contract.</li>
+    <li><b>Handlers</b><br>search (with after/before), apps (fuzzy launch per OS), veracrypt (CLI, password prompt), shell (propose → risk-flag → confirm → run).</li>
+    <li><b>CLI</b><br><code>finder "&lt;request&gt;"</code>, <code>index [--reindex] [--kind]</code>, <code>status</code>, <code>config</code>; run plan steps in order, continue past failures.</li>
+    <li><b>Harden recognition</b><br>Pass filename + handle to the captioner; forbid invented names; strip preambles.</li>
+  </ol>
+
+</main>
+</body>
+</html>

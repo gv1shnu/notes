@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>finder — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="finder" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>finder</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/finder · Python · 8 commits · all on 19 Sep 2026 · ~1,970 lines</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">I know what a file <i>is</i> ("the photo of kids playing in the rain", "my 2025 expense tracker") but not where it lives
+    or what I named it. And I wanted to drive my desktop in plain English, from the terminal, <span class="hl">entirely offline</span>.</p>
+  <p>The brief: natural-language prompts in a Windows/Mac terminal; four flows (find image by content, find document by content, open an app,
+    create a VeraCrypt container); completely local, iterative yet efficient. Then it grew past the four.</p>
+
+  <!-- EDIT: examples -->
+  <div class="card wrap">finder "find me the image with kids playing in rain"
+finder "find the document with my 2025 expense tracker"
+finder "open up valorant"
+finder "create a new veracrypt container with 50gb, ask me for the password"
+finder "find my photoshoot from jan 2026, and open paint"   # several actions
+finder "zip all the pdfs in my Downloads into archive.zip"  # anything else</div>
+
+  <!-- EDIT: the idea -->
+  <h2>The idea: the model plans, plain code acts</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 920 230" role="img" aria-label="prompt to planner to ordered steps to handlers">
+      <rect class="box" x="20" y="90" width="150" height="54" rx="6"/><text class="lbl mid" x="95" y="114">your prompt</text><text class="lbl-s mid" x="95" y="132">free-form English</text>
+      <path class="arr" d="M172 117 H212"/>
+      <rect class="fillbox" x="214" y="80" width="180" height="74" rx="6"/><text class="lbl mid" x="304" y="106">planner (local LLM)</text><text class="lbl-s mid" x="304" y="126">gemma3:27b → JSON</text><text class="lbl-s mid" x="304" y="144">ordered list of steps</text>
+      <path class="arr" d="M396 117 H436"/>
+      <rect class="box" x="438" y="40" width="200" height="150" rx="6"/>
+      <text class="lbl mid" x="538" y="62">handlers (in order)</text>
+      <text class="lbl-s" x="452" y="86">find_image / _video / _document</text>
+      <text class="lbl-s" x="452" y="108">open_app</text>
+      <text class="lbl-s" x="452" y="130">veracrypt_create</text>
+      <text class="lbl-s" x="452" y="152">shell — the "anything" hatch</text>
+      <text class="lbl-s" x="452" y="178">each step = plain, testable code</text>
+      <path class="arr" d="M640 115 H690"/>
+      <rect class="box" x="692" y="88" width="200" height="58" rx="6"/><text class="lbl mid" x="792" y="112">local index + OS</text><text class="lbl-s mid" x="792" y="132">SQLite · Ollama · subprocess</text>
+      <text class="lbl-r" x="214" y="200">the planner is the ONLY free-form step</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="FND-01">constrain the model to a JSON contract → the rest of the system is ordinary code</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>The four flows are too varied for regex ("50gb", "expense tracker of 2025", "kids playing in rain"): an LLM is the only robust offline parser.</li>
+      <li><b>CLIP would mean torch</b> (heavy, no new-Python wheels). But a local vision model can <i>see</i> an image and caption it, so I caption at index time and embed the caption, no extra ML deps.</li>
+      <li>A vision model given only pixels <b>hallucinates identities</b>: it captioned a photo from the <code>palaktiwarii</code> account as "Kiara Advani". The filename carries a reliable signal.</li>
+      <li>A bigger model doesn't fix niche recognition: a game-character render stays unidentified even on <code>qwen2.5vl:32b</code>, which answers "Unsure". That's a training-data ceiling, not a size one.</li>
+      <li>Users don't ask one thing at a time, and they ask for things off the menu. Hence plans, and a general confirm-then-run <code>shell</code> action.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>the anti-hallucination rule</h4>
+        The captioner may name a real person from a handle, or a known fictional character, but <b>must not invent a celebrity from looks alone</b> —
+        it describes generically when unsure. finder refuses to guess.
+      </div>
+      <div class="margin">offline at runtime: the only connection is to localhost:11434 (Ollama).</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Models (Ollama)</th><td>router <code>gemma3:27b</code>, vision <code>qwen2.5vl:32b</code>, embeddings <code>nomic-embed-text</code></td></tr>
+    <tr><th>Index</th><td>SQLite at <code>~/.finder/index.db</code>; numpy cosine; incremental by mtime</td></tr>
+    <tr><th>Extraction</th><td>pymupdf (PDF), python-docx, openpyxl, text; ffmpeg for a video frame</td></tr>
+    <tr><th>Commands</th><td><code>finder "&lt;request&gt;"</code>, <code>index [--reindex] [--kind]</code>, <code>status</code>, <code>config</code></td></tr>
+    <tr><th>Reference HW</th><td>M5 Max / 48 GB; smaller machines set <code>qwen2.5vl:7b</code> in config</td></tr>
+    <tr><th>Deployed</th><td>Not deployed; a local desktop CLI.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
