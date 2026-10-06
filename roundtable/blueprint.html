@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>roundtable — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="roundtable" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">six small modules under <code>multivoice/</code></p>
+
+  <!-- EDIT: module diagram -->
+  <h2>Modules</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="run.py wires config, llm, orchestrator, transcript, stt and tts">
+      <rect class="fillbox" x="40" y="120" width="150" height="60" rx="6"/><text class="lbl-b mid" x="115" y="146">run.py</text><text class="lbl-s mid" x="115" y="166">CLI loop</text>
+      <path class="arr" d="M192 140 L300 60"/><path class="arr" d="M192 150 H300"/><path class="arr" d="M192 160 L300 240"/>
+      <rect class="box" x="302" y="30" width="190" height="56" rx="6"/><text class="lbl mid" x="397" y="54">config.py</text><text class="lbl-s mid" x="397" y="72">YAML → dataclasses</text>
+      <rect class="box" x="302" y="122" width="190" height="56" rx="6"/><text class="lbl mid" x="397" y="146">orchestrator.py</text><text class="lbl-s mid" x="397" y="164">round(), two modes</text>
+      <rect class="box" x="302" y="214" width="190" height="56" rx="6"/><text class="lbl mid" x="397" y="238">stt.py / tts.py</text><text class="lbl-s mid" x="397" y="256">lazy heavy imports</text>
+      <path class="arr" d="M494 140 H600"/><path class="arr" d="M494 160 L600 230"/>
+      <rect class="box" x="602" y="110" width="170" height="56" rx="6"/><text class="lbl mid" x="687" y="134">llm.py</text><text class="lbl-s mid" x="687" y="152">ollama.Client.chat</text>
+      <rect class="box" x="602" y="206" width="170" height="56" rx="6"/><text class="lbl mid" x="687" y="230">transcript.py</text><text class="lbl-s mid" x="687" y="248">list[Turn], tail(n)</text>
+      <path class="arr" d="M774 138 H850"/><rect class="box2" x="852" y="110" width="120" height="56" rx="6"/><text class="lbl mid" x="912" y="134">Ollama</text><text class="lbl-s mid" x="912" y="152">:11434</text>
+      <text class="lbl-r" x="560" y="60">text-only needs just ollama + PyYAML</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="RT-02">voice is optional and imported only when enabled</figcaption>
+  </figure>
+
+  <!-- EDIT: modes -->
+  <h2>The two context modes</h2>
+  <div class="cols">
+    <figure class="sk">
+      <svg viewBox="0 0 420 250" role="img" aria-label="conversation mode: each agent sees earlier replies">
+        <text class="lbl-b" x="10" y="22">conversation (live debate)</text>
+        <rect class="box" x="10" y="40" width="400" height="30"/><text class="lbl-s" x="18" y="60">transcript T</text>
+        <path class="arr" d="M60 72 V100"/><rect class="box" x="20" y="102" width="90" height="30"/><text class="lbl-s mid" x="65" y="122">A sees T</text>
+        <path class="arr" d="M112 117 H150"/><rect class="box" x="152" y="102" width="110" height="30"/><text class="lbl-s mid" x="207" y="122">B sees T+A</text>
+        <path class="arr" d="M264 117 H290"/><rect class="box" x="292" y="102" width="118" height="30"/><text class="lbl-s mid" x="351" y="122">C sees T+A+B</text>
+        <text class="lbl-s" x="10" y="170">each reply appended immediately</text>
+        <text class="lbl-r" x="10" y="200">one_turn() → transcript.add() → next</text>
+      </svg>
+    </figure>
+    <figure class="sk">
+      <svg viewBox="0 0 420 250" role="img" aria-label="query mode: all agents see the frozen transcript">
+        <text class="lbl-b" x="10" y="22">query (blind, simultaneous)</text>
+        <rect class="box" x="10" y="40" width="400" height="30"/><text class="lbl-s" x="18" y="60">frozen = transcript T</text>
+        <path class="arr" d="M70 72 V100 M210 72 V100 M350 72 V100"/>
+        <rect class="box" x="20" y="102" width="100" height="30"/><text class="lbl-s mid" x="70" y="122">A sees T</text>
+        <rect class="box" x="160" y="102" width="100" height="30"/><text class="lbl-s mid" x="210" y="122">B sees T</text>
+        <rect class="box" x="300" y="102" width="100" height="30"/><text class="lbl-s mid" x="350" y="122">C sees T</text>
+        <path class="arr" d="M70 134 L200 170 M210 134 V166 M350 134 L220 170"/>
+        <rect class="fillbox" x="120" y="170" width="180" height="30"/><text class="lbl-s mid" x="210" y="190">reveal all → append</text>
+        <text class="lbl-r" x="10" y="230">visible to others only next round</text>
+      </svg>
+    </figure>
+  </div>
+  <p><code>test_modes.py</code> proves it with a <b>stub LLM</b> that records each prompt: in conversation mode agent 2's prompt contains
+    <code>REPLY_FROM[agent1]</code>; in query mode it must not.</p>
+
+  <!-- EDIT: prompt -->
+  <h2>The prompt every participant gets</h2>
+  <div class="card wrap">SYSTEM: {persona}
+You are {name}, one voice in a live group conversation with {others}, and a human called User.
+Stay fully in character. React to what others have said so far — agree, build, or push back.
+Reply ONLY with your own next contribution, in the first person, with no name prefix and no stage directions.
+Keep it to at most {max_reply_sentences} sentences.
+
+USER: Conversation so far:
+{last 20 turns as "Speaker: text"  |  "(nothing said yet — you are opening.)"}
+
+Your turn, {name}:</div>
+
+  <!-- EDIT: config knobs -->
+  <h2>Config knobs</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>key</th><th>default</th><th>effect</th></tr>
+    <tr><td><code>conversation.context_mode</code></td><td>conversation</td><td>debate vs blind rounds</td></tr>
+    <tr><td><code>conversation.auto_rounds</code></td><td>1</td><td>full cycles before pausing for you</td></tr>
+    <tr><td><code>conversation.context_turns</code></td><td>20</td><td>how much history each model sees</td></tr>
+    <tr><td><code>conversation.max_reply_sentences</code></td><td>4</td><td>keeps spoken turns short</td></tr>
+    <tr><td><code>conversation.temperature</code></td><td>0.8</td><td>variety between voices</td></tr>
+    <tr><td><code>voice.tts_enabled / stt_enabled</code></td><td>true / false</td><td>Kokoro out / Whisper in</td></tr>
+    <tr><td><code>voice.whisper_model</code></td><td>base</td><td>tiny … large-v3 (bigger = better + slower)</td></tr>
+  </table>
+  </div>
+
+</main>
+</body>
+</html>

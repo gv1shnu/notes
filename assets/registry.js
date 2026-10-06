@@ -64,5 +64,13 @@ window.NOTEBOOK = {
       stack: ["ES modules", "IndexedDB", "JSON"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // roundtable
+      slug: "roundtable", name: "roundtable", shelf: "ai", status: "local",
+      tagline: "Three local LLMs with personas and voices debate a topic out loud; I interject by typing or speaking.",
+      url: "https://github.com/gv1shnu/roundtable", live: null,
+      start: "2026-07-19", end: "2026-09-28", commits: 2,
+      stack: ["Python", "Ollama", "Kokoro", "Whisper"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

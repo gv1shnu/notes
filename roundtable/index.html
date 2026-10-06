@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>roundtable — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="roundtable" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>roundtable (multi-voice)</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/roundtable · Python 3.12 · 2 commits · Jul–Sep 2026 · ~780 lines</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">One chatbot talking to itself has one reasoning style. I wanted a table of <i>different</i> models, each with a persona and a voice,
+    debating a topic out loud while I sit in and interject, fully offline: no cloud, no keys, no per-token cost.</p>
+
+  <!-- EDIT: the table drawing -->
+  <h2>Who sits at the table</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 360" role="img" aria-label="three local models and the user around a round table">
+      <ellipse class="circ" cx="450" cy="185" rx="170" ry="95"/>
+      <text class="lbl-t mid" x="450" y="180">shared transcript</text>
+      <text class="lbl-s mid" x="450" y="204">last 20 turns · "Name: line"</text>
+      <!-- seats -->
+      <circle class="circ" cx="190" cy="110" r="44"/><text class="lbl-b mid" x="190" y="108">Gemmini</text><text class="lbl-s mid" x="190" y="126">gemma3:12b</text>
+      <text class="lbl-s" x="40" y="180">voice am_michael</text><text class="lbl-s" x="40" y="198">analytical, structured</text>
+      <circle class="circ" cx="710" cy="110" r="44"/><text class="lbl-b mid" x="710" y="108">Chatsby</text><text class="lbl-s mid" x="710" y="126">llama3.1:8b</text>
+      <text class="lbl-s" x="760" y="180">voice af_heart</text><text class="lbl-s" x="760" y="198">warm, synthesises</text>
+      <circle class="circ" cx="450" cy="325" r="40"/><text class="lbl-b mid" x="450" y="322">Claudia</text><text class="lbl-s mid" x="450" y="340">qwen3.6</text>
+      <text class="lbl-s" x="510" y="320">voice bm_george · careful, pushes back</text>
+      <rect class="fillbox" x="400" y="22" width="100" height="44" rx="6"/><text class="lbl-b mid" x="450" y="50">User</text>
+      <text class="lbl-s mid" x="450" y="14">types or /voice (Whisper)</text>
+      <path class="arr" d="M230 125 Q320 150 300 170"/><path class="arr" d="M670 125 Q580 150 600 170"/><path class="arr" d="M450 284 V262"/><path class="arr" d="M450 68 V88"/>
+      <text class="lbl-r" x="600" y="40">turns go round-robin →</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="RT-01">open-weight stand-ins: Gemma ≈ Google, Llama ≈ "ChatGPT-ish", Qwen ≈ "Claude-ish"</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>Turns are sequential, so <b>only one model is loaded at a time</b>: you need VRAM for the largest single model, not the sum.</li>
+      <li>On my reference RTX 3080 Ti Laptop (16 GB VRAM), <code>qwen3.6</code> (~23 GB) spills into system RAM and is by far the slowest turn; the others stay on GPU.</li>
+      <li>The ML/audio stack (torch, kokoro, faster-whisper) had no wheels for newer Pythons: <b>pin to 3.12</b>.</li>
+      <li>Models drift into prefixing their own name and writing stage directions. The system prompt has to forbid both.</li>
+      <li>"Debate" and "independent opinions" are different products, so the context mode became a config switch.</li>
+    </ul>
+    <div class="note">
+      <h4>controls</h4>
+      Type a topic to start. After each round: <b>Enter</b> = let them continue, type = join in, <code>/voice</code> = speak, <code>/quit</code> = stop.
+      <br><code>python run.py --list-voices</code>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>LLM</th><td>Ollama via the <code>ollama</code> Python client, <code>chat()</code> with system + user, temperature 0.8</td></tr>
+    <tr><th>TTS</th><td>Kokoro <code>KPipeline</code>, 24 kHz, CUDA if available, played with <code>sounddevice</code></td></tr>
+    <tr><th>STT</th><td><code>faster-whisper</code> (model "base"), 16 kHz mic recording until Enter</td></tr>
+    <tr><th>Config</th><td>one <code>config.yaml</code>: participants, conversation, voice</td></tr>
+    <tr><th>Platforms</th><td>Windows (NVIDIA, CUDA torch build) and macOS (Metal/CPU torch)</td></tr>
+    <tr><th>Deployed</th><td>Not deployed; a local desktop CLI by design.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
