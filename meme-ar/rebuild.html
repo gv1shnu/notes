@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>meme-ar — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="meme-ar" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">4 Oct 2026</span><span class="what">Rebuild as Punchline: in-browser meme reactions for uploaded videos</span><br>
+      A single commit — a full rebuild of the earlier meme-ar idea into the current on-device pipeline: perception, camera, tracking, 14 detectors, the comedic planner, placement, GIPHY stickers, and one compositor for preview + export, with unit tests throughout.</li>
+  </ol>
+  <p class="margin">The repo name stayed "meme-ar"; the product is "Punchline". The history was squashed into one clean commit at the rebuild.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>All analysis on-device (MediaPipe)</td><td>privacy: the video never leaves the browser</td><td>limited by the laptop GPU; a server proxy only for the key</td></tr>
+    <tr><td>Analyse the whole clip, not live</td><td>confirm sustained cues but stamp their onset → accurate, few false positives</td><td>can't react in real time</td></tr>
+    <tr><td>Estimate camera motion first</td><td>pans/cuts otherwise look like people moving</td><td>extra per-frame work</td></tr>
+    <tr><td>Ephemeral ids reset per cut</td><td>no recognition, no identity to leak; simpler tracker</td><td>a person loses their id across a cut</td></tr>
+    <tr><td>Comedic delay as a per-type mode, seeded</td><td>timing is the joke; reproducible plans are testable</td><td>timing tuning is subjective</td></tr>
+    <tr><td>Score + cooldown + density budget</td><td>a reaction every second isn't funny</td><td>some real moments get skipped</td></tr>
+    <tr><td>One compositor for preview + export</td><td>what you see is what you get; no second render path</td><td>export re-plays in real time</td></tr>
+    <tr><td>Serverless proxy with fixed terms</td><td>static-host the app while hiding the key and preventing abuse</td><td>search is limited to the app's own terms</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Timing</b>: does the sticker land a beat after the moment, not on it?</li>
+    <li><b>Precision</b>: false reactions from camera motion / crowd hallucinations kept low.</li>
+    <li><b>Density</b>: reactions spaced, never a wall of stickers.</li>
+    <li><b>Speed</b>: analysis ≈ 0.8× video length on a laptop GPU.</li>
+    <li><b>Reproducibility</b>: same video + seed → same edit (unit-tested).</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Re-identify people across camera cuts (currently ids reset).</li>
+    <li>Export without real-time replay (offline encode).</li>
+    <li>More event types and sticker variety; per-event sticker tuning.</li>
+    <li>Better distant/crowd face handling beyond the head-crop pass.</li>
+    <li>Upgrade the GIPHY key to production for real traffic.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Frame sampler</b><br>Decode the uploaded video to ~8 fps frames in the browser; no upload.</li>
+    <li><b>Perception</b><br>Run MediaPipe pose + face blendshapes + an object model per frame; GPU with CPU fallback; an upscaled head-crop pass for small faces.</li>
+    <li><b>Camera + tracking</b><br>Estimate cuts and global shift; a greedy IoU tracker with ids that reset at each cut.</li>
+    <li><b>Detectors</b><br>14 event types reading pose/face/objects/audio; confirm sustained, stamp onset; plausibility-gate hallucinations.</li>
+    <li><b>Planner</b><br>Score funniness; enforce spacing, per-type cooldown, density budget; map each type to instant/beat/delayed and sample a seeded delay.</li>
+    <li><b>Placement + stickers</b><br>Place beside the head on the roomier side; GIPHY search via a serverless proxy (fixed terms, CDN cache) with emoji fallback.</li>
+    <li><b>Compositor</b><br>One canvas renderer for both live preview and MediaRecorder export, keeping original audio.</li>
+    <li><b>Ship</b><br>Vite build + a serverless function on Vercel; unit tests via a synthetic-frame testkit.</li>
+  </ol>
+
+</main>
+</body>
+</html>

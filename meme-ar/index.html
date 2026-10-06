@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>meme-ar — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="meme-ar" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>meme-ar: Punchline</h1>
+    <span class="stamp">live on vercel</span>
+  </div>
+  <p class="sub">gv1shnu/meme-ar · TypeScript + MediaPipe · 1 commit (rebuilt) · 4 Oct 2026 · meme-ar.vercel.app</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Drop in a video and get meme reactions added <i>exactly</i> when the funny moments happen — a surprised face, a facepalm, a fall, a snack grab, an awkward silence — stickers that follow the person they're reacting to.</p>
+  <p>The hard constraint I set: <span class="hl">everything runs in the browser</span>. The video is analysed on-device with MediaPipe and never uploaded. The only server code is a tiny proxy that keeps the GIPHY key secret.</p>
+
+  <!-- EDIT: pipeline -->
+  <h2>The pipeline</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 220" role="img" aria-label="sample frames, perceive, track, detect events, plan with timing, fetch stickers, place and render">
+      <rect class="box" x="10" y="90" width="120" height="50" rx="6"/><text class="lbl-s mid" x="70" y="112">sample 8 fps</text><text class="lbl-s mid" x="70" y="130">frames</text>
+      <path class="arr" d="M132 115 H162"/>
+      <rect class="fillbox" x="164" y="80" width="150" height="70" rx="6"/><text class="lbl-s mid" x="239" y="102">MediaPipe</text><text class="lbl-s mid" x="239" y="120">pose · face · objects</text><text class="lbl-s mid" x="239" y="138">+ camera cut · audio</text>
+      <path class="arr" d="M316 115 H346"/>
+      <rect class="box" x="348" y="90" width="120" height="50" rx="6"/><text class="lbl-s mid" x="408" y="112">track people</text><text class="lbl-s mid" x="408" y="130">P1, P2… (per cut)</text>
+      <path class="arr" d="M470 115 H500"/>
+      <rect class="box" x="502" y="90" width="120" height="50" rx="6"/><text class="lbl-s mid" x="562" y="112">detect events</text><text class="lbl-s mid" x="562" y="130">14 types</text>
+      <path class="arr" d="M624 115 H654"/>
+      <rect class="fillbox" x="656" y="80" width="140" height="70" rx="6"/><text class="lbl-s mid" x="726" y="102">plan reactions</text><text class="lbl-s mid" x="726" y="120">score · space · cooldown</text><text class="lbl-s mid" x="726" y="138">+ comedic delay</text>
+      <path class="arr" d="M798 115 H828"/>
+      <rect class="box" x="830" y="90" width="140" height="50" rx="6"/><text class="lbl-s mid" x="900" y="112">GIPHY → place</text><text class="lbl-s mid" x="900" y="130">preview / MP4 export</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="MA-01">on-device perception → event detection → comedic planning → compositing</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What makes it work (and the clever bits)</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>The whole clip is known</b>, so a cue can be <i>confirmed as sustained</i> but <i>stamped at its true onset</i> — accurate timing without false positives.</li>
+      <li><b>Camera motion fools everything.</b> A cut/pan/tilt reads as people moving unless you estimate global shift first (<code>camera.ts</code>: pixel + colour-histogram change).</li>
+      <li><b>Timing is comedy.</b> A reaction placed on the exact frame isn't funny; each event type has a timing mode — <b>instant</b> (surprise, jump), <b>beat</b> (facepalm, laugh), or <b>delayed</b> — and the delay is seeded so plans are reproducible.</li>
+      <li><b>Not every event deserves a meme.</b> The planner scores funniness, enforces spacing + per-type cooldowns + a density budget, so the video never drowns in stickers.</li>
+      <li><b>Distant faces</b> get an upscaled head-crop pass; crowd pose-model hallucinations are dropped by plausibility gates.</li>
+    </ul>
+    <div>
+      <div class="note green">
+        <h4>privacy by construction</h4>
+        No uploads, no face recognition, no persistent identity. People get session-local ids (P1, P2…) that reset at every camera cut and never outlive the page.
+      </div>
+      <div class="margin">the proxy only accepts the app's own fixed search terms, so the GIPHY key can't become an open search proxy.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Stack</th><td>TypeScript, Vite, React; MediaPipe (pose, face blendshapes, COCO objects), GPU with CPU fallback</td></tr>
+    <tr><th>Events</th><td>14: surprise, laugh, celebrate, facepalm, fall, jump, sudden motion, snack grab, phone check, pet, entrance, exit, awkward silence, loud noise</td></tr>
+    <tr><th>Stickers</th><td>GIPHY via a serverless <code>/api/stickers</code> proxy (key hidden, CDN-cached 1 day); emoji fallback with no key</td></tr>
+    <tr><th>Render</th><td>one compositor for preview and export; canvas + MediaRecorder, original audio kept; MP4 where recordable, else WebM</td></tr>
+    <tr><th>Limits</th><td>≤ 3 min / 500 MB; analysis ≈ 0.8× video length on a laptop GPU</td></tr>
+    <tr><th>Deploy</th><td>Vercel (Vite build + serverless function) → <a href="https://meme-ar.vercel.app">meme-ar.vercel.app</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

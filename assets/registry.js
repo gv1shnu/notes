@@ -152,5 +152,13 @@ window.NOTEBOOK = {
       stack: ["Unity", "C#", "Utility AI", "GA"],
       pages: [ { file: "index", title: "Cover & research" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // meme-ar
+      slug: "meme-ar", name: "meme-ar · Punchline", shelf: "ai", status: "deployed",
+      tagline: "Drops GIPHY meme reactions into a video at the funny moments, analysed on-device so nothing is uploaded.",
+      url: "https://github.com/gv1shnu/meme-ar", live: "https://meme-ar.vercel.app",
+      start: "2026-10-04", end: "2026-10-04", commits: 1,
+      stack: ["TypeScript", "MediaPipe", "GIPHY"],
+      pages: [ { file: "index", title: "Cover & pipeline" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

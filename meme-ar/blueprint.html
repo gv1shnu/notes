@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>meme-ar — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="meme-ar" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">one stage per file, one compositor for preview and export</p>
+
+  <!-- EDIT: module map -->
+  <h2>Stages &amp; files</h2>
+  <div class="table-wrap"><table>
+    <tr><th>stage</th><th>file</th><th>what it does</th></tr>
+    <tr><td>Perception</td><td><code>analysis/perception.ts</code></td><td>pose, face blendshapes (+ upscaled head-crop for distant faces), COCO objects; GPU→CPU fallback</td></tr>
+    <tr><td>Camera</td><td><code>analysis/camera.ts</code></td><td>cut detection (pixel + colour histogram) + global shift, so pans aren't read as motion</td></tr>
+    <tr><td>Tracking</td><td><code>analysis/tracker.ts</code></td><td>greedy IoU tracker; ephemeral ids, reset at each cut; no recognition</td></tr>
+    <tr><td>Events</td><td><code>analysis/detectors.ts</code></td><td>14 event types; sustained-confirm, onset-stamp; plausibility gates</td></tr>
+    <tr><td>Planning</td><td><code>analysis/planner.ts</code></td><td>score, space, cooldown, density budget, comedic delay; seeded</td></tr>
+    <tr><td>Placement</td><td><code>analysis/placement.ts</code></td><td>sticker beside the head on the roomier side; scene reactions to the emptiest corner</td></tr>
+    <tr><td>Stickers</td><td><code>stickers/</code></td><td>GIPHY search, GIF→frames decode, emoji fallback</td></tr>
+    <tr><td>Render</td><td><code>render/</code></td><td>one compositor → live preview and MP4 export (audio kept)</td></tr>
+  </table></div>
+
+  <!-- EDIT: timing model -->
+  <h2>Comedic timing: the planner's job</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 200" role="img" aria-label="event types map to instant beat or delayed timing modes">
+      <line class="ln" x1="30" y1="150" x2="870" y2="150"/><text class="lbl-s" x="30" y="175">video time →</text>
+      <path class="arr red" d="M120 150 V110"/><text class="lbl-s mid" x="120" y="100">surprise</text><text class="lbl-s mid" x="120" y="185">instant</text>
+      <path class="arr red" d="M300 150 V110"/><text class="lbl-s mid" x="300" y="100">jump</text><text class="lbl-s mid" x="300" y="185">instant</text>
+      <path class="arr" d="M460 150 V100"/><text class="lbl-s mid" x="460" y="90">facepalm</text><text class="lbl-s mid" x="500" y="185">+beat</text><path class="ln-d" d="M440 150 H500"/>
+      <path class="arr" d="M650 150 V100"/><text class="lbl-s mid" x="650" y="90">awkward silence</text><text class="lbl-s mid" x="710" y="185">+delayed</text><path class="ln-d" d="M620 150 H720"/>
+      <text class="lbl-r" x="30" y="40">instant = surprise/loud/suddenMotion/jump · beat = celebrate/facepalm/snack/laugh/pet · delayed = the slow burns</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="MA-02">the sticker lands a beat after the moment, not on it — that's the joke</figcaption>
+  </figure>
+  <div class="cols">
+    <div class="card wrap">plan rules (planner.ts):
+  minScore      0.3   (funny enough?)
+  typeCooldown  6s    (per event type)
+  spacing            (global min gap)
+  density budget     (cap total reactions)
+  delay mode    instant | beat | delayed
+  seeded random → reproducible plans</div>
+    <div>
+      <p>Because the plan is seeded, the same video + same seed produces the same meme edit — testable and shareable.</p>
+      <p class="margin">placement picks the roomier side of the head so the sticker never covers the face.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: the sticker key problem -->
+  <h2>Keeping the GIPHY key safe on a static app</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 820 140" role="img" aria-label="browser calls serverless proxy which holds the key and caches">
+      <rect class="box" x="10" y="45" width="150" height="50"/><text class="lbl-s mid" x="85" y="68">browser</text><text class="lbl-s mid" x="85" y="86">fixed search terms</text>
+      <path class="arr" d="M162 70 H220"/>
+      <rect class="fillbox" x="222" y="35" width="200" height="70"/><text class="lbl-s mid" x="322" y="60">/api/stickers (serverless)</text><text class="lbl-s mid" x="322" y="80">holds GIPHY_API_KEY</text><text class="lbl-s mid" x="322" y="98">CDN-cached 1 day</text>
+      <path class="arr" d="M424 70 H482"/>
+      <rect class="box" x="484" y="45" width="120" height="50"/><text class="lbl-s mid" x="544" y="74">GIPHY</text>
+      <text class="lbl-r" x="630" y="55">no key → emoji</text><text class="lbl-r" x="630" y="77">fallback stickers</text>
+    </svg>
+    </div>
+    <figcaption>the proxy accepts only the app's own terms, so it can't be abused as an open search API</figcaption>
+  </figure>
+
+  <!-- EDIT: tests -->
+  <h2>What's tested</h2>
+  <ul class="dash">
+    <li>detectors, planner, placement, camera, the proxy, and render each have unit tests (<code>pnpm test</code>).</li>
+    <li>a <code>testkit.ts</code> builds synthetic perception frames so detectors/planner are tested without a real video.</li>
+    <li>seeded planning makes those tests deterministic.</li>
+  </ul>
+
+</main>
+</body>
+</html>
