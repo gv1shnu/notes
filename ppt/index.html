@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ppt — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="ppt" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>ppt: plain English → PowerPoint</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/ppt · Python · 1 commit · 18 Aug 2026 · ~1,280 lines</p>
+
+  <!-- EDIT: the problem -->
+  <h2>The problem</h2>
+  <p class="lead">I make a lot of teaching decks. Writing the words is the slow part, but every "AI slide maker"
+    I tried either needed the cloud or produced slides with text spilling out of boxes.</p>
+  <p>What I wanted: write a short brief ("open with why indexes matter, compare a scan vs a lookup, show
+    <code>CREATE INDEX</code>, close with a summary"), and get a <code>.pptx</code> that looks designed,
+    generated <span class="hl">on my own laptop</span>, with nothing leaving it.</p>
+
+  <!-- EDIT: observations — what I found before/while building -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <div>
+      <ul class="dash">
+        <li>A 3B model on an 8 GB M1 can write good bullets, but asking it for a <b>whole deck as one JSON</b>
+          truncates and silently drops slides.</li>
+        <li>Small models love to label most slides <code>"section"</code>, so you get a wall of title-only slides.</li>
+        <li>They wrap words in <code>`backticks`</code> and <code>**bold**</code>, which render literally on a slide.</li>
+        <li>They mislabel a code slide as <code>"content"</code>, so the code silently disappears.</li>
+        <li>Generated decks "look off" mostly because <b>text overflows its box</b>, not because of colours.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="note">
+        <h4>the one rule for laptops</h4>
+        The model must fit in RAM <i>with room to spare</i>. An 8B model "fits" by weight on 8 GB,
+        but with ~7 GB already used by the OS it swaps and drops to ~2.5 tok/s, so a whole-deck request times out.
+        <b>Below 16 GB, stay at 3–4B.</b>
+      </div>
+      <div class="margin">qwen2.5:3b ≈ 3.7 GB, ~12 tok/s, unusually clean JSON → default.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: the key idea, as a drawing -->
+  <h2>The idea in one drawing</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 260" role="img" aria-label="The model decides what goes on a slide; Python decides how it looks">
+      <line class="ln-d" x1="450" y1="20" x2="450" y2="240"/>
+      <text class="lbl-t mid" x="225" y="44">the model decides WHAT</text>
+      <text class="lbl-t mid" x="675" y="44">Python decides HOW</text>
+      <rect class="box" x="80" y="70" width="290" height="150" rx="10"/>
+      <text class="lbl" x="100" y="102">• slide type (content / code / …)</text>
+      <text class="lbl" x="100" y="130">• title + purpose line</text>
+      <text class="lbl" x="100" y="158">• 3–5 bullets, optional code</text>
+      <text class="lbl" x="100" y="186">• speaker notes</text>
+      <text class="lbl-s" x="100" y="210">(JSON only, small calls)</text>
+      <path class="arr" d="M372 145 H528"/>
+      <text class="lbl-s mid" x="450" y="135">validated spec</text>
+      <rect class="box" x="530" y="70" width="290" height="150" rx="10"/>
+      <text class="lbl" x="550" y="102">• fonts, colours, spacing</text>
+      <text class="lbl" x="550" y="130">• measured grid, auto-fit text</text>
+      <text class="lbl" x="550" y="158">• Pygments code highlighting</text>
+      <text class="lbl" x="550" y="186">• writes the .pptx file</text>
+      <text class="lbl-s" x="550" y="210">(deterministic, never the model)</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PPT-01">that split is why a 3B model's deck still looks consistent</figcaption>
+  </figure>
+
+  <!-- EDIT: spec sheet -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Interface</th><td>CLI: <code>python main.py brief.txt [-o out.pptx] [--model tag] [--open]</code></td></tr>
+    <tr><th>Model runtime</th><td>Ollama on <code>localhost:11434</code>, <code>/api/chat</code>, <code>format: "json"</code>, <code>think: false</code>, temperature 0.3, <code>num_ctx</code> 4096</td></tr>
+    <tr><th>Default model</th><td><code>qwen2.5:3b</code> (any Ollama tag works)</td></tr>
+    <tr><th>Libraries</th><td><code>python-pptx</code>, <code>requests</code>, <code>Pygments</code> (optional)</td></tr>
+    <tr><th>Output</th><td>16:9 deck (13.333 × 7.5 in), title slide + one slide per outline stub, notes in the notes pane</td></tr>
+    <tr><th>Deployed</th><td>Nowhere. It is a local tool by design: privacy is the point.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

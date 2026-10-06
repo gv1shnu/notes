@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ppt — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="ppt" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">one commit, so the history is short; the decisions are not</p>
+
+  <!-- EDIT: build log (from git history) -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">18 Aug 2026 · 16:04</span>
+      <span class="what">initial commit</span><span class="sha">d0ed0cb</span><br>
+      8 files, +1,467 lines. The whole tool landed at once after local iteration: CLI, two-stage generator,
+      Ollama client, schema normaliser, renderer with the block engine, README with the model table.</li>
+  </ol>
+  <p class="margin">The repo description still says "using pptgenxjs", but the shipped code is Python
+    (<code>python-pptx</code>). The JS route was the first idea; Python won.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Why I decided what I decided</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>decision</th><th>why</th><th>cost</th></tr>
+    <tr><td>Local model via Ollama</td><td>nothing leaves the laptop; free; any model tag works</td><td>quality capped by what fits in 8 GB</td></tr>
+    <tr><td>Outline first, then one call per slide</td><td>one big JSON call truncated and dropped slides; small calls don't, and show progress</td><td>n+1 calls, slower overall</td></tr>
+    <tr><td>Model writes content only</td><td>consistent look regardless of model; text can't break layout</td><td>model can't invent a new visual idea (except via blocks)</td></tr>
+    <tr><td>Per-slide fallback to the stub</td><td>a timeout costs one slide's detail, not the run</td><td>a stub slide is thin</td></tr>
+    <tr><td><code>format: json</code> + <code>think: false</code> + temp 0.3</td><td>clean, fast, repeatable JSON; reasoning models stop rambling</td><td>less creative wording</td></tr>
+    <tr><td>Block engine under presets</td><td>custom layouts without new renderer code paths</td><td>weights are heuristics</td></tr>
+    <tr><td>Estimated text metrics</td><td>no font files needed, cross-platform</td><td>occasionally too conservative</td></tr>
+  </table>
+  </div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>metric</th><th>how I measure it</th><th>recorded</th></tr>
+    <tr><td>slides the model actually wrote</td><td>the run prints <code>wrote ok/total slides</code>; ↺ marks a fallback</td><td>per run, not logged</td></tr>
+    <tr><td>text overflow / clipping</td><td>open the deck, look at every slide</td><td>target: zero</td></tr>
+    <tr><td>generation speed</td><td>tokens/sec on my 8 GB M1</td><td>qwen2.5:3b ≈ 12 tok/s · 8B ≈ 2.5 tok/s (swapping)</td></tr>
+    <tr><td>memory headroom</td><td><code>llmfit</code> estimate vs free RAM</td><td>3.7 GB (qwen2.5:3b) … 5.6 GB (qwen3:8b)</td></tr>
+  </table>
+  </div>
+  <div class="sk">
+    <svg viewBox="0 0 700 170" role="img" aria-label="RAM needed by each model compared with an 8 GB budget">
+      <text class="lbl-b" x="10" y="22">RAM each model needs (llmfit, 8 GB M1)</text>
+            <g>
+        <rect class="fillbox" x="130" y="40" width="222" height="20"/><text class="lbl-s" x="10" y="55">qwen2.5:3b</text><text class="lbl-s" x="360" y="55">3.7 GB ✓ default</text>
+        <rect class="fillbox" x="130" y="70" width="252" height="20"/><text class="lbl-s" x="10" y="85">llama3.2:3b</text><text class="lbl-s" x="390" y="85">4.2 GB</text>
+        <rect class="fillbox" x="130" y="100" width="300" height="20"/><text class="lbl-s" x="10" y="115">qwen3:4b</text><text class="lbl-s" x="438" y="115">5.0 GB</text>
+        <rect class="fillbox red-fill red" x="130" y="130" width="336" height="20"/><text class="lbl-s" x="10" y="145">qwen3:8b</text><text class="lbl-s" x="474" y="145">5.6 GB ✗ swaps</text>
+      </g>
+      <text class="lbl-r" x="540" y="100">7–8B wants ≥ 16 GB</text><text class="lbl-r" x="540" y="122">in practice</text>
+    </svg>
+  </div>
+
+  <!-- EDIT: pending work -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li><code>examples/brief.txt</code> is referenced in the README but was never committed: add it.</li>
+    <li>Fix the repo description (it mentions pptgenxjs).</li>
+    <li>Real font metrics (e.g. measure with Pillow) instead of fixed char widths.</li>
+    <li>Tests for <code>schema.py</code>: it is pure functions and easy to cover.</li>
+    <li><code>--open</code> for Linux/Windows (<code>xdg-open</code> / <code>start</code>).</li>
+    <li>Theme switch (colours/fonts are constants at the top of <code>renderer.py</code>).</li>
+  </ul>
+
+  <!-- EDIT: rebuild guide -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Set up</b><br><code>python3 -m venv .venv &amp;&amp; pip install python-pptx requests Pygments</code>; install Ollama, <code>ollama pull qwen2.5:3b</code>.</li>
+    <li><b>Write the renderer first, with a hand-made JSON</b><br>16:9 <code>Presentation()</code>, blank layout 6, a paper rectangle,
+      header (accent bar + title), footer (deck title + number). Get a hard-coded deck looking right before any model is involved.</li>
+    <li><b>Add <code>fit_font_size</code></b><br>the estimate on the blueprint page; loop from max to min pt in 0.5 steps. Use it for every text box.</li>
+    <li><b>Add blocks</b><br><code>bullets, text, callout, code, steps, cards, columns</code>; <code>render_blocks</code> stacks by weight; then write <code>slide_to_blocks</code> so each type is a recipe.</li>
+    <li><b>Code panel</b><br>dark rounded rect, language label, Pygments <code>lex()</code> per line, map token types → colours; fall back to one colour.</li>
+    <li><b>Schema</b><br><code>normalize_presentation/slide/block</code>: coerce types, infer type, force code layout, strip paired markdown, drop empties.</li>
+    <li><b>Ollama client</b><br>POST <code>/api/chat</code> with <code>format:"json"</code>, <code>stream:false</code>; robust <code>extract_json</code>; <code>merge_slide</code> that only ever adds.</li>
+    <li><b>Two-stage generator</b><br>outline prompt (types, 4–12 slides, follow given structure) → cap sections → per-slide prompt with try/except fallback and <code>[i/n]</code> progress.</li>
+    <li><b>CLI</b><br>argparse: input, <code>-o</code>, <code>--model</code>, <code>--ollama-url</code>, <code>--open</code>.</li>
+  </ol>
+
+</main>
+</body>
+</html>

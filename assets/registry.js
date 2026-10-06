@@ -32,5 +32,13 @@ window.NOTEBOOK = {
 
   // EDIT: one entry per repo folder (kept in commit order)
   repos: [
+    { // ppt
+      slug: "ppt", name: "ppt", shelf: "ai", status: "local",
+      tagline: "Plain-English brief → styled .pptx, drafted by a local 3B model, drawn by Python.",
+      url: "https://github.com/gv1shnu/ppt", live: null,
+      start: "2026-08-18", end: "2026-08-18", commits: 1,
+      stack: ["Python", "python-pptx", "Ollama"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

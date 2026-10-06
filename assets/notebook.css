@@ -193,6 +193,7 @@ th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom
 th { font-family: var(--f-label); font-weight: 400; color: var(--bp); border-bottom: 2px solid var(--ink); }
 .spec th { width: 34%; border-bottom: 1.5px dashed rgba(29,43,90,.3); color: var(--ink-soft); }
 .table-wrap { overflow-x: auto; }
+td:first-child code { white-space: nowrap; }
 
 /* ---------- index cards (code, formulas) ---------- */
 .card {
@@ -239,8 +240,8 @@ th { font-family: var(--f-label); font-weight: 400; color: var(--bp); border-bot
 .red { stroke: var(--red) !important; } .sk .red-fill { fill: rgba(200,52,44,.15); }
 .bp .red { stroke: #ff8f87 !important; }
 .dot { fill: var(--ink); }
-.lbl, .lbl-s, .lbl-b, .lbl-t { fill: var(--ink); font-family: var(--f-label); font-size: 15px; }
-.lbl-s { font-size: 12.5px; opacity: .92; }
+.lbl, .lbl-s, .lbl-b, .lbl-t { fill: var(--ink); font-family: var(--f-label); font-size: 16px; }
+.lbl-s { font-size: 13.5px; opacity: .92; }
 .lbl-b { font-size: 19px; font-weight: 700; }
 .lbl-t { font-family: var(--f-title); font-size: 28px; font-weight: 700; }
 .lbl-r { fill: var(--red); font-family: var(--f-title); font-size: 19px; }
