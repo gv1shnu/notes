@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>learn — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="learn" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">data in JSON, logic in small modules, state in the browser</p>
+
+  <!-- EDIT: architecture -->
+  <h2>Module map</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 420" role="img" aria-label="app.js boot sequence and module dependencies">
+      <rect class="fillbox" x="400" y="20" width="200" height="56" rx="6"/><text class="lbl-b mid" x="500" y="46">src/app.js</text><text class="lbl-s mid" x="500" y="66">boot · shell · global actions</text>
+      <!-- boot steps -->
+      <path class="arr" d="M420 78 L170 140"/><path class="arr" d="M460 78 L380 140"/><path class="arr" d="M540 78 L620 140"/><path class="arr" d="M580 78 L840 140"/>
+      <rect class="box" x="60" y="142" width="220" height="80" rx="6"/><text class="lbl mid" x="170" y="166">① data/loader.js</text><text class="lbl-s mid" x="170" y="186">fetch manifest.json →</text><text class="lbl-s mid" x="170" y="204">fetch every dataset</text>
+      <rect class="box" x="300" y="142" width="200" height="80" rx="6"/><text class="lbl mid" x="400" y="166">② store/progress.js</text><text class="lbl-s mid" x="400" y="186">IndexedDB → memory cache</text><text class="lbl-s mid" x="400" y="204">write-through on change</text>
+      <rect class="box" x="520" y="142" width="200" height="80" rx="6"/><text class="lbl mid" x="620" y="166">③ search/search.js</text><text class="lbl-s mid" x="620" y="186">buildIndex() over all</text><text class="lbl-s mid" x="620" y="204">types + synonyms</text>
+      <rect class="box" x="740" y="142" width="220" height="80" rx="6"/><text class="lbl mid" x="850" y="166">④ router.js</text><text class="lbl-s mid" x="850" y="186">#/path?query → resolve()</text><text class="lbl-s mid" x="850" y="204">→ {html, title, onMount}</text>
+      <path class="arr" d="M400 224 V260"/><path class="arr" d="M850 224 V300 H620"/>
+      <rect class="box" x="300" y="262" width="200" height="56" rx="6"/><text class="lbl mid" x="400" y="286">store/db.js</text><text class="lbl-s mid" x="400" y="304">promise wrapper, 5 stores</text>
+      <rect class="fillbox" x="420" y="300" width="200" height="80" rx="6"/><text class="lbl mid" x="520" y="324">ui/views.js (45 KB)</text><text class="lbl-s mid" x="520" y="344">17 view functions</text><text class="lbl-s mid" x="520" y="362">ui/components.js helpers</text>
+      <rect class="box" x="60" y="262" width="220" height="56" rx="6"/><text class="lbl mid" x="170" y="286">store/exportImport.js</text><text class="lbl-s mid" x="170" y="304">JSON backup, SCHEMA_VERSION 1</text>
+      <path class="ln-d" d="M282 290 H298"/>
+      <text class="lbl-r" x="650" y="345">views read data + progress synchronously</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="LRN-02">no framework: a view is a function returning an HTML string</figcaption>
+  </figure>
+
+  <!-- EDIT: data model -->
+  <h2>Data model: the concept graph</h2>
+  <div class="cols wide-left">
+    <div class="card">concept {
+  id, title, category  → taxonomy node
+  difficulty 0..6, importance
+  prerequisites[]  → concept ids
+  summary, description, whyItMatters, mentalModel
+  offensive[], defensive[], ctf, bugBounty
+  certifications[], vulnerabilities[]
+  resources[] → resource ids
+  platforms[] → platform ids
+  commonMistakes[], related[], next[], tags[]
+  lastVerified
+}</div>
+    <div>
+      <p><b>resource</b> carries <code>freeStatus</code>, <code>accountRequired</code>, <code>paymentRequired</code>, <code>regionRestrictions</code>,
+        <code>qualityScore</code>, <code>relevanceScore</code>, <code>confidence</code>, <code>verificationMethod</code>, <code>backupResources</code>.</p>
+      <p><b>assessment</b>: <code>{conceptId, passThreshold: 0.7, questions[{q, options, answer, explanation}]}</code></p>
+      <p><b>manifest.json</b> lists the datasets and holds <code>searchSynonyms</code> (idor → access control, sqli → sql-injection…).</p>
+    </div>
+  </div>
+
+  <!-- EDIT: progress ladder -->
+  <h2>Progress ladder</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 130" role="img" aria-label="six learning statuses">
+      <g>
+        <rect class="box" x="10" y="70" width="130" height="40"/><text class="lbl mid" x="75" y="96">Not started</text>
+        <rect class="box" x="155" y="58" width="130" height="52"/><text class="lbl mid" x="220" y="90">Viewed</text>
+        <rect class="box" x="300" y="46" width="130" height="64"/><text class="lbl mid" x="365" y="84">Studied</text>
+        <rect class="box" x="445" y="34" width="130" height="76"/><text class="lbl mid" x="510" y="78">Practiced</text>
+        <rect class="box" x="590" y="22" width="130" height="88"/><text class="lbl mid" x="655" y="72">Assessed</text>
+        <rect class="fillbox" x="735" y="10" width="140" height="100"/><text class="lbl-b mid" x="805" y="66">Mastered</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>per concept: status + confidence + notes + bookmark; quiz results stored separately</figcaption>
+  </figure>
+
+  <!-- EDIT: search -->
+  <h2>Search scoring (offline)</h2>
+  <div class="cols">
+    <div class="card">exact title          +100
+title contains query  +30
+haystack contains     +12
+per token: in title   +6
+           as token   +4
+           substring  +2
+synonym hit (id)      +40
+sort: score desc, then title</div>
+    <div>
+      <p>Indexed: concepts, resources, platforms, vulnerabilities, certifications, interview questions, projects. Results are capped at 40 and highlighted.</p>
+      <p class="margin">synonyms fix the beginner vocabulary gap: someone types "css" meaning XSS.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: THM pipeline -->
+  <h2>Research pipeline: TryHackMe rooms → concepts</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 200" role="img" aria-label="CSV converted then mapped to concepts by weighted topic match">
+      <rect class="box" x="20" y="60" width="190" height="70" rx="6"/><text class="lbl mid" x="115" y="88">thm-all-rooms.csv</text><text class="lbl-s mid" x="115" y="108">open MIT catalogue</text>
+      <path class="arr" d="M212 95 H262"/><text class="lbl-s mid" x="237" y="85">convert</text>
+      <rect class="box" x="264" y="60" width="190" height="70" rx="6"/><text class="lbl mid" x="359" y="88">thm-free-rooms.json</text><text class="lbl-s mid" x="359" y="108">633 free rooms</text>
+      <path class="arr" d="M456 95 H506"/><text class="lbl-s mid" x="481" y="85">map</text>
+      <rect class="fillbox" x="508" y="30" width="260" height="130" rx="6"/>
+      <text class="lbl" x="522" y="56">score = Σ topic hits</text>
+      <text class="lbl-s" x="522" y="78">specific tag (sqli, xss, AD…) = 10</text>
+      <text class="lbl-s" x="522" y="98">generic tag (web, linux…) = 1</text>
+      <text class="lbl-s" x="522" y="118">tie-break: |room diff − concept diff|</text>
+      <text class="lbl-s" x="522" y="138">easy concepts prefer walkthroughs</text>
+      <path class="arr" d="M770 95 H820"/>
+      <rect class="box" x="822" y="60" width="160" height="70" rx="6"/><text class="lbl mid" x="902" y="88">thm-practice.json</text><text class="lbl-s mid" x="902" y="108">top 5 per concept</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="LRN-03">62 of 67 concepts got practice rooms</figcaption>
+  </figure>
+
+</main>
+</body>
+</html>

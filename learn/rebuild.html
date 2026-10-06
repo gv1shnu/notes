@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>learn — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="learn" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">27 Aug 2026 · 09:38</span><span class="what">first commit</span><span class="sha">95dfefe</span><br>
+      40 files, +23,580 lines. The platform arrived complete at v0.3.1 (content v0.6.0, generated 25 Aug): app, 12 datasets, validator,
+      link checker, dev server, THM research pipeline.</li>
+    <li><span class="when">28 Sep 2026 · 19:46</span><span class="what">Reword maintenance note in resources generator</span><span class="sha">0c08c42</span><br>
+      Copy change in <code>gen-resources.mjs</code>, the script that compiles this dataset into a static resources page for my notes site.</li>
+  </ol>
+  <p class="margin">Code comments cite decision ids (D-001 hash routing + HTTP serving, D-002 IndexedDB) and spec sections (§4, §47, §49, §64, §75):
+    I wrote a spec first and built against it. <code>map-thm.mjs</code> still points at the old working folder <code>pt-lms</code>, the project's original name.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>decision</th><th>why</th><th>cost</th></tr>
+    <tr><td>Static site, JSON as the database</td><td>free hosting; content is reviewable in git diffs</td><td>whole dataset (~1 MB with research files) fetched by the browser; only <code>data/</code> is loaded</td></tr>
+    <tr><td>Hash router (D-001)</td><td>works on GitHub Pages without 404 rewrites</td><td>URLs have <code>#/</code></td></tr>
+    <tr><td>IndexedDB + memory cache (D-002)</td><td>no account, progress stays on the device; sync reads while rendering</td><td>lost if the browser clears storage → export/import exists</td></tr>
+    <tr><td>Free-status enum + confidence + lastVerified</td><td>honest about what "free" means and how stale it is</td><td>needs re-verification</td></tr>
+    <tr><td>Offline validator, zero deps</td><td>catches dangling ids/duplicates before deploy</td><td>run manually</td></tr>
+    <tr><td>Third-party data kept in <code>research/</code></td><td>licence kept with it; only the mapped subset ships</td><td>re-run scripts to refresh</td></tr>
+  </table>
+  </div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Validator clean</b>: <code>npm run validate</code> exits 0 (JSON valid, enums, difficulty range, unique ids/URLs, no orphans).</li>
+    <li><b>Links alive</b>: <code>npm run check-links</code>; dead resources become <code>DEAD</code> with a backup.</li>
+    <li><b>Coverage</b>: every concept has a quiz (67/67) and practice rooms (62/67).</li>
+    <li><b>Learner progress</b>: dashboard counts by status; quiz pass mark 70%.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Make the research scripts path-relative (they hard-code the old absolute folder).</li>
+    <li>Only 2 certifications and 5 vulnerabilities so far; expand.</li>
+    <li>Add a README to the repo (none yet).</li>
+    <li>CI job: validate + link-check on push.</li>
+    <li>Re-verify <code>lastVerified</code> dates on resources and platforms.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Write the spec + taxonomy</b><br>Tree of areas (foundations, security foundations, offensive, defensive…). Fix the concept schema above before writing content.</li>
+    <li><b>Author JSON + validator together</b><br><code>validate.mjs</code>: parse every file, enums, <code>ID_RE</code> kebab ids, dates, duplicates, and resolve every cross-reference.</li>
+    <li><b>Loader + router</b><br>Fetch manifest, then datasets in parallel; hash router that calls <code>resolve(path, params)</code> and mounts <code>{html,title,onMount}</code>, focusing <code>main</code>.</li>
+    <li><b>Storage</b><br>IndexedDB wrapper (open, tx, get/set/delete/getAll); progress module loads all into memory at init and writes through.</li>
+    <li><b>Views</b><br>Home, path, concept list/detail, quiz, roadmaps, dashboard (with export/import), reference pages, search.</li>
+    <li><b>Search</b><br>Token scoring + synonyms from the manifest.</li>
+    <li><b>Practice mapping</b><br>Convert the room CSV, weighted-match to concepts, write <code>thm-practice.json</code>.</li>
+    <li><b>Ship</b><br><code>.nojekyll</code>, Pages from root; <code>npm run serve</code> locally (module scripts need HTTP).</li>
+  </ol>
+
+</main>
+</body>
+</html>

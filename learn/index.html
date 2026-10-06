@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>learn — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="learn" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>learn: Cyber Learning OS</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/learn · vanilla ES modules + JSON · 2 commits · Aug–Sep 2026 · vishnugandarapu.in/learn · package name <code>cyber-learning-os</code> v0.3.1</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Beginners in cybersecurity drown in tools and buzzwords, and in "free" resources that turn out to be paywalled.
+    Nobody hands them a map: <i>what</i> to learn, <i>why</i>, <i>where to learn it free</i>, <i>where to practise legally</i>, and <i>what's next</i>.</p>
+  <p>I wanted a <span class="hl">free-only</span>, static learning platform that works like a small operating system for the field:
+    a concept graph, a path through it, quizzes, progress tracking, all of it running in the browser with no account.</p>
+
+  <!-- EDIT: what's inside: infographic -->
+  <h2>What's in the box</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="counts of each dataset">
+      <circle class="circ" cx="500" cy="150" r="70"/>
+      <text class="lbl-b mid" x="500" y="145">67</text><text class="lbl mid" x="500" y="168">concepts</text>
+      <g>
+        <path class="ln" d="M440 110 L300 60"/><rect class="box" x="170" y="35" width="130" height="50" rx="6"/><text class="lbl mid" x="235" y="58">72 resources</text><text class="lbl-s mid" x="235" y="76">free status checked</text>
+        <path class="ln" d="M432 150 H300"/><rect class="box" x="150" y="125" width="150" height="50" rx="6"/><text class="lbl mid" x="225" y="148">67 assessments</text><text class="lbl-s mid" x="225" y="166">one quiz per concept</text>
+        <path class="ln" d="M440 190 L300 240"/><rect class="box" x="170" y="215" width="130" height="50" rx="6"/><text class="lbl mid" x="235" y="238">15 platforms</text><text class="lbl-s mid" x="235" y="256">legal practice</text>
+        <path class="ln" d="M560 110 L700 60"/><rect class="box" x="700" y="35" width="150" height="50" rx="6"/><text class="lbl mid" x="775" y="58">8 roadmaps</text><text class="lbl-s mid" x="775" y="76">zero → SOC / pentest…</text>
+        <path class="ln" d="M568 150 H700"/><rect class="box" x="700" y="125" width="170" height="50" rx="6"/><text class="lbl mid" x="785" y="148">62 concepts → THM</text><text class="lbl-s mid" x="785" y="166">from 633 free rooms</text>
+        <path class="ln" d="M560 190 L700 240"/><rect class="box" x="700" y="215" width="150" height="50" rx="6"/><text class="lbl mid" x="775" y="238">3 university plans</text><text class="lbl-s mid" x="775" y="256">4 · 8 · 12 weeks</text>
+        <path class="ln" d="M500 80 V30"/><text class="lbl-s mid" x="500" y="22">25 interview Qs · 12 projects · 5 vulns · 2 certs</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption data-dwg="LRN-01">content v0.6.0 · every node links to the others</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>"Free" is not binary. I needed a status enum: <code>FREE, FREE_WITH_ACCOUNT, FREE_TIER, SELF_HOSTED_FREE, UNKNOWN, PAID, DEAD</code>, plus a confidence grade (A–D) and a <code>lastVerified</code> date.</li>
+      <li>A concept page is only useful if it answers the same questions every time: summary, why it matters, mental model, offensive view, defensive view, CTF angle, bug-bounty angle, common mistakes, what's next.</li>
+      <li>Hand-curating practice rooms doesn't scale. An open MIT-licensed catalogue of TryHackMe rooms could be matched to concepts by topic + difficulty.</li>
+      <li>Hand-written JSON drifts: dangling prerequisite ids, duplicate URLs. It needs a validator.</li>
+    </ul>
+    <div>
+      <div class="note pink">
+        <h4>ethics line, printed in the footer</h4>
+        Everything offensive here is for CTFs, intentionally vulnerable apps, local labs, and targets you have explicit permission to test.
+      </div>
+      <div class="margin">difficulty scale 0–6; the 67 concepts span all of it, most sit at 2–4.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Runtime</th><td>static <code>index.html</code> + <code>src/app.js</code> (ES module); hash router; no build</td></tr>
+    <tr><th>Storage</th><td>IndexedDB <code>cyber-learning-os</code> v2: stores progress, notes, bookmarks, meta, assessments; prefs in localStorage <code>clos.prefs</code></td></tr>
+    <tr><th>Tooling (local only)</th><td><code>npm run validate</code> · <code>npm run serve</code> · <code>npm run check-links</code> (Node ≥ 18, zero deps)</td></tr>
+    <tr><th>Routes</th><td><code>#/ · path · concepts · concept/:id · assess/:id · roadmap/:id · dashboard · certifications · interview · projects · university · platforms · vulnerabilities · search · about</code></td></tr>
+    <tr><th>Deployed</th><td>GitHub Pages → <a href="http://www.vishnugandarapu.in/learn/">vishnugandarapu.in/learn</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

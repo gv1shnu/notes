@@ -56,5 +56,13 @@ window.NOTEBOOK = {
       stack: ["Vanilla JS", "Node self-test"],
       pages: [ { file: "index", title: "Cover & journey" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // learn
+      slug: "learn", name: "learn · Cyber Learning OS", shelf: "security", status: "deployed",
+      tagline: "Free-only cybersecurity learning platform: 67-concept graph, quizzes, roadmaps, progress in IndexedDB.",
+      url: "https://github.com/gv1shnu/learn", live: "http://www.vishnugandarapu.in/learn/",
+      start: "2026-08-27", end: "2026-09-28", commits: 2,
+      stack: ["ES modules", "IndexedDB", "JSON"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
