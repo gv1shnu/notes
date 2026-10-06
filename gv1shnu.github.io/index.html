@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gv1shnu.github.io — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="gv1shnu.github.io" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>gv1shnu.github.io: my front door</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/gv1shnu.github.io · plain HTML/CSS/JS · 19 commits · Feb – Sep 2026 · <a href="https://www.vishnugandarapu.in">www.vishnugandarapu.in</a></p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">I needed one address that says who I am in a few seconds: a CS teacher, an ethical hacker, someone who lives in databases. A plain résumé page doesn't say any of that.</p>
+  <p>So the site is a little <span class="hl">hacker terminal</span>. You get a stick-figure me at a desk, a log stream that scrolls past what I actually spend my days on, and a <code>whoami</code> card for anyone who wants the real introduction. It's three static pages on GitHub Pages behind my own domain. No framework and no build step.</p>
+
+  <!-- EDIT: site map -->
+  <h2>Three pages, three moods</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 300" role="img" aria-label="site map: home links to timeline and contact; each page has its own canvas effect">
+      <text class="lbl-s" x="20" y="30">CNAME → www.vishnugandarapu.in</text>
+      <rect class="box" x="330" y="45" width="300" height="100" rx="6"/>
+      <text class="lbl-t mid" x="480" y="78">/ (home)</text>
+      <text class="lbl-s mid" x="480" y="102">canvas avatar · log stream from logz.txt</text>
+      <text class="lbl-s mid" x="480" y="122">whoami card · disco toggle</text>
+      <path class="arr" d="M400 147 L210 200"/><text class="lbl-s" x="230" y="165">Visit Timeline</text>
+      <path class="arr" d="M560 147 L750 200"/><text class="lbl-s" x="660" y="165">Contact Me</text>
+      <rect class="box" x="60" y="202" width="300" height="80" rx="6"/>
+      <text class="lbl-b mid" x="210" y="230">/timeline/</text>
+      <text class="lbl-s mid" x="210" y="252">filterable life timeline</text>
+      <text class="lbl-s mid" x="210" y="270">over a live starfield</text>
+      <rect class="box" x="600" y="202" width="300" height="80" rx="6"/>
+      <text class="lbl-b mid" x="750" y="230">/contact/</text>
+      <text class="lbl-s mid" x="750" y="252">typewriter lines, links fade in</text>
+      <text class="lbl-s mid" x="750" y="270">over Matrix rain</text>
+      <path class="arr-d" d="M600 270 Q480 300 360 270"/><text class="lbl-r mid" x="480" y="296">[ RETURN ] → home</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="GV-01">each page gets its own full-screen canvas; the content always sits on top of it</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed while building it</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>The log stream is the personality.</b> <code>homepage/logz.txt</code> has 52 tagged lines (<code>[HACK]</code>, <code>[SEC]</code>, <code>[DB]</code>, <code>[TEACH]</code>, <code>[GAME]</code>…). Editing that file changes how the site feels, and I don't have to touch any code.</li>
+      <li><b>Easter egg:</b> whenever a <code>git push</code> line scrolls past, the avatar drops what it's doing and <i>dabs</i> in magenta for 2.5 s.</li>
+      <li><b>Profiles got pruned.</b> One commit called "close profiles" took the X link off the contact page and renamed "IMF_PROTOCOL / Agent:" to a plain "Contact". The site grew up a bit there.</li>
+      <li><b>The timeline is the living part.</b> New projects get added as they ship: Web Timeline in August, Dilli Khoj in September.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>cheap to run</h4>
+        Static files, one custom domain and a GoatCounter snippet for page views. Nothing to patch and nothing to keep paying for.
+      </div>
+      <div class="margin">the starfield, the Matrix rain and the typewriter all check <code>prefers-reduced-motion</code>; the home avatar doesn't yet.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Pages</th><td><code>/</code>, <code>/timeline/</code>, <code>/contact/</code>, each a folder with its own css/js</td></tr>
+    <tr><th>Effects</th><td>stick-figure avatar canvas (4 states, 30 fps cap) · colour-cycled log stream · CSS spectrum "disco" layer · twinkling starfield with nebulae and shooting stars · katakana Matrix rain · typewriter reveal</td></tr>
+    <tr><th>Timeline</th><td>28 entries tagged <code>edu</code> (8), <code>work</code> (4), <code>project</code> (9), plus untagged milestones; year headers hide when they're empty</td></tr>
+    <tr><th>Meta</th><td>description, canonical, OpenGraph + Twitter cards, PWA web manifest, favicons for every platform</td></tr>
+    <tr><th>Libraries</th><td>Font Awesome (CDN) for icons. Everything else is hand-written vanilla JS</td></tr>
+    <tr><th>Hosting</th><td>GitHub Pages + <code>CNAME</code> → <a href="https://www.vishnugandarapu.in">www.vishnugandarapu.in</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

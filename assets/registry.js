@@ -200,5 +200,13 @@ window.NOTEBOOK = {
       stack: ["bash", "Node", "StatiCrypt"],
       pages: [ { file: "index", title: "Cover & invariant" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // gv1shnu.github.io
+      slug: "gv1shnu.github.io", name: "personal site", shelf: "site", status: "deployed",
+      tagline: "My portfolio with a hacker-terminal aesthetic: a canvas avatar, a streaming log, Matrix rain, and a filterable timeline.",
+      url: "https://github.com/gv1shnu/gv1shnu.github.io", live: "https://www.vishnugandarapu.in",
+      start: "2026-02-01", end: "2026-09-14", commits: 19,
+      stack: ["HTML/CSS/JS", "Canvas", "GitHub Pages"],
+      pages: [ { file: "index", title: "Cover & site map" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

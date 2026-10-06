@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gv1shnu.github.io — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="gv1shnu.github.io" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">four small machines, one per effect</p>
+
+  <!-- EDIT: home layers -->
+  <h2>The home page is a stack of layers</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1180 300" role="img" aria-label="home page layers from back to front">
+      <path class="box" d="M120 260 L620 260 L700 220 L200 220 Z"/><text class="lbl-s" x="720" y="245">#spectrum-bg (z 0): hidden until body.disco-on</text>
+      <path class="box" d="M120 215 L620 215 L700 175 L200 175 Z"/><text class="lbl-s" x="720" y="200">canvas#hacker-den (z 1): avatar at desk</text>
+      <path class="fillbox" d="M120 170 L620 170 L700 130 L200 130 Z"/><text class="lbl-s" x="720" y="155">#log-stream (z 10): up to 5 lines</text>
+      <path class="box" d="M120 125 L620 125 L700 85 L200 85 Z"/><text class="lbl-s" x="720" y="110">#ui-layer (z 50): name, nav, whoami</text>
+      <path class="box2" d="M120 80 L620 80 L700 40 L200 40 Z"/><text class="lbl-s" x="720" y="65">scanlines (z 100), pointer-events: none</text>
+      <text class="lbl-r" x="40" y="285">back</text><text class="lbl-r" x="40" y="35">front</text>
+      <path class="arr-d red" d="M60 270 V45"/>
+    </svg>
+    </div>
+    <figcaption data-dwg="GV-02">the content sits on top and the effects run underneath it, so the text always stays readable</figcaption>
+  </figure>
+
+  <!-- EDIT: log stream -->
+  <h2>The log stream, and why the colours never repeat</h2>
+  <div class="cols wide-left">
+    <figure class="sk">
+      <div class="scroll-x">
+      <svg viewBox="0 0 560 250" role="img" aria-label="logz.txt parsed then spawned on a timer with colour de-duplication">
+        <rect class="box" x="10" y="20" width="150" height="60"/><text class="lbl-s mid" x="85" y="45">logz.txt</text><text class="lbl-s mid" x="85" y="65">[TYPE] message</text>
+        <path class="arr" d="M162 50 H220"/><text class="lbl-s mid" x="191" y="40">regex</text>
+        <rect class="box" x="222" y="20" width="150" height="60"/><text class="lbl-s mid" x="297" y="45">logs[ ]</text><text class="lbl-s mid" x="297" y="65">{type, text}</text>
+        <path class="arr" d="M297 82 V120"/>
+        <rect class="fillbox" x="200" y="122" width="200" height="70"/><text class="lbl-s mid" x="300" y="145">spawnLog()</text><text class="lbl-s mid" x="300" y="165">next in order, pick a colour</text><text class="lbl-s mid" x="300" y="183">not already on screen</text>
+        <path class="arr-d" d="M402 157 Q470 157 470 110 Q470 60 400 60"/><text class="lbl-s" x="440" y="100">300–1000 ms</text>
+        <path class="arr red" d="M300 194 V230"/><text class="lbl-r" x="310" y="228">"git push" → triggerDab()</text>
+        <text class="lbl-s" x="10" y="140">fetch fails →</text><text class="lbl-s" x="10" y="160">"Local Mode"</text>
+      </svg>
+      </div>
+      <figcaption>parse once, then loop through the logs forever on a jittered timer</figcaption>
+    </figure>
+    <div>
+      <p>There are five colours (green, cyan, amber, red, grey), and up to five entries can be on screen. When the stack is full, the oldest entry gets dropped <i>before</i> the next colour is picked. That way there's always a free colour and no two visible lines ever share one.</p>
+      <p class="margin">I read the used colours back from <code>data-color</code>, not <code>style.color</code>, because the browser hands that back as <code>rgb()</code> instead of the hex I set.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: avatar state machine -->
+  <h2>The avatar is a four-state machine</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 250" role="img" aria-label="avatar states coding gaming writing cycle randomly; git push forces dabbing for 2.5 seconds">
+      <circle class="circ" cx="150" cy="90" r="58"/><text class="lbl-b mid" x="150" y="86">coding</text><text class="lbl-s mid" x="150" y="106">green · typing</text>
+      <circle class="circ" cx="400" cy="90" r="58"/><text class="lbl-b mid" x="400" y="86">gaming</text><text class="lbl-s mid" x="400" y="106">cyan · leans in</text>
+      <circle class="circ" cx="650" cy="90" r="58"/><text class="lbl-b mid" x="650" y="86">writing</text><text class="lbl-s mid" x="650" y="106">amber · leans back</text>
+      <path class="arr" d="M210 80 H340"/><path class="arr" d="M460 80 H590"/><path class="arr" d="M600 135 Q400 190 200 135"/>
+      <text class="lbl-s mid" x="400" y="190">random pick every ≥ 2 s</text>
+      <circle class="circ red" cx="860" cy="170" r="58"/><text class="lbl-b mid" x="860" y="166">dabbing</text><text class="lbl-s mid" x="860" y="186">magenta · 2.5 s</text>
+      <path class="arr red" d="M705 110 L805 150"/><text class="lbl-r" x="700" y="160">log says git push</text>
+      <path class="arr-d red" d="M810 205 Q500 250 180 150"/><text class="lbl-r mid" x="560" y="240">lock released → back to the cycle</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="GV-03">it's all stick lines on a 2D canvas: DPR-aware, the resize is debounced to 150 ms, and drawing is capped at 30 fps</figcaption>
+  </figure>
+
+  <!-- EDIT: other pages -->
+  <h2>The other two pages</h2>
+  <div class="cols">
+    <div class="card wrap">timeline/space-bg.js
+  stars    = viewport area × 0.0006
+  twinkle  = sin phase, 0.006 rad/frame
+  nebulae  = 7 radial clouds, drift 0.15 px/frame
+  shooting = 1.2% chance per frame (~1 per 1.5 s)
+  parallax = 0.08 × scroll
+  reduced motion → static frame
+
+timeline/timeline.js
+  click filter → show items with that class
+  then hide any year header whose items
+  are all hidden</div>
+    <div class="card wrap">contact/matrix-rain.js
+  one column per 16 px
+  katakana + A–Z + 0–9 + symbols
+  white head, glowing green trail
+  fade = rgba(0,0,0,.05) each frame
+  speed per column 0.3 – 1.2
+
+contact/contact.js
+  type each .typed-line at 22 ms/char,
+  160 ms pause between lines, █ cursor;
+  then fade the links in 200 ms apart;
+  glitch flicker on hover</div>
+  </div>
+
+</main>
+</body>
+</html>

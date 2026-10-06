@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gv1shnu.github.io — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="gv1shnu.github.io" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">Feb 2026: getting a site up at all</li>
+    <li><span class="when">1 Feb</span><span class="what">f1215ab · Initial empty commit</span></li>
+    <li class="big"><span class="when">1 Feb</span><span class="what">44aba2f · add timeline</span><br>The first version: a single <code>index.html</code> + <code>styles.css</code>, the CNAME for my domain, and the favicon set.</li>
+    <li><span class="when">8 Feb</span><span class="what">57a15a3 · update timeline</span></li>
+    <li class="big"><span class="when">10 Feb</span><span class="what">c6d30d4 · add new index, contact page</span><br>The terminal redesign: the avatar canvas, <code>logz.txt</code>, a separate timeline page and the contact page. About 2,100 lines in a single commit.</li>
+    <li><span class="when">11 – 15 Feb</span><span class="what">a3b793b · 0ba1059 · f943bfe · 14ff9f3 · 48ac345</span><br>Polish: Font Awesome version, icon sizes, footer, <code>defer</code> on the scripts, timeline page.</li>
+    <li><span class="when">23 Feb</span><span class="what">2f03d0f · update prf</span></li>
+    <li class="big"><span class="when">25 Feb</span><span class="what">60b2bb8 · reorganised and improved</span><br>Gave every page its own folder (<code>homepage/</code>, <code>timeline/</code>, <code>favicon/</code>).</li>
+    <li class="phase">Mar 2026: the effects</li>
+    <li><span class="when">5 Mar</span><span class="what">bdcdc73 · close profiles</span><br>Dropped the X link and toned the contact copy down from "IMF_PROTOCOL".</li>
+    <li class="big"><span class="when">6 Mar</span><span class="what">e5aa06d · add matrix rain and typed terminal effect</span><br><code>matrix-rain.js</code> + the typewriter on the contact page.</li>
+    <li class="big"><span class="when">9 Mar</span><span class="what">ec43926 · add space bg</span><br><code>space-bg.js</code>: stars, nebulae and shooting stars behind the timeline.</li>
+    <li><span class="when">9 Mar</span><span class="what">0de11d4 · rename</span><br>Renamed <code>timeline.html</code> and <code>contact.html</code> to <code>index.html</code> so the URLs come out clean (<code>/timeline/</code>).</li>
+    <li class="phase">Aug – Sep 2026: who I am now</li>
+    <li class="big"><span class="when">9 Aug</span><span class="what">c6907cf · disco toggle + professor tagline, refine logz, add Web Timeline</span></li>
+    <li><span class="when">24 Aug</span><span class="what">82126bb · colored</span></li>
+    <li class="big"><span class="when">1 Sep</span><span class="what">7700089 · add about</span><br>The <code>whoami</code> card, the meta/OG tags rewritten, and <code>logz.txt</code> rewritten to cover teaching, research, privacy and writing.</li>
+    <li><span class="when">14 Sep</span><span class="what">ea47a37 · add Dilli Khoj project to timeline</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Static files on GitHub Pages + CNAME</td><td>free, fast, nothing to patch, and my domain stays the address</td><td>no server-side anything; the analytics come from a third-party snippet</td></tr>
+    <tr><td>Vanilla JS, no framework or build</td><td>four effects don't need React; view-source shows exactly what runs</td><td>some repeated boilerplate (resize debounce, reduced-motion check) in each script</td></tr>
+    <tr><td>One canvas effect per page</td><td>each page has its own mood without one huge script</td><td>three separate animation loops to look after</td></tr>
+    <tr><td>Log lines live in a text file</td><td>I can change the tone without touching code</td><td>an extra fetch (preloaded in <code>&lt;head&gt;</code>)</td></tr>
+    <tr><td>Folder per page with its own <code>index.html</code></td><td>clean URLs, and the CSS/JS stay next to their page</td><td>shared bits (favicons, meta) get copied into each page</td></tr>
+    <tr><td><code>defer</code> on scripts; FPS capped at 30</td><td>first paint isn't blocked, and laptops don't spin their fans up for a portfolio</td><td>the animation is slightly less smooth</td></tr>
+    <tr><td>Honour <code>prefers-reduced-motion</code></td><td>the theme is loud, but it should still be accessible</td><td>applied to the timeline, the contact page and the disco CSS so far; the home avatar still animates</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Tells the story in about 5 s:</b> name, "Assistant Professor of CS and Certified Ethical Hacker", and then the log stream shows the rest.</li>
+    <li><b>Weight:</b> about 3,270 lines of hand-written HTML/CSS/JS across three pages, plus one icon font.</li>
+    <li><b>Shares well:</b> the OG/Twitter cards render a proper preview card on any chat app.</li>
+    <li><b>Stays current:</b> 9 projects on the timeline so far; adding another one is a single <code>div.timeline-item.project</code>.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li class="done">Clean URLs for every page (<code>/timeline/</code>, <code>/contact/</code>)</li>
+    <li class="done">Disco toggle and a real <code>whoami</code> introduction</li>
+    <li>A dedicated 1200×630 OG image (the code comment says so; the 512 px favicon stands in for now)</li>
+    <li>Put Fiction's links back on the timeline once it's public again (commented out for now)</li>
+    <li>Make the home avatar respect <code>prefers-reduced-motion</code> like the other two pages do</li>
+    <li>Factor the repeated resize/reduced-motion code into one small shared helper</li>
+    <li>Keep adding projects to the timeline as they ship</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Repo + domain</b><br>Create <code>&lt;user&gt;.github.io</code>, enable Pages from the default branch, and add a <code>CNAME</code> file with your domain plus a DNS CNAME record pointing at GitHub.</li>
+    <li><b>Folders</b><br><code>index.html</code> + <code>homepage/</code>, then <code>timeline/index.html</code> and <code>contact/index.html</code>, each with its own css/js. Put the favicons and <code>site.webmanifest</code> in <code>favicon/</code>.</li>
+    <li><b>Home layers</b><br>A full-screen canvas at z 1, the log div above it, the UI at z 50, and a hidden spectrum div behind everything.</li>
+    <li><b>Log stream</b><br>Fetch <code>logz.txt</code>, parse it with <code>/^\[(\w+)\]\s*(.*)/</code>, prepend one line every 300–1000 ms, cap the stack at five, and give each line a colour that isn't on screen yet.</li>
+    <li><b>Avatar</b><br>Draw a chair, desk, monitor and a stick body with <code>lineTo</code>. Keep a state variable that cycles coding/gaming/writing and changes the pose and glow colour; a "git push" line forces a 2.5 s dab.</li>
+    <li><b>Timeline</b><br>Items get classes <code>edu|work|project</code> under <code>.timeline-year</code> headers. Filter buttons hide the items, then hide any header left with nothing visible. Add a starfield canvas behind it.</li>
+    <li><b>Contact</b><br>Matrix rain (column drops plus a translucent black fill for the trails), then type out each <code>data-type</code> line and fade in the links.</li>
+    <li><b>Ship it</b><br>Add the description, canonical and OG/Twitter meta, <code>defer</code> on every script, a reduced-motion check in each effect, then push.</li>
+  </ol>
+
+</main>
+</body>
+</html>
