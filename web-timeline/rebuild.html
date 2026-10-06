@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>web-timeline — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="web-timeline" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">15 Jul · 08:23</span><span class="what">Initial commit: domain reconnaissance pipeline</span><span class="sha">9588c9e</span><br>
+      33 files, +2,688. Passive recon pipeline (subdomains → resolve → probe → crawl → screenshots → vulns → exploit lookup), normalized results.json + HTML report, CLI + Flask dashboard, active stages gated behind <code>--active</code>.</li>
+    <li class="big"><span class="when">27 Jul · 18:08</span><span class="what">add offensive side</span><span class="sha">7580d2b</span><br>
+      40 files, +3,994/−2,623. Added the offensive tier behind <code>--exploit</code> and the bounded-offense config caps.</li>
+    <li class="big"><span class="when">10 Aug · 17:45</span><span class="what">add correlating vulns</span><span class="sha">c10cb61</span><br>
+      12 files, +1,192. The <code>correlate</code> stage and the <code>Insight</code> model — the pre-exploitation synthesis layer.</li>
+    <li><span class="when">28 Sep · 19:46</span><span class="what">Drop tool-specific entry from .gitignore</span><span class="sha">fcce196</span></li>
+  </ol>
+  <p class="margin"><code>docs/PROGRESS.md</code> is a working log I keep between sessions (what was added, what was deliberately skipped, what's in flight). <code>docs/METHODOLOGY.md</code> records the assessment method each stage implements.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Three-tier ceiling, enforced in core + server</td><td>safety must not depend on a UI; passive is the default and the floor</td></tr>
+    <tr><td>Uniform <code>Stage</code> base class</td><td>tier gating, tool-skip, timing, audit all written once</td></tr>
+    <tr><td>One typed result model</td><td>report/export decoupled from tools; swap a tool without touching downstream</td></tr>
+    <tr><td>Argument-list subprocess calls, never shell strings</td><td>no shell injection from target-derived data; per-stage timeouts</td></tr>
+    <tr><td>Rewrite results.json every stage</td><td>crash-safe, inspectable, resumable by hand</td></tr>
+    <tr><td>Graceful degradation on missing tools</td><td>runs on any machine; report says what was skipped and why</td></tr>
+    <tr><td>Correlation as a passive stage</td><td>biggest value for a human operator with zero added traffic; keeps exploitation human-driven</td></tr>
+    <tr><td>Bounded offense (row/URL/hash caps; destructive actions opt-in)</td><td>limit blast radius even inside an authorized engagement</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Tier safety</b>: a default run emits zero attack traffic; higher stages appear in the report as "skipped".</li>
+    <li><b>Completeness</b>: CLI summary counts hosts, ports, HTTP endpoints, URLs, findings by severity, exploits, and loot.</li>
+    <li><b>Robustness</b>: a missing tool or one stage's error never aborts the run.</li>
+    <li><b>Operator leverage</b>: do the correlate insights point a human straight at the best lead?</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending (from docs/PROGRESS.md)</h2>
+  <ul class="checks">
+    <li>Capture HTTP response headers in <code>http_probe</code> → enables a missing-security-headers heuristic in correlate.</li>
+    <li>Risk enrichment for findings (CISA KEV / EPSS / NVD) — the natural home is the exploit-lookup and vuln-rollup paths.</li>
+    <li>Finish the in-flight MSF module-resolution feature in <code>exploit_run</code>.</li>
+    <li>Tests around the tier gate and the model aggregation.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Model first</b><br>Write the dataclasses (Host, Service, HttpEndpoint, CrawlUrl, Finding, Exploit, Insight, Credential, Secret, Loot, StageRun) and <code>ReconResults</code> with <code>to_json()</code> and <code>summary()</code>.</li>
+    <li><b>Stage base class</b><br><code>Stage.run()</code>: check enabled → tier ≤ ceiling → tool present → <code>execute()</code> in try/except → finalize with timing. Write the gate before any real stage.</li>
+    <li><b>Safe runner</b><br>A <code>runner.have(tool)</code> check and a subprocess wrapper that takes an argument list, enforces a timeout, and writes <code>.cmd/.stdout/.stderr</code>.</li>
+    <li><b>Passive stages</b><br>subdomains, resolve, http_probe, crawl, screenshots, exploit-lookup — each parses its tool's output into the model.</li>
+    <li><b>Orchestrator</b><br>Ordered <code>STAGE_CLASSES</code>; run each; rewrite <code>results.json</code> after every one; render the Jinja report.</li>
+    <li><b>Active + offensive tiers</b><br>Add behind <code>--active</code> / <code>--exploit</code>, with config caps and opt-in flags for the most destructive actions.</li>
+    <li><b>Correlate</b><br>A passive stage reading the whole <code>ReconResults</code> and emitting Insights that each end in a human next-step.</li>
+    <li><b>Front ends</b><br>CLI (<code>recon.py</code>) and a Flask dashboard that wraps the Orchestrator in a thread and streams the log over SSE. Re-check the tier server-side.</li>
+  </ol>
+
+</main>
+</body>
+</html>

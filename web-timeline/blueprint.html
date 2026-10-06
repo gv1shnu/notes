@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>web-timeline — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="web-timeline" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">one stage contract, one result model, one gate</p>
+
+  <!-- EDIT: stage lifecycle -->
+  <h2>The stage contract</h2>
+  <p>Every stage subclasses <code>Stage</code> and sets <code>name, tools, tier (or active), depends_on</code>, then implements one <code>execute()</code>.
+    The base class's <code>run()</code> does everything else, the same way for all 16 stages:</p>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 240" role="img" aria-label="stage run lifecycle: enabled, tier allowed, tool available, execute, finalize">
+      <rect class="box" x="20" y="90" width="120" height="60" rx="6"/><text class="lbl mid" x="80" y="116">stage.run()</text><text class="lbl-s mid" x="80" y="136">StageRun record</text>
+      <path class="arr" d="M142 120 H185"/>
+      <path class="box" d="M250 85 L300 120 L250 155 L200 120 Z"/><text class="lbl-s mid" x="250" y="124">enabled?</text>
+      <path class="arr-d red" d="M250 155 V200 H150"/><text class="lbl-r" x="30" y="195">skip: disabled in config</text>
+      <path class="arr" d="M300 120 H345"/>
+      <path class="box" d="M410 85 L470 120 L410 155 L350 120 Z"/><text class="lbl-s mid" x="410" y="118">tier ≤</text><text class="lbl-s mid" x="410" y="134">ceiling?</text>
+      <path class="arr-d red" d="M410 155 V205 H520"/><text class="lbl-r" x="440" y="225">skip: run with --active / --exploit</text>
+      <path class="arr" d="M470 120 H515"/>
+      <path class="box" d="M580 85 L640 120 L580 155 L520 120 Z"/><text class="lbl-s mid" x="580" y="118">tool</text><text class="lbl-s mid" x="580" y="134">present?</text>
+      <path class="arr-d red" d="M580 155 V200 H690"/><text class="lbl-r" x="650" y="195">skip: missing tool(s)</text>
+      <path class="arr" d="M640 120 H690"/>
+      <rect class="fillbox" x="692" y="90" width="130" height="60" rx="6"/><text class="lbl mid" x="757" y="116">execute(ctx)</text><text class="lbl-s mid" x="757" y="136">mutate results</text>
+      <path class="arr" d="M824 120 H865"/>
+      <rect class="box" x="867" y="90" width="100" height="60" rx="6"/><text class="lbl mid" x="917" y="116">finalize</text><text class="lbl-s mid" x="917" y="136">time + persist</text>
+      <path class="arr-d red" d="M757 152 V180 H757"/><text class="lbl-r" x="700" y="175">exception → status=error, run continues</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="WT-02">one try/except per stage: a single stage can never kill the whole run</figcaption>
+  </figure>
+
+  <!-- EDIT: pipeline DAG -->
+  <h2>The pipeline (passive → active → correlate → offensive)</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="stages in order, grouped by tier">
+      <text class="lbl-b" x="20" y="30">🟢 passive</text>
+      <g class="lbl-s">
+        <rect class="box" x="20" y="44" width="92" height="34"/><text x="30" y="65">subdomains</text>
+        <rect class="box" x="118" y="44" width="70" height="34"/><text x="128" y="65">resolve</text>
+        <rect class="box" x="194" y="44" width="92" height="34"/><text x="204" y="65">http_probe</text>
+        <rect class="box" x="292" y="44" width="60" height="34"/><text x="302" y="65">crawl</text>
+        <rect class="box" x="358" y="44" width="100" height="34"/><text x="368" y="65">screenshots</text>
+        <rect class="box" x="464" y="44" width="110" height="34"/><text x="474" y="65">exploits (lookup)</text>
+      </g>
+      <path class="arr" d="M112 61 H118 M188 61 H194 M286 61 H292 M352 61 H358 M458 61 H464"/>
+      <text class="lbl-b" x="20" y="110">🟡 active (--active)</text>
+      <g class="lbl-s">
+        <rect class="box2" x="20" y="124" width="60" height="34"/><text x="30" y="145">ports</text>
+        <rect class="box2" x="86" y="124" width="60" height="34"/><text x="96" y="145">vulns</text>
+        <rect class="box2" x="152" y="124" width="100" height="34"/><text x="162" y="145">sqli_detect</text>
+        <rect class="box2" x="258" y="124" width="100" height="34"/><text x="268" y="145">xss_detect</text>
+      </g>
+      <text class="lbl-b" x="20" y="190">🔗 correlate (passive · zero traffic)</text>
+      <rect class="fillbox" x="20" y="202" width="360" height="40" rx="4"/><text class="lbl-s" x="32" y="226">6 heuristics → Insight objects (each ends in a human verify step)</text>
+      <text class="lbl-b red" x="430" y="110">🔴 offensive (--exploit)</text>
+      <g class="lbl-s">
+        <rect class="box2 red" x="430" y="124" width="540" height="34"/><text x="440" y="145">confirmation &amp; exploitation stages — bounded by config caps, most destructive actions opt-in</text>
+        <rect class="box2 red" x="430" y="166" width="540" height="34"/><text x="440" y="187">every external call: argument list (never a shell string) · per-stage timeout · audit trail</text>
+      </g>
+      <text class="lbl-r" x="430" y="236">offense is meant for an approved human; the pipeline stages it, bounded</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="WT-03">STAGE_CLASSES is an ordered list; each declares depends_on for the DAG</figcaption>
+  </figure>
+
+  <!-- EDIT: result model -->
+  <h2>One typed result model</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">ReconResults
+ ├ targets, active, offensive, started/finished
+ ├ hosts[]       Host(name, ips, cname, resolved, sources)
+ ├ services[]    Service(host, port, product, version)
+ ├ http[]        HttpEndpoint(url, status, title, tech, tls, screenshot)
+ ├ crawl_urls[]  CrawlUrl(url, source)
+ ├ findings[]    Finding(template_id, severity, cves[], exploits[])
+ ├ insights[]    Insight(category, confidence, evidence, next_step)
+ ├ credentials[] / secrets[] / loot[]
+ └ stages[]      StageRun(name, status, note, produced, timing)</div>
+    <div>
+      <p>Stages parse native tool output into these dataclasses. The aggregator, the JSON writer and the Jinja report all read the same objects, so adding a tool never ripples into the report.</p>
+      <p class="margin">results.to_json() is rewritten after every stage → crash-safe & resumable-by-hand.</p>
+      <p class="small"><code>Severity</code> is an enum; <code>summary()</code> rolls up counts by severity for the CLI banner and dashboard.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: correlate -->
+  <h2>The correlate stage (where the real value is)</h2>
+  <p>Passive, no tools, no extra traffic. Six heuristics each emit an <code>Insight</code> that <b>ends in an explicit human verification step</b>, never an automated trigger:</p>
+  <div class="table-wrap"><table>
+    <tr><th>insight</th><th>signal it fuses</th></tr>
+    <tr><td>subdomain-takeover</td><td>dangling CNAME fingerprinted against ~30 claimable third-party services</td></tr>
+    <tr><td>sensitive-exposure</td><td>crawled URLs matching VCS / env / backup / debug / admin / API-schema path patterns</td></tr>
+    <tr><td>injection-surface</td><td>query-parameter <i>names</i> matching known risky conventions</td></tr>
+    <tr><td>exposed-service</td><td>DB / management ports reachable, escalated when the host is also CDN-fronted (origin exposure)</td></tr>
+    <tr><td>shadow-it</td><td>internal-sounding hostnames (staging / CI / admin) live on the public internet</td></tr>
+    <tr><td>vuln-rollup</td><td>hosts with ≥ 2 CVE findings rolled into one prioritized target + exploit-availability tally</td></tr>
+  </table></div>
+
+</main>
+</body>
+</html>

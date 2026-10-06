@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>web-timeline — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="web-timeline" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>web-timeline</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/web-timeline · Python · 4 commits · Jul–Sep 2026 · ~5,000 lines</p>
+
+  <!-- EDIT: scope banner -->
+  <div class="note pink">
+    <h4>authorized use only</h4>
+    This is a security-engineering project for assessing systems I own or have explicit written permission to test
+    (my own lab, an in-scope bug-bounty program, a signed engagement). The whole design is built around <b>consent gating</b>:
+    nothing beyond passive reconnaissance runs unless a human opts in with a flag.
+  </div>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">A web-application assessment means running a dozen different specialist tools in sequence, each with its own output format,
+    then stitching the results together by hand.</p>
+  <p>I wanted <span class="hl">one pipeline</span> that orchestrates those tools behind a single stage interface and one typed result model,
+    producing a normalized JSON dataset plus a browsable HTML report, with a <b>strict three-tier safety gate</b> so a careless run can never
+    send attack traffic.</p>
+
+  <!-- EDIT: the tier gate infographic -->
+  <h2>The idea: a tier ceiling</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 260" role="img" aria-label="three tiers, each needs an explicit flag to unlock">
+      <rect class="box" x="30" y="40" width="250" height="180" rx="8"/>
+      <text class="lbl-b mid" x="155" y="68">🟢 PASSIVE</text><text class="lbl-s mid" x="155" y="90">default · no attack traffic</text>
+      <text class="lbl-s mid" x="155" y="120">OSINT · DNS · HTTP fingerprint</text><text class="lbl-s mid" x="155" y="142">crawl · screenshots</text>
+      <text class="lbl-s mid" x="155" y="164">CVE lookup · correlate</text>
+      <path class="arr-d" d="M282 130 H322"/><text class="lbl-r" x="286" y="120">--active</text>
+      <rect class="box2" x="324" y="60" width="250" height="140" rx="8"/>
+      <text class="lbl-b mid" x="449" y="88">🟡 ACTIVE</text><text class="lbl-s mid" x="449" y="110">real scan probes</text>
+      <text class="lbl-s mid" x="449" y="138">port / vuln scanning</text><text class="lbl-s mid" x="449" y="160">SQLi &amp; XSS detection</text>
+      <path class="arr-d red" d="M576 130 H616"/><text class="lbl-r" x="580" y="120">--exploit</text>
+      <rect class="box2 red" x="618" y="80" width="250" height="100" rx="8"/>
+      <text class="lbl-b mid" x="743" y="108">🔴 OFFENSIVE</text><text class="lbl-s mid" x="743" y="130">real attacks</text>
+      <text class="lbl-s mid" x="743" y="156">verification &amp; exploitation</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="WT-01">a stage only runs if its tier ≤ the run's ceiling; higher stages self-skip and say so in the report</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed / designed around</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>Every external tool has a different output shape. Normalising into <b>one typed model</b> (Host, Service, HttpEndpoint, Finding, Exploit, Insight…) means the report never cares which tool produced a fact.</li>
+      <li>A run is long and fragile. Writing <code>results.json</code> <b>after every stage</b> makes it crash-safe and inspectable mid-flight.</li>
+      <li>Tools go missing on different machines. A stage with no installed tool <b>self-skips</b> and notes it, instead of crashing the run.</li>
+      <li>The highest-leverage automation is <b>pre-exploitation correlation</b>: fusing isolated facts into chained leads, so a human operator's first move is obvious. Exploitation itself is for an approved human, not the pipeline.</li>
+      <li>A disabled UI button isn't a safety control. The gate is enforced in the <b>core and server-side</b>.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>two front ends, one core</h4>
+        A CLI (<code>recon.py</code>) and a local Flask dashboard (<code>serve.py</code>) that launch scans, stream them live (SSE), and browse past runs. The web layer just wraps the same <code>Orchestrator</code>.
+      </div>
+      <div class="margin">correlate is the odd stage out: it attacks nothing, it reads everyone else's output.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Entry points</th><td><code>python recon.py &lt;domain&gt; [-c config.yaml] [--active] [--exploit]</code> · <code>python serve.py</code></td></tr>
+    <tr><th>Core</th><td>uniform <code>Stage</code> base class, <code>Orchestrator</code>, typed dataclass model, dependency-free logger</td></tr>
+    <tr><th>Output</th><td><code>output/&lt;target&gt;/&lt;timestamp&gt;/</code>: <code>results.json</code>, per-stage audit (<code>*.cmd/.stdout/.stderr</code>), <code>report.html</code></td></tr>
+    <tr><th>Orchestrated tools</th><td>ProjectDiscovery suite (subfinder, dnsx, httpx, naabu, katana, nuclei…), plus standard assessment tooling, installed via <code>scripts/install_tools.sh</code></td></tr>
+    <tr><th>Deployed</th><td>Not deployed; runs locally against authorized targets only.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

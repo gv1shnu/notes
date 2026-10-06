@@ -80,5 +80,13 @@ window.NOTEBOOK = {
       stack: ["Node/Express", "Puppeteer", "Docker"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // web-timeline
+      slug: "web-timeline", name: "web-timeline", shelf: "security", status: "local",
+      tagline: "Staged web-assessment pipeline with a strict three-tier authorization gate and one typed result model.",
+      url: "https://github.com/gv1shnu/web-timeline", live: null,
+      start: "2026-07-15", end: "2026-09-28", commits: 4,
+      stack: ["Python", "Flask", "ProjectDiscovery"],
+      pages: [ { file: "index", title: "Cover & scope" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
