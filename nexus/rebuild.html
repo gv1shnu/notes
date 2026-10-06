@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nexus — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="nexus" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">21 Feb 2026</span><span class="what">initial commit</span><span class="sha">c0b4ee5</span><br>31 files, +2,592. The metasearch core and first engines.</li>
+    <li><span class="when">23 Feb</span><span class="what">Update README</span><span class="sha">9848726</span></li>
+    <li><span class="when">8 May</span><span class="what">Delete images directory → mark archived</span><span class="sha">7576fbb / 18254d6</span><br>Project paused and labelled archived.</li>
+    <li class="big"><span class="when">7 Jul</span><span class="what">project revive</span><span class="sha">a2f0cc2</span><br>30 files, +2,151/−565. Brought back and reworked.</li>
+    <li><span class="when">14 Jul</span><span class="what">add tests</span><span class="sha">2d43b67</span><br>classifier / engines / ranking / server test files.</li>
+    <li><span class="when">25 Aug</span><span class="what">add render deploy config</span><span class="sha">9cd4023</span><br>Dockerfile + render.yaml.</li>
+    <li class="big"><span class="when">5 Sep</span><span class="what">add sherlock, reddit</span><span class="sha">2393f96</span><br>25 files, +4,558. OSINT (Sherlock port) and the resilient Reddit engine.</li>
+  </ol>
+  <p class="margin">Nexus is the repo with a real second life: built in Feb, archived in May, revived in July, and given OSINT in September.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Fan out to many engines</td><td>no single engine's top page is trustworthy (the "mercury" study)</td><td>slower than one engine; needs dedup</td></tr>
+    <tr><td>Scrape, don't pay for APIs</td><td>no keys, no cost, no tracking</td><td>brittle; engines actively block scrapers</td></tr>
+    <tr><td>Warm Python worker for ddgs</td><td>avoid per-query interpreter startup</td><td>a long-lived subprocess to manage</td></tr>
+    <tr><td>BM25 ⊕ RRF ⊕ priors, each squashed</td><td>blend text relevance with cross-engine agreement; no signal dominates by scale</td><td>weights are hand-tuned</td></tr>
+    <tr><td>SSE for date sort, blocking for relevance</td><td>stream when order is time; batch when ranking needs the whole set</td><td>two endpoints</td></tr>
+    <tr><td>Deterministic classifier, not ML</td><td>reproducible routing, no training/inference cost</td><td>rules need maintenance</td></tr>
+    <tr><td>Reddit fallback chain</td><td>survive Reddit's 2026 API lockdown with or without credentials</td><td>RSS path is rate-limited</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Coverage</b>: how many engines actually returned, per query (metrics.jsonl → <code>/stats</code>).</li>
+    <li><b>Latency per engine</b> and cache-hit rate.</li>
+    <li><b>Filter/dedup trim</b>: how much junk the relevance filter removed.</li>
+    <li><b>Agreement</b>: does RRF lift the URLs multiple engines surface?</li>
+    <li><b>Tests</b>: classifier, engines, ranking, server unit tests.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Wire up the engines the classifier already names: GitHub, X, Bing.</li>
+    <li>Reduce Sherlock false positives (soft-404 detection) and the 10–25 s OSINT latency.</li>
+    <li>Persist/learn ranking weights instead of hand-tuning.</li>
+    <li>Make SearXNG optional-but-bundled on the deploy so image tabs aren't empty on Render.</li>
+    <li>Harden scrapers against layout changes (they break when engines redesign).</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Server shell</b><br>Express on :8000 serving the static frontend; <code>/api/search</code> (blocking) and <code>/api/search/stream</code> (SSE).</li>
+    <li><b>One engine</b><br>Start with Wikipedia (clean REST/JSON): a module returning <code>{title, url, content, rank}</code>. Fix the result shape here.</li>
+    <li><b>Fan-out + merge</b><br>Call engines in parallel with <code>Promise.allSettled</code>; dedup by URL; bucket into tabs.</li>
+    <li><b>Ranking</b><br>BM25 over title+content, RRF across engines, priors; squash each to [0,1]; relevance filter on query terms.</li>
+    <li><b>Hard engines</b><br>Google WAP scrape; a persistent Python <code>ddgs</code> worker; the Reddit OAuth→RSS→HTML chain; SearXNG via Docker for images.</li>
+    <li><b>Classifier</b><br>Rule-based intent detection → engine subset; <code>?route=auto</code> and a read-only <code>/api/classify</code>.</li>
+    <li><b>OSINT</b><br>Port Sherlock's site DB to Node for username lookups; crt.sh for domain subdomains; only fire for single-token queries.</li>
+    <li><b>Ops</b><br>TTL cache, metrics to jsonl + a <code>/stats</code> page, an SSRF guard on any URL-fetching endpoint, Dockerfile + render.yaml.</li>
+  </ol>
+
+</main>
+</body>
+</html>

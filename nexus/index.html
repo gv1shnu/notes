@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nexus — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="nexus" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>Nexus</h1>
+    <span class="stamp">live on render</span>
+  </div>
+  <p class="sub">gv1shnu/nexus · Node + Python · 8 commits · Feb–Sep 2026 · nexus-lixx.onrender.com</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">No two search engines return the same list, so trusting one means only ever seeing one engine's opinion.</p>
+  <p>Nexus is a <b>metasearch engine that goes wide</b>: one query fans out to Google, DuckDuckGo, a self-hosted SearXNG, Wikipedia,
+    StackOverflow, Reddit and arXiv at once, plus an OSINT module, then <span class="hl">merges and ranks</span> everything into one feed
+    with tabs (web, images, videos, news, docs, books, code, academic, wiki, community, OSINT). No API keys, no tracking.</p>
+
+  <!-- EDIT: the "mercury" observation -->
+  <h2>Why go wide: one word, three worlds</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 230" role="img" aria-label="the query mercury returns different top results on DuckDuckGo, Bing and Google">
+      <text class="lbl-t" x="20" y="34">query: "mercury" — top results, same day</text>
+      <g class="lbl-s">
+        <rect class="box" x="20" y="54" width="270" height="150"/><text class="lbl-b" x="30" y="76">DuckDuckGo</text>
+        <text x="30" y="100">1 Mercury (planet) · wikipedia</text><text x="30" y="122">2 science.nasa.gov</text><text x="30" y="144">3 Mercury (element)</text><text x="30" y="166">encyclopedic lean</text>
+        <rect class="box" x="310" y="54" width="270" height="150"/><text class="lbl-b" x="320" y="76">Bing</text>
+        <text x="320" y="100">1 Mercury (planet)</text><text x="320" y="122">2 Log in · app.mercury.com</text><text x="320" y="144">3 Mercury (element)</text><text x="320" y="166">commercial lean</text>
+        <rect class="box red" x="600" y="54" width="280" height="150"/><text class="lbl-b" x="610" y="76">Google</text>
+        <text x="610" y="100">1 Mercury (fintech) · mercury.com</text><text x="610" y="122">2 epa.gov</text><text x="610" y="144">3 Mercury Marine</text><text x="610" y="166">most scattered</text>
+      </g>
+      <text class="lbl-r" x="20" y="222">only ONE result — Wikipedia's "Mercury (planet)" — lands in every top-3</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="NX-01">same word, three personalities → fan out and merge instead of trusting one</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed (the web fights back)</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>DuckDuckGo images get 403'd</b> constantly, so images + the "other" tab come from SearXNG (Bing/Google/Flickr/Pinterest), not DDG.</li>
+      <li><b>Reddit killed unauthenticated <code>.json</code></b> in May 2026, so the Reddit engine tries OAuth API → Atom <code>search.rss</code> → old.reddit HTML, first that returns posts.</li>
+      <li><b>Google serves a reCAPTCHA to screenshots</b>, so the comparison panel is rendered from Nexus's own scraper data, labelled as such.</li>
+      <li><b>Python startup cost</b> is paid every search unless you keep the interpreter warm — so there's a persistent <code>ddgs</code> worker.</li>
+      <li><b>A URL-fetching endpoint is an SSRF risk</b> — the date resolver is guarded and re-checks after DNS.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>quantity over raw speed</h4>
+        The thesis: completeness of information beats latency. Date sort streams live (feels fast); relevance sort needs the whole set at once to rank.
+      </div>
+      <div class="margin">OSINT only fires for a single username (~480 platforms via Sherlock) or a domain (crt.sh subdomains).</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Backend</th><td>Express on :8000, serves the static frontend too; parallel fan-out to all engines</td></tr>
+    <tr><th>Engines</th><td>Google (WAP scrape), SearXNG (Docker), DuckDuckGo (ddgs worker), Wikipedia, arXiv, StackOverflow, Reddit, OSINT</td></tr>
+    <tr><th>Ranking</th><td>BM25 ⊕ Reciprocal Rank Fusion ⊕ priors, each squashed to [0,1]</td></tr>
+    <tr><th>Endpoints</th><td><code>/api/search</code> (ranked) · <code>/api/search/stream</code> (SSE) · <code>/api/classify</code> · <code>/api/resolve-date</code> · <code>/api/stats</code></td></tr>
+    <tr><th>Deployed</th><td>Render (Docker) → <a href="https://nexus-lixx.onrender.com/">nexus-lixx.onrender.com</a> (SearXNG-fed tabs empty without the container)</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

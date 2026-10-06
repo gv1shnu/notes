@@ -112,5 +112,13 @@ window.NOTEBOOK = {
       stack: ["Kafka", "Flink", "Postgres", "Superset"],
       pages: [ { file: "index", title: "Cover & architecture" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // nexus
+      slug: "nexus", name: "Nexus", shelf: "tools", status: "deployed",
+      tagline: "Metasearch engine that fans one query out to 8 sources and merges them with BM25 + RRF. No keys, no tracking.",
+      url: "https://github.com/gv1shnu/nexus", live: "https://nexus-lixx.onrender.com/",
+      start: "2026-02-21", end: "2026-09-05", commits: 8,
+      stack: ["Node/Express", "Python", "SearXNG"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

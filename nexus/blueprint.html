@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nexus — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="nexus" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">fan out in parallel, merge, rank, stream</p>
+
+  <!-- EDIT: fan-out -->
+  <h2>Fan-out architecture</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="browser to express to parallel engines back to ranked or streamed results">
+      <rect class="box" x="20" y="120" width="140" height="60" rx="6"/><text class="lbl mid" x="90" y="146">browser</text><text class="lbl-s mid" x="90" y="166">index.js · SSE/fetch</text>
+      <path class="arr" d="M162 150 H210"/>
+      <rect class="fillbox" x="212" y="100" width="190" height="100" rx="6"/>
+      <text class="lbl mid" x="307" y="124">Express :8000</text>
+      <text class="lbl-s mid" x="307" y="146">/api/search (ranked)</text><text class="lbl-s mid" x="307" y="164">/api/search/stream (SSE)</text><text class="lbl-s mid" x="307" y="182">classify · resolve-date · stats</text>
+      <path class="arr" d="M404 150 H452"/><text class="lbl-s mid" x="428" y="140">parallel</text>
+      <g class="lbl-s">
+        <rect class="box" x="454" y="40" width="120" height="30"/><text x="462" y="60">Google (WAP)</text>
+        <rect class="box" x="454" y="78" width="120" height="30"/><text x="462" y="98">SearXNG (Docker)</text>
+        <rect class="box" x="454" y="116" width="120" height="30"/><text x="462" y="136">DuckDuckGo</text>
+        <rect class="box" x="454" y="154" width="120" height="30"/><text x="462" y="174">Wikipedia</text>
+        <rect class="box" x="454" y="192" width="120" height="30"/><text x="462" y="212">arXiv</text>
+        <rect class="box" x="584" y="78" width="120" height="30"/><text x="592" y="98">StackOverflow</text>
+        <rect class="box" x="584" y="116" width="120" height="30"/><text x="592" y="136">Reddit</text>
+        <rect class="box" x="584" y="154" width="120" height="30"/><text x="592" y="174">OSINT</text>
+      </g>
+      <path class="arr" d="M706 150 H754"/>
+      <rect class="box" x="756" y="90" width="220" height="120" rx="6"/>
+      <text class="lbl mid" x="866" y="114">merge pipeline</text>
+      <text class="lbl-s mid" x="866" y="136">dedup by URL</text><text class="lbl-s mid" x="866" y="154">relevance filter</text><text class="lbl-s mid" x="866" y="172">BM25 ⊕ RRF ⊕ priors</text><text class="lbl-s mid" x="866" y="190">tab bucketing</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="NX-02">the backend serves the frontend, so it's one process</figcaption>
+  </figure>
+
+  <!-- EDIT: ranking -->
+  <h2>How results get ranked</h2>
+  <div class="cols wide-left">
+    <div class="card">score = w1 · squash(BM25(title, content))
+      + w2 · RRF(rank across engines)
+      + priors(source trust, recency)
+
+BM25   Okapi over title+content (util/bm25.js)
+RRF    Σ 1/(60 + rank)  → agreement boosts a URL
+filter drop results sharing NONE of the query terms
+each signal squashed to [0,1] so scale can't dominate</div>
+    <div>
+      <p>If several engines independently surface the same URL near the top, RRF lifts it. BM25 handles term frequency, rarity and document length.
+        Priors are gentle tie-breakers.</p>
+      <p class="margin">date sort streams (SSE, newest first, feels fast); relevance sort blocks because BM25+RRF need the whole set.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: classifier -->
+  <h2>Smart routing: a deterministic classifier</h2>
+  <p>Going wide is the default, but <code>util/classifier.js</code> can read a query and pick the fitting engines — pure rules (keywords, phrases, regexes), no ML, no network, so the same query always routes the same way. Opt in with <code>?route=auto</code>.</p>
+  <div class="table-wrap"><table>
+    <tr><th>query looks like</th><th>intent</th><th>engines favored</th></tr>
+    <tr><td><code>TypeError in react useEffect</code></td><td>code</td><td>StackOverflow · GitHub* · Google · DDG</td></tr>
+    <tr><td><code>attention is all you need paper</code></td><td>academic</td><td>arXiv · Google · Wikipedia</td></tr>
+    <tr><td><code>best keyboard reddit</code></td><td>social</td><td>Reddit · X* · DDG · Google</td></tr>
+    <tr><td><code>who is alan turing</code></td><td>reference</td><td>Wikipedia · DDG · Google</td></tr>
+    <tr><td><code>github.com</code> · <code>8.8.8.8</code></td><td>entity</td><td>OSINT</td></tr>
+    <tr><td>anything else</td><td>general</td><td>Google · SearXNG · DDG · Wikipedia</td></tr>
+  </table></div>
+  <p class="small">* named but not wired up yet (GitHub, X, Bing) — the classifier shows the roadmap but filters them out; a general fallback is always appended so routing never comes back empty.</p>
+
+  <!-- EDIT: the tricky engines -->
+  <h2>The engines that fight back</h2>
+  <div class="cols">
+    <figure class="sk">
+      <svg viewBox="0 0 440 180" role="img" aria-label="reddit fallback chain">
+        <text class="lbl-b" x="10" y="22">Reddit, in order</text>
+        <rect class="box" x="10" y="36" width="130" height="40"/><text class="lbl-s mid" x="75" y="60">OAuth API</text>
+        <path class="arr-d red" d="M142 56 H180"/><text class="lbl-s" x="150" y="48">no key</text>
+        <rect class="box" x="182" y="36" width="120" height="40"/><text class="lbl-s mid" x="242" y="60">Atom search.rss</text>
+        <path class="arr-d red" d="M304 56 H340"/>
+        <rect class="box" x="342" y="36" width="90" height="40"/><text class="lbl-s mid" x="387" y="60">old.reddit</text>
+        <text class="lbl-r" x="10" y="110">first that returns posts wins</text>
+        <text class="lbl-s" x="10" y="140">OAuth is the only fully reliable path;</text><text class="lbl-s" x="10" y="160">RSS works keyless but is rate-limited</text>
+      </svg>
+    </figure>
+    <div>
+      <ul class="dash">
+        <li><b>Warm Python worker</b> (<code>ddg_worker.py</code> + <code>pyworker.js</code>): the <code>ddgs</code> interpreter is kept alive over a thread pool, not restarted per search.</li>
+        <li><b>OSINT</b>: Sherlock's real site DB ported to Node (<code>util/sherlock.js</code>), ~480 checks on a bounded pool (~10–25 s, some soft-404 false positives); domains → crt.sh subdomains.</li>
+        <li><b>SSRF guard</b> on <code>/api/resolve-date</code>: public http(s) only, re-checked after DNS (rebinding-proof).</li>
+        <li><b>TTL cache</b> so repeated queries skip the whole fan-out; <b>parallel pagination</b> for Wikipedia/arXiv/StackOverflow.</li>
+        <li><b>Metrics</b> to <code>metrics.jsonl</code>: per-engine latency, counts, cache hits, filter trim; viewable at <code>/stats</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
