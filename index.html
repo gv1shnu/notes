@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workshop Notes</title>
+<meta name="description" content="Engineering notebook: how each of my repositories was observed, designed, built, deployed and what is still pending.">
+<link rel="stylesheet" href="assets/notebook.css">
+<script src="assets/registry.js" defer></script>
+<script src="assets/notebook.js" defer></script>
+</head>
+<!-- =====================================================================
+     THE DESK — landing page
+     The folders and the calendar are drawn by assets/notebook.js from
+     assets/registry.js. Edit the hero text below; everything else is data.
+     ===================================================================== -->
+<body class="desk-page">
+<div class="desk">
+
+  <!-- EDIT: hero / intro -->
+  <header class="desk-hero">
+    <h1>Workshop Notes</h1>
+    <p>My engineering notebook. One folder per repository. Each folder holds the sheets I wish I had
+       before I started: what the problem was, what I observed, the blueprint, the build log straight
+       from git history, why I took each decision, where it runs, how I judge it, and what is still open.</p>
+    <p>Written so that I, or any engineer, can rebuild every project from a blank editor.</p>
+  </header>
+
+  <!-- how to read a folder: a small infographic -->
+  <figure class="bp" style="margin-top:22px">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 150" role="img" aria-label="Every folder follows the same order: cover, blueprint, build log, decisions, rebuild guide">
+      <text class="lbl-t" x="20" y="38">how a folder reads</text>
+      <g>
+        <rect class="box" x="20" y="62" width="160" height="60" rx="6"/><text class="lbl mid" x="100" y="88">1 · cover</text><text class="lbl-s mid" x="100" y="108">problem + observations</text>
+        <path class="arr" d="M184 92 H222"/>
+        <rect class="box" x="226" y="62" width="160" height="60" rx="6"/><text class="lbl mid" x="306" y="88">2 · blueprint</text><text class="lbl-s mid" x="306" y="108">architecture + flows</text>
+        <path class="arr" d="M390 92 H428"/>
+        <rect class="box" x="432" y="62" width="160" height="60" rx="6"/><text class="lbl mid" x="512" y="88">3 · build log</text><text class="lbl-s mid" x="512" y="108">git history, phase by phase</text>
+        <path class="arr" d="M596 92 H634"/>
+        <rect class="box" x="638" y="62" width="160" height="60" rx="6"/><text class="lbl mid" x="718" y="88">4 · decisions</text><text class="lbl-s mid" x="718" y="108">why · deploy · metrics</text>
+        <path class="arr" d="M802 92 H840"/>
+        <rect class="fillbox" x="844" y="62" width="140" height="60" rx="6"/><text class="lbl mid" x="914" y="88">5 · rebuild</text><text class="lbl-s mid" x="914" y="108">steps + pending</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption data-dwg="000">small repos fold sheets together, but the order never changes</figcaption>
+  </figure>
+
+  <!-- project calendar (drawn by notebook.js) -->
+  <div class="chart-strip">
+    <div class="legend"><span>■ <span style="color:#9cc3ff">blue</span> = first → last commit</span><span>■ <span style="color:#ffcf6e">amber</span> = still in progress</span></div>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- shelves of folders (drawn by notebook.js) -->
+  <div id="shelves"></div>
+
+</div>
+</body>
+</html>
