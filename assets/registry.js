@@ -192,5 +192,13 @@ window.NOTEBOOK = {
       stack: ["Electron", "TypeScript", "whisper", "Ollama"],
       pages: [ { file: "index", title: "Cover & idea" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // cs
+      slug: "cs", name: "cs · encrypted notes", shelf: "security", status: "deployed",
+      tagline: "A publishing pipeline that puts my notes on a public GitHub Pages site while committing only ciphertext, gated so nothing leaks.",
+      url: "https://github.com/gv1shnu/cs", live: "http://www.vishnugandarapu.in/cs/",
+      start: "2026-09-01", end: "2026-09-16", commits: 3,
+      stack: ["bash", "Node", "StatiCrypt"],
+      pages: [ { file: "index", title: "Cover & invariant" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

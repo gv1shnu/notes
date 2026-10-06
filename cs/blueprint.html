@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cs — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="cs" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">the build pipeline, stage by stage</p>
+
+  <!-- EDIT: pipeline -->
+  <h2>build.sh, in order</h2>
+  <ol class="steps">
+    <li><b>Stage</b><br>rsync the plaintext site into <code>.enc-build/site</code>, excluding every tooling/meta file <i>by name</i> so it can never be obfuscated and shipped as cleartext.</li>
+    <li><b>Obfuscate paths</b><br><code>obfuscate.js</code> renames dirs/files to tokens and rewrites all internal links (<code>index.html</code> keeps its name; assets keep generic names, parents get tokens).</li>
+    <li><b>Strip residue</b><br><code>strip-residue.js</code> removes leftover identifying bits from the staged tree.</li>
+    <li><b>Inline assets</b><br><code>inline-assets.js</code> folds CSS/JS/images <i>into</i> each page (data URIs), rebuilds any retired SPA shells as static link pages, and sweeps orphan files.</li>
+    <li><b>Build search</b><br><code>build-search-index.js</code> indexes the obfuscated tree and injects it into <code>index.html</code>'s placeholder.</li>
+    <li><b>Encrypt</b><br>StatiCrypt AES-256-encrypts every page's content with the shared salt.</li>
+    <li><b>Sessionize</b><br><code>sessionize-staticrypt.js</code> converts StatiCrypt's persistent "remember me" into a per-tab <code>sessionStorage</code> key.</li>
+    <li><b>Publish</b><br>copy ciphertext to <code>docs/</code>; then <code>verify.sh</code> gates; then a sequential commit + push.</li>
+  </ol>
+
+  <!-- EDIT: path tokens -->
+  <h2>Why paths are KDF-derived, not hashed</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">key   = scrypt(PASSWORD, salt from .staticrypt.json, 32B)
+token = HMAC-SHA256(key, "path:" + sourceRelPath)[:16 hex]
+
+• same salt StatiCrypt uses → tokens deterministic per password
+• a new password reshuffles EVERY token
+• password never used directly as an HMAC key
+• scrypt is memory-hard → no raw-hash-speed brute force
+  even if a (plaintext path, token) pair leaks</div>
+    <div>
+      <p>A plain hash of the path would be brute-forceable at billions/sec; routing it through scrypt first means an attacker who somehow learns one mapping still can't cheaply recover the password or other paths.</p>
+      <p class="margin">index.html must keep its name for directory-default serving and the home link — so that one name is deliberately not tokenised.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: verify gate -->
+  <h2>The verification gate (verify.sh)</h2>
+  <p>Runs on the built <code>docs/</code> and exits non-zero (printing every failure) if anything could leak. It strips long base64/hex ciphertext runs to a "shell" first, so greps can't false-positive on random ciphertext:</p>
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>check</th></tr>
+    <tr><td>1</td><td>only <code>*.html</code> and <code>.nojekyll</code> may exist in docs/</td></tr>
+    <tr><td>2</td><td>every page has a StatiCrypt payload (<code>staticryptEncryptedMsg…</code>)</td></tr>
+    <tr><td>3</td><td>outer metadata is neutral: title is exactly "Private notes"; no description, no OpenGraph/Twitter tags</td></tr>
+    <tr><td>4</td><td>no source fragments in cleartext (topic slugs, <code>requirements.txt</code>, <code>.mjs</code>, <code>/learn/</code>, taxonomy ids…)</td></tr>
+    <tr><td>5</td><td>no email, no <code>PRIVATE KEY</code> header, no credential assignment in cleartext</td></tr>
+  </table></div>
+  <p class="small">Written for bash 3.2 (macOS default); reads no secrets and prints none. <code>publish.sh</code> aborts before <code>git add</code> if it fails.</p>
+
+  <!-- EDIT: round trip -->
+  <h2>Round trip</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 820 130" role="img" aria-label="publish and decrypt are inverse">
+      <rect class="box" x="10" y="40" width="150" height="50"/><text class="lbl-s mid" x="85" y="62">local plaintext</text><text class="lbl-s mid" x="85" y="80">(gitignored)</text>
+      <path class="arr" d="M162 55 H300"/><text class="lbl-s mid" x="231" y="45">publish.sh →</text>
+      <rect class="box" x="302" y="40" width="190" height="50"/><text class="lbl-s mid" x="397" y="62">docs/ ciphertext</text><text class="lbl-s mid" x="397" y="80">(the only commit)</text>
+      <path class="arr" d="M492 75 H660"/><text class="lbl-s mid" x="576" y="100">← decrypt.sh</text>
+      <rect class="box" x="662" y="40" width="150" height="50"/><text class="lbl-s mid" x="737" y="62">.plaintext-restore</text><text class="lbl-s mid" x="737" y="80">recover the source</text>
+    </svg>
+    </div>
+    <figcaption>the committed ciphertext is the only copy on GitHub; decrypt.sh reconstructs the plaintext from it with the password</figcaption>
+  </figure>
+
+</main>
+</body>
+</html>

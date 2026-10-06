@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cs — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="cs" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>cs: encrypted notes site</h1>
+    <span class="stamp blue">live (locked)</span>
+  </div>
+  <p class="sub">gv1shnu/cs · bash + Node toolchain · 3 commits · Sep 2026 · vishnugandarapu.in/cs (password-gated)</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">I want my personal CS notes online — searchable, linkable, on GitHub Pages — but the <b>repo is public</b>, so everything committed is world-readable forever.</p>
+  <p>The whole project is a publishing pipeline with one invariant: <span class="hl">only ciphertext is ever committed</span>. Plaintext notes live gitignored on my machine; a verification gate refuses to publish if anything would leak.</p>
+
+  <!-- EDIT: the invariant -->
+  <h2>The one invariant</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 220" role="img" aria-label="plaintext stays local; encrypt, verify gate, then only ciphertext is committed">
+      <rect class="box" x="20" y="80" width="170" height="70" rx="6"/><text class="lbl mid" x="105" y="104">plaintext notes</text><text class="lbl-s mid" x="105" y="124">gitignored, local only</text><text class="lbl-s mid" x="105" y="142">never pushed</text>
+      <path class="arr" d="M192 115 H240"/><text class="lbl-s mid" x="216" y="105">build.sh</text>
+      <rect class="fillbox" x="242" y="80" width="180" height="70" rx="6"/><text class="lbl mid" x="332" y="104">encrypt (StatiCrypt)</text><text class="lbl-s mid" x="332" y="124">AES-256 per page</text><text class="lbl-s mid" x="332" y="142">+ obfuscate paths + inline</text>
+      <path class="arr" d="M424 115 H472"/>
+      <path class="box red" d="M545 75 L610 115 L545 155 L480 115 Z"/><text class="lbl-s mid" x="545" y="112">verify.sh</text><text class="lbl-s mid" x="545" y="128">gate</text>
+      <path class="arr-d red" d="M545 155 V190 H260"/><text class="lbl-r" x="280" y="185">any leak → abort BEFORE git</text>
+      <path class="arr" d="M610 115 H658"/><text class="lbl-s mid" x="634" y="105">pass</text>
+      <rect class="box" x="660" y="80" width="150" height="70" rx="6"/><text class="lbl mid" x="735" y="104">docs/ → commit</text><text class="lbl-s mid" x="735" y="124">ciphertext only</text><text class="lbl-s mid" x="735" y="142">GitHub Pages</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="CS-01">the gate runs before anything is staged, so a leak can never reach a commit</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What the design has to defend against</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Content</b>: every page's body is AES-256 encrypted; the reader unlocks once per browser tab and the derived key lives only in <code>sessionStorage</code>, discarded when the tab closes.</li>
+      <li><b>Paths</b>: topic names in URLs would leak the content, so every directory/file is renamed to an opaque token — derived by a memory-hard KDF, so a seen path+token pair can't be brute-forced at raw-hash speed.</li>
+      <li><b>Metadata</b>: titles are forced to a neutral "Private notes"; descriptions and OpenGraph/Twitter tags are stripped.</li>
+      <li><b>Assets</b>: CSS/JS/images are inlined <i>into</i> each page before encryption, so nothing ships as a cleartext sidecar; orphans are swept.</li>
+      <li><b>Search</b>: the full-text index is built then injected into <code>index.html</code> <i>before</i> encryption, so it ships encrypted and only works after unlock.</li>
+    </ul>
+    <div>
+      <div class="note green">
+        <h4>unlock once, browse all</h4>
+        A fixed shared salt (<code>.staticrypt.json</code>) means a reader unlocks once per tab and can then browse every page in that session.
+      </div>
+      <div class="margin">the commits are literally "commit #1", "commit #2", "commit #3" — sequential, by design.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Crypto</th><td>StatiCrypt (AES-256) per HTML page; scrypt-derived path tokens; <code>sessionStorage</code> key, not persistent</td></tr>
+    <tr><th>Toolchain</th><td>bash (<code>build / verify / publish / decrypt</code>) + Node (<code>obfuscate</code>, <code>inline-assets</code>, <code>strip-residue</code>, <code>sessionize-staticrypt</code>, <code>build-search-index</code>)</td></tr>
+    <tr><th>Published</th><td>704 encrypted HTML pages in <code>docs/</code>; nothing else but <code>.nojekyll</code></td></tr>
+    <tr><th>Commit</th><td><code>STATICRYPT_PASSWORD='…' ./publish.sh</code> → build → verify → sequential commit → push</td></tr>
+    <tr><th>Live</th><td><a href="http://www.vishnugandarapu.in/cs/">vishnugandarapu.in/cs</a> — asks for a password</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

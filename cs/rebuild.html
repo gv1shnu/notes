@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cs — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="cs" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">1 Sep 2026</span><span class="what">commit #1</span><br>The first encrypted publish.</li>
+    <li><span class="when">9 Sep</span><span class="what">commit #2</span></li>
+    <li><span class="when">16 Sep</span><span class="what">commit #3</span></li>
+  </ol>
+  <p class="margin">Every commit is ciphertext only, so the git history itself leaks nothing — not even a meaningful message. The interesting evolution is in the toolchain, which lives in the working tree.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Commit ciphertext only; plaintext gitignored</td><td>a public repo is forever-readable; the source must never touch it</td></tr>
+    <tr><td>Verify gate before git</td><td>catch a leak at build time, not after it's pushed and cached</td></tr>
+    <tr><td>Obfuscate paths with a scrypt KDF</td><td>URLs would leak topics; memory-hard derivation resists brute force</td></tr>
+    <tr><td>Inline all assets before encryption</td><td>no cleartext CSS/JS/image sidecars alongside encrypted pages</td></tr>
+    <tr><td>Search index injected pre-encryption</td><td>search ships encrypted and only works after unlock</td></tr>
+    <tr><td>sessionStorage key, shared salt</td><td>unlock once per tab; nothing persists after the session</td></tr>
+    <tr><td>Exclude tooling by name when staging</td><td>belt-and-braces: a tool file can't be obfuscated and shipped</td></tr>
+    <tr><td>Neutral title / no meta</td><td>even unopened, a page reveals nothing about its subject</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Zero-leak</b>: <code>verify.sh</code> passes — no plaintext fragment, email, key or credential in <code>docs/</code>.</li>
+    <li><b>Only ciphertext committed</b>: every file in docs/ is an encrypted HTML page (or <code>.nojekyll</code>).</li>
+    <li><b>Round-trip</b>: <code>decrypt.sh</code> reconstructs the plaintext from the committed ciphertext.</li>
+    <li><b>Usability</b>: unlock once per tab, search works, links resolve across obfuscated paths.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Run <code>verify.sh</code> in a pre-push hook / CI so a manual publish can't skip the gate.</li>
+    <li>Rotate the password periodically (it reshuffles every token — plan for the churn).</li>
+    <li>Consider per-section passwords for selectively sharing a subtree.</li>
+    <li>Document the exact StatiCrypt version pin for reproducible builds.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Separate source from output</b><br>Plaintext notes at the repo root (or a restore dir), gitignored; only <code>docs/</code> is committed.</li>
+    <li><b>Stage safely</b><br>rsync into a build dir excluding <code>.git</code>, build artifacts, and <b>every tooling file by name</b>.</li>
+    <li><b>Obfuscate</b><br>scrypt(password, salt) → HMAC per path → 16-hex token; rename dirs/files and rewrite links; keep <code>index.html</code>.</li>
+    <li><b>Flatten</b><br>Inline CSS/JS/images into each page; rebuild dead SPA shells as static link pages; delete orphans.</li>
+    <li><b>Index + encrypt</b><br>Build the search index into index.html; StatiCrypt-encrypt every page with a shared salt; convert remember-me to sessionStorage.</li>
+    <li><b>Gate</b><br>A <code>verify.sh</code> that strips ciphertext runs then greps for only-HTML, payload-present, neutral-meta, and no fragments/secrets; exit non-zero on any failure.</li>
+    <li><b>Publish</b><br><code>publish.sh</code>: build → verify → sequential commit → fast-forward push; a <code>decrypt.sh</code> for recovery.</li>
+  </ol>
+
+</main>
+</body>
+</html>
