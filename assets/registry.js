@@ -128,5 +128,13 @@ window.NOTEBOOK = {
       stack: ["NestJS", "Next.js", "Postgres", "Redis"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // dilli-khoj
+      slug: "dilli-khoj", name: "Dilli Khoj", shelf: "games", status: "deployed",
+      tagline: "A 3D SQL learning game: explore ruined Delhi, restore 20 archives by writing SELECTs, graded server-side so XP can't be faked.",
+      url: "https://github.com/gv1shnu/dilli-khoj", live: "http://www.vishnugandarapu.in/dilli-khoj/",
+      start: "2026-09-03", end: "2026-10-04", commits: 119,
+      stack: ["React", "Three.js", "PGlite", "Supabase"],
+      pages: [ { file: "index", title: "Cover & idea" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

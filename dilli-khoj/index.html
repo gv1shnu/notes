@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dilli-khoj — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dilli-khoj" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>Dilli Khoj</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/dilli-khoj · React 19 + Three.js + PGlite + Supabase · 119 commits · Sep–Oct 2026 · vishnugandarapu.in/dilli-khoj · (renamed from treasure-hunt)</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Teach the DBMS curriculum (Modules 1–8) by making students <i>write real SQL</i>, not watch slides, and make it fun enough that they want to.</p>
+  <p>A PostgreSQL learning game set in a fictional overgrown Delhi: explore a 3D world, restore <b>twenty archives</b> across seven districts,
+    and solve each by writing a <code>SELECT</code>. <span class="hl">Unlimited practice in the browser</span>, but grading and progress are server-authoritative so XP can't be faked.
+    Target: up to 3,000 students on campus Wi-Fi at a <b>₹0</b> operating cost.</p>
+
+  <!-- EDIT: the two-database idea -->
+  <h2>The core idea: two databases, two trust levels</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 940 240" role="img" aria-label="practice runs in browser Postgres; grading runs on the server against hidden fixtures">
+      <rect class="box" x="20" y="60" width="260" height="130" rx="8"/>
+      <text class="lbl-b mid" x="150" y="86">in the browser (untrusted)</text>
+      <text class="lbl-s mid" x="150" y="114">PGlite — real Postgres in WASM</text>
+      <text class="lbl-s mid" x="150" y="136">unlimited free practice ("Run")</text>
+      <text class="lbl-s mid" x="150" y="158">sees only visible sample data</text>
+      <text class="lbl-s mid" x="150" y="178">local Run = never scored</text>
+      <path class="arr" d="M282 125 H360"/><text class="lbl-s mid" x="321" y="114">Submit + JWT</text>
+      <rect class="fillbox" x="362" y="50" width="300" height="150" rx="8"/>
+      <text class="lbl-b mid" x="512" y="78">on the server (authoritative)</text>
+      <text class="lbl-s mid" x="512" y="106">Supabase judge</text>
+      <text class="lbl-s mid" x="512" y="128">restricted read-only executor</text>
+      <text class="lbl-s mid" x="512" y="150">runs vs hidden fixtures (3 cases/q)</text>
+      <text class="lbl-s mid" x="512" y="172">owns XP, unlocks, purchases</text>
+      <path class="arr" d="M664 125 H740"/>
+      <rect class="box" x="742" y="90" width="170" height="70" rx="6"/><text class="lbl mid" x="827" y="116">private vault</text><text class="lbl-s mid" x="827" y="138">answers + hidden data</text>
+      <text class="lbl-r" x="362" y="222">canonical solutions never ship to students → give them the app, not the repo</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="DK-01">the executor role that runs student SQL is separate from the identity that records progress</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What shaped it</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Cheating is the real threat.</b> Anything the browser knows can be forged, so the local run is explicitly untrusted and the server owns every number.</li>
+      <li><b>₹0 budget</b> means degrade gracefully (drop hidden runtime cases) before adding paid infrastructure. PGlite moves all practice off the server.</li>
+      <li><b>Accept any correct query.</b> Grading passes any safe query that matches all result fixtures; the intended syntax is not a hard gate.</li>
+      <li><b>Help should never block progress.</b> A wrong answer costs nothing; hints/reveals cost XP, so a no-help run tops out at 600 and a full-help run still finishes at 250.</li>
+      <li><b>Sequential unlock</b> (1→20, difficulty rising with the modules) keeps the curriculum order and reduces load.</li>
+    </ul>
+    <div>
+      <div class="note pink">
+        <h4>honest status</h4>
+        Open-source release: all 20 server-graded questions and the judge are complete. Native-browser/accessibility QA, sustained <i>hosted</i>-load validation, and blind human review of every question are still open before a real classroom rollout.
+      </div>
+      <div class="margin">a working preview ≠ capacity for 3,000 students: the hosted load test still has to be run.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Stack</th><td>React 19, TypeScript, Vite 8, Three.js r185, PGlite (browser Postgres), Supabase (auth + judge + progress), pnpm</td></tr>
+    <tr><th>Content</th><td>20 ruins · 7 districts · 3 generated test datasets per question; read-only SQL (SELECT / WITH)</td></tr>
+    <tr><th>Auth</th><td>Google sign-in required before play; admin via a server allowlist (<code>game_private.admin_emails</code>)</td></tr>
+    <tr><th>Tests</th><td>157 tests + Chrome/WebKit MacBook browser checks; Vitest + Playwright</td></tr>
+    <tr><th>Deploy</th><td>static frontend on GitHub Pages, judge + data on Supabase (moved off Cloudflare Workers, 4 Oct)</td></tr>
+    <tr><th>Live</th><td><a href="http://www.vishnugandarapu.in/dilli-khoj/">vishnugandarapu.in/dilli-khoj</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

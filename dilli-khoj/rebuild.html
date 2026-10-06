@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dilli-khoj — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dilli-khoj" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">119 commits; built mostly across two weeks of September</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log (shape of it)</h2>
+  <ol class="timeline">
+    <li class="phase">3 Sep — foundation</li>
+    <li class="big"><span class="when">3 Sep</span><span class="what">foundation vertical slice · authoritative query judge · overgrown-ruins world · 20 draft questions · intro + CI/CD</span><br>The spine landed in a day: a slice, the judge, the world, the curriculum sequence.</li>
+    <li class="phase">4 Sep — the systems</li>
+    <li class="big"><span class="when">4 Sep</span><span class="what">20 playable ruins · 7 districts + XP economy + Question Studio · anti-bypass XP · sequential unlock + per-player tracking + sign-in gate · the 10 named levels</span><br>Dozens of commits: economy, auth, the toroidal world, and levels 01–10 each with ambience.</li>
+    <li class="phase">7–14 Sep — hardening &amp; opening up</li>
+    <li><span class="when">7–8 Sep</span><span class="what">Supabase env, admin can open any explorer's profile</span></li>
+    <li class="big"><span class="when">14 Sep</span><span class="what">open sign-in to any Google account; reassign admin; credits/privacy/terms; auto-deploy Supabase CI</span><br>Dropped the domain restriction (owner decision) and refreshed the legal pages.</li>
+    <li class="phase">28 Sep – 4 Oct — open-source &amp; Pages</li>
+    <li><span class="when">28 Sep</span><span class="what">chore: prepare open-source release</span></li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">host on GitHub Pages under /dilli-khoj/ (PR #1), retire the Workers deploy</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions (from docs/decisions-and-open-items.md)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>area</th><th>decision</th></tr>
+    <tr><td>Trust</td><td>local Run untrusted; server owns grading, XP, unlocks; solutions never ship to students</td></tr>
+    <tr><td>Grading</td><td>any safe query passing all result fixtures is accepted; wrong answers cost nothing</td></tr>
+    <tr><td>Progression</td><td>strictly sequential 1→20; difficulty tracks Modules 1–8</td></tr>
+    <tr><td>Access</td><td>Google sign-in required; any account (domain restriction removed 14 Sep); admin via server allowlist</td></tr>
+    <tr><td>Budget</td><td>₹0 target; degrade hidden runtime cases before paying for infrastructure</td></tr>
+    <tr><td>Practice</td><td>PGlite in the browser → free, unlimited, off-server</td></tr>
+    <tr><td>Maps</td><td>players see cleared parcels only; admins see all; no paid map API</td></tr>
+    <tr><td>Hosting</td><td>GitHub Pages + Supabase (moved off Cloudflare Workers, 4 Oct)</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Judge scale</b>: 3,000-player local stress run — 600 req/s, p95 7 ms, 0 errors (see Blueprint).</li>
+    <li><b>Test suite</b>: 157 tests + Chrome/WebKit MacBook browser checks pass.</li>
+    <li><b>Anti-bypass</b>: can the client fake XP or unlocks? (It can't — the server recomputes.)</li>
+    <li><b>Economy sanity</b>: <code>economy-validation.mjs</code> checks the 600 / 250 XP bounds hold.</li>
+    <li><b>Download cost</b>: PGlite WASM payload vs. campus Wi-Fi (2–5 MB/s) — still to be measured at scale.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending (open items)</h2>
+  <ul class="checks">
+    <li>Sustained <b>hosted</b>-load validation at 3,000 concurrent (local harness ≠ Supabase stack).</li>
+    <li>Native-browser + accessibility QA beyond the Mac baseline.</li>
+    <li>Blind human review of every one of the 20 questions.</li>
+    <li>Measure PGlite WASM/data download on real campus Wi-Fi.</li>
+    <li>Free database compute headroom for the cohort.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Pick the trust boundary first</b><br>Decide that the browser is untrusted. All grading/XP lives on the server; the client is a renderer.</li>
+    <li><b>Content pipeline</b><br>Author questions privately (prompt, schema, sample rows, canonical answer). A generator emits <i>visible</i> content for the browser and <i>hidden</i> fixtures for the judge.</li>
+    <li><b>Browser practice</b><br>PGlite in a worker; load the visible sample data; a "Run" that executes locally and is never scored.</li>
+    <li><b>Judge</b><br>Supabase RPC that takes query + JWT, runs it under a restricted read-only role against hidden fixtures (≥3 cases), compares result sets, and returns a verdict.</li>
+    <li><b>Progress + economy</b><br>A second server identity applies XP/unlock transactions; implement the staged-help economy with the 600/250 bounds; sequential unlock.</li>
+    <li><b>World</b><br>Three.js scene; a tiled landscape; an avatar; 20 levels with ambience; a cleared-parcels atlas.</li>
+    <li><b>Auth + admin</b><br>Google OAuth (External + published); admin from a server allowlist; a DEV-only Question Studio that never ships answers.</li>
+    <li><b>Validate + ship</b><br>Vitest + Playwright; a local stress harness; static frontend on Pages, judge on Supabase with CI.</li>
+  </ol>
+
+</main>
+</body>
+</html>

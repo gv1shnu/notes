@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dilli-khoj — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dilli-khoj" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">content pipeline, trust boundary, and the XP economy</p>
+
+  <!-- EDIT: content pipeline -->
+  <h2>Content pipeline: split at the trust boundary</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 220" role="img" aria-label="private authoring sources split into public browser content and private server fixtures">
+      <rect class="box" x="20" y="80" width="200" height="60" rx="6"/><text class="lbl mid" x="120" y="106">private authoring</text><text class="lbl-s mid" x="120" y="126">catalog + canonical answers</text>
+      <path class="arr" d="M222 110 H280"/>
+      <rect class="fillbox" x="282" y="80" width="170" height="60" rx="6"/><text class="lbl mid" x="367" y="106">fixture generator</text><text class="lbl-s mid" x="367" y="126">scripts/generate-*.mjs</text>
+      <path class="arr" d="M454 95 L540 60"/><path class="arr" d="M454 125 L540 160"/>
+      <rect class="box" x="542" y="35" width="220" height="50" rx="6"/><text class="lbl mid" x="652" y="58">visible browser content</text><text class="lbl-s mid" x="652" y="76">sample rows only → ships</text>
+      <rect class="box red" x="542" y="140" width="220" height="50" rx="6"/><text class="lbl mid" x="652" y="163">private server fixtures</text><text class="lbl-s mid" x="652" y="181">hidden data + answers</text>
+      <path class="arr" d="M764 60 H860 V95"/>
+      <path class="arr" d="M764 165 H860 V130"/>
+      <rect class="box" x="820" y="95" width="120" height="36" rx="6"/><text class="lbl-s mid" x="880" y="118">Browser / Judge</text>
+      <text class="lbl-r" x="542" y="210">3 generated test datasets per question</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="DK-02">the generator decides what students can see vs. what only the judge can</figcaption>
+  </figure>
+
+  <!-- EDIT: grading flow -->
+  <h2>Grade flow (a submission)</h2>
+  <ol class="steps">
+    <li><b>Practice (Run)</b><br>Student query runs in the PGlite worker against visible sample data. Instant, free, unlimited, and <b>never scored</b>.</li>
+    <li><b>Submit</b><br>The query + the player's Supabase JWT go to the judge RPC.</li>
+    <li><b>Execute safely</b><br>A restricted read-only executor role runs the query against the hidden fixtures (3 cases). Any safe query matching all result sets passes — intended syntax isn't required.</li>
+    <li><b>Record</b><br>A separate server identity applies the XP/unlock transaction. Wrong answers cost nothing; the local Run state is ignored.</li>
+    <li><b>Progress</b><br>Server returns the authoritative state (solved, XP, next unlock, <code>isAdmin</code>). The client learns admin status only from the server.</li>
+  </ol>
+
+  <!-- EDIT: XP economy -->
+  <h2>The XP economy (anti-bypass)</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">start            100 XP
+survey           +5
+solve a ruin     +20
+first clue       free
+deeper clue      −5   (ruins 11–20)
+full reveal      −15  (after all clues opened)
+----------------------------------------
+no-help ceiling  MAX_XP        = 600
+full-help end    FULL_HELP_END = 250
+revisits         non-scoring, analytics only
+wrong answer     0  (never penalised)</div>
+    <div>
+      <p>Help is <b>staged</b>: free result diagnostics name the kind of mismatch; the first clue removes the fear of asking; stronger help costs XP so it stays visible in the final score without ever stopping progress.</p>
+      <p class="margin">XP, solved state and unlocks are server-authoritative in production; the browser's copy is a display cache.</p>
+      <p class="small">Leaderboard = completers only (all 20 solved), ranked by XP then time from sign-up to completion; no email shown.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: the world -->
+  <h2>The 3D world</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>Seven districts (Yamuna Gates → Deep Foundations), contiguous ruin ranges named in <code>ruins.ts</code>.</li>
+      <li>Twenty hand-built levels (fortress, bus depot, riverfront, vault, bazaar…), each with its own ambience track.</li>
+      <li>Infinite tiled landscape (toroidal tiling of the asset kit), an animated Soldier avatar, guide arrows, fullscreen.</li>
+      <li>An animated geographic atlas: players see only cleared parcels; admins inspect all 20.</li>
+      <li>No paid map API; original asset kit (see CREDITS).</li>
+    </ul>
+    <div>
+      <h4>repo layout</h4>
+      <div class="card wrap">src/
+  App.tsx        shell, archive flow, XP, maps
+  game/          3D scene, movement, ambience,
+                 progression, world/ (20 levels)
+  db/            PGlite practice worker
+  questions/     catalog + generated public content
+  sql/           query/result policy
+  lib/           Supabase client, RPCs, judge calls
+  admin/         DEV-only Question Studio
+scripts/         generators, browser checks, judge harness</div>
+    </div>
+  </div>
+
+  <!-- EDIT: stress test -->
+  <h2>Load behaviour (local stress harness)</h2>
+  <p class="small">Disposable Postgres 17, one Node judge, in-process (no HTTP/GoTrue/PostgREST/pooler/browser). Limits: p95 &lt; 2000 ms, &lt;1% errors, &lt;2000 outstanding.</p>
+  <div class="table-wrap"><table>
+    <tr><th>scenario</th><th>result</th></tr>
+    <tr><td>3,000 players, 41,500 requests sent</td><td>confirmation run: 600 req/s × 60 s = 36,000 submissions, <b>all correct</b></td></tr>
+    <tr><td>latency</td><td>p50 2 ms · p95 7 ms · p99 25 ms · max 110 ms</td></tr>
+    <tr><td>peak outstanding / memory</td><td>67 in flight · 335 MB Node RSS · pass</td></tr>
+  </table></div>
+  <p class="margin">this proves the judge logic scales; it does NOT prove the hosted Supabase stack at 3,000 concurrent — that test is still open.</p>
+
+</main>
+</body>
+</html>
