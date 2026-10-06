@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>project-bay — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="project-bay" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>Project BAY</h1>
+    <span class="stamp">live on vercel</span>
+  </div>
+  <p class="sub">gv1shnu/project-bay · FastAPI + React + Postgres · 45 commits · Jan–Oct 2026 · project-bay-amber.vercel.app</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Accountability works better with stakes and an audience. Project BAY is a social challenge platform: post a personal commitment
+    ("I'll run 5km today"), stake virtual points, and let friends bet you <i>won't</i> do it.</p>
+  <p>Points are virtual, no money — <span class="hl">a motivation game, not a betting app</span>. The engineering interest is the economy: a fair pot, proportional payouts, a dispute jury, and AI moderation so people stake on real, safe commitments.</p>
+
+  <!-- EDIT: lifecycle -->
+  <h2>A challenge, start to finish</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 200" role="img" aria-label="create, challenge, prove, verify, tribunal">
+      <rect class="box" x="10" y="80" width="120" height="50" rx="6"/><text class="lbl-s mid" x="70" y="102">1 · create</text><text class="lbl-s mid" x="70" y="120">stake + deadline</text>
+      <path class="arr" d="M132 105 H162"/>
+      <rect class="box" x="164" y="80" width="130" height="50" rx="6"/><text class="lbl-s mid" x="229" y="102">2 · challenge</text><text class="lbl-s mid" x="229" y="120">followers bet "won't"</text>
+      <path class="arr" d="M296 105 H326"/>
+      <rect class="box" x="328" y="80" width="120" height="50" rx="6"/><text class="lbl-s mid" x="388" y="102">3 · prove</text><text class="lbl-s mid" x="388" y="120">photo/video</text>
+      <path class="arr" d="M450 105 H480"/>
+      <path class="box" d="M545 75 L600 105 L545 135 L490 105 Z"/><text class="lbl-s mid" x="545" y="109">4 · verify</text>
+      <path class="arr" d="M600 105 H650"/><text class="lbl-s mid" x="625" y="95">all ✓</text>
+      <rect class="fillbox" x="652" y="80" width="120" height="50" rx="6"/><text class="lbl-s mid" x="712" y="102">creator wins</text><text class="lbl-s mid" x="712" y="120">whole pot</text>
+      <path class="arr-d red" d="M545 135 V170 H820 V135"/><text class="lbl-r" x="640" y="165">anyone flags →</text>
+      <rect class="box red" x="820" y="80" width="150" height="50" rx="6"/><text class="lbl-s mid" x="895" y="102">5 · Tribunal</text><text class="lbl-s mid" x="895" y="120">jury, first to 3 votes</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PB-01">if a review stalls, the creator wins automatically — points are never trapped</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>The economy &amp; safety rules</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Proportional payouts.</b> Challengers win a share of the pot in proportion to their stake, not winner-take-all.</li>
+      <li><b>You can only challenge people you follow</b> — the follow graph gates who can bet against whom.</li>
+      <li><b>Disputes go to a neutral jury.</b> The first side to 3 votes decides; the winning side pays a small court fee to the jurors who called it right.</li>
+      <li><b>Funds are never trapped.</b> New users start with 10 points; a stalled review auto-resolves to the creator.</li>
+      <li><b>AI moderation at creation.</b> A bet must be personal, actionable and safe — not a prediction or abuse. A fast Groq check runs first; the full validation agent confirms.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>demo-ready by design</h4>
+        On first run the backend seeds demo users (alex, bella, chris… / <code>demo1234</code>) and bets in every state (active, under review, disputed, won, lost, cancelled), so the app looks alive immediately.
+      </div>
+      <div class="margin">started with a local Ollama bet check, moved to Groq's hosted Llama 3.3 70B for the deploy.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Backend</th><td>FastAPI, SQLAlchemy, Pydantic; routers split into bets (crud / challenges / resolution), follows, notifications, admin; a service layer</td></tr>
+    <tr><th>Frontend</th><td>React + TypeScript + Vite + Tailwind; pages for home feed, profile, notifications, proof review, disputes, admin</td></tr>
+    <tr><th>Data</th><td>PostgreSQL 16 (Docker); connection pooling + a cache layer</td></tr>
+    <tr><th>Auth</th><td>JWT (OAuth2 password flow); a passphrase-gated admin page</td></tr>
+    <tr><th>Moderation</th><td>Groq <code>llama-3.3-70b-versatile</code> (JSON mode) via LangChain/LangGraph</td></tr>
+    <tr><th>Live</th><td><a href="https://project-bay-amber.vercel.app/">project-bay-amber.vercel.app</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

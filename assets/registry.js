@@ -176,5 +176,13 @@ window.NOTEBOOK = {
       stack: ["Three.js", "Node", "WebSocket"],
       pages: [ { file: "index", title: "Cover & netcode" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // project-bay
+      slug: "project-bay", name: "Project BAY", shelf: "web", status: "deployed",
+      tagline: "A social accountability game: stake virtual points on your own commitments and let friends bet you won't follow through.",
+      url: "https://github.com/gv1shnu/project-bay", live: "https://project-bay-amber.vercel.app/",
+      start: "2026-01-03", end: "2026-10-05", commits: 45,
+      stack: ["FastAPI", "React", "Postgres", "Groq LLM"],
+      pages: [ { file: "index", title: "Cover & economy" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

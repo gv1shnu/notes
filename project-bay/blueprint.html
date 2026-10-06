@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>project-bay — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="project-bay" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">a layered FastAPI backend with a points economy at its core</p>
+
+  <!-- EDIT: backend layers -->
+  <h2>Backend layers</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 220" role="img" aria-label="routers to services to models, with auth, cache, deadline checker and llm validator">
+      <rect class="box" x="20" y="80" width="150" height="60" rx="6"/><text class="lbl-s mid" x="95" y="104">routers/</text><text class="lbl-s mid" x="95" y="124">auth · bets · follows</text><text class="lbl-s mid" x="95" y="142">notifications · admin</text>
+      <path class="arr" d="M172 110 H220"/>
+      <rect class="fillbox" x="222" y="80" width="160" height="60" rx="6"/><text class="lbl-s mid" x="302" y="104">services/</text><text class="lbl-s mid" x="302" y="124">bet · challenge · follow</text><text class="lbl-s mid" x="302" y="142">(the economy lives here)</text>
+      <path class="arr" d="M384 110 H432"/>
+      <rect class="box" x="434" y="80" width="150" height="60" rx="6"/><text class="lbl-s mid" x="509" y="104">models.py</text><text class="lbl-s mid" x="509" y="124">SQLAlchemy</text><text class="lbl-s mid" x="509" y="142">+ schemas (Pydantic)</text>
+      <path class="arr" d="M586 110 H634"/>
+      <rect class="box" x="636" y="85" width="130" height="50" rx="6"/><text class="lbl-s mid" x="701" y="113">PostgreSQL</text>
+      <rect class="box2" x="20" y="165" width="150" height="40" rx="6"/><text class="lbl-s mid" x="95" y="190">auth.py (JWT)</text>
+      <rect class="box2" x="186" y="165" width="150" height="40" rx="6"/><text class="lbl-s mid" x="261" y="190">cache + pool</text>
+      <rect class="box2" x="352" y="165" width="180" height="40" rx="6"/><text class="lbl-s mid" x="442" y="190">deadline_checker</text>
+      <rect class="box2" x="548" y="165" width="200" height="40" rx="6"/><text class="lbl-s mid" x="648" y="190">utils/llm_validator (LangGraph)</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PB-02">bets.py was modularised into crud / challenges / resolution as it grew</figcaption>
+  </figure>
+
+  <!-- EDIT: the pot -->
+  <h2>The pot &amp; proportional payout</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">pot = creator_stake + Σ challenger_stakes
+
+creator proves + all approve:
+    creator takes the whole pot
+
+challengers win (proof rejected):
+    each challenger gets back their stake
+    + a share of the creator's stake
+      proportional to  stake_i / Σ challenger_stakes
+
+tribunal:
+    first side to 3 juror votes wins
+    losing side pays a small court fee → correct jurors
+stall / no review in time → creator wins (no trapped funds)</div>
+    <div>
+      <p>Payout started winner-take-all and was changed to <b>proportionate reward</b> (commit, 20 Feb) so a big staker doesn't dominate and small challengers still get a fair cut.</p>
+      <p class="margin">a deadline_checker resolves bets whose time has passed, so nothing sits half-finished.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: moderation agent -->
+  <h2>AI moderation: two-stage, structured</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 880 170" role="img" aria-label="new bet goes through a fast groq check then a langgraph validation agent">
+      <rect class="box" x="10" y="55" width="130" height="50"/><text class="lbl-s mid" x="75" y="78">new bet</text><text class="lbl-s mid" x="75" y="96">title + criteria</text>
+      <path class="arr" d="M142 80 H180"/>
+      <rect class="box" x="182" y="55" width="150" height="50"/><text class="lbl-s mid" x="257" y="78">fast Groq check</text><text class="lbl-s mid" x="257" y="96">initial screen</text>
+      <path class="arr" d="M334 80 H372"/>
+      <rect class="fillbox" x="374" y="45" width="190" height="70"/><text class="lbl-s mid" x="469" y="70">LangGraph agent</text><text class="lbl-s mid" x="469" y="90">personal? actionable? safe?</text><text class="lbl-s mid" x="469" y="108">JSON: is_valid + reason</text>
+      <path class="arr" d="M566 80 H604"/>
+      <path class="box" d="M670 50 L720 80 L670 110 L620 80 Z"/><text class="lbl-s mid" x="668" y="84">valid?</text>
+      <path class="arr" d="M720 80 H770"/><rect class="box" x="772" y="55" width="90" height="50"/><text class="lbl-s mid" x="817" y="84">goes live</text>
+      <path class="arr-d red" d="M670 110 V140 H400"/><text class="lbl-r" x="420" y="135">rejected with a reason</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PB-03">lazy-instantiated Groq client (JSON mode, temp 0) — importing the app doesn't require a live LLM</figcaption>
+  </figure>
+  <p class="small">The validator is a LangGraph <code>StateGraph</code> over an <code>AgentState</code> (title, criteria, amount → is_valid, reason). Groq's Llama 3.3 70B replaced the original local Ollama check for the hosted deploy.</p>
+
+  <!-- EDIT: social graph + notifications -->
+  <h2>Social graph &amp; notifications</h2>
+  <ul class="dash">
+    <li><b>Follow graph</b> gates challenges (you can only bet against people you follow) and powers the activity feed; a friends network was added in July.</li>
+    <li><b>Star system</b>: community-curated feed sorted by popularity.</li>
+    <li><b>Notifications</b> for challenges, proof requests, reviews, and verdicts; a proof-upload modal and review pages.</li>
+    <li><b>Admin</b> dashboard (passphrase-gated) to view all users and bets.</li>
+  </ul>
+
+  <!-- EDIT: tests -->
+  <h2>What's tested</h2>
+  <p>A broad backend suite: <code>test_payouts</code>, <code>test_challenges</code>, <code>test_follows</code>, <code>test_notifications</code>, <code>test_failsafes</code> (the no-trapped-funds guarantees), <code>test_input_validation</code>, <code>test_llm_validator</code>, <code>test_admin</code>, and auth/bet integration — the economy and its edge cases are the most-tested part.</p>
+
+</main>
+</body>
+</html>

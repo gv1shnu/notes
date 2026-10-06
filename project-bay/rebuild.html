@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>project-bay — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="project-bay" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">my oldest multi-month project: built Jan–Feb, archived, revived twice</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">Jan–Feb 2026 — the MVP</li>
+    <li class="big"><span class="when">3 Jan</span><span class="what">first commit</span></li>
+    <li><span class="when">14–21 Jan</span><span class="what">profile page, pooling, validation; frontend</span></li>
+    <li class="big"><span class="when">1 Feb</span><span class="what">add bet validation with llama (local)</span></li>
+    <li><span class="when">8–10 Feb</span><span class="what">cancel button; modularize bets.py; comments + tests</span></li>
+    <li class="big"><span class="when">15–17 Feb</span><span class="what">remove ollama + admin page + seed script · stars + sort · connection pool + cache · notifications + proof-upload</span></li>
+    <li><span class="when">19–20 Feb</span><span class="what">review pages; proportionate reward</span></li>
+    <li class="big"><span class="when">21 Feb</span><span class="what">challenge status overhaul · Groq for initial check · rate limit · merge dev → master</span></li>
+    <li class="phase">archived, then revived</li>
+    <li><span class="when">8 May</span><span class="what">Update project status to archived</span></li>
+    <li class="big"><span class="when">8–14 Jul</span><span class="what">add friends network · add tests</span></li>
+    <li class="big"><span class="when">5 Oct</span><span class="what">show pending/disputed bets on feed (#1) · fix deployed 404s + auto-refresh expired demo bets (#2)</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Virtual points only</td><td>motivation game, not gambling; no money, no regulation</td></tr>
+    <tr><td>Proportional payouts (not winner-take-all)</td><td>small challengers still get a fair share; no whale dominance</td></tr>
+    <tr><td>Jury Tribunal, first to 3</td><td>disputes resolved by neutral users, not an admin</td></tr>
+    <tr><td>No-trapped-funds failsafe</td><td>a stalled review auto-wins for the creator; explicitly tested</td></tr>
+    <tr><td>Follow-gated challenges</td><td>stops strangers piling on; ties stakes to the social graph</td></tr>
+    <tr><td>AI moderation at creation</td><td>keep bets personal, actionable, safe — not predictions/abuse</td></tr>
+    <tr><td>Ollama → Groq for the LLM</td><td>a hosted model so the deploy doesn't need a local GPU</td></tr>
+    <tr><td>Layered routers → services → models</td><td>bets grew too big; splitting crud/challenges/resolution kept it testable</td></tr>
+    <tr><td>Auto-seed demo data</td><td>the app looks alive on first run; off in production</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Economy correctness</b>: payouts sum to the pot; proportional shares are exact (<code>test_payouts</code>).</li>
+    <li><b>Failsafes</b>: no challenge can ever trap points (<code>test_failsafes</code>).</li>
+    <li><b>Moderation quality</b>: bad bets (predictions, abuse) rejected with a reason (<code>test_llm_validator</code>).</li>
+    <li><b>Deadline handling</b>: expired bets resolve without manual action.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Real media storage for proof (beyond the MVP upload).</li>
+    <li>Richer anti-collusion checks in the jury.</li>
+    <li>Push/email notifications beyond the in-app feed.</li>
+    <li>Rate-limit tuning (limiters were toggled on/off during development).</li>
+    <li>Move past MVP status: harden auth, abuse handling, and moderation coverage.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Data model</b><br>Users (points, follows), Bets (stake, deadline, status, proof), Challenges (stake per challenger), a validation queue, notifications, disputes/jury votes.</li>
+    <li><b>Auth</b><br>JWT OAuth2 password flow; a passphrase-gated admin area.</li>
+    <li><b>Economy in services</b><br><code>bet_service</code> / <code>challenge_service</code>: compute the pot, proportional payouts, tribunal resolution, and the no-trapped-funds failsafe — write these tests first.</li>
+    <li><b>Lifecycle</b><br>create → challenge (follow-gated) → prove → verify → tribunal; a deadline checker that resolves expired bets.</li>
+    <li><b>Moderation</b><br>A LangGraph agent over Groq (JSON mode): is the bet personal, actionable, safe? Lazy-instantiate the client. A fast pre-check first.</li>
+    <li><b>Social + feed</b><br>Follow graph, stars, activity feed, notifications, proof-upload and review pages.</li>
+    <li><b>Frontend</b><br>React + Tailwind pages for feed/profile/notifications/review/disputes/admin.</li>
+    <li><b>Seed + deploy</b><br>Auto-seed demo users/bets across every state (off in prod); FastAPI under gunicorn/uvicorn; Postgres via Docker.</li>
+  </ol>
+
+</main>
+</body>
+</html>
