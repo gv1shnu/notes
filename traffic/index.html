@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>traffic — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="traffic" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>traffic: Cause Investigator</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/traffic · FastAPI + React + CV · 23 commits · Sep–Oct 2026 · showcase at vishnugandarapu.in/traffic</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Why is this road jammed? Upload fixed-camera footage, define the road, and get an <b>evidence-first</b> investigation:
+    tracked subjects, a suspected cause, the frames that prove it, and a place for a human to record their review.</p>
+  <p>Built for <span class="hl">Indian mixed traffic</span>: configurable road regions/directions, relative movement (not uncalibrated speed), Indian plate formats (incl. BH-series).</p>
+
+  <!-- EDIT: scope banner -->
+  <div class="note pink">
+    <h4>the line the whole project is built around</h4>
+    This produces <b>probabilistic</b> incident assessments <b>for human review</b>. It must never be the sole basis for enforcement, identification, or accusations — and the code enforces that conservatism everywhere.
+  </div>
+
+  <!-- EDIT: pipeline -->
+  <h2>The investigation pipeline</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 220" role="img" aria-label="upload, detect+track, movement, congestion, cause attribution, evidence, review">
+      <rect class="box" x="10" y="90" width="110" height="50" rx="6"/><text class="lbl-s mid" x="65" y="112">upload +</text><text class="lbl-s mid" x="65" y="130">define road</text>
+      <path class="arr" d="M122 115 H150"/>
+      <rect class="fillbox" x="152" y="85" width="150" height="60" rx="6"/><text class="lbl-s mid" x="227" y="108">YOLO11n + ByteTrack</text><text class="lbl-s mid" x="227" y="128">detect + track (sampled)</text>
+      <path class="arr" d="M304 115 H332"/>
+      <rect class="box" x="334" y="90" width="130" height="50" rx="6"/><text class="lbl-s mid" x="399" y="112">movement +</text><text class="lbl-s mid" x="399" y="130">congestion / region</text>
+      <path class="arr" d="M466 115 H494"/>
+      <rect class="fillbox" x="496" y="85" width="160" height="60" rx="6"/><text class="lbl-s mid" x="576" y="108">cause attribution</text><text class="lbl-s mid" x="576" y="128">rank + corroboration gates</text>
+      <path class="arr" d="M658 115 H686"/>
+      <rect class="box" x="688" y="90" width="130" height="50" rx="6"/><text class="lbl-s mid" x="753" y="112">evidence +</text><text class="lbl-s mid" x="753" y="130">plate OCR (candidates)</text>
+      <path class="arr" d="M820 115 H848"/>
+      <rect class="box" x="850" y="90" width="130" height="50" rx="6"/><text class="lbl-s mid" x="915" y="112">human review</text><text class="lbl-s mid" x="915" y="130">corrections</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="TR-01">coordinated as a LangGraph StateGraph; the expensive model loads once per worker</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed / designed around</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Good detection ≠ cause.</b> A stopped car isn't a confirmed fault; the whole attribution layer is heuristic evidence strength, explicitly <i>not</i> calibrated probabilities.</li>
+      <li><b>Refuse to blame when unsure.</b> Missing precedence/follower response caps a candidate below 0.5; no road regions caps below the 0.62 threshold; similar top scores → <code>unknown</code>.</li>
+      <li><b>Don't blame the queue for the jam.</b> Queue followers are separated from the leader; earlier downstream stationary subjects reduce a candidate's precedence.</li>
+      <li><b>Tracking quality gates attribution</b>, separately from detector confidence — a track that latched onto another object is rejected.</li>
+      <li><b>Indian specifics matter</b>: autorickshaws aren't a COCO class (a documented gap); two-wheeler recall is the clearest weakness (17% in the 3D test).</li>
+    </ul>
+    <div>
+      <div class="note blue">
+        <h4>honest evaluation</h4>
+        Five rendered 3D scenarios (IDM car-following, Blender CCTV) analysed by the <b>real</b> pipeline: stalled car ✓ 0.93, free flow ✓ no congestion, signal queue → <code>unknown</code> (two-wheelers missed), pedestrian missed (truck occlusion). Rendered scenes are cleaner than real cameras, so this proves the system works end-to-end, not field accuracy.
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Stack</th><td>FastAPI + Celery/Redis + PostgreSQL + React/TanStack Query; Nginx proxy; LangGraph for the investigation graph</td></tr>
+    <tr><th>Vision</th><td>YOLO11n + ByteTrack; a separate YOLO plate detector + EasyOCR on candidate vehicles only; no LLM, no paid API</td></tr>
+    <tr><th>Evidence</th><td>annotated best-subject frames, before/during/after frames, an MP4 clip, click-to-seek timeline, versioned JSON report</td></tr>
+    <tr><th>Deploy</th><td>Docker Compose (loopback-bound frontend); CI runs the same sequence on Linux; static showcase on Pages</td></tr>
+    <tr><th>Live</th><td>showcase: <a href="http://www.vishnugandarapu.in/traffic/">vishnugandarapu.in/traffic</a> (the app itself runs locally)</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

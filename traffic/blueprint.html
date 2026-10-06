@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>traffic — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="traffic" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">async jobs, a vision package, and a conservative attribution core</p>
+
+  <!-- EDIT: architecture -->
+  <h2>Architecture</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 240" role="img" aria-label="browser, nginx, fastapi, postgres, redis, celery worker running langgraph with CV">
+      <rect class="box" x="20" y="100" width="130" height="50" rx="6"/><text class="lbl-s mid" x="85" y="122">React + Query</text><text class="lbl-s mid" x="85" y="140">SSE progress</text>
+      <path class="arr" d="M152 125 H190"/>
+      <rect class="box" x="192" y="100" width="90" height="50" rx="6"/><text class="lbl-s mid" x="237" y="128">Nginx</text>
+      <path class="arr" d="M284 125 H322"/>
+      <rect class="fillbox" x="324" y="95" width="130" height="60" rx="6"/><text class="lbl-s mid" x="389" y="118">FastAPI</text><text class="lbl-s mid" x="389" y="138">uploads · status · evidence</text>
+      <path class="arr" d="M389 95 V60 H470"/><rect class="box" x="472" y="40" width="110" height="40" rx="6"/><text class="lbl-s mid" x="527" y="64">PostgreSQL</text>
+      <path class="arr" d="M456 125 H500"/><rect class="box" x="502" y="100" width="90" height="50" rx="6"/><text class="lbl-s mid" x="547" y="128">Redis</text>
+      <path class="arr" d="M594 125 H632"/>
+      <rect class="fillbox" x="634" y="85" width="160" height="90" rx="6"/><text class="lbl-s mid" x="714" y="108">Celery worker</text><text class="lbl-s mid" x="714" y="128">LangGraph StateGraph</text><text class="lbl-s mid" x="714" y="148">1 process / job</text><text class="lbl-s mid" x="714" y="166">model loaded once</text>
+      <path class="arr" d="M796 130 H834"/>
+      <rect class="box" x="836" y="100" width="130" height="50" rx="6"/><text class="lbl-s mid" x="901" y="122">YOLO · ByteTrack</text><text class="lbl-s mid" x="901" y="140">EasyOCR · storage</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="TR-02">inference runs outside the API, one process per job; SSE streams real stage progress</figcaption>
+  </figure>
+
+  <!-- EDIT: packages -->
+  <h2>The packages</h2>
+  <div class="table-wrap"><table>
+    <tr><th>package</th><th>responsibility</th></tr>
+    <tr><td><code>packages/vision</code></td><td>media validation, normalization, detection, image quality; model loaded once/worker, tracker reset per video</td></tr>
+    <tr><td><code>packages/tracking</code></td><td>movement with a 1-second baseline; handles observation gaps</td></tr>
+    <tr><td><code>traffic_analysis</code></td><td>per-region persistent-queue / congestion detection</td></tr>
+    <tr><td><code>cause_attribution</code></td><td>candidate ranking with corroboration gates</td></tr>
+    <tr><td><code>plate_recognition</code></td><td>candidate-only YOLO plate detector → EasyOCR, multi-frame consensus</td></tr>
+    <tr><td><code>workflows</code></td><td>the LangGraph StateGraph with conditional branches</td></tr>
+  </table></div>
+
+  <!-- EDIT: congestion -->
+  <h2>What counts as congestion</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">congestion requires ALL of:
+  ≥ 4 vehicles
+  low median motion
+  high stationary fraction
+  road occupancy (union of boxes in a road raster)
+  temporal persistence (queue growth corroborates onset)
+dropout tolerance 0.6s → occlusion dips don't reset the timer
+already-congested clips need 2× the persistence window
+movement = displacement/sec ÷ mean box size (not km/h)</div>
+    <div>
+      <p>Movement is <b>relative</b> by design: without camera calibration you can't claim km/h, so the system normalises displacement by bounding-box size and refuses to invent speed.</p>
+      <p class="margin">occupancy is a union of boxes, so overlapping vehicles aren't double-counted.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: attribution -->
+  <h2>Cause attribution: built to say "unknown"</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 200" role="img" aria-label="candidate score combines signals and is gated, returning unknown when evidence is weak">
+      <rect class="box" x="10" y="30" width="250" height="140"/>
+      <text class="lbl-s" x="22" y="52">score combines:</text>
+      <text class="lbl-s" x="22" y="74">temporal precedence</text><text class="lbl-s" x="22" y="94">downstream position</text><text class="lbl-s" x="22" y="114">blockage · stationary dur.</text><text class="lbl-s" x="22" y="134">follower response</text><text class="lbl-s" x="22" y="154">upstream propagation · tracking qual.</text>
+      <path class="arr" d="M262 100 H320"/>
+      <path class="box" d="M400 50 L470 100 L400 150 L330 100 Z"/><text class="lbl-s mid" x="400" y="104">gates pass?</text>
+      <path class="arr" d="M470 100 H540"/><rect class="box" x="542" y="75" width="150" height="50"/><text class="lbl-s mid" x="617" y="104">named subject</text>
+      <path class="arr-d red" d="M400 150 V180 H710"/><text class="lbl-r" x="560" y="196">no precedence / followers / regions / low tracking → unknown</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="TR-03">needs observed movement before its stop AND followers that moved before queuing behind it</figcaption>
+  </figure>
+  <ul class="dash">
+    <li>Missing precedence or follower response <b>caps the score below 0.5</b>.</li>
+    <li>Without road regions, scores cap at 0.59 and can't pass the 0.62 selection threshold.</li>
+    <li>Similar top scores → <code>unknown</code>; a leading candidate below <code>min_tracking_quality</code> (0.65) → <code>unknown</code>, kept first in alternatives.</li>
+    <li>Tracking quality = share of expected samples present × a box-stability term (falls when a box jumps = track latching onto another object). <b>Separate from detector confidence.</b></li>
+  </ul>
+
+  <!-- EDIT: persistence -->
+  <h2>Crash-safe, idempotent jobs</h2>
+  <ul class="dash">
+    <li>Tracking checkpoint via atomic temp-file replace; reused on retry; other deterministic stages replay from it.</li>
+    <li>Postgres advisory locks prevent concurrent runs of the same job; Celery uses late-ack + prefetch 1.</li>
+    <li>Camera config + thresholds are <b>snapshotted into the job</b>, so a later edit never silently changes an old result; model checksums + config version appear in the report.</li>
+    <li>Extend via interfaces: <code>DetectorTracker</code>, <code>CauseDetector.category()</code>, the <code>OCR</code> protocol, <code>LocalStorage</code> — unsupported classes never become fake detections.</li>
+  </ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>traffic — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="traffic" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">15 Sep</span><span class="what">Build asynchronous traffic investigation application with evidence and review</span><br>The whole app: FastAPI + Celery + React, real YOLO/ByteTrack, evidence, review.</li>
+    <li><span class="when">17 Sep</span><span class="what">checkpoint working tree; real-presentation-time timestamps; simulated reasoning-layer eval harness</span></li>
+    <li><span class="when">19 Sep</span><span class="what">resume guide + reasoning-layer preview GIFs + live app walkthrough GIFs</span></li>
+    <li class="phase">4 Oct — rendered 3D evaluation</li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">separate queue leaders from followers · rendered 3D traffic sim for end-to-end eval · tracking-quality gate · tolerate occlusion dropouts</span><br>The honest end-to-end test and the conservatism fixes.</li>
+    <li><span class="when">4 Oct</span><span class="what">static showcase site + publish rendered scenario results</span></li>
+    <li class="phase">5 Oct — deployment hardening</li>
+    <li class="big"><span class="when">5 Oct</span><span class="what">build backend image once + default CPU PyTorch · proxy /ready · record Compose verification · merge PR #1</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Evidence-first, human-in-the-loop</td><td>it assists a reviewer; it never accuses</td></tr>
+    <tr><td>Conservative <code>unknown</code> over a wrong blame</td><td>a false accusation is worse than no answer</td></tr>
+    <tr><td>Relative movement, not km/h</td><td>uncalibrated cameras can't support speed claims</td></tr>
+    <tr><td>Attribution gated by precedence + followers + tracking quality</td><td>stops the queue being blamed for the jam, and bad tracks from winning</td></tr>
+    <tr><td>Async worker, one process per job</td><td>heavy inference off the API; model loaded once</td></tr>
+    <tr><td>Snapshot config/thresholds into each job</td><td>a later edit can't silently change a past result</td></tr>
+    <tr><td>Plate OCR on candidates only</td><td>cost + privacy; optional bystander redaction</td></tr>
+    <tr><td>No LLM in the numeric path</td><td>deterministic, reproducible analysis</td></tr>
+    <tr><td>Rendered 3D for honest eval</td><td>ground truth to score against, while stating it's cleaner than real cameras</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it (the 3D showcase)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>scenario</th><th>outcome</th></tr>
+    <tr><td>Stalled car</td><td>correct subject, score 0.93</td></tr>
+    <tr><td>Stalled autorickshaw</td><td>correct subject, 0.93 (detector labelled it "truck")</td></tr>
+    <tr><td>Free flow</td><td>correctly no congestion</td></tr>
+    <tr><td>Pedestrian in lane</td><td>missed: an undetected truck hides the queue</td></tr>
+    <tr><td>Signal queue</td><td><code>unknown</code> — two-wheelers in the queue not detected</td></tr>
+  </table></div>
+  <p class="small">Two-wheeler detection (17% recall here) is the clearest gap. These prove the pipeline end-to-end, not real-world accuracy.</p>
+
+  <!-- EDIT: pending -->
+  <h2>Pending / known limits</h2>
+  <ul class="checks">
+    <li>Validate on representative real Indian fixed-camera video with independently reviewed cause labels.</li>
+    <li>Two-wheeler + autorickshaw detection (not distinct COCO classes) — a custom-trained model.</li>
+    <li>Multi-event reporting (currently only the highest-severity interval).</li>
+    <li>Auto-attribution for collision / transverse blockage / road defects / flood (schema + review supported, model evidence missing).</li>
+    <li>Multi-user hardening: auth, tenant isolation, object-storage authz before any hosting.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Async spine</b><br>FastAPI for uploads/status/evidence; PostgreSQL for jobs/tracks/incidents; Redis + Celery for inference; SSE for progress.</li>
+    <li><b>Vision package</b><br>Validate + normalize video; YOLO11n + ByteTrack on time-sampled frames (sequential to keep tracking state); keep original frame indices + normalized timestamps.</li>
+    <li><b>Movement + congestion</b><br>Displacement ÷ box size over a 1-s baseline; per-region queue detection with the thresholds above and dropout tolerance.</li>
+    <li><b>Attribution</b><br>Rank candidates by precedence/position/followers/propagation/tracking quality; gate hard so weak evidence returns <code>unknown</code>.</li>
+    <li><b>Plates</b><br>A separate plate YOLO on candidate vehicles → EasyOCR with multi-frame consensus and Indian formats; reject nulls.</li>
+    <li><b>Evidence + review</b><br>Annotated frames, before/during/after, an MP4 clip, a seekable timeline, and append-only human review; versioned JSON report with model checksums.</li>
+    <li><b>Workflow + persistence</b><br>Wire the stages as a LangGraph StateGraph; checkpoint tracking atomically; advisory-lock jobs; snapshot config into each job.</li>
+    <li><b>Package + evaluate</b><br>Docker Compose (loopback frontend); build a rendered-3D scenario set with ground truth to score end-to-end; publish a static showcase.</li>
+  </ol>
+
+</main>
+</body>
+</html>

@@ -160,5 +160,13 @@ window.NOTEBOOK = {
       stack: ["TypeScript", "MediaPipe", "GIPHY"],
       pages: [ { file: "index", title: "Cover & pipeline" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // traffic
+      slug: "traffic", name: "traffic · Cause Investigator", shelf: "ai", status: "deployed",
+      tagline: "Upload fixed-camera footage and get an evidence-first, deliberately conservative investigation of what's causing the jam.",
+      url: "https://github.com/gv1shnu/traffic", live: "http://www.vishnugandarapu.in/traffic/",
+      start: "2026-09-15", end: "2026-10-05", commits: 23,
+      stack: ["FastAPI", "Celery", "YOLO/ByteTrack", "React"],
+      pages: [ { file: "index", title: "Cover & scope" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
