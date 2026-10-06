@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>coursera-transcripts — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="coursera-transcripts" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">one script, a handful of well-separated jobs</p>
+
+  <!-- EDIT: run flow -->
+  <h2>Run flow</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 300" role="img" aria-label="login check, discover or load cache, resume, loop lectures, write markdown">
+      <rect class="box" x="20" y="20" width="170" height="50" rx="6"/><text class="lbl mid" x="105" y="42">launch Brave profile</text><text class="lbl-s mid" x="105" y="60">or attach via CDP</text>
+      <path class="arr" d="M105 72 V100"/>
+      <path class="box" d="M105 102 L175 135 L105 168 L35 135 Z"/><text class="lbl-s mid" x="105" y="139">logged in?</text>
+      <path class="arr-d red" d="M175 135 H250 V95"/><text class="lbl-r" x="190" y="90">no → pause for manual login</text>
+      <path class="arr" d="M105 168 V196"/>
+      <path class="box" d="M105 198 L185 231 L105 264 L25 231 Z"/><text class="lbl-s mid" x="105" y="229">outline</text><text class="lbl-s mid" x="105" y="247">cached?</text>
+      <path class="arr" d="M185 231 H250"/><text class="lbl-s" x="195" y="222">yes</text>
+      <path class="arr" d="M105 264 V284 H330 V250"/><text class="lbl-s" x="120" y="282">no → discover + save json</text>
+      <rect class="box" x="252" y="206" width="160" height="50" rx="6"/><text class="lbl mid" x="332" y="228">get_resume_order()</text><text class="lbl-s mid" x="332" y="246">skip done lectures</text>
+      <path class="arr" d="M414 231 H470"/>
+      <rect class="fillbox" x="472" y="190" width="220" height="90" rx="6"/>
+      <text class="lbl mid" x="582" y="214">for each lecture:</text>
+      <text class="lbl-s mid" x="582" y="236">goto → reveal_transcript</text>
+      <text class="lbl-s mid" x="582" y="254">→ extract_transcript (ladder)</text>
+      <text class="lbl-s mid" x="582" y="272">→ write .md · update cursor</text>
+      <path class="arr" d="M694 235 H760"/>
+      <rect class="box" x="762" y="206" width="160" height="50" rx="6"/><text class="lbl mid" x="842" y="228">write_course_index</text><text class="lbl-s mid" x="842" y="246">00_index.md</text>
+      <path class="arr-d red" d="M582 282 V296 H470"/><text class="lbl-r" x="420" y="293">no transcript → manual_items · error → failed_items + screenshot</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="CT-02">every lecture updates the resume cursor, so Ctrl-C never loses progress</figcaption>
+  </figure>
+
+  <!-- EDIT: extraction ladder -->
+  <h2>The extraction ladder</h2>
+  <p><code>extract_transcript</code> tries progressively looser strategies and stops at the first that yields text:</p>
+  <ol class="steps">
+    <li><b>Structured phrases</b><br>If the transcript container has ≥ 3 cue-phrase elements, read each as a cue. Gives clean boundaries and timestamps.</li>
+    <li><b>Container innerText</b><br>Otherwise read the whole transcript container's text in one go.</li>
+    <li><b>JS scan</b><br>Last-ditch: in-page query for <code>div.rc-Transcript</code>, <code>[data-testid=transcript]</code>, or any class containing "ranscript"; keep the longest region.</li>
+  </ol>
+
+  <!-- EDIT: cleaning -->
+  <h2>Cleaning &amp; shaping</h2>
+  <div class="cols">
+    <div class="card wrap">sanitize_transcript():
+  strip 0x200b/c/d, 0xFEFF  (zero-width)
+  0x00A0 (NBSP) → space
+  remove "Play video starting at …
+           and follow transcript"
+  collapse runs of spaces
+
+cues_to_outputs():  timestamp line → [mm:ss] prefix
+raw_to_outputs():   drop bare timestamp lines
+paragraphize():     ~4 sentences per paragraph</div>
+    <div>
+      <p>Two outputs are built from the same cues: a clean paragraph form and a timestamped form (emitted only with <code>--timestamps</code>).</p>
+      <p>Titles are cleaned too: <code>clean_lecture_title</code> strips the "Video• . Duration: 9 min  Resume . Click to resume" noise Coursera appends.</p>
+      <p class="margin">slugify + zero-padded numbers keep files in lecture order on disk.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: output + state -->
+  <h2>Output &amp; state files</h2>
+  <div class="cols">
+    <div>
+      <h4>per course</h4>
+      <div class="card wrap">transcripts/&lt;slug&gt;/
+  00_index.md
+  01_module/001_lecture.md …</div>
+      <p class="small">each .md: course name, module, lecture number, URL, extraction timestamp, transcript.</p>
+    </div>
+    <div>
+      <h4>root state (git-ignored at runtime)</h4>
+      <ul class="dash">
+        <li><code>coursera_outline.json</code> — cached outline</li>
+        <li><code>coursera_last_completed.txt</code> / <code>last_processed.txt</code> — resume cursors</li>
+        <li><code>coursera_failed_items.txt</code> / <code>manual_items.txt</code></li>
+        <li><code>coursera_transcripts.log</code> + <code>coursera_screenshots/</code></li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

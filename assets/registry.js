@@ -96,5 +96,13 @@ window.NOTEBOOK = {
       stack: ["Python", "Ollama", "SQLite"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // coursera-transcripts
+      slug: "coursera-transcripts", name: "coursera-transcripts", shelf: "tools", status: "local",
+      tagline: "Playwright scraper that logs in once, walks a course, and exports every lecture transcript as organised Markdown.",
+      url: "https://github.com/gv1shnu/coursera-transcripts", live: null,
+      start: "2026-06-24", end: "2026-08-14", commits: 5,
+      stack: ["Python", "Playwright", "Brave"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

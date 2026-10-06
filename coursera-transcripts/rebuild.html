@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>coursera-transcripts — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="coursera-transcripts" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">24 Jun · 11:16</span><span class="what">add transcripts pt1</span><span class="sha">09f77f2</span><br>612 files, +27,143. The first big harvest of courses.</li>
+    <li class="big"><span class="when">24 Jun · 11:18</span><span class="what">add scraper script</span><span class="sha">287d7cc</span><br>+807 lines: <code>coursera_transcripts.py</code>, the tool that produced them.</li>
+    <li><span class="when">13 Jul · 12:09</span><span class="what">add bug bounty</span><span class="sha">f11c8d1</span></li>
+    <li><span class="when">11 Aug · 15:44</span><span class="what">add mongo</span><span class="sha">4b6b3eb</span><br>63 files; the script grew to its 876-line form around here.</li>
+    <li><span class="when">14 Aug · 09:38</span><span class="what">add more courses</span><span class="sha">bfcdf16</span><br>207 files. 23 courses in total now.</li>
+  </ol>
+  <p class="margin">The transcripts were committed first, the scraper two minutes later — I pulled a batch, liked the output, then saved the tool.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Browser automation, not an API</td><td>Coursera has no transcript API; content is behind login</td><td>brittle to DOM changes</td></tr>
+    <tr><td>Dedicated Brave profile under <code>~/.brave-coursera-transcripts</code></td><td>log in once; a home-level dir avoids the profile-lock issue in Library paths</td><td>macOS-specific path</td></tr>
+    <tr><td>Manual login, then automated</td><td>never handles my password; respects MFA</td><td>one human step per machine</td></tr>
+    <tr><td>Discover → cache → extract</td><td>preview the outline; re-runs skip crawling</td><td>stale cache if the course changes (use <code>--restart</code>)</td></tr>
+    <tr><td>Resume cursors + per-item lists</td><td>a long pull survives interruption; distinguishes "no transcript" from "failed"</td><td>extra state files</td></tr>
+    <tr><td>Fallback ladder for extraction</td><td>one selector set won't survive every layout</td><td>JS scan is a guess of last resort</td></tr>
+    <tr><td>Markdown out, numbered + slugged</td><td>searchable, diff-able, sorts in lecture order</td><td>loses video/slides</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Extracted / total</b> per course (printed at the end; 59/59 on MongoDB).</li>
+    <li><b>Manual + failed counts</b> small and explained by their lists.</li>
+    <li><b>Readability</b>: paragraphs, no zero-width junk, no player labels bleeding into text.</li>
+    <li><b>Resumability</b>: killing and restarting continues from the cursor, doesn't redo work.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Make it cross-platform (the Brave path and profile dir are macOS-only).</li>
+    <li>Centralise the selector lists so a Coursera redesign is a one-place fix.</li>
+    <li>Optionally capture slides / in-video quizzes, not just transcripts.</li>
+    <li>A manifest of harvested courses with counts, generated into the repo README.</li>
+    <li>Retry-with-backoff on transient extraction failures before logging them.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Browser session</b><br>Playwright launching Brave with a persistent profile dir, or <code>connect_over_cdp</code> to a running browser; an <code>is_logged_in</code> heuristic + a pause-for-login helper.</li>
+    <li><b>Discovery</b><br>Open the course home, expand every collapsed week/module, harvest lecture links and titles into an ordered list; save to JSON.</li>
+    <li><b>Resume</b><br>Read the last-completed cursor and start the loop after it; <code>--restart</code> ignores it.</li>
+    <li><b>Per lecture</b><br>goto → click the transcript tab → run the extraction ladder → sanitize → build plain + timestamped forms.</li>
+    <li><b>Write</b><br><code>NN_module/NNN_lecture.md</code> with a header; append to failed/manual lists on misses; screenshot on error.</li>
+    <li><b>Index + summary</b><br>Write <code>00_index.md</code> and print the Extracted/Manual/Failed tally.</li>
+    <li><b>Flags</b><br><code>--discover-only</code>, <code>--limit</code>, <code>--timestamps</code>, <code>--cdp-url</code>.</li>
+  </ol>
+
+</main>
+</body>
+</html>

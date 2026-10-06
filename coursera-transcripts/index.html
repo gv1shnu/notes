@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>coursera-transcripts — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="coursera-transcripts" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>coursera-transcripts</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/coursera-transcripts · Python + Playwright · 5 commits · Jun–Aug 2026 · one 876-line script + 23 harvested courses</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">I learn best from text I can search and re-read, but Coursera gives me video. Opening every lecture, clicking the transcript tab,
+    copying the text, and filing it by module is tedious and I do it for whole courses.</p>
+  <p>So: a script that logs in once, walks a course outline, and exports <span class="hl">every lecture's transcript</span> as tidy, organised Markdown.</p>
+
+  <!-- EDIT: two phases -->
+  <h2>Two phases</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 220" role="img" aria-label="phase 1 discover outline, phase 2 extract each lecture">
+      <rect class="box" x="30" y="70" width="200" height="90" rx="8"/>
+      <text class="lbl-b mid" x="130" y="98">1 · DISCOVER</text>
+      <text class="lbl-s mid" x="130" y="122">walk the outline, expand</text>
+      <text class="lbl-s mid" x="130" y="140">every week/module</text>
+      <path class="arr" d="M232 115 H300"/>
+      <text class="lbl-s mid" x="266" y="104">cache</text>
+      <rect class="fillbox" x="302" y="80" width="180" height="70" rx="6"/><text class="lbl mid" x="392" y="108">coursera_outline.json</text><text class="lbl-s mid" x="392" y="130">ordered lecture list</text>
+      <path class="arr" d="M484 115 H552"/>
+      <rect class="box" x="554" y="70" width="200" height="90" rx="8"/>
+      <text class="lbl-b mid" x="654" y="98">2 · EXTRACT</text>
+      <text class="lbl-s mid" x="654" y="122">open lecture, reveal</text>
+      <text class="lbl-s mid" x="654" y="140">transcript, write .md</text>
+      <path class="arr" d="M754 115 H822"/>
+      <rect class="box" x="824" y="80" width="60" height="70" rx="6"/><text class="lbl-s mid" x="854" y="120">notes/</text>
+      <text class="lbl-r" x="300" y="195">re-runs load the cache → no re-crawl; resume cursor skips done lectures</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="CT-01">discovery and extraction are separate so you can eyeball the outline before a long pull</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>Login must be <b>manual and one-time</b>: the script opens Brave with a dedicated profile, pauses until I'm signed in, then runs itself.</li>
+      <li>Coursera's transcript DOM varies, so extraction needs a <b>ladder of fallbacks</b>: structured cue phrases → container innerText → a last-ditch JS scan.</li>
+      <li>The transcript text is polluted: zero-width chars, NBSPs, and the player's a11y label "Play video starting at :1:24 and follow transcript" injected into the words. All stripped.</li>
+      <li>A long run will be interrupted. State files (last completed / last processed) let it <b>resume</b> exactly where it stopped.</li>
+      <li>Lectures with no transcript aren't failures: they go to a <code>manual_items</code> list, separate from real <code>failed_items</code>.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>end-of-run summary</h4>
+        <span class="small">Course: Introduction To Mongodb · Total 59 · Extracted 59 · No transcript 0 · Failed 0</span>
+      </div>
+      <div class="margin">23 courses harvested so far: databases, algorithms, deep learning, game design, quantum computing, bug bounty…</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Engine</th><td>Playwright (Chromium driver) driving <b>Brave</b> via a dedicated profile, or attach to a running browser over CDP</td></tr>
+    <tr><th>Deps</th><td><code>playwright</code>, <code>tqdm</code>; Python 3.9+; macOS</td></tr>
+    <tr><th>Flags</th><td><code>--course-url</code>, <code>--discover-only</code>, <code>--restart</code>, <code>--limit N</code>, <code>--timestamps</code>, <code>--cdp-url</code></td></tr>
+    <tr><th>Output</th><td><code>transcripts/&lt;slug&gt;/NN_module/NNN_lecture.md</code> + <code>00_index.md</code> per course</td></tr>
+    <tr><th>Deployed</th><td>Not deployed; a personal scraper run against my own logged-in account.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
