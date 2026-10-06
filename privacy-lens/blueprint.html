@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>privacy-lens — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="privacy-lens" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">one Express service serves the UI and the scanner</p>
+
+  <!-- EDIT: request flow -->
+  <h2>Request flow</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 380" role="img" aria-label="browser calls api scan, SSRF guard, deep scan with fallback, classify, score">
+      <rect class="box" x="20" y="150" width="120" height="60" rx="6"/><text class="lbl mid" x="80" y="176">browser</text><text class="lbl-s mid" x="80" y="196">public/app.js</text>
+      <path class="arr" d="M142 170 H200"/><text class="lbl-s" x="146" y="160">/api/scan?url</text>
+      <rect class="box" x="202" y="140" width="150" height="80" rx="6"/><text class="lbl mid" x="277" y="166">normalizeUrl()</text><text class="lbl-s mid" x="277" y="186">SSRF guard</text><text class="lbl-s mid" x="277" y="204">DNS → all IPs public?</text>
+      <path class="arr-d red" d="M277 222 V280"/><text class="lbl-r" x="190" y="300">400 "refusing private address"</text>
+      <path class="arr" d="M354 180 H410"/>
+      <path class="box" d="M470 140 L530 180 L470 220 L410 180 Z"/><text class="lbl-s mid" x="470" y="185">mode?</text>
+      <path class="arr" d="M470 140 V70 H560"/><text class="lbl-s" x="478" y="100">deep</text>
+      <rect class="fillbox" x="562" y="30" width="220" height="80" rx="6"/><text class="lbl mid" x="672" y="56">deepScan() Puppeteer</text><text class="lbl-s mid" x="672" y="76">probe → goto networkidle2 (25 s)</text><text class="lbl-s mid" x="672" y="94">+ 2.5 s settle → read state</text>
+      <path class="arr-d red" d="M672 112 V160"/><text class="lbl-r" x="680" y="145">throws → fallback</text>
+      <path class="arr" d="M530 180 H560"/><text class="lbl-s" x="536" y="172">fast</text>
+      <rect class="box" x="562" y="162" width="220" height="60" rx="6"/><text class="lbl mid" x="672" y="188">scanUrl() fetch + cheerio</text><text class="lbl-s mid" x="672" y="208">result.degraded = reason</text>
+      <path class="arr" d="M784 70 H850 V250 M784 192 H850"/>
+      <rect class="box" x="760" y="252" width="200" height="56" rx="6"/><text class="lbl mid" x="860" y="276">classifyTrackers()</text><text class="lbl-s mid" x="860" y="294">hosts ⋈ trackers.json</text>
+      <path class="arr" d="M760 280 H660"/>
+      <rect class="box" x="460" y="252" width="198" height="56" rx="6"/><text class="lbl mid" x="559" y="276">scoreResult()</text><text class="lbl-s mid" x="559" y="294">0–100, floor 3</text>
+      <path class="arr" d="M458 280 H80 V212"/><text class="lbl-s" x="160" y="272">JSON report grouped by category</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PL-02">deep is the default; fast is the safety net</figcaption>
+  </figure>
+
+  <!-- EDIT: deep scan internals -->
+  <h2>Inside a deep scan</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>launch headless Chromium (<code>--no-sandbox --disable-dev-shm-usage</code> for containers), viewport 1280×800, desktop Chrome UA</li>
+        <li><code>page.evaluateOnNewDocument(fingerprintProbe)</code>: runs <b>before</b> any site script</li>
+        <li>record every <code>request</code> URL; remember the main document's status</li>
+        <li><code>goto(url, {waitUntil:"networkidle2", timeout:25000})</code>; on timeout keep going if anything loaded</li>
+        <li>wait 2.5 s for late pixels</li>
+        <li>read: probe hits, env (timezone, language, screen, viewport, platform), localStorage + sessionStorage keys, form fields, cookies</li>
+        <li>cookie is third-party if its domain doesn't end with the page's root domain; persistent if <code>expires &gt; 0</code></li>
+      </ol>
+    </div>
+    <div class="card wrap">fingerprintProbe wraps:
+• canvas toDataURL / toBlob / getImageData
+• WebGL getParameter (GPU)
+• OfflineAudioContext / AudioContext
+• navigator getters: hardwareConcurrency, deviceMemory,
+  platform, plugins, languages
+• screen width / height / colorDepth
+• getBattery, permissions.query, geolocation
+• RTCPeerConnection.createDataChannel (local IP)
+each call → window.__pl.fp.add(label)</div>
+  </div>
+
+  <!-- EDIT: data from you -->
+  <h2>"Data from you": reading forms</h2>
+  <p>Every <code>input / textarea / select</code> is labelled by its type and a haystack of <code>name, id, autocomplete, placeholder</code>:</p>
+  <div class="table-wrap"><table>
+    <tr><th>signal</th><th>label</th></tr>
+    <tr><td><code>type=email</code> or /email/</td><td>Email address</td></tr>
+    <tr><td><code>type=password</code></td><td>Password</td></tr>
+    <tr><td><code>type=tel</code> or /phone|mobile|tel/</td><td>Phone number</td></tr>
+    <tr><td>/name|fname|lname|fullname/</td><td>Name</td></tr>
+    <tr><td>/address|street|city|zip|postal/</td><td>Postal address</td></tr>
+    <tr><td>/card|cc-|credit|cvv|payment/</td><td>Payment / card details</td></tr>
+    <tr><td>/dob|birth|bday/ · search · file</td><td>Date of birth · Search queries · Uploaded files</td></tr>
+  </table></div>
+
+  <!-- EDIT: score -->
+  <h2>The privacy score</h2>
+  <div class="cols wide-left">
+    <div class="card">score = 100
+ − 10 × advertising trackers
+ − 12 × session-replay trackers
+ −  5 × analytics / marketing / ab-testing
+ − 1.5 × other third-party hosts
+ −  2 × persistent cookies
+ −  3 × password/payment fields
+ −  6 × fingerprinting probes
+ − 0.5 × storage keys
+clamp to [3, 100], round</div>
+    <div>
+      <p>Weights reflect how invasive each thing is: replaying your session or fingerprinting your device costs more than a page-view counter.</p>
+      <p class="margin">floor of 3, not 0: even the worst site is "very bad", not "undefined".</p>
+    </div>
+  </div>
+
+  <!-- EDIT: ssrf -->
+  <h2>SSRF guard</h2>
+  <figure class="sk">
+    <svg viewBox="0 0 900 130" role="img" aria-label="blocked address ranges">
+      <text class="lbl-b" x="10" y="24">refused before any request is made</text>
+      <g class="lbl-s">
+        <rect class="box" x="10" y="40" width="160" height="34"/><text x="20" y="62">localhost / .local / .internal</text>
+        <rect class="box" x="180" y="40" width="130" height="34"/><text x="190" y="62">0.x · 10.x · 127.x</text>
+        <rect class="box" x="320" y="40" width="130" height="34"/><text x="330" y="62">169.254.x.x</text>
+        <rect class="box" x="460" y="40" width="150" height="34"/><text x="470" y="62">172.16–31 · 192.168</text>
+        <rect class="box" x="620" y="40" width="110" height="34"/><text x="630" y="62">≥ 224 (multicast)</text>
+        <rect class="box" x="740" y="40" width="150" height="34"/><text x="750" y="62">::1 · fc/fd · fe80 · ::ffff:</text>
+      </g>
+      <text class="lbl-r" x="10" y="110">hostname resolved with dns.lookup(all:true); if ANY address is private → reject</text>
+    </svg>
+  </figure>
+
+</main>
+</body>
+</html>

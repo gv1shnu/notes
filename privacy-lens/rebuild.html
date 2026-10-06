@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>privacy-lens — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="privacy-lens" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">one day: build in the morning, fight the deploy at noon</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">11 Aug · 09:50</span><span class="what">Privacy Lens: live deep-scan of what a website collects about you</span><span class="sha">c68e632</span><br>
+      14 files, +1,194. Puppeteer deep scan, static fallback, tracker DB, SSRF guard, Docker + render.yaml.</li>
+    <li><span class="when">11 Aug · 12:00</span><span class="what">Add unzip to Docker image so Puppeteer can extract Chromium</span><span class="sha">b4b1999</span><br>
+      The first Render build failed: Puppeteer's postinstall downloads a Chromium zip and the slim image had no <code>unzip</code>.</li>
+    <li><span class="when">11 Aug · 13:09</span><span class="what">Add screenshot</span><span class="sha">846bf21</span><br>README screenshot of the live report.</li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>cost</th></tr>
+    <tr><td>Real headless browser</td><td>only way to see JS-loaded trackers, storage, fingerprinting</td><td>~30–40 s on heavy sites; memory-hungry</td></tr>
+    <tr><td>Static scan fallback</td><td>bot walls / OOM on free tier still return <i>something</i>, flagged <code>degraded</code></td><td>less accurate</td></tr>
+    <tr><td>Curated JSON tracker list, substring match</td><td>readable, explainable "join" for a DBMS class</td><td>48 entries; unknown hosts go to "other third-party"</td></tr>
+    <tr><td>Docker instead of Node buildpack</td><td>Chromium needs system libs buildpacks don't reliably provide</td><td>bigger image, slower builds</td></tr>
+    <tr><td>Chromium cached inside the project (<code>.puppeteerrc.cjs</code>)</td><td>Render/Railway wipe the default cache between build and run</td><td>image size</td></tr>
+    <tr><td>New browser per scan</td><td>no state bleed between sites</td><td>launch cost each time</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Detection gap</b> fast vs deep (cnn.com: ~4 vs 11 trackers, 235 hosts, 53 cookies, 8 probes).</li>
+    <li><b>Scan time</b> reported as <code>tookMs</code> in every result.</li>
+    <li><b>Degradation rate</b>: how often the deep scan falls back (shown to the user).</li>
+    <li><b>Safety</b>: private/internal targets always rejected.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Grow <code>trackers.json</code> (or import an open tracker list) to shrink "other third-party".</li>
+    <li>Reuse one browser with a page pool + a scan queue, so concurrent users don't OOM the free instance.</li>
+    <li>Rate-limit <code>/api/scan</code>.</li>
+    <li>Re-check the resolved IP at connection time (DNS rebinding can bypass a lookup-then-connect check).</li>
+    <li>Cache recent results per domain for a few minutes.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Express skeleton</b><br><code>express.static("public")</code>, <code>/api/health</code>, <code>/api/scan</code> returning <code>{ok, result}</code> or 400.</li>
+    <li><b>Guard first</b><br><code>normalizeUrl</code> (add https://, require http/https) and <code>assertPublicHost</code> with the ranges above.</li>
+    <li><b>Fast scan</b><br>fetch HTML, cheerio: collect script/img/iframe/link hosts, parse <code>set-cookie</code>, detect forms.</li>
+    <li><b>Tracker table + classify</b><br>for each third-party host, find the first pattern contained in it; group by category.</li>
+    <li><b>Deep scan</b><br>Puppeteer with the probe injected on new document; request log; networkidle2 + settle; read storage, cookies, forms.</li>
+    <li><b>Score + UI</b><br>scoring weights; a search box, a deep/fast toggle with a "can take 30–40 s" warning, cards per category.</li>
+    <li><b>Deploy</b><br>Dockerfile from <code>node:20-slim</code> + Chromium libs + <b>unzip</b>; <code>render.yaml</code> with Docker runtime and health check.</li>
+  </ol>
+
+</main>
+</body>
+</html>

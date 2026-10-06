@@ -72,5 +72,13 @@ window.NOTEBOOK = {
       stack: ["Python", "Ollama", "Kokoro", "Whisper"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // privacy-lens
+      slug: "privacy-lens", name: "Privacy Lens", shelf: "security", status: "deployed",
+      tagline: "Type a URL, get a live report of the trackers, cookies, fingerprinting and form data a site collects.",
+      url: "https://github.com/gv1shnu/privacy-lens", live: "https://privacy-lens-ggop.onrender.com/",
+      start: "2026-08-11", end: "2026-08-11", commits: 3,
+      stack: ["Node/Express", "Puppeteer", "Docker"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

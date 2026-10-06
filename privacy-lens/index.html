@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>privacy-lens — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="privacy-lens" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>Privacy Lens</h1>
+    <span class="stamp">live on render</span>
+  </div>
+  <p class="sub">gv1shnu/privacy-lens · Node + Express + Puppeteer · 3 commits · 11 Aug 2026 · privacy-lens-ggop.onrender.com</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">When I open a website, what does it learn <i>about</i> me (trackers, cookies, fingerprinting) and what does it ask <i>from</i> me (forms)?
+    Browser devtools show it, but not in a way a student can read.</p>
+  <p>Built as a teaching project on <b>data privacy</b> and <b>DBMS</b>: a curated tracker table is "joined" against everything a live page loads and does,
+    then grouped into an organised report with a 0–100 privacy score.</p>
+
+  <!-- EDIT: key finding infographic -->
+  <h2>The observation that decided the design</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 270" role="img" aria-label="Fast scan of cnn.com finds 4 trackers; deep scan finds 11 trackers, 235 third-party hosts, 53 cookies, 8 fingerprint probes">
+      <text class="lbl-t" x="20" y="36">cnn.com, same moment, two methods</text>
+      <text class="lbl" x="20" y="90">fast scan (fetch HTML)</text>
+      <rect class="fillbox" x="240" y="72" width="40" height="26"/><text class="lbl" x="290" y="92">~4 trackers</text>
+      <text class="lbl" x="20" y="150">deep scan (real Chromium)</text>
+      <rect class="fillbox" x="240" y="132" width="110" height="26"/><text class="lbl" x="360" y="152">11 trackers</text>
+      <rect class="box2" x="240" y="166" width="600" height="18"/><text class="lbl-s" x="250" y="180">235 third-party hosts</text>
+      <rect class="box2" x="240" y="190" width="200" height="18"/><text class="lbl-s" x="250" y="204">53 cookies</text>
+      <rect class="box2" x="240" y="214" width="90" height="18"/><text class="lbl-s" x="250" y="228">8 FP probes</text>
+      <text class="lbl-r" x="480" y="100">most trackers load after the HTML,</text>
+      <text class="lbl-r" x="480" y="122">via JavaScript; a fetch never sees them</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PL-01">numbers from my own run, recorded in the README</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What else I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>It can't be a static site.</b> Same-origin policy blocks reading another site's response from the browser, and a headless browser can't run in a page. So: a backend.</li>
+      <li>Ad-heavy pages <b>never reach network idle</b>; navigation must time out gracefully and keep whatever loaded.</li>
+      <li>Fingerprinting is invisible in the network tab; you only catch it by <b>wrapping the APIs before site code runs</b>.</li>
+      <li>A URL-taking server is an <b>SSRF</b> risk: someone could ask it to scan <code>localhost</code> or the cloud metadata IP.</li>
+      <li>Some sites block bots or hide behind consent walls; results are partial and the UI has to say so.</li>
+    </ul>
+    <div class="note pink">
+      <h4>scope line</h4>
+      Results are best-effort and educational, <b>not</b> a legal privacy audit.
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>API</th><td><code>GET /api/scan?url=…[&amp;mode=fast]</code> · <code>GET /api/health</code></td></tr>
+    <tr><th>Stack</th><td>Node ≥ 18 (ESM), Express 4, Puppeteer, Cheerio; vanilla JS frontend in <code>public/</code></td></tr>
+    <tr><th>"Database"</th><td><code>data/trackers.json</code>: 48 host patterns → owner, category, what it collects (23 advertising, 10 analytics, 3 session-replay …)</td></tr>
+    <tr><th>Deploy</th><td>Docker (<code>node:20-slim</code> + Chromium libs) on Render free plan via <code>render.yaml</code>; Railway also works</td></tr>
+    <tr><th>Live</th><td><a href="https://privacy-lens-ggop.onrender.com/">privacy-lens-ggop.onrender.com</a> (free tier: cold starts)</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
