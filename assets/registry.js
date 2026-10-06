@@ -120,5 +120,13 @@ window.NOTEBOOK = {
       stack: ["Node/Express", "Python", "SearXNG"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // world-of-books
+      slug: "world-of-books", name: "world-of-books", shelf: "web", status: "deployed",
+      tagline: "Full-stack book explorer over a live scrape: queued scraping, stale-while-revalidate cache, and a page-count PDF reader.",
+      url: "https://github.com/gv1shnu/world-of-books", live: "http://www.vishnugandarapu.in/world-of-books/",
+      start: "2026-01-12", end: "2026-10-04", commits: 19,
+      stack: ["NestJS", "Next.js", "Postgres", "Redis"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

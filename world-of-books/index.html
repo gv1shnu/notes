@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>world-of-books — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="world-of-books" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>world-of-books</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/world-of-books · NestJS + Next.js + Postgres · 19 commits · Jan &amp; Oct 2026 · vishnugandarapu.in/world-of-books</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Started as an assignment: browse live product data from <a href="https://www.worldofbooks.com/">World of Books</a> —
+    navigation → categories → a single book's details — backed by a real scrape, not a static dump. (The original brief has been removed from the repo.)</p>
+  <p>It grew into a full-stack explorer with <span class="hl">background scraping</span>, caching, pagination, typo-tolerant category search,
+    and a later "Extract PDF" reader.</p>
+
+  <!-- EDIT: architecture -->
+  <h2>Architecture</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 250" role="img" aria-label="next.js frontend, nestjs backend, redis/bull queue, scraper, postgres">
+      <rect class="box" x="20" y="95" width="150" height="60" rx="6"/><text class="lbl mid" x="95" y="120">Next.js</text><text class="lbl-s mid" x="95" y="140">React Query · static export</text>
+      <path class="arr" d="M172 125 H212"/>
+      <rect class="fillbox" x="214" y="90" width="160" height="70" rx="6"/><text class="lbl mid" x="294" y="116">NestJS API</text><text class="lbl-s mid" x="294" y="136">categories · products · pdf</text><text class="lbl-s mid" x="294" y="152">triggers scrape when stale</text>
+      <path class="arr" d="M376 125 H560"/><text class="lbl-s mid" x="468" y="116">reads / writes</text>
+      <rect class="box" x="562" y="95" width="150" height="60" rx="6"/><text class="lbl mid" x="637" y="120">PostgreSQL</text><text class="lbl-s mid" x="637" y="140">nav · products · jobs</text>
+      <path class="arr" d="M294 162 V200 H420"/>
+      <rect class="box" x="422" y="180" width="160" height="50" rx="6"/><text class="lbl mid" x="502" y="202">Redis + Bull queue</text><text class="lbl-s mid" x="502" y="220">retries · concurrency</text>
+      <path class="arr" d="M584 205 H650"/>
+      <rect class="box" x="652" y="180" width="170" height="50" rx="6"/><text class="lbl mid" x="737" y="202">scraper worker</text><text class="lbl-s mid" x="737" y="220">HTTP + Algolia listings</text>
+      <path class="arr" d="M737 178 V160 H712"/>
+      <text class="lbl-r" x="650" y="130">stale data (1h TTL) → background refresh</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="WOB-01">scrapes run in the background so the UI never blocks on them</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed / changed my mind on</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>The first design used a <b>Playwright headless browser</b> worker. Later it moved to <b>plain HTTP + World of Books' Algolia listings</b> — faster, lighter, and it fits in a 512 MB free instance where Chromium does not.</li>
+      <li>When the DB is empty, <b>every</b> request for navigations started a fresh scrape; concurrent requests launched several Chromiums at once and OOM'd. Fix: share one in-flight scrape and log failures instead of swallowing them.</li>
+      <li>Static export needs every route to be a real file, so category/product pages read their slug/id from the <b>query string</b> (<code>?slug=</code>, <code>?book=</code>).</li>
+      <li>Render's free Postgres is deleted after 30 days, so the database lives on <b>Neon</b>; Render runs in Singapore next to it.</li>
+      <li>A good book link should survive a re-scrape, so products resolve <b>by handle</b> and are rebuilt from the source page if missing.</li>
+    </ul>
+    <div>
+      <div class="note blue">
+        <h4>typo tolerance</h4>
+        Unknown category slugs 404, then the site corrects clear typos or suggests the closest categories (<code>lib/suggest.ts</code>, a "did you mean").
+      </div>
+      <div class="margin">free-tier hosting with no card and no DNS changes was an explicit constraint for the Oct rework.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Backend</th><td>NestJS + Prisma; Redis + Bull queue; HTTP/Algolia scraper</td></tr>
+    <tr><th>Frontend</th><td>Next.js (React Query), static export with configurable <code>BASE_PATH</code></td></tr>
+    <tr><th>Data</th><td>Postgres models: Navigation, Category, Product, ScrapeJob — with targeted indexes</td></tr>
+    <tr><th>Caching</th><td>Redis with TTL; 1-hour staleness → background refresh</td></tr>
+    <tr><th>Deploy</th><td>frontend on GitHub Pages, backend on Render (Docker) + Render Key Value, Postgres on Neon; a Docker-Compose + Caddy stack as a self-host alternative</td></tr>
+    <tr><th>Live</th><td><a href="http://www.vishnugandarapu.in/world-of-books/">vishnugandarapu.in/world-of-books</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

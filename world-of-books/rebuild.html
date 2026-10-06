@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>world-of-books — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="world-of-books" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">January: the assignment</li>
+    <li class="big"><span class="when">12 Jan · 10:38</span><span class="what">initial commit</span><span class="sha">8da5d44</span><br>58 files, +4,795. Full stack: NestJS + Next.js + Postgres + Redis/Bull + scraper.</li>
+    <li><span class="when">12 Jan · 15:32</span><span class="what">about, contact, product detail page</span><span class="sha">b2dd15b</span></li>
+    <li><span class="when">12 Jan · 15:48</span><span class="what">fix: rate limiting</span><span class="sha">698f284</span></li>
+    <li class="phase">October: ship it for real</li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">feat: extract and read PDFs matched by book page count</span><span class="sha">e02fa78</span><br>32 files, +26,870 (PDF.js bundled). The Extract-PDF reader.</li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">deploy without Railway: static Pages frontend + compose backend</span><span class="sha">e23ddd9</span><br>Static export with base path; Caddy HTTPS stack; query-string routing.</li>
+    <li><span class="when">4 Oct</span><span class="what">deploy: Render free tier + Neon Postgres; Singapore</span><span class="sha">a719cfe / dee6af4</span><br>PORT + SCRAPER_MAX_CONCURRENCY so Chromium fits 512 MB.</li>
+    <li><span class="when">4 Oct</span><span class="what">fix: run only one initial navigation scrape at a time</span><span class="sha">2535cf1</span><br>Share the in-flight scrape; stop concurrent Chromiums from OOMing the instance.</li>
+    <li><span class="when">4 Oct</span><span class="what">merge PRs #1, #2 (dev/extract-pdf)</span><span class="sha">71a2001 / 8d16f96</span></li>
+  </ol>
+  <p class="margin">The only repo I developed on a branch and merged via PRs. A <code>dev/extract-pdf</code> branch still exists on the remote.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Queue scraping, don't block requests</td><td>a page load can't wait on a multi-page scrape</td></tr>
+    <tr><td>Stale-while-revalidate (1h TTL)</td><td>fast responses, freshness restored in the background</td></tr>
+    <tr><td>HTTP + Algolia over a headless browser</td><td>fits a 512 MB free instance; faster and lighter</td></tr>
+    <tr><td>Static export + query-string routes</td><td>host the frontend on GitHub Pages for free</td></tr>
+    <tr><td>Postgres on Neon, app on Render (Singapore)</td><td>Render's free DB is wiped after 30 days; keep app next to the DB</td></tr>
+    <tr><td>Products by handle</td><td>links survive a re-scrape; rebuilt from source if missing</td></tr>
+    <tr><td>PDF match by page count + tolerance</td><td>a cheap, explainable heuristic; never claims it proves the edition</td></tr>
+    <tr><td>Share one in-flight scrape</td><td>empty-DB concurrent requests otherwise launch many browsers</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Cache hit rate</b> and response latency on category/product reads.</li>
+    <li><b>Scrape job success / retry counts</b> (ScrapeJob log + <code>/categories/:slug/progress</code>).</li>
+    <li><b>Memory headroom</b>: Chromium/scraper stays under 512 MB on the free instance.</li>
+    <li><b>PDF match quality</b>: matched / no_match / missing_metadata / not_configured outcomes.</li>
+    <li>Tests: unit specs per service + a categories e2e spec.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Free-tier cold starts: the keep-awake workflow is a patch, not a fix.</li>
+    <li>Scraper selectors are coupled to the source site's markup; centralise them.</li>
+    <li>More robust "did you mean" (fuzzy distance, not just prefix).</li>
+    <li>Rate-limit the PDF-extract endpoint (SerpApi quota).</li>
+    <li>Reconcile the README (mentions both "no headless browser" and a Playwright worker — the code moved to HTTP/Algolia).</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Schema first</b><br>Prisma models Navigation / Category / Product / ScrapeJob with the indexes above; <code>docker-compose</code> for Postgres + Redis.</li>
+    <li><b>Scraper service</b><br>Fetch navigation, then category pages (paginate), then product details over HTTP/Algolia; config for delays, retries, max pages.</li>
+    <li><b>Queue</b><br>Bull jobs for scrapes with retries + concurrency; a processor that upserts and writes a ScrapeJob log.</li>
+    <li><b>API + cache</b><br>NestJS controllers for categories/products; Redis TTL cache; stale-while-revalidate that enqueues a refresh.</li>
+    <li><b>Frontend</b><br>Next.js with React Query; static export; query-string routes; a typo-tolerant category suggester.</li>
+    <li><b>Extract PDF</b><br>SerpApi search → download up to 5 → pdf-lib page count → tolerance match → cache bytes → PDF.js reader via a token route.</li>
+    <li><b>Deploy</b><br>Pages workflow for the frontend; Render Docker + Key Value for the API; Neon for Postgres; a Caddy compose stack as a self-host option.</li>
+  </ol>
+
+</main>
+</body>
+</html>

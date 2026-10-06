@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>world-of-books — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="world-of-books" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">stale-while-revalidate over a scraped catalogue</p>
+
+  <!-- EDIT: request/scrape cycle -->
+  <h2>The stale-while-revalidate cycle</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 260" role="img" aria-label="request hits cache then db then enqueues scrape if stale">
+      <rect class="box" x="20" y="100" width="130" height="56" rx="6"/><text class="lbl mid" x="85" y="124">GET /categories/:slug</text>
+      <path class="arr" d="M152 128 H190"/>
+      <path class="box" d="M250 95 L310 128 L250 161 L190 128 Z"/><text class="lbl-s mid" x="250" y="132">in Redis?</text>
+      <path class="arr" d="M310 128 H360"/><text class="lbl-s" x="318" y="118">miss</text>
+      <path class="arr-d" d="M250 95 V60 H420"/><text class="lbl-s" x="258" y="54">hit → return</text>
+      <path class="box" d="M420 95 L480 128 L420 161 L360 128 Z"/><text class="lbl-s mid" x="420" y="132">in DB?</text>
+      <path class="arr" d="M480 128 H540"/>
+      <rect class="box" x="542" y="100" width="150" height="56" rx="6"/><text class="lbl mid" x="617" y="124">serve DB rows</text><text class="lbl-s mid" x="617" y="144">cache them</text>
+      <path class="arr-d red" d="M617 158 V200 H420"/><text class="lbl-r" x="300" y="195">stale (&gt;1h) OR empty → enqueue scrape job</text>
+      <path class="arr" d="M420 95 V60 H540"/><text class="lbl-s" x="430" y="54">empty → block on first scrape (shared)</text>
+      <rect class="box" x="740" y="100" width="150" height="56" rx="6"/><text class="lbl mid" x="815" y="124">Bull worker</text><text class="lbl-s mid" x="815" y="144">scrape → upsert → cache</text>
+      <path class="arr-d" d="M420 215 H815 V158"/>
+    </svg>
+    </div>
+    <figcaption data-dwg="WOB-02">a cached/DB response returns immediately; freshness is restored in the background</figcaption>
+  </figure>
+
+  <!-- EDIT: data model -->
+  <h2>Data model (Prisma)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>model</th><th>holds</th><th>indexes</th></tr>
+    <tr><td>Navigation</td><td>top-level menus</td><td>—</td></tr>
+    <tr><td>Category</td><td>a menu's categories + <code>last_scraped_at</code></td><td>navigation_id, last_scraped_at</td></tr>
+    <tr><td>Product</td><td>book: title, author, price, stock, handle, specs</td><td>categoryId, author, price, updatedAt, is_in_stock</td></tr>
+    <tr><td>ScrapeJob</td><td>job log: type, status, timing</td><td>status, (target_type, status), started_at</td></tr>
+  </table></div>
+  <p>Indexes are chosen for the real queries: finding stale categories to refresh, filtering/sorting products by price/availability/author, and finding pending or failed jobs.</p>
+
+  <!-- EDIT: modules -->
+  <h2>Backend modules</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><code>categories/</code> — REST with caching + pagination + sort</li>
+      <li><code>products/</code> — book detail, by handle (stable) or id (legacy)</li>
+      <li><code>scraper/</code> — <code>scraper.service</code> (nav/category/product), <code>scraper.config</code> (pagination, delays, retries), <code>scraper.processor</code> (Bull worker), <code>wob-http</code></li>
+      <li><code>cache/</code> — Redis TTL layer</li>
+      <li><code>pdf/</code> — the Extract-PDF feature (search / download / inspect / match)</li>
+      <li><code>health/</code> — health checks (plus a keep-API-awake workflow for the free tier)</li>
+    </ul>
+    <div>
+      <h4>API surface</h4>
+      <div class="card wrap">GET /categories/navigations
+GET /categories/:slug?page=&limit=&sort=
+GET /categories/:slug/progress
+GET /products/by-handle/:handle
+GET /products/:id
+POST /products/:id/pdf/extract
+GET  /products/:id/pdf/:token</div>
+    </div>
+  </div>
+
+  <!-- EDIT: pdf matching -->
+  <h2>Extract PDF: matching by page count</h2>
+  <p>The book page has an <b>Extract PDF</b> button: it queries SerpApi's Google engine for <code>"Title" "Author" filetype:pdf</code>, downloads up to five results,
+    and parses each with pdf-lib — then <span class="hl">matches by page count</span>:</p>
+  <div class="cols wide-left">
+    <div class="card wrap">accept Pages / Page count / No. of pages … ("320 pages", "1,024")
+require BOTH a title and an author
+tolerance = max(5, ceil(expectedPages * 0.05))  inclusive
+  → 320-page listing matches a 304–336-page PDF
+prefer the closest; stop on an exact match
+skip encrypted / broken / non-PDF / previews / out-of-tolerance
+cache the exact bytes 10 min; serve via /pdf/:token (never an arbitrary URL)</div>
+    <div>
+      <p>The frontend renders pages with PDF.js from a temporary blob URL (avoids source CORS/framing), with prev/next, zoom, and screen-reader text.</p>
+      <p class="margin">honest caveat shown to the user: a matching page count does NOT prove edition, completeness, or rights. Pagination is a heuristic.</p>
+      <p class="small">No Google HTML is scraped and no access controls are bypassed; without a key, the page links to the same query on Google. Uses SerpApi because Google's Custom Search JSON API closed to new customers (ending Jan 2027).</p>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
