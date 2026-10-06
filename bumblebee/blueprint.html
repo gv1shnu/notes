@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bumblebee — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="bumblebee" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">ingest once, converse forever</p>
+
+  <!-- EDIT: ingest -->
+  <h2>Ingest: media → a corpus of clips</h2>
+  <ol class="steps">
+    <li><b>Extract dialogue</b><br>Pull the dialogue track — the centre channel on 5.1, a downmix otherwise — with ffmpeg.</li>
+    <li><b>Get the text</b><br>If the file ships an English subtitle, read its cues and <b>skip transcription</b>; else run <code>whisper-cli</code> with auto language detection.</li>
+    <li><b>Second pass</b><br>When whisper covers little of a file (common with non-English audio), hand the same clip to macOS's on-device Speech recogniser and add the phrases it missed.</li>
+    <li><b>Cut + normalise</b><br>Cut clean phrases from a 48 kHz master with 10/12 ms fades, normalised per source — leaving a few dB of variance on purpose.</li>
+    <li><b>Embed</b><br>Embed distinct phrases with <code>nomic-embed-text</code> so replies can match by meaning; store clips in SQLite with audio on disk.</li>
+  </ol>
+  <p class="margin">clip ids were widened to avoid collisions during ingest; clip timing was fixed so ingest doesn't abort on early words.</p>
+
+  <!-- EDIT: conversation -->
+  <h2>Conversation: message → spliced reply</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 220" role="img" aria-label="message to chat model to viterbi match to splice engine to playback">
+      <rect class="box" x="20" y="85" width="120" height="50" rx="6"/><text class="lbl-s mid" x="80" y="108">message</text>
+      <path class="arr" d="M142 110 H180"/>
+      <rect class="box" x="182" y="80" width="150" height="60" rx="6"/><text class="lbl-s mid" x="257" y="104">chat model (ollama)</text><text class="lbl-s mid" x="257" y="122">tight vocabulary → reply text</text>
+      <path class="arr" d="M334 110 H372"/>
+      <rect class="fillbox" x="374" y="75" width="170" height="70" rx="6"/><text class="lbl-s mid" x="459" y="100">Viterbi matcher</text><text class="lbl-s mid" x="459" y="118">cost-based coverage</text><text class="lbl-s mid" x="459" y="136">semantic + phrase search</text>
+      <path class="arr" d="M546 110 H584"/>
+      <rect class="box" x="586" y="80" width="170" height="60" rx="6"/><text class="lbl-s mid" x="671" y="104">audio engine</text><text class="lbl-s mid" x="671" y="122">splice · static · band-pass</text>
+      <path class="arr" d="M758 110 H796"/>
+      <rect class="box" x="798" y="85" width="160" height="50" rx="6"/><text class="lbl-s mid" x="878" y="104">play + sync terminal</text><text class="lbl-s mid" x="878" y="122">station tags</text>
+      <text class="lbl-r" x="374" y="175">reply vocabulary tightened so generation stays fast; generation capped so it can't run away</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="BB-02">models are warmed at startup so the first reply isn't a cold load</figcaption>
+  </figure>
+
+  <!-- EDIT: the filter -->
+  <h2>The one line that is the whole aesthetic</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">for each clip in the reply:
+    play 48kHz phrase (10/12ms fades)
+    insert tuning static + a small gap
+    ── route EVERYTHING through ──
+    one ~1150 Hz band-pass filter
+    (never per-clip, never optional)
+
+seed → identical splice every time
+export: re-render offline → WAV + SRT</div>
+    <div>
+      <p>Because every borrowed voice passes through the <i>same</i> narrow band, their timbres collapse toward one another and the result reads as a single broken radio, not a mixtape.</p>
+      <p class="margin">all randomness is seeded, so a reply is reproducible — the foundation of the offline WAV+SRT export.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: files -->
+  <h2>Module map</h2>
+  <div class="table-wrap"><table>
+    <tr><th>area</th><th>files</th></tr>
+    <tr><td>main (Node side)</td><td><code>db.ts</code>, <code>ingest.ts</code>, <code>ollama.ts</code>, <code>process.ts</code>, <code>reply.ts</code>, <code>setup.ts</code>, <code>speech.ts</code></td></tr>
+    <tr><td>renderer (UI)</td><td><code>App.tsx</code>, <code>DeviceRadio.tsx</code> (the faceplate), <code>audio.ts</code>, <code>matcher.ts</code>, <code>export.ts</code>, <code>store.ts</code></td></tr>
+    <tr><td>shared boundary</td><td><code>ipc.ts</code>, <code>types.ts</code>, <code>normalize.ts</code></td></tr>
+    <tr><td>cli</td><td><code>cli/ingest.ts</code> (ingest from the terminal)</td></tr>
+  </table></div>
+
+  <!-- EDIT: the radio UI -->
+  <h2>The receiver faceplate</h2>
+  <ul class="dash">
+    <li>A clock-synced receiver faceplate with a tuner dial (decluttered when there are many sources), a live spectrum on the right wall, and the Bumblebee face.</li>
+    <li>A terminal types the reply <b>in sync</b> with the audio and names the station each fragment came from; alternating-italic reply text; replay.</li>
+    <li>Corpus stats, reply latency and credits shown on the radio; Setup and Library screens are scrollable.</li>
+    <li>Robustness: survive missing clips, let the audio context use the device sample rate, stop the engine only on unmount (a bug that caused silent playback).</li>
+  </ul>
+
+</main>
+</body>
+</html>

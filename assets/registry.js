@@ -184,5 +184,13 @@ window.NOTEBOOK = {
       stack: ["FastAPI", "React", "Postgres", "Groq LLM"],
       pages: [ { file: "index", title: "Cover & economy" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // bumblebee
+      slug: "bumblebee", name: "Bumblebee", shelf: "ai", status: "local",
+      tagline: "A macOS app that answers you by splicing dialogue fragments from your own films into one damaged radio voice.",
+      url: "https://github.com/gv1shnu/bumblebee", live: null,
+      start: "2026-09-19", end: "2026-09-28", commits: 31,
+      stack: ["Electron", "TypeScript", "whisper", "Ollama"],
+      pages: [ { file: "index", title: "Cover & idea" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

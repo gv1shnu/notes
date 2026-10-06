@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bumblebee — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="bumblebee" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">two days, 31 commits — most of it on 20 Sep</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">19 Sep — the machine</li>
+    <li class="big"><span class="when">19 Sep</span><span class="what">build local dialogue radio application · unpack vector extension for packaged app · clock-synced receiver faceplate</span></li>
+    <li class="phase">20 Sep — make it Bumblebee</li>
+    <li class="big"><span class="when">20 Sep</span><span class="what">persona + host-aware model settings · face/intro/icon · corpus stats + latency + credits · ingest audio, prefer existing subtitles</span></li>
+    <li><span class="when">20 Sep</span><span class="what">rename to Bumblebee · declutter tuner · never answer with silence</span></li>
+    <li class="big"><span class="when">20 Sep</span><span class="what">live spectrum · fix silent playback (stop engine only on unmount) · warm models + auto-detect language + semantic phrase search</span></li>
+    <li class="big"><span class="when">20 Sep</span><span class="what">export reply as WAV + SRT · on-device Speech fallback transcriber · cap reply generation · release polish</span></li>
+    <li><span class="when">28 Sep</span><span class="what">drop tool-specific .gitignore entry</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>One global band-pass, never per-clip/optional</td><td>it's what unifies unrelated recordings into one voice — the entire concept</td></tr>
+    <tr><td>Viterbi (cost-based) matcher</td><td>optimal coverage of the message with available clips, not greedy dead-ends</td></tr>
+    <tr><td>Embed phrases for semantic match</td><td>reach for the nearest meaning, not an exact keyword</td></tr>
+    <tr><td>Seeded randomness</td><td>reproducible audio → enables offline WAV+SRT export</td></tr>
+    <tr><td>Prefer existing subtitles over transcription</td><td>faster, more accurate when the file already has cues</td></tr>
+    <tr><td>whisper + on-device Speech second pass</td><td>catch non-English phrases whisper misses</td></tr>
+    <tr><td>One typed IPC boundary</td><td>the renderer never touches Node; a clean, testable seam</td></tr>
+    <tr><td>Corpus from your own media, never bundled</td><td>runs locally; no distribution of copyrighted dialogue</td></tr>
+    <tr><td>Warm models at startup; cap generation</td><td>fast first reply; a reply can't run away</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Illusion</b>: do a dozen sources sound like one damaged speaker? (The band-pass test.)</li>
+    <li><b>Coverage</b>: how much of a typed message the matcher can voice from the corpus.</li>
+    <li><b>Reply latency</b> and corpus stats, shown live on the radio.</li>
+    <li><b>Reproducibility</b>: same seed → identical audio (and a clean export).</li>
+    <li><b>Ingest robustness</b>: no aborts on early words, no clip-id collisions, graceful on non-English.</li>
+    <li>Unit tests: <code>ingest.test</code>, <code>audio.test</code>, <code>normalize.test</code>.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Record and embed the demo video (the README has a stub + shot list).</li>
+    <li>Cross-platform beyond macOS/Apple-silicon (the Speech pass + paths are mac-specific).</li>
+    <li>Smarter clip selection (prosody/emotion match, not just text coverage).</li>
+    <li>Larger-corpus performance tuning for the matcher + search.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Electron skeleton</b><br>electron-vite with main/preload/renderer and a single typed IPC bridge; a Setup screen that checks ffmpeg/whisper/ollama and recommends models by RAM.</li>
+    <li><b>Ingest</b><br>ffmpeg to extract dialogue; prefer existing subtitles, else whisper-cli (auto language); a Speech second pass; cut 48 kHz clips with fades, normalise per source; store in SQLite.</li>
+    <li><b>Embed + search</b><br>Embed distinct phrases with <code>nomic-embed-text</code>; a semantic + phrase search over the corpus.</li>
+    <li><b>Reply text</b><br>An ollama chat model with a tightened vocabulary and a generation cap; warm it at startup.</li>
+    <li><b>Matcher</b><br>A Viterbi cost-based matcher that covers the reply text with available clips.</li>
+    <li><b>Audio engine</b><br>Splice clips with tuning static + gaps; route everything through one ~1150 Hz band-pass; seed all randomness.</li>
+    <li><b>Radio UI</b><br>A receiver faceplate: tuner, spectrum, a terminal that types in sync and names each station; replay.</li>
+    <li><b>Export + package</b><br>Re-render a reply offline to WAV + SRT; build an arm64 .dmg (remember to unpack the vector extension for the packaged app).</li>
+  </ol>
+
+</main>
+</body>
+</html>

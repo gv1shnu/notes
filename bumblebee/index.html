@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bumblebee — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="bumblebee" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>Bumblebee</h1>
+    <span class="stamp blue">runs locally</span>
+  </div>
+  <p class="sub">gv1shnu/bumblebee · Electron + TypeScript · 31 commits · Sep 2026 · macOS (Apple silicon)</p>
+
+  <!-- EDIT: problem -->
+  <h2>The idea</h2>
+  <p class="lead">An app that <b>can't speak in its own voice</b>. You type a message; it answers by splicing together fragments of dialogue from <i>your own</i> films and TV —
+    the way Bumblebee talks through his radio after his voice box is destroyed.</p>
+  <p>Half the point is that it's approximate: it reaches for the nearest phrase it has, stitches the borrowed voices together with tuning static, and runs everything through
+    <span class="hl">one band-limited filter</span> so a dozen unrelated recordings sound like a single damaged speaker.</p>
+
+  <!-- EDIT: two loops -->
+  <h2>Two loops and one boundary</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 980 240" role="img" aria-label="ingest builds a corpus of clips; conversation splices clips into a reply">
+      <text class="lbl-t" x="40" y="34">INGEST (build the corpus)</text>
+      <rect class="box" x="30" y="50" width="120" height="44" rx="6"/><text class="lbl-s mid" x="90" y="76">your media</text>
+      <path class="arr" d="M152 72 H188"/>
+      <rect class="box" x="190" y="50" width="140" height="44" rx="6"/><text class="lbl-s mid" x="260" y="68">extract dialogue</text><text class="lbl-s mid" x="260" y="84">+ get text</text>
+      <path class="arr" d="M332 72 H368"/>
+      <rect class="box" x="370" y="50" width="140" height="44" rx="6"/><text class="lbl-s mid" x="440" y="68">cut + embed</text><text class="lbl-s mid" x="440" y="84">clips → SQLite</text>
+      <line class="ln-d" x1="40" y1="120" x2="940" y2="120"/>
+      <text class="lbl-t" x="40" y="150">CONVERSATION (speak)</text>
+      <rect class="box" x="30" y="165" width="120" height="44" rx="6"/><text class="lbl-s mid" x="90" y="191">your message</text>
+      <path class="arr" d="M152 187 H188"/>
+      <rect class="fillbox" x="190" y="165" width="160" height="44" rx="6"/><text class="lbl-s mid" x="270" y="183">Viterbi matcher</text><text class="lbl-s mid" x="270" y="200">cover text with clips</text>
+      <path class="arr" d="M352 187 H388"/>
+      <rect class="box" x="390" y="165" width="160" height="44" rx="6"/><text class="lbl-s mid" x="470" y="183">splice + static</text><text class="lbl-s mid" x="470" y="200">one ~1150 Hz band-pass</text>
+      <path class="arr" d="M552 187 H588"/>
+      <rect class="box" x="590" y="165" width="160" height="44" rx="6"/><text class="lbl-s mid" x="670" y="183">play + type in sync</text><text class="lbl-s mid" x="670" y="200">name each station</text>
+      <rect class="box2" x="800" y="110" width="150" height="50" rx="6"/><text class="lbl-s mid" x="875" y="132">typed IPC bridge</text><text class="lbl-s mid" x="875" y="150">renderer ⟂ Node</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="BB-01">the renderer never touches Node; everything crosses one typed IPC boundary (src/shared/ipc.ts)</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>The decisions that make it sound right</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>The band-pass is never optional.</b> That single ~1150 Hz filter is what turns a playlist of unrelated clips into "one damaged speaker" — it's the whole aesthetic in one line.</li>
+      <li><b>Match by meaning, not keywords.</b> Distinct phrases are embedded with <code>nomic-embed-text</code>, so a reply can reach for the nearest phrase it actually has.</li>
+      <li><b>Viterbi, not greedy.</b> A cost-based matcher covers the text optimally with available clips, instead of grabbing the first match and getting stuck.</li>
+      <li><b>Seeded randomness.</b> The same reply reproduces the same audio exactly — which is also how Export re-renders it offline to a WAV + matching SRT.</li>
+      <li><b>Never answer with silence</b>; cap generation so it can't run away; leave a few dB of variance between sources so it sounds found, not produced.</li>
+    </ul>
+    <div>
+      <div class="note green">
+        <h4>everything local, your media only</h4>
+        The corpus is built entirely from your own files, lives in SQLite under userData, and is <b>never bundled or distributed</b>. Nothing leaves the machine except model downloads you ask for.
+      </div>
+      <div class="margin">whisper covers English; a macOS on-device Speech second pass catches what it missed (often non-English).</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>App</th><td>Electron + TypeScript (electron-vite); main / preload / renderer, one typed IPC bridge</td></tr>
+    <tr><th>External tools</th><td><code>ffmpeg</code>/<code>ffprobe</code> (extract + cut), <code>whisper-cli</code> (transcribe), <code>ollama</code> (reply + <code>nomic-embed-text</code>), optional <code>swiftc</code> (Speech fallback)</td></tr>
+    <tr><th>Audio</th><td>48 kHz master, 10/12 ms fades, per-source normalise, one ~1150 Hz band-pass + tuning static</td></tr>
+    <tr><th>Store</th><td>SQLite at <code>app.getPath('userData')</code>; clip audio on disk beside it</td></tr>
+    <tr><th>Deployed</th><td>Not deployed; a packaged arm64 <code>.dmg</code> you build yourself.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
