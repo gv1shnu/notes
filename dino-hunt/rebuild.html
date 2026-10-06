@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dino-hunt — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dino-hunt" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">27 Jul 2026</span><span class="what">Unity project: DinoHunt AI ecosystem sandbox</span><br>The whole sandbox: determinism, sim/render split, Utility brain, combat, eggs, raptors, batch runner, event log, and the docs (GDD, ARCHITECTURE, DECISIONS, RESEARCH).</li>
+    <li><span class="when">24 Aug</span><span class="what">build for web</span><br>WebGL build.</li>
+    <li><span class="when">28 Sep</span><span class="what">Reword determinism note in Agent comment</span></li>
+    <li class="phase">4 Oct — ship it on the web</li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">replace capsules with animated 3D models · GitHub Actions WebGL → Pages · Unity Personal license in CI</span><br>Soldier + Velociraptor GLBs; the deploy pipeline.</li>
+    <li><span class="when">4 Oct</span><span class="what">camera fixes · overlay scaling · keep runtime colliders in builds · thin the arena</span><br>WebGL-build gotchas: colliders stripped by the build, camera drift, overlay DPI.</li>
+  </ol>
+  <p class="margin">The code milestones (1–9, 11, 13) were developed before the first commit — so the first commit is the whole engine, and the later commits are art + deployment.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions (from docs/DECISIONS.md)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>decision</th><th>why</th></tr>
+    <tr><td>D-1</td><td>Determinism + sim/render split + event log are non-negotiable</td><td>reproducible fitness, headless batch, free statistics</td></tr>
+    <tr><td>D-2</td><td>Personality = a plain 5-float weight vector</td><td>keeps evolution swappable behind one boundary</td></tr>
+    <tr><td>D-3</td><td>The map is always symmetric</td><td>can't tell skill from map advantage otherwise</td></tr>
+    <tr><td>—</td><td>Evolution in C#, not Python (GDD deviation)</td><td>5 floats don't justify a bridge + 2nd toolchain + 2nd determinism story</td></tr>
+    <tr><td>—</td><td>Fitness = eggs delivered, not win rate</td><td>win-optimising finds degenerate 0-0 equilibria</td></tr>
+    <tr><td>—</td><td>Each trait owns a primary action; combat priced by force ratio</td><td>gives personality leverage; makes fights survivable</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Q1</b>: do distinct weight vectors cluster into distinct behaviour? (Instrumented; preliminary yes.)</li>
+    <li><b>Objective health</b>: eggs delivered per match &gt; 0 (the metric that caught the broken sim).</li>
+    <li><b>Determinism</b>: same seed → byte-identical event log.</li>
+    <li><b>End-reason distribution</b>: timeouts vs deliveries vs eliminations across a batch.</li>
+    <li>All statistics come from the JSONL log, so any new metric is a query, not new plumbing.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending (from docs/README)</h2>
+  <ul class="checks">
+    <li>Run the experiments at scale (Q3, Q4, Q2 are instrumented but not yet run).</li>
+    <li>Replay from the event log; an auto-director camera.</li>
+    <li>Corpse looting for ammo; roster persistence between sessions.</li>
+    <li>Art: buildings, grass, humanoids, lighting.</li>
+    <li>Publish the WebGL build to itch.io (configured, not yet published).</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Lock the three non-negotiables first</b><br>Fixed timestep + seeded RNG; a Simulation that never calls Unity rendering; an append-only JSONL event log. Everything else depends on these.</li>
+    <li><b>World model</b><br>Agent, Raptor, Egg, WorldView with helpers (nearest enemy/teammate/raptor, force ratio); put line-of-sight and pathfinding behind <code>ILineOfSight</code> / <code>IPathfinder</code>.</li>
+    <li><b>Utility brain</b><br>Score each action against the world, weighted by a 5-float Personality; give each trait a primary action; price engagement by local force ratio.</li>
+    <li><b>Batch runner</b><br>Headless MatchRunner using analytic LOS + grid pathfinder; run thousands of matches and aggregate from the log.</li>
+    <li><b>Evolution</b><br>A generational GA with elitism over the 5 floats; <b>fitness = eggs delivered</b>, not wins.</li>
+    <li><b>Symmetric arena</b><br>ArenaBuilder/Geometry/Layout; keep it symmetric even when procedurally generated.</li>
+    <li><b>View + ship</b><br>A Unity view that only draws sim state; animated models; a game-ci Actions workflow to build WebGL and deploy to Pages (keep runtime colliders, watch the camera).</li>
+  </ol>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dino-hunt — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dino-hunt" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">determinism, a clean sim/render seam, and an event log as the spine</p>
+
+  <!-- EDIT: architecture -->
+  <h2>The load-bearing seam</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 250" role="img" aria-label="simulation layer separate from view layer, both reading the event log">
+      <rect class="fillbox" x="20" y="40" width="330" height="170" rx="8"/><text class="lbl-b mid" x="185" y="66">Sim (no Unity rendering)</text>
+      <text class="lbl-s mid" x="185" y="92">SimClock · DeterministicRandom · Simulation</text>
+      <text class="lbl-s mid" x="185" y="114">Agent · Raptor · Egg · WorldView</text>
+      <text class="lbl-s mid" x="185" y="136">UtilityBrain ← Personality (5 floats)</text>
+      <text class="lbl-s mid" x="185" y="158">ILineOfSight · IPathfinder (interfaces)</text>
+      <text class="lbl-s mid" x="185" y="186">pure float math · seeded RNG</text>
+      <path class="arr" d="M352 95 H410"/><text class="lbl-s mid" x="381" y="86">emits</text>
+      <rect class="box" x="412" y="70" width="150" height="60" rx="6"/><text class="lbl mid" x="487" y="96">EventLog</text><text class="lbl-s mid" x="487" y="116">JSONL, append-only</text>
+      <path class="arr" d="M487 132 V175 H360"/><text class="lbl-s mid" x="420" y="165">stats derived, never stored</text>
+      <path class="arr" d="M562 100 H620"/>
+      <rect class="box" x="622" y="40" width="320" height="100" rx="8"/><text class="lbl-b mid" x="782" y="66">View (Unity)</text>
+      <text class="lbl-s mid" x="782" y="90">Bootstrap · BulletFx · ChatterOverlay</text>
+      <text class="lbl-s mid" x="782" y="112">reads sim state, draws it — never decides</text>
+      <rect class="box2" x="622" y="160" width="320" height="60" rx="8"/><text class="lbl-b mid" x="782" y="184">Batch (headless)</text><text class="lbl-s mid" x="782" y="204">BatchRunner · MatchRunner · AnalyticLineOfSight · GridPathfinder</text>
+      <path class="arr" d="M487 132 V200 H620"/>
+    </svg>
+    </div>
+    <figcaption data-dwg="DH-02">because the sim has no visual dependency, the same match runs with a camera or thousands of times headless</figcaption>
+  </figure>
+
+  <!-- EDIT: the utility brain -->
+  <h2>The Utility brain</h2>
+  <p>Each tick, the brain scores the available actions against the world state, weighted by the agent's personality, and returns the highest. Deterministic — no RNG. Two properties were <b>measured, not assumed</b>:</p>
+  <div class="cols">
+    <div>
+      <h4>1 · Leverage</h4>
+      <p>Every trait must decide something. If situation modifiers swamp the weights, all personalities play alike and Q1 is dead on arrival. So each trait <b>owns a primary action</b> (see the cover).</p>
+    </div>
+    <div>
+      <h4>2 · Survival</h4>
+      <p>Agents must be able to lose a fight without dying in it. With perfect aim and long range, any stand-up trade is mutual destruction — so engagement is priced against the <b>local force ratio</b>: outnumbered agents disengage, supported ones press. A firefight becomes a decision, not a coin-flip.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: evolution -->
+  <h2>Evolving the personalities</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">search space  = 5 floats in [0,1]
+method        = generational GA + elitism (C#, not Python)
+runs on       = the existing BatchRunner (headless)
+FITNESS       = EGGS DELIVERED, not win rate
+why not wins  = optimising "win" finds degenerate
+                equilibria (camp the choke, run the
+                clock, win 0-0). Score the objective →
+                evolved agents keep doing the
+                interesting thing.</div>
+    <div>
+      <p>The search space is small enough that a plain GA finds good vectors in minutes — no neural nets, no GPU, no Python. A deliberate deviation from the GDD (which specified Python): five floats don't justify a serialisation bridge, a second toolchain, and a separate determinism story.</p>
+      <p class="margin">personality is a plain weight vector so any learning method can drop in behind the same boundary.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: determinism rules -->
+  <h2>The three non-negotiables (D-1)</h2>
+  <ul class="dash">
+    <li><b>Determinism</b>: same seed → byte-identical match. Without it, evolution fitness is noise and bugs are irreproducible.</li>
+    <li><b>Sim/render separation</b>: the simulation never touches rendering. Without it, headless batch mode is impossible.</li>
+    <li><b>Event log</b>: every statistic is derived from the append-only JSONL log, never stored. Without it, every stat needs its own plumbing.</li>
+  </ul>
+  <p class="small">All three paid off directly: the batch runner exists <i>because</i> the sim had no visual dependencies and its two Unity couplings were already behind interfaces.</p>
+
+  <!-- EDIT: arena -->
+  <h2>The arena</h2>
+  <ul class="dash">
+    <li><b>Always symmetric</b> (D-3): an asymmetric map makes every AI-vs-AI result ambiguous — you can't tell skill from map advantage. Survives even procedural generation.</li>
+    <li>Dynamic arena generation (milestone 13); raptors kept out of cover blocks; arena thinned for readability.</li>
+    <li>Raptors: chase, leash, screech, are killable, and do pack encirclement.</li>
+  </ul>
+
+</main>
+</body>
+</html>

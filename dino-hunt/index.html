@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dino-hunt — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="dino-hunt" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>Dino Hunt</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/dino-hunt · Unity / C# · 13 commits · Jul–Oct 2026 · WebGL on Pages (and itch.io)</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">An AI ecosystem sandbox, not a game you play. Two teams of autonomous agents raid a raptor nest to steal eggs
+    and carry them home, while raptors — hostile to both teams — hunt whoever is most isolated. <span class="hl">A human watches; a human never plays.</span></p>
+  <p>The slogan, straight from the design doc: <b>the game is the environment, the AI is the product</b>. It exists to answer research questions about agent behaviour.</p>
+
+  <!-- EDIT: the loop -->
+  <h2>The three-way standoff</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 250" role="img" aria-label="team A and team B raid the nest, raptors hunt the isolated">
+      <circle class="circ" cx="450" cy="130" r="55"/><text class="lbl-b mid" x="450" y="126">nest</text><text class="lbl-s mid" x="450" y="148">eggs + raptors</text>
+      <rect class="box" x="60" y="100" width="130" height="60" rx="6"/><text class="lbl-b mid" x="125" y="126">Team A</text><text class="lbl-s mid" x="125" y="146">grab · carry · deliver</text>
+      <rect class="box" x="710" y="100" width="130" height="60" rx="6"/><text class="lbl-b mid" x="775" y="126">Team B</text><text class="lbl-s mid" x="775" y="146">grab · carry · deliver</text>
+      <path class="arr" d="M192 130 H392"/><path class="arr" d="M708 130 H508"/>
+      <path class="arr red" d="M420 180 Q300 230 160 162"/><path class="arr red" d="M480 180 Q600 230 740 162"/>
+      <text class="lbl-r mid" x="300" y="225">raptors hunt the isolated →</text>
+      <text class="lbl-s mid" x="450" y="210">symmetric arena · AI vs AI vs environment</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="DH-01">a neutral hostile population (the raptors) changes the two-team equilibrium</figcaption>
+  </figure>
+
+  <!-- EDIT: the research questions -->
+  <h2>The four research questions</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Q1 (primary)</b>: do weight-space personalities produce measurably distinct behaviour? <span class="ink-green">Preliminary: yes — after a fix.</span></li>
+      <li><b>Q3</b>: how does a neutral hostile population change competitive equilibria?</li>
+      <li><b>Q4</b>: does objective-gated sustain self-balance?</li>
+      <li><b>Q2</b>: constrained communication under partial observability.</li>
+    </ul>
+    <div class="note">
+      <h4>order is a dependency chain, not a preference</h4>
+      Q2 (varying radio vocabulary) would contaminate Q1's personality clustering, and Q1 is load-bearing for Q3/Q4 — "strategy distributions" over identical clones are meaningless. So: Q1 → Q3 → Q4 → Q2.
+    </div>
+  </div>
+
+  <!-- EDIT: observations -->
+  <h2>The most important finding (about the sim, not the agents)</h2>
+  <div class="cols wide-left">
+    <div>
+      <p>Before headless batch mode existed, the sim was "verified" by watching it. The first real batch run exposed the truth:</p>
+      <div class="card wrap">=== 5 matches, 300s timer ===
+eggs delivered  0.00 per match
+end reasons     timeout 5</div>
+      <p>Personality had <b>no leverage</b> (a cautious and a reckless agent played identically) and the objective was broken (nobody ever delivered an egg). Both were fixed by giving each trait a primary action it owns outright, and pricing combat against the local force ratio.</p>
+    </div>
+    <div>
+      <div class="margin">you can't see a statistical bug by watching five matches — you measure it.</div>
+      <div class="note green">
+        <h4>what each trait owns</h4>
+        <span class="small">aggression → Engage/Hunt · greed → Grab/Deliver/Intercept · caution → Retreat/Flee · teamplay → Regroup/Escort · patience → Hold</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Engine</th><td>Unity, C#; strict sim/render separation; two Unity couplings behind interfaces (line-of-sight, pathfinding)</td></tr>
+    <tr><th>AI</th><td>deterministic Utility brain scoring actions by a 5-float personality vector; a C# generational GA (elitism) to evolve the weights</td></tr>
+    <tr><th>Determinism</th><td>fixed timestep, seeded RNG → same seed = byte-identical match; stats derived from an append-only JSONL event log</td></tr>
+    <tr><th>Batch</th><td>headless BatchRunner: thousands of matches with no rendering</td></tr>
+    <tr><th>Deploy</th><td>WebGL build to GitHub Pages via a game-ci Actions workflow (Unity Personal license in CI); also itch.io</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

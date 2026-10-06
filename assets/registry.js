@@ -144,5 +144,13 @@ window.NOTEBOOK = {
       stack: ["React", "Supabase", "Postgres"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // dino-hunt
+      slug: "dino-hunt", name: "Dino Hunt", shelf: "games", status: "deployed",
+      tagline: "An AI ecosystem sandbox: two agent teams raid a raptor nest. The game is the environment; the AI is the product.",
+      url: "https://github.com/gv1shnu/dino-hunt", live: "https://www.vishnugandarapu.in/dino-hunt/",
+      start: "2026-07-27", end: "2026-10-04", commits: 13,
+      stack: ["Unity", "C#", "Utility AI", "GA"],
+      pages: [ { file: "index", title: "Cover & research" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
