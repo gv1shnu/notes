@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rapid-fire — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="rapid-fire" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">11 Sep — the whole thing in a day</li>
+    <li class="big"><span class="when">11 Sep</span><span class="what">build spec → M1 scaffold + sealed Postgres foundation → practice preview → round metrics → configurable releases → tests + pre-push gate → auth/legal → per-student-order draw → join-and-play</span><br>~25 commits: the game, the sealing, the instructor flow, and the test gate all land.</li>
+    <li class="phase">12–13 Sep — polish &amp; the Jerrys</li>
+    <li><span class="when">12 Sep</span><span class="what">final-page leaderboard, reveal gating, production build</span></li>
+    <li class="big"><span class="when">13 Sep</span><span class="what">single-config self-paced across 9 rounds · good/evil Jerry tempters + toggle · post-close instructor leaderboard · clock-skew retry</span></li>
+    <li class="phase">14 Sep — hosting &amp; CI</li>
+    <li><span class="when">14 Sep</span><span class="what">auto-apply Supabase migrations from main; deploy via --db-url; instructor past-sessions; footer credit</span></li>
+    <li class="phase">28 Sep – 4 Oct — open source &amp; Pages</li>
+    <li class="big"><span class="when">4 Oct</span><span class="what">host on GitHub Pages under /rapid-fire/, open sign-in to any Google account (PR #8); instructor question review/edit before sharing (PR #9)</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>Immutable server deadlines per question</td><td>a refresh or reconnect can't buy time</td></tr>
+    <tr><td>Sealed answers/scores until close</td><td>early finishers can't leak answers</td></tr>
+    <tr><td>Opaque option tokens + per-student order</td><td>answers aren't shareable by position/letter</td></tr>
+    <tr><td>RPC-only access, RLS, revoked tables</td><td>the browser can't read the answer bank or other students' data</td></tr>
+    <tr><td>Idempotent, immutable submissions</td><td>retries and double-clicks can't change or double-score</td></tr>
+    <tr><td>Ordered migration stack</td><td>reproducible backend; the history is auditable; 008 is a protocol gate</td></tr>
+    <tr><td>Instructor allowlist, students rosterless</td><td>no per-student provisioning; instructor power is server-checked</td></tr>
+    <tr><td>Public 174-question seed ≠ production bank</td><td>the demo fixture must never be graded; keep the real bank private</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>CI concurrency suite</b>: 120 concurrent starts, duplicate submissions, instructor closure racing submissions — on a disposable Postgres 17.</li>
+    <li><b><code>verify</code> gate</b>: format + lint + tests + typecheck + production build, enforced by branch protection (a local hook alone can't).</li>
+    <li><b>Sealing</b>: can any client read a correct answer before close? (No.)</li>
+    <li><b>Timing integrity</b>: does a refresh / disconnect / clock skew ever extend a deadline? (No.)</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Google Spaces distribution of the join URL (currently copied manually).</li>
+    <li>Hosted-capacity validation (CI proves transaction behaviour, not Supabase at campus scale).</li>
+    <li>Richer instructor analytics beyond the per-round reports.</li>
+    <li>Accessibility pass on the timed question card and tempter avatars.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Schema as migrations</b><br>sessions → members → releases → frozen questions → runs → attempts, with RLS and revoked direct table access from the first migration.</li>
+    <li><b>RPCs only</b><br>Instructor: open/configure/go_live/end/report. Student: join/state/start/next/submit/result. Each locks the session and enforces membership + sealing.</li>
+    <li><b>Server clocks</b><br>Stamp an immutable deadline per question at start; compute expiry server-side; never trust the client's time.</li>
+    <li><b>Sealing</b><br>Keep answers/keys in a table the browser can't read; reveal only after the release closes.</li>
+    <li><b>Client controller</b><br>Serialize requests; identical-retry uncertain submits; back off; validate; anchor time to server + <code>performance.now()</code>; handle clock-skew rejections.</li>
+    <li><b>Auth + roles</b><br>Google OAuth; a <code>before_user_created</code> hook; an instructor email allowlist checked server-side.</li>
+    <li><b>Tests + gate</b><br>Real migrations in PGlite; a Postgres concurrency suite; a <code>verify</code> CI check required before deploy.</li>
+    <li><b>Ship</b><br>Static Vite build under a base path on Pages; auto-apply migrations from main; add the tempters last.</li>
+  </ol>
+
+</main>
+</body>
+</html>

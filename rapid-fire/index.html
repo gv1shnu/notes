@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rapid-fire — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="rapid-fire" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>rapid-fire: The Lost Schema</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/rapid-fire · React 19 + Supabase/Postgres · 45 commits · Sep–Oct 2026 · vishnugandarapu.in/rapid-fire</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">A timed SQL quiz for the DBMS lab where the <b>timer and the score cannot be cheated</b>: no restarting the clock with a refresh, no peeking at answers before the round closes, no replaying a finished run.</p>
+  <p>Instructors approve a question count and seconds-per-question, release one shared set, and review every student's results after closure. Students join with a Google account and get one resumable attempt. A playful touch: <span class="hl">good/evil Jerry tempters</span> at the halfway mark.</p>
+
+  <!-- EDIT: server-authoritative clock -->
+  <h2>The thing that makes it fair</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 920 220" role="img" aria-label="each question has an immutable server deadline a refresh cannot restart">
+      <rect class="box" x="20" y="80" width="170" height="60" rx="6"/><text class="lbl mid" x="105" y="106">start_round (server)</text><text class="lbl-s mid" x="105" y="126">stamps each deadline</text>
+      <path class="arr" d="M192 110 H250"/>
+      <rect class="fillbox" x="252" y="60" width="240" height="110" rx="6"/>
+      <text class="lbl mid" x="372" y="86">immutable per-question clock</text>
+      <text class="lbl-s mid" x="372" y="110">deadline = server timestamp</text>
+      <text class="lbl-s mid" x="372" y="130">refresh → re-reads same deadline</text>
+      <text class="lbl-s mid" x="372" y="150">disconnect → questions still expire</text>
+      <path class="arr" d="M494 115 H552"/>
+      <rect class="box" x="554" y="80" width="160" height="60" rx="6"/><text class="lbl mid" x="634" y="106">submit_answer</text><text class="lbl-s mid" x="634" y="126">immutable once accepted</text>
+      <path class="arr-d red" d="M372 172 V200 H105 V142"/><text class="lbl-r" x="140" y="196">a refresh never restarts the timer</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="RF-01">visual time is anchored to server timestamps + performance.now(), never the wall clock</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What shaped it</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Every clock is the server's.</b> A refresh re-reads the same deadline; disconnecting doesn't pause anything; reconnecting catches up, it doesn't grant extra time.</li>
+      <li><b>Everyone gets the same frozen set</b>, but with per-student question order and <b>opaque option tokens</b>, so answers can't be shared by position.</li>
+      <li><b>Nothing is revealed early.</b> Correct answers, explanations and scores stay sealed until the release ends, even for early finishers.</li>
+      <li><b>Submissions are immutable + idempotent.</b> A duplicate can't change an accepted answer or double-score; the client safely retries uncertain submissions.</li>
+      <li><b>Clock skew is real.</b> RPCs rejected for a future-issued token are retried (migration + commit for it).</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>roles by sign-in</h4>
+        Any verified Google account can play. Instructor access comes only from an email allowlist (<code>public.instructor_emails</code>), checked server-side; the instructor entry point is hidden from students.
+      </div>
+      <div class="margin">sibling of dilli-khoj: same server-authoritative-trust philosophy, different game.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Frontend</th><td>React 19, strict TS, Vite static <code>dist/</code>; CSP as meta tags</td></tr>
+    <tr><th>Backend</th><td>PostgreSQL 17 / Supabase; server-authoritative RPCs; RLS + revoked table access + instructor allowlist</td></tr>
+    <tr><th>Auth</th><td>Supabase Auth, Google <code>openid email profile</code>, a <code>before_user_created</code> hook</td></tr>
+    <tr><th>Tests</th><td>Vitest + RTL; real migrations in PGlite; a Postgres 17 concurrency suite (120 concurrent starts, duplicate submits, closure races)</td></tr>
+    <tr><th>Deploy</th><td>GitHub Pages under <code>/rapid-fire/</code> after the <code>verify</code> gate passes; migrations auto-applied from <code>main</code></td></tr>
+    <tr><th>Live</th><td><a href="http://www.vishnugandarapu.in/rapid-fire/">vishnugandarapu.in/rapid-fire</a> · <a href="http://www.vishnugandarapu.in/rapid-fire/?preview=question">practice question</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

@@ -136,5 +136,13 @@ window.NOTEBOOK = {
       stack: ["React", "Three.js", "PGlite", "Supabase"],
       pages: [ { file: "index", title: "Cover & idea" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // rapid-fire
+      slug: "rapid-fire", name: "rapid-fire · The Lost Schema", shelf: "data", status: "deployed",
+      tagline: "A timed SQL quiz with uncheatable server clocks, sealed answers, and good/evil Jerry tempters.",
+      url: "https://github.com/gv1shnu/rapid-fire", live: "http://www.vishnugandarapu.in/rapid-fire/",
+      start: "2026-09-11", end: "2026-10-04", commits: 45,
+      stack: ["React", "Supabase", "Postgres"],
+      pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

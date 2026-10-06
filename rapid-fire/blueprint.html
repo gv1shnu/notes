@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rapid-fire — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="rapid-fire" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">RPCs over sealed tables; the browser never touches the answer bank</p>
+
+  <!-- EDIT: data model -->
+  <h2>Data model &amp; RPC surface</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 250" role="img" aria-label="sessions to releases to frozen questions to runs to attempts, with instructor and student RPCs">
+      <rect class="box" x="30" y="30" width="180" height="40" rx="6"/><text class="lbl mid" x="120" y="55">sessions + members</text>
+      <path class="arr" d="M120 72 V100"/>
+      <rect class="box" x="30" y="102" width="180" height="40" rx="6"/><text class="lbl mid" x="120" y="127">round_releases</text>
+      <path class="arr" d="M120 144 V172"/>
+      <rect class="fillbox red" x="30" y="174" width="180" height="46" rx="6"/><text class="lbl mid" x="120" y="197">release_questions</text><text class="lbl-s mid" x="120" y="213">frozen content + keys (sealed)</text>
+      <path class="arr" d="M212 120 H260"/>
+      <rect class="box" x="262" y="100" width="150" height="44" rx="6"/><text class="lbl mid" x="337" y="126">round_runs</text>
+      <path class="arr" d="M337 146 V172"/>
+      <rect class="box" x="262" y="174" width="150" height="46" rx="6"/><text class="lbl mid" x="337" y="197">attempts</text><text class="lbl-s mid" x="337" y="213">opaque tokens · immutable clocks</text>
+      <rect class="box2" x="470" y="40" width="220" height="90" rx="6"/><text class="lbl-b mid" x="580" y="64">instructor RPCs</text>
+      <text class="lbl-s mid" x="580" y="86">open_session · configure_round</text><text class="lbl-s mid" x="580" y="104">go_live · end_round · end_session</text><text class="lbl-s mid" x="580" y="122">instructor_state · *_report</text>
+      <rect class="box2" x="470" y="150" width="220" height="90" rx="6"/><text class="lbl-b mid" x="580" y="174">student RPCs</text>
+      <text class="lbl-s mid" x="580" y="196">join · student_state · start_round</text><text class="lbl-s mid" x="580" y="214">next_question · submit_answer</text><text class="lbl-s mid" x="580" y="232">submit_round · my_result</text>
+      <rect class="box" x="730" y="95" width="200" height="60" rx="6"/><text class="lbl mid" x="830" y="120">React browser</text><text class="lbl-s mid" x="830" y="140">no direct table access</text>
+      <path class="arr-d" d="M730 125 H692"/>
+      <text class="lbl-r" x="470" y="20">every call locks the session before mutating a run</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="RF-02">RLS revokes table access; all reads/writes go through RPCs that enforce membership + sealing</figcaption>
+  </figure>
+
+  <!-- EDIT: release lifecycle -->
+  <h2>A release, start to finish</h2>
+  <ol class="steps">
+    <li><b>Configure</b><br>Instructor picks a section, question count and 1–120 s/question; UI shows nominal time = count × seconds, and the join URL.</li>
+    <li><b>Go live</b><br>The count × seconds duration is also the joining window. Students admitted inside it keep their timers afterward.</li>
+    <li><b>Play</b><br>Each accepted answer immediately serves the next question; unanswered ones advance from their original deadlines, even offline.</li>
+    <li><b>Close</b><br>Auto: admission closed + all started attempts finished. Or the instructor ends early (accepted answers kept, the rest become timeouts). Hard cap: 3 h.</li>
+    <li><b>Reveal</b><br>Only now do answers, explanations and scores unseal; students review saved answers; instructor sees the leaderboard + reports.</li>
+  </ol>
+
+  <!-- EDIT: scoring/metrics -->
+  <h2>Scoring &amp; the metrics it records</h2>
+  <div class="cols">
+    <div>
+      <ul class="dash">
+        <li>Correct = points; wrong & timeout = 0; score can't go negative.</li>
+        <li>Per student & round: correct/wrong/timeout counts, mean answering time, accuracy, and a strict <b>half-time</b> count.</li>
+        <li>Leaderboard materialises on submit; final reveal is gated until close.</li>
+        <li>Self-paced across all 9 rounds (migration 012); fixed A–E sections (013).</li>
+      </ul>
+    </div>
+    <div>
+      <div class="note green">
+        <h4>the Jerrys</h4>
+        At the halfway mark a "good Jerry" / "evil Jerry" tempter avatar appears on the question card — an instructor on/off toggle (migrations 014–015). Pure flavour, but it's what the repo is named for.
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: migration-driven -->
+  <h2>Built as an ordered migration stack</h2>
+  <p>The whole backend is a sequence of numbered SQL migrations, applied in order — the feature history <i>is</i> the migration list:</p>
+  <div class="card wrap">0001 foundation            0009 session_leaderboard
+0002 round_metrics         0010 final_reveal
+0003 configurable_releases 0011 leaderboard_on_submit
+0004 instructor_allowlist  0012 self_paced
+0005 shuffle_and_sections  0013 fixed_sections
+0006 rosterless_join       0014 tempters
+0007 round_grace           0015 tempter_toggle
+0008 production_protocol    …   0017 instructor_sessions …</div>
+  <p class="small">Migration 008 is a protocol change: apply it between sittings and deploy the matching frontend with it. The old roster table is retained as legacy data, not an access control.</p>
+
+  <!-- EDIT: client robustness -->
+  <h2>Client robustness</h2>
+  <ul class="dash">
+    <li>Serializes requests; retains uncertain submissions for <b>identical</b> retries; backs off failures.</li>
+    <li>Validates every response; ignores responses after unmount/sign-out.</li>
+    <li>Anchors visual time to server timestamps + <code>performance.now()</code>.</li>
+    <li>Retries RPCs rejected for a future-issued token (clock skew).</li>
+  </ul>
+
+</main>
+</body>
+</html>
