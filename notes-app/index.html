@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notes-app — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="notes-app" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>notes-app: CRUD, done end to end</h1>
+    <span class="stamp red">assignment</span>
+  </div>
+  <p class="sub">gv1shnu/notes-app · Next.js 16 + React 19 + TypeScript + MongoDB · 3 commits · 8 Jan 2026 · runs locally</p>
+
+  <!-- EDIT: problem -->
+  <h2>The brief</h2>
+  <p class="lead">Build a full-stack notes app where you can create, read, update and delete notes, store them in MongoDB, and make it work on a phone as well as a desktop.</p>
+  <p>It's a small app on purpose. What I cared about was getting the whole loop working in one codebase: <span class="hl">React pages → Next.js API routes → MongoDB</span>, with TypeScript types shared across all of it. I built it in one morning, and search came 25 minutes after the first commit.</p>
+
+  <!-- EDIT: hero -->
+  <h2>One repo, both halves</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 260" role="img" aria-label="browser pages call API routes which use a cached Mongo client">
+      <text class="lbl-s" x="20" y="28">browser ("use client" pages)</text>
+      <rect class="box" x="20" y="40" width="200" height="44" rx="5"/><text class="lbl-s mid" x="120" y="67">/notes: grid + search</text>
+      <rect class="box" x="20" y="100" width="200" height="44" rx="5"/><text class="lbl-s mid" x="120" y="127">/notes/create</text>
+      <rect class="box" x="20" y="160" width="200" height="44" rx="5"/><text class="lbl-s mid" x="120" y="187">/notes/edit/[id]</text>
+      <text class="lbl-s" x="20" y="235">/ → redirects to /notes</text>
+      <path class="arr" d="M222 62 H380"/><text class="lbl-s mid" x="300" y="54">GET · DELETE</text>
+      <path class="arr" d="M222 122 H380"/><text class="lbl-s mid" x="300" y="114">POST</text>
+      <path class="arr" d="M222 182 H380"/><text class="lbl-s mid" x="300" y="174">GET · PUT</text>
+      <rect class="fillbox" x="382" y="40" width="230" height="164" rx="6"/>
+      <text class="lbl-b mid" x="497" y="70">API routes</text>
+      <text class="lbl-s mid" x="497" y="100">/api/notes</text>
+      <text class="lbl-s mid" x="497" y="120">GET all · POST</text>
+      <text class="lbl-s mid" x="497" y="150">/api/notes/[id]</text>
+      <text class="lbl-s mid" x="497" y="170">GET · PUT · DELETE</text>
+      <path class="arr" d="M614 122 H700"/><text class="lbl-s mid" x="657" y="112">lib/mongodb</text>
+      <rect class="box" x="702" y="70" width="230" height="104" rx="6"/>
+      <text class="lbl-b mid" x="817" y="100">MongoDB</text>
+      <text class="lbl-s mid" x="817" y="124">db notes-db</text>
+      <text class="lbl-s mid" x="817" y="144">collection notes</text>
+      <text class="lbl-r mid" x="497" y="235">5 endpoints, one shared Note type</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="NA-01">pages and API live in the same Next.js app router tree, so there's nothing to deploy separately</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Validation happens twice, and not quite the same way.</b> The forms reject blank text with <code>.trim()</code>; the API only checks that the field is truthy, so a title of spaces sent straight to the API still gets through.</li>
+      <li><b>Search runs in the client.</b> It filters the notes already loaded by title or content, case-insensitively. That's instant for a personal notes list, but it won't scale once there's pagination.</li>
+      <li><b>The list is sorted on the server</b> by <code>createdAt</code>, newest first.</li>
+      <li><b>Bad ids are caught early:</b> every <code>[id]</code> route checks <code>ObjectId.isValid</code> and returns 400 before it touches the database.</li>
+    </ul>
+    <div>
+      <div class="note blue">
+        <h4>README as a checklist</h4>
+        The README's "Future Additions" list ticks off search and leaves auth, tags, dark mode, rich text, export and collaborative editing open.
+      </div>
+      <div class="margin">The second commit cut the README down: troubleshooting, a styling section and a license line all went.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Stack</th><td>Next.js 16.1 (app router) · React 19.2 · TypeScript 5 · Tailwind CSS 4 · mongodb driver 7</td></tr>
+    <tr><th>Data</th><td><code>{ _id, title, content, createdAt, updatedAt }</code> in <code>notes-db.notes</code></td></tr>
+    <tr><th>API</th><td><code>GET/POST /api/notes</code> · <code>GET/PUT/DELETE /api/notes/[id]</code></td></tr>
+    <tr><th>UI</th><td>card grid: 1 / 2 / 3 columns (mobile / tablet / desktop), line-clamped previews, confirm before delete</td></tr>
+    <tr><th>Config</th><td><code>MONGODB_URI</code> in <code>.env.local</code> (local or Atlas)</td></tr>
+    <tr><th>Size</th><td>about 690 lines of TSX across 5 pages, plus 2 route files and 2 lib files</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

@@ -208,5 +208,13 @@ window.NOTEBOOK = {
       stack: ["HTML/CSS/JS", "Canvas", "GitHub Pages"],
       pages: [ { file: "index", title: "Cover & site map" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // notes-app
+      slug: "notes-app", name: "notes-app", shelf: "assignments", status: "assignment",
+      tagline: "A full-stack notes CRUD in one Next.js repo: React pages, API routes, MongoDB, and client-side search.",
+      url: "https://github.com/gv1shnu/notes-app", live: null,
+      start: "2026-01-08", end: "2026-01-08", commits: 3,
+      stack: ["Next.js", "TypeScript", "MongoDB", "Tailwind"],
+      pages: [ { file: "index", title: "Cover & brief" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

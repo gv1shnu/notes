@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notes-app — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="notes-app" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">the routes, the connection cache, and one round trip</p>
+
+  <!-- EDIT: file map -->
+  <h2>File map</h2>
+  <div class="cols">
+    <div class="card wrap">app/
+  page.tsx               → push('/notes')
+  layout.tsx, globals.css
+  notes/
+    page.tsx             list + search + delete
+    create/page.tsx      form → POST
+    edit/[id]/page.tsx   load → form → PUT
+  api/notes/
+    route.ts             GET (sorted) · POST
+    [id]/route.ts        GET · PUT · DELETE
+lib/
+  mongodb.ts             connectToDatabase()
+  types.ts               interface Note</div>
+    <div>
+      <p>The app router's folders <i>are</i> the URL map. A <code>page.tsx</code> is something you see; a <code>route.ts</code> is something you call. Dynamic segments like <code>[id]</code> come in as <code>params</code>, which Next 16 hands over as a Promise, so every handler starts with <code>const { id } = await params</code>.</p>
+      <p class="margin">every page is a client component that fetches in a <code>useEffect</code>. There's no server rendering of the data at all.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: connection cache -->
+  <h2>Connect once, reuse it after that</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 220" role="img" aria-label="connectToDatabase returns cached client if present else connects and caches">
+      <rect class="box" x="20" y="80" width="170" height="56" rx="5"/><text class="lbl-s mid" x="105" y="104">any route handler</text><text class="lbl-s mid" x="105" y="122">connectToDatabase()</text>
+      <path class="arr" d="M192 108 H270"/>
+      <path class="box" d="M350 60 L430 108 L350 156 L270 108 Z"/><text class="lbl-s mid" x="350" y="104">cachedClient</text><text class="lbl-s mid" x="350" y="120">&amp;&amp; cachedDb?</text>
+      <path class="arr" d="M432 108 H560"/><text class="lbl-s mid" x="496" y="98">yes</text>
+      <rect class="fillbox" x="562" y="80" width="150" height="56" rx="5"/><text class="lbl-s mid" x="637" y="113">return cached</text>
+      <path class="arr" d="M350 158 V190 H560"/><text class="lbl-s" x="360" y="182">no</text>
+      <rect class="box" x="562" y="165" width="300" height="44" rx="5"/><text class="lbl-s mid" x="712" y="192">new MongoClient → connect → db('notes-db') → cache</text>
+      <text class="lbl-r" x="20" y="40">missing MONGODB_URI → throws as soon as the module is imported</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="NA-02">two module-level variables hold the connection, so a warm server reuses one client across requests</figcaption>
+  </figure>
+
+  <!-- EDIT: round trip -->
+  <h2>An edit, end to end</h2>
+  <ol class="steps">
+    <li><b>Load</b><br><code>/notes/edit/[id]</code> reads the id with <code>useParams</code> and calls <code>GET /api/notes/[id]</code>; the response fills the title and content fields.</li>
+    <li><b>Validate on the client</b><br>On submit, a blank title or content after <code>.trim()</code> shows an inline error and stops there.</li>
+    <li><b>PUT</b><br>The body <code>{title, content}</code> goes as JSON. The route checks <code>ObjectId.isValid</code> (400), then that both fields are present (400).</li>
+    <li><b>Write</b><br><code>updateOne({_id}, {$set: {title, content, updatedAt: new Date()}})</code>; <code>matchedCount === 0</code> → 404.</li>
+    <li><b>Return</b><br>200 <code>{message}</code> → the client goes back to <code>/notes</code>, which fetches the list again.</li>
+  </ol>
+
+  <!-- EDIT: status codes -->
+  <h2>Status codes per endpoint</h2>
+  <div class="table-wrap"><table>
+    <tr><th>endpoint</th><th>success</th><th>client errors</th><th>server</th></tr>
+    <tr><td><code>GET /api/notes</code></td><td>200 array</td><td>–</td><td>500</td></tr>
+    <tr><td><code>POST /api/notes</code></td><td>201 <code>{_id,title,content}</code></td><td>400 missing field</td><td>500</td></tr>
+    <tr><td><code>GET /api/notes/[id]</code></td><td>200 note</td><td>400 bad id · 404</td><td>500</td></tr>
+    <tr><td><code>PUT /api/notes/[id]</code></td><td>200 message</td><td>400 bad id / field · 404</td><td>500</td></tr>
+    <tr><td><code>DELETE /api/notes/[id]</code></td><td>200 message</td><td>400 bad id · 404</td><td>500</td></tr>
+  </table></div>
+
+</main>
+</body>
+</html>

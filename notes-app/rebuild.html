@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notes-app — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="notes-app" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">8 Jan 2026 · 10:13</span><span class="what">c42d5dd · initial commit</span><br>The whole app in one go: 23 files, about 1,000 lines. All five CRUD endpoints, three pages and the Mongo helper.</li>
+    <li class="big"><span class="when">10:38</span><span class="what">fcc0222 · added search bar</span><br>A client-side filter on the list page (+23 lines). The README was trimmed in the same commit.</li>
+    <li><span class="when">10:47</span><span class="what">54585ed · added screenshots</span><br>Mobile and desktop captures in <code>public/screenshots/</code>, linked from the README.</li>
+  </ol>
+  <p class="margin">34 minutes from first commit to last. It was written to a brief, then left alone.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Next.js API routes instead of a separate Express server</td><td>one repo and one <code>npm run dev</code>; front and back share <code>lib/types.ts</code></td><td>the backend is tied to Next's runtime</td></tr>
+    <tr><td>MongoDB with the plain driver, no ORM</td><td>a note is a single document; no schema migrations</td><td>no schema enforcement. The <code>Note</code> type is just a promise in TypeScript</td></tr>
+    <tr><td>Module-level cached client</td><td>don't open a new connection per request</td><td>simple caching that doesn't handle hot-reload in dev</td></tr>
+    <tr><td>Search in the client</td><td>instant, zero extra endpoints, done in 25 minutes</td><td>only searches what's already loaded</td></tr>
+    <tr><td>Client components that fetch in <code>useEffect</code></td><td>the familiar React pattern; loading/error states are easy</td><td>a loading flash on every page; no server-rendered data</td></tr>
+    <tr><td>Tailwind utility classes</td><td>responsive grid and cards without writing CSS files</td><td>long className strings</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Brief covered:</b> create, list, edit and delete all work, with persistence and a responsive layout. Search, an item on the README's own future list, got ticked off too.</li>
+    <li><b>Error surface:</b> every route catches errors and returns a JSON <code>{error}</code> with a real status code (400 / 404 / 500), never a stack trace.</li>
+    <li><b>Gaps an honest review finds:</b> server-side validation doesn't trim; unused <code>ObjectId</code> import in <code>route.ts</code>; no tests; no auth, so anyone with the URL owns every note.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li class="done">Search by title and content</li>
+    <li>Trim and length-limit fields on the server, not just in the form</li>
+    <li>User authentication, with notes scoped to their owner</li>
+    <li>Note categories / tags</li>
+    <li>Dark mode</li>
+    <li>Rich text editor</li>
+    <li>Export notes</li>
+    <li>Collaborative editing</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Scaffold</b><br><code>npx create-next-app</code> with TypeScript, Tailwind and the app router. Then <code>npm i mongodb</code>.</li>
+    <li><b>Connection helper</b><br><code>lib/mongodb.ts</code>: read <code>MONGODB_URI</code> (throw if it's missing), connect once, and cache the client and db in module variables.</li>
+    <li><b>Type</b><br><code>lib/types.ts</code>: <code>interface Note { _id; title; content; createdAt; updatedAt }</code>.</li>
+    <li><b>Collection routes</b><br><code>app/api/notes/route.ts</code>: GET sorts by <code>createdAt: -1</code>; POST validates the fields, inserts with both timestamps, and returns 201.</li>
+    <li><b>Item routes</b><br><code>app/api/notes/[id]/route.ts</code>: await <code>params</code>, check <code>ObjectId.isValid</code>, then findOne / updateOne(<code>$set</code> + <code>updatedAt</code>) / deleteOne, and return 404 when nothing matched.</li>
+    <li><b>List page</b><br>Fetch on mount, render a 1/2/3-column card grid, filter it with a search box, and confirm before a DELETE.</li>
+    <li><b>Forms</b><br>The create and edit pages share one shape: trimmed validation, a submitting flag, then <code>router.push('/notes')</code>.</li>
+    <li><b>Root</b><br>Redirect <code>/</code> to <code>/notes</code>. Put <code>MONGODB_URI</code> in <code>.env.local</code> and run <code>npm run dev</code>.</li>
+  </ol>
+
+</main>
+</body>
+</html>
