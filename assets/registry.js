@@ -216,5 +216,13 @@ window.NOTEBOOK = {
       stack: ["Next.js", "TypeScript", "MongoDB", "Tailwind"],
       pages: [ { file: "index", title: "Cover & brief" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // inventory-allocation-system
+      slug: "inventory-allocation-system", name: "inventory-allocation-system", shelf: "assignments", status: "assignment",
+      tagline: "A one-endpoint order API with strict route/controller/service/repository layering and a transaction that refuses to oversell.",
+      url: "https://github.com/gv1shnu/inventory-allocation-system", live: null,
+      start: "2026-01-25", end: "2026-01-25", commits: 5,
+      stack: ["Node", "Express", "Sequelize", "SQLite", "React"],
+      pages: [ { file: "index", title: "Cover & brief" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

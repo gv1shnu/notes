@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inventory-allocation-system — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="inventory-allocation-system" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">25 Jan 2026: bottom-up, one layer per commit</li>
+    <li class="big"><span class="when">08:59</span><span class="what">050b6f0 · Initial backend commit</span><br>Express app, the Sequelize/SQLite connection, the <code>Product</code> and <code>Order</code> models, and the brief itself as <code>requirements.pdf</code>.</li>
+    <li><span class="when">10:54</span><span class="what">8d68f1b · Implement database repositories</span><br><code>findById</code>, <code>updateStock</code>, <code>create</code>, each taking a transaction argument from the start.</li>
+    <li class="big"><span class="when">11:18</span><span class="what">69eba75 · Implement single order api with transc stock handling</span><br>Route, controller and the transactional service, all 82 lines in one commit.</li>
+    <li><span class="when">11:56</span><span class="what">7c29c43 · Add frontend react app with cors</span><br>A Create React App form; the backend moved from :3000 to :4000 and got <code>cors()</code>.</li>
+    <li><span class="when">12:27</span><span class="what">4509919 · Update README.md</span><br>Folder structure, API flow and concurrency handling, the three sections the brief asked for.</li>
+  </ol>
+  <p class="margin">The brief said "commit history mandatory", so the history goes one layer per commit on purpose.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Everything in one <code>POST /order</code></td><td>the brief: more than one API is an automatic fail, and splitting check/deduct into separate calls is exactly how races happen</td><td>no way to list products or orders from the API</td></tr>
+    <tr><td>Rules only in <code>services/</code></td><td>the controller stays HTTP-only, so the logic can be tested without Express</td><td>error identity crosses the boundary as a string</td></tr>
+    <tr><td>Sequelize managed transaction</td><td>automatic commit/rollback; the read and write share one unit of work</td><td>the transaction has to be passed into every repository call by hand</td></tr>
+    <tr><td>SQLite</td><td>zero setup for a reviewer: <code>npm install && node index.js</code></td><td>a single writer, so it serializes rather than scales</td></tr>
+    <tr><td>Rejections roll back with no order row</td><td>the Order table only ever holds real allocations</td><td>no audit trail of failed attempts</td></tr>
+    <tr><td>Minimal React form, no stock logic in it</td><td>the brief forbade frontend stock handling; the server's message is shown as-is</td><td>the backend URL is hard-coded</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it, against the brief's fail list</h2>
+  <div class="table-wrap"><table>
+    <tr><th>brief says</th><th>result</th></tr>
+    <tr><td>Only one API</td><td>✓ <code>POST /order</code> (plus a <code>/health</code> probe)</td></tr>
+    <tr><td>routes / controllers / services / repositories / models</td><td>✓ all five, not mixed</td></tr>
+    <tr><td>No logic in the controller</td><td>✓ shape check + error mapping only</td></tr>
+    <tr><td>No stock logic in the frontend</td><td>✓</td></tr>
+    <tr><td>Stock 5 → 3 succeeds, 3 fails</td><td>✓ by construction of the service</td></tr>
+    <tr><td>Concurrency explained in README</td><td>✓ transaction-based argument</td></tr>
+    <tr><td>Flutter client using the same API</td><td>✗ not in the repo</td></tr>
+  </table></div>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li class="done">Single transactional order endpoint</li>
+    <li class="done">README with structure, flow and concurrency</li>
+    <li>A test that fires parallel orders at one product and asserts no overselling, so the guarantee is proven rather than just described</li>
+    <li>Make the deduction itself conditional (<code>UPDATE … SET stock = stock - ? WHERE id = ? AND stock &gt;= ?</code>) or take the write lock up front, so correctness doesn't rest on the read</li>
+    <li>Seed a few products on first boot</li>
+    <li>Reject non-integer quantities; consider 409 rather than 400 for "insufficient stock"</li>
+    <li>Replace the leftover Create React App test (it still looks for "learn react")</li>
+    <li>The Flutter client</li>
+    <li>Remove <code>requirements.pdf</code>: it's the assignment author's brief, not mine to publish (I already did this in mini-grocery)</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Init</b><br><code>npm i express sequelize sqlite3 cors</code>; <code>index.js</code> listens on 4000 and requires <code>src/app.js</code>.</li>
+    <li><b>Models</b><br><code>models/index.js</code> creates the Sequelize instance (dialect sqlite, storage <code>./database.sqlite</code>). Define <code>Product(id, name, stock)</code> and <code>Order(id, productId, quantity, status)</code>, then <code>sequelize.sync()</code>.</li>
+    <li><b>Repositories</b><br>Thin wrappers: <code>findById(id, t)</code>, <code>updateStock(id, n, t)</code>, <code>create(data, t)</code>. They always accept the transaction.</li>
+    <li><b>Service</b><br><code>placeOrder</code> inside <code>sequelize.transaction(async t =&gt; …)</code>: find, 404-error if missing, error if <code>stock &lt; qty</code>, update, create with status SUCCESS.</li>
+    <li><b>Controller</b><br>Reject a missing productId/quantity or quantity ≤ 0 (400). Call the service, return 201, and map the two error messages to 404 / 400, everything else to 500.</li>
+    <li><b>Route</b><br><code>router.post('/', createOrder)</code> mounted at <code>/order</code>; <code>express.json()</code> and <code>cors()</code> on the app.</li>
+    <li><b>Frontend</b><br><code>npx create-react-app frontend</code>: two inputs, one button, POST the numbers, and print <code>data.message</code>.</li>
+    <li><b>Prove it</b><br>Seed stock 5, order 3 twice and expect 201 then 400. Then fire N parallel orders and check that stock never goes below zero.</li>
+  </ol>
+
+</main>
+</body>
+</html>

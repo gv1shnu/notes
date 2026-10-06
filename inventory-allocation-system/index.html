@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inventory-allocation-system — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="inventory-allocation-system" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>inventory-allocation-system: one endpoint, no overselling</h1>
+    <span class="stamp red">assignment</span>
+  </div>
+  <p class="sub">gv1shnu/inventory-allocation-system · Node + Express 5 + Sequelize + SQLite · React form · 5 commits · 25 Jan 2026 · runs locally</p>
+
+  <!-- EDIT: problem -->
+  <h2>The brief</h2>
+  <p class="lead">"You are allowed ONLY ONE API: <code>POST /order</code>." It has to check the product exists, check the stock, deduct it, create the order, never go negative, and stay safe when requests arrive at the same moment.</p>
+  <p>The brief (<code>requirements.pdf</code>, committed with the code) was a 3-day take-home. It was there to test <span class="hl">API discipline and backend layering</span>, not UI. It had hard fail conditions: more than one API, mixed layers, logic inside the controller, or stock logic in the frontend. I built it in one morning, from 08:59 to 12:27.</p>
+
+  <!-- EDIT: the edge case -->
+  <h2>The edge case the brief insists on</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 230" role="img" aria-label="stock 5; order of 3 succeeds leaving 2; second order of 3 fails and stock stays 2">
+      <rect class="box" x="20" y="80" width="140" height="70" rx="6"/><text class="lbl-b mid" x="90" y="110">stock = 5</text><text class="lbl-s mid" x="90" y="132">Product #1</text>
+      <path class="arr" d="M162 115 H260"/><text class="lbl-s mid" x="211" y="105">order 1 · qty 3</text>
+      <rect class="fillbox" x="262" y="80" width="170" height="70" rx="6"/><text class="lbl-s mid" x="347" y="106">5 ≥ 3 ✓</text><text class="lbl-s mid" x="347" y="126">stock → 2</text><text class="lbl-s mid" x="347" y="144">201 · Order SUCCESS</text>
+      <path class="arr" d="M434 115 H532"/><text class="lbl-s mid" x="483" y="105">order 2 · qty 3</text>
+      <rect class="box red" x="534" y="80" width="190" height="70" rx="6"/><text class="lbl-s mid" x="629" y="106">2 &lt; 3 ✗</text><text class="lbl-s mid" x="629" y="126">throw INSUFFICIENT_STOCK</text><text class="lbl-s mid" x="629" y="144">rollback · 400</text>
+      <path class="arr" d="M726 115 H800"/>
+      <rect class="box" x="802" y="80" width="140" height="70" rx="6"/><text class="lbl-b mid" x="872" y="110">stock = 2</text><text class="lbl-s mid" x="872" y="132">no order row</text>
+      <text class="lbl-r" x="262" y="200">the check and the deduction run inside one sequelize.transaction()</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="IA-01">"If this case is not handled correctly = Fail." The service rejects order 2 before it writes anything</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>The layering is literal.</b> <code>routes/ → controllers/ → services/ → repositories/ → models/</code>, matching the brief's folder list name for name. The controller only checks the request shape and maps errors to status codes.</li>
+      <li><b>Errors travel as strings.</b> The service throws <code>Error('PRODUCT_NOT_FOUND')</code> / <code>Error('INSUFFICIENT_STOCK')</code> and the controller matches on <code>error.message</code>: 404 / 400, anything else 500.</li>
+      <li><b>The transaction object is passed down by hand</b> into every repository call. That's how the read and the write share one transaction.</li>
+      <li><b>Failed orders leave no trace.</b> Status is always <code>'SUCCESS'</code>, because a rejected order rolls back before its row exists.</li>
+    </ul>
+    <div>
+      <div class="note pink">
+        <h4>honest gaps vs the brief</h4>
+        There's no Flutter client in the repo (only React). There's a <code>GET /health</code> probe next to the one business API. Nothing seeds the products either: <code>sync()</code> creates empty tables.
+      </div>
+      <div class="margin">The README answers the brief's three questions: folder structure, API flow and concurrency handling.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>API</th><td><code>POST /order {productId, quantity}</code> → 201 / 400 invalid / 404 no product / 400 insufficient / 500</td></tr>
+    <tr><th>Schema</th><td><code>Product(id, name, stock)</code> · <code>Order(id, productId, quantity, status)</code>, exactly the brief's columns</td></tr>
+    <tr><th>Stack</th><td>Express 5.2 · Sequelize 6.37 · sqlite3 5 · cors · React (Create React App)</td></tr>
+    <tr><th>Ports</th><td>backend <code>:4000</code> · frontend <code>:3000</code> (backend moved off 3000 when the React app arrived)</td></tr>
+    <tr><th>Storage</th><td><code>./database.sqlite</code>, gitignored</td></tr>
+    <tr><th>Size</th><td>about 190 lines of backend JS across 10 files; a 59-line React form</td></tr>
+  </table>
+
+</main>
+</body>
+</html>
