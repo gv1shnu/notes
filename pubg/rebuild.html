@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pubg — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="pubg" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="big"><span class="when">28 Sep · 20:19</span><span class="what">Build tested telemetry pipeline and Superset dashboards</span><span class="sha">f297ae7</span><br>141 files, +11,798. The whole stack landed at once: simulator, Flink job, warehouse, Superset, dbt, Airflow, observability, tests, evidence.</li>
+    <li><span class="when">28 Sep · 20:20</span><span class="what">Document Superset demo walkthrough and volume exports</span><span class="sha">6a446dd</span></li>
+    <li><span class="when">28 Sep · 20:21</span><span class="what">Record Kafka dead-letter and snapshot acceptance evidence</span><span class="sha">c08f500</span></li>
+    <li class="big"><span class="when">4 Oct · 15:07</span><span class="what">Add README showcase and GitHub Pages project page</span><span class="sha">acd3f6a</span><br>README leads with results + architecture; <code>site/index.html</code> is the static Pages showcase.</li>
+    <li><span class="when">4 Oct · 15:36</span><span class="what">Point branch references and showcase link at main</span><span class="sha">76e54e3</span></li>
+  </ol>
+  <p class="margin">It was developed locally first (so the first commit is huge) and the acceptance evidence was captured before the first push. <code>static-checks.json</code> is kept as dev.1 history, not the current result.</p>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Flink in Java, not PyFlink</td><td>first-class DataStream: watermarks, keyed state/TTL, side outputs, checkpointing</td><td>a second language + Maven build</td></tr>
+    <tr><td>Correctness in SQL at read time</td><td>canonical facts + reconciliation stay right under reorder/replay</td><td>heavier queries; manifest checks costly at scale (see EXPLAIN)</td></tr>
+    <tr><td>Provisional/final status</td><td>never show a half-finished match as complete</td><td>extra status plumbing</td></tr>
+    <tr><td>Dashboards authored in code</td><td>reproducible, diffable BI; no click-ops</td><td>bootstrap script to maintain</td></tr>
+    <tr><td>Superset over Tableau</td><td>open, scriptable, self-hostable (see <code>docs/bi-decision.md</code>)</td><td>Tableau specs kept only as reference</td></tr>
+    <tr><td>Everything measured into <code>docs/evidence/</code></td><td>claims must be defensible in an interview</td><td>discipline overhead</td></tr>
+    <tr><td>Single broker, non-HA</td><td>a portfolio deployment, not production</td><td>no HA; stated plainly in guarantees</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it — the recorded benchmark</h2>
+  <p class="small">Run <code>3c1881c3…</code>: 100 players, latency-spike scenario, 60 s source target, 64.46 s harness, on a 6-CPU / ~12.5 GB Colima VM (Apple Silicon). Not cloud hardware, not a saturation test.</p>
+  <div class="cols three">
+    <div><div class="meter-lbl"><span>emitted→processed p95</span><span>106 ms</span></div><div class="meter"><i style="--v:18%"></i></div><p class="small">0.1065 s, app wall timestamps, excludes query/render</p></div>
+    <div><div class="meter-lbl"><span>records persisted</span><span>1,524</span></div><div class="meter"><i style="--v:70%"></i></div><p class="small">over 62.3 s of processing timestamps</p></div>
+    <div><div class="meter-lbl"><span>peak 1-min rate</span><span>22.2 rec/s</span></div><div class="meter"><i style="--v:55%"></i></div><p class="small">window warm-up ≠ rows ÷ duration</p></div>
+    <div><div class="meter-lbl"><span>peak memory (sum)</span><span>1,725 MiB</span></div><div class="meter"><i style="--v:30%"></i></div></div>
+    <div><div class="meter-lbl"><span>peak CPU (1-core conv.)</span><span>84.0%</span></div><div class="meter red"><i style="--v:84%"></i></div></div>
+    <div><div class="meter-lbl"><span>leaderboard EXPLAIN</span><span>214.7 ms</span></div><div class="meter"><i style="--v:40%"></i></div><p class="small">filtered, ANALYZE+BUFFERS</p></div>
+  </div>
+  <p>Recovery proof: TaskManager killed mid-run → committed lag 108 → 553 → drained to 0, outcomes unchanged. Live refresh proof: new DB value visible in the browser after <b>12.9 s</b>.</p>
+
+  <!-- EDIT: pending / limits -->
+  <h2>Pending &amp; limits (from STATUS / guarantees)</h2>
+  <ul class="checks">
+    <li>It's a dev prerelease (0.1.0-dev.2): cloud operation and sustained capacity are not certified.</li>
+    <li>Single broker + non-HA JobManager; source process state isn't durable.</li>
+    <li>Checkpoints don't imply end-to-end exactly-once delivery.</li>
+    <li>Manifest reconciliation can be expensive at larger volumes — filter one run, use indexes.</li>
+    <li>The target 5–15 s backend / 10–30 s dashboard freshness is not yet evidenced.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Contracts</b><br>Define <code>events.v1</code> JSON schema + Pydantic models; four source loops in one process emitting with <code>emitted_at</code>, <code>event_id</code>, <code>run_id</code>.</li>
+    <li><b>Kafka</b><br>Single-broker KRaft; a topic per source; a DLQ and a late topic.</li>
+    <li><b>Flink job (Java)</b><br>Deserialize + validate contracts → side-output rejects; key by identity, dedupe with 24h TTL; event-time watermarks + idleness; windows for server stats; idempotent JDBC sink + checkpointing.</li>
+    <li><b>Warehouse</b><br>Canonical fact tables, manifest table, reconciliation that flips provisional→final, live mart views, least-privilege roles.</li>
+    <li><b>dbt</b><br>Staging + marts + a historical player-match model; add tests (unique placements, one winner, reconciled totals, server bounds).</li>
+    <li><b>Observability</b><br>An exporter reading real broker offsets, row counts and Flink checkpoint status; Prometheus scrape.</li>
+    <li><b>Superset in code</b><br><code>bootstrap.py</code> creates the DB connection, datasets and all charts/dashboards; export them to YAML.</li>
+    <li><b>Orchestration + proof</b><br>Airflow DAG (pin → archive → reconcile → dbt → export → finish); fault-injection and benchmark scripts that write evidence JSON; a Playwright script that proves live refresh.</li>
+    <li><b>Package</b><br>Docker Compose + a Makefile (<code>bootstrap/demo/bi-up/status/scenario</code>); loopback-only admin ports; a static Pages showcase.</li>
+  </ol>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pubg — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="pubg" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>pubg: Battleground Telemetry</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/pubg · Python · Kafka · Flink(Java) · Postgres · Superset · dbt · Airflow · 5 commits · Sep–Oct 2026 · ~12k lines · vishnugandarapu.in/pubg</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">I wanted to build, and be able to defend in an interview, a <span class="hl">real-time analytics pipeline</span> that stays correct when
+    delivery is messy: out-of-order, duplicated, late and malformed events.</p>
+  <p>The scenario is a synthetic battle-royale game. Four independent event sources stream through Kafka → Flink → PostgreSQL and into four live
+    Apache Superset dashboards. All gameplay/server data is synthetic; there is no PUBG affiliation. The <b>pipeline</b> metrics, though, are measured from real components.</p>
+
+  <!-- EDIT: architecture infographic -->
+  <h2>Architecture</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="four sources to kafka to flink to postgres to superset, plus dbt airflow prometheus">
+      <rect class="box" x="20" y="90" width="150" height="120" rx="6"/>
+      <text class="lbl-b mid" x="95" y="112">simulator</text>
+      <text class="lbl-s mid" x="95" y="134">match coordinator</text><text class="lbl-s mid" x="95" y="152">gameplay loop</text><text class="lbl-s mid" x="95" y="170">session loop</text><text class="lbl-s mid" x="95" y="188">server loop</text>
+      <path class="arr" d="M172 150 H212"/>
+      <rect class="box" x="214" y="120" width="110" height="60" rx="6"/><text class="lbl mid" x="269" y="146">Kafka</text><text class="lbl-s mid" x="269" y="166">KRaft</text>
+      <path class="arr" d="M326 150 H366"/>
+      <rect class="fillbox" x="368" y="105" width="160" height="90" rx="6"/><text class="lbl mid" x="448" y="130">Flink (Java)</text><text class="lbl-s mid" x="448" y="150">validate · dedupe</text><text class="lbl-s mid" x="448" y="168">watermarks · windows</text><text class="lbl-s mid" x="448" y="186">idempotent JDBC</text>
+      <path class="arr-d red" d="M448 196 V240 H340"/><text class="lbl-r" x="230" y="235">DLQ + late topics</text>
+      <path class="arr" d="M530 150 H570"/>
+      <rect class="box" x="572" y="120" width="140" height="60" rx="6"/><text class="lbl mid" x="642" y="144">PostgreSQL</text><text class="lbl-s mid" x="642" y="164">canonical facts</text>
+      <path class="arr" d="M714 135 H840"/>
+      <rect class="box" x="842" y="105" width="140" height="50" rx="6"/><text class="lbl mid" x="912" y="126">Superset</text><text class="lbl-s mid" x="912" y="144">4 dashboards</text>
+      <path class="arr" d="M714 160 H790 V200"/>
+      <rect class="box2" x="700" y="202" width="130" height="40" rx="4"/><text class="lbl-s mid" x="765" y="226">dbt marts + tests</text>
+      <rect class="box2" x="572" y="202" width="120" height="40" rx="4"/><text class="lbl-s mid" x="632" y="226">Parquet archive</text>
+      <path class="arr" d="M632 180 V202"/>
+      <rect class="box2" x="842" y="170" width="140" height="40" rx="4"/><text class="lbl-s mid" x="912" y="194">Airflow batch DAG</text>
+      <rect class="box2" x="842" y="222" width="140" height="40" rx="4"/><text class="lbl-s mid" x="912" y="246">Prometheus metrics</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PB-01">four source loops in one process, separate Kafka clients, shared authoritative match state</figcaption>
+  </figure>
+
+  <!-- EDIT: observations / what makes it correct -->
+  <h2>What makes it correct under messy delivery</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Contracts first.</b> Flink validates typed/versioned JSON contracts; malformed or wrong-version input is rejected to a dead-letter topic while valid input keeps flowing.</li>
+      <li><b>Dedupe by identity.</b> Keyed deduplication with a 24-hour TTL; the first accepted identity wins. Repeated writes leave canonical counts unchanged.</li>
+      <li><b>Event-time, not arrival-time.</b> Watermarks + idleness; bounded-late events are accepted, excessively late ones are retained and corrected.</li>
+      <li><b>Provisional → final.</b> Results stay <i>provisional</i> until the immutable facts match the source manifest, then become <i>final</i>. "Finish-first / shuffled" data resolves correctly.</li>
+      <li><b>Recovers.</b> With the Flink TaskManager killed mid-run, checkpoint-committed Kafka lag rose 108 → 553, then drained to zero after recovery, <b>outcomes unchanged</b>.</li>
+    </ul>
+    <div>
+      <div class="note blue">
+        <h4>measured, not claimed</h4>
+        Every pipeline number on these pages comes from a recorded run in <code>docs/evidence/</code>. Gameplay is synthetic; the pipeline behaviour is real.
+      </div>
+      <div class="margin">honest scope: single broker, non-HA JobManager, a portfolio deployment, not production.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Stack</th><td>Python simulator · Kafka 3.9 (KRaft) · Flink 1.20 (Java 17) · PostgreSQL 16 · Superset 5 · dbt 1.9 · Airflow 2.10 · Prometheus 3.2</td></tr>
+    <tr><th>Run</th><td>Docker Compose; <code>make bootstrap / demo / bi-up / status / scenario</code>; Colima profile on Apple Silicon</td></tr>
+    <tr><th>Dashboards</th><td>Live Leaderboard · Match Operations · Server Health · Pipeline Reliability — 24 charts, authored in code (<code>bootstrap.py</code>)</td></tr>
+    <tr><th>Tests</th><td>69 Python unit · 4 Java JUnit · 4 real-stack integration · 12 dbt models + 22 dbt tests · 6-task Airflow DAG</td></tr>
+    <tr><th>Deployed</th><td>Static showcase on GitHub Pages → <a href="https://www.vishnugandarapu.in/pubg/">vishnugandarapu.in/pubg</a>; the pipeline itself runs locally in Docker.</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

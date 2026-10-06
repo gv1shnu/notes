@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pubg — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="pubg" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">one event's journey, and the layers it passes through</p>
+
+  <!-- EDIT: event lifecycle -->
+  <h2>One event's life</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="event validated, deduped, windowed, written, reconciled to final">
+      <rect class="box" x="20" y="120" width="130" height="56" rx="6"/><text class="lbl mid" x="85" y="144">source emits</text><text class="lbl-s mid" x="85" y="164">emitted_at (UTC)</text>
+      <path class="arr" d="M152 148 H190"/>
+      <path class="box" d="M250 115 L310 148 L250 181 L190 148 Z"/><text class="lbl-s mid" x="250" y="152">valid?</text>
+      <path class="arr-d red" d="M250 181 V240 H150"/><text class="lbl-r" x="30" y="235">malformed / bad version → DLQ</text>
+      <path class="arr" d="M310 148 H348"/>
+      <path class="box" d="M408 115 L468 148 L408 181 L348 148 Z"/><text class="lbl-s mid" x="408" y="145">seen</text><text class="lbl-s mid" x="408" y="162">before?</text>
+      <path class="arr-d red" d="M408 181 V215 H470 V181"/><text class="lbl-r" x="420" y="235">dup (24h TTL) → drop</text>
+      <path class="arr" d="M468 148 H506"/>
+      <rect class="box" x="508" y="118" width="150" height="60" rx="6"/><text class="lbl mid" x="583" y="142">watermark +</text><text class="lbl-s mid" x="583" y="162">window / side-output late</text>
+      <path class="arr" d="M660 148 H698"/>
+      <rect class="fillbox" x="700" y="118" width="130" height="60" rx="6"/><text class="lbl mid" x="765" y="142">idempotent</text><text class="lbl-s mid" x="765" y="162">JDBC write</text>
+      <path class="arr" d="M832 148 H870"/>
+      <rect class="box" x="872" y="118" width="110" height="60" rx="6"/><text class="lbl mid" x="927" y="142">canonical</text><text class="lbl-s mid" x="927" y="162">facts</text>
+      <path class="arr" d="M927 180 V250 H600"/>
+      <rect class="box2" x="430" y="232" width="170" height="40" rx="4"/><text class="lbl-s mid" x="515" y="256">manifest reconcile</text>
+      <text class="lbl-r" x="150" y="290">provisional until facts == manifest → final · processed_at − emitted_at = the latency metric</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="PB-02">rejects and dups never reach the canonical facts; lateness is corrected, not dropped</figcaption>
+  </figure>
+
+  <!-- EDIT: layers -->
+  <h2>The layers (the repo map)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>dir</th><th>job</th><th>notable</th></tr>
+    <tr><td><code>simulator/</code> + <code>contracts/</code></td><td>four source schedules; shared match invariants</td><td>Pydantic + versioned JSON schema <code>events.v1</code></td></tr>
+    <tr><td><code>streaming/</code> (Java)</td><td>Flink: validate, dedupe, watermark, side-output, window, sink</td><td><code>TelemetryJob</code>, <code>Event</code>, <code>Wire</code> + JUnit</td></tr>
+    <tr><td><code>warehouse/</code></td><td>canonical facts, reconciliation, live mart views, DB roles</td><td><code>001_schema.sql</code>, <code>002_roles.sql</code></td></tr>
+    <tr><td><code>superset/</code></td><td>pinned image, secure init, dashboards authored in code</td><td><code>bootstrap.py</code> → 24 charts</td></tr>
+    <tr><td><code>dbt/</code></td><td>documented marts + tests; historical correction</td><td>12 models, 22 tests, <code>history_player_match</code></td></tr>
+    <tr><td><code>orchestration/</code></td><td>Airflow 6-task maintenance DAG</td><td>pin → archive → reconcile → dbt → export → finish</td></tr>
+    <tr><td><code>observability/</code></td><td>real offset/persistence/checkpoint exporter + Prometheus</td><td><code>collector.py</code></td></tr>
+    <tr><td><code>scripts/</code> + <code>tests/</code></td><td>ops, benchmark, fault acceptance, browser proof</td><td><code>fault_acceptance.py</code>, <code>verify_superset.py</code></td></tr>
+  </table></div>
+
+  <!-- EDIT: facts vs metrics -->
+  <h2>Two kinds of number: synthetic facts vs real pipeline metrics</h2>
+  <div class="cols">
+    <div>
+      <h4>Synthetic gameplay facts</h4>
+      <ul class="dash">
+        <li><b>Kills</b>: canonical <code>player_eliminated</code> facts per attacker, at namespace/run/match/player grain</li>
+        <li><b>Project score</b>: <code>kill_points × kills + placement points</code> (editable by DB admin)</li>
+        <li><b>Rank</b>: score DESC, wins DESC, kills DESC — per match; pick one match in Superset</li>
+        <li><b>Alive players</b>: min alive count in each 10-second window (not sessions)</li>
+        <li><b>Server latency p95</b>: <code>percentile_cont(.95)</code> over pooled synthetic samples per window</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Measured pipeline metrics</h4>
+      <ul class="dash">
+        <li><b>Committed lag</b>: broker end offset − Flink checkpoint-committed offset, per partition</li>
+        <li><b>Emitted-to-processed p95</b>: <code>processed_at − emitted_at</code> over recent persisted rows</li>
+        <li><b>Persisted events/sec</b>: Prometheus 1-min rate of the row-count gauge</li>
+        <li><b>Checkpoint duration / age</b>: from Flink's REST checkpoint endpoint</li>
+        <li><b>Watermark</b>: min operator input watermark (epoch ms)</li>
+      </ul>
+    </div>
+  </div>
+  <p class="margin">the discipline of this project is keeping those two columns clearly labelled, so nobody reads a synthetic latency as a real SLA.</p>
+
+  <!-- EDIT: reproducible dashboards -->
+  <h2>Dashboards authored in code</h2>
+  <p>No chart is assembled by hand. <code>superset/bootstrap.py</code> creates the database connection, datasets and all 24 charts across four dashboards, so the BI layer is reproducible and reviewable in git (charts + dashboards are also exported as YAML under <code>superset/assets/</code>).</p>
+  <div class="cols">
+    <div class="card wrap">Live Leaderboard   — ranks, kills, damage, placement
+                     (each row: provisional / final)
+Match Operations   — running vs reconciled, alive players,
+                     eliminations over time, manifest completeness
+Server Health      — latency p95, packet loss, CPU/mem, tick,
+                     injected incident windows labelled
+Pipeline Reliability — throughput, committed lag,
+                     processing delay, checkpoint duration</div>
+    <div>
+      <p>Freshness is <b>polling</b>, not push: Superset refresh is configured at 15 s. One live proof saw a new DB value appear in an auto-refreshing chart after <b>12.9 s</b> — an observation, not a guaranteed SLA.</p>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

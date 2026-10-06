@@ -104,5 +104,13 @@ window.NOTEBOOK = {
       stack: ["Python", "Playwright", "Brave"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // pubg
+      slug: "pubg", name: "pubg · Battleground Telemetry", shelf: "data", status: "deployed",
+      tagline: "Real-time telemetry pipeline (Kafka → Flink → Postgres → Superset) that stays correct under out-of-order, duplicate and late events.",
+      url: "https://github.com/gv1shnu/pubg", live: "https://www.vishnugandarapu.in/pubg/",
+      start: "2026-09-28", end: "2026-10-04", commits: 5,
+      stack: ["Kafka", "Flink", "Postgres", "Superset"],
+      pages: [ { file: "index", title: "Cover & architecture" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
