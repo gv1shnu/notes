@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>normalform — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="normalform" data-page="index">
+<main class="sheet">
+
+  <!-- EDIT: title block -->
+  <div class="title-row">
+    <h1>normalform</h1>
+    <span class="stamp">live on pages</span>
+  </div>
+  <p class="sub">gv1shnu/normalform · vanilla JS · 7 commits · 15–16 Sep 2026 · vishnugandarapu.in/normalform</p>
+
+  <!-- EDIT: problem -->
+  <h2>The problem</h2>
+  <p class="lead">Normalisation is taught as seven separate definitions with seven unrelated toy tables. Students memorise
+    "no partial dependency" without ever <i>seeing</i> a table split.</p>
+  <p>I wanted <span class="hl">one</span> student database that travels from a messy spreadsheet (UNF) all the way to 5NF,
+    where every step's output is literally the next step's input, shown before/after, side by side.</p>
+
+  <!-- EDIT: the journey infographic -->
+  <h2>The whole journey on one page</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 420" role="img" aria-label="Tables at each normal form from UNF to 5NF">
+      <g class="lbl-b">
+        <text x="20" y="30">UNF</text><text x="160" y="30">1NF</text><text x="310" y="30">2NF</text><text x="460" y="30">3NF</text><text x="610" y="30">BCNF</text><text x="760" y="30">4NF</text><text x="900" y="30">5NF</text>
+      </g>
+      <line class="ln-d" x1="10" y1="40" x2="990" y2="40"/>
+      <!-- UNF -->
+      <rect class="fillbox" x="10" y="60" width="120" height="120" rx="4"/><text class="lbl-s" x="18" y="80">Campus_Workbook</text>
+      <text class="lbl-s" x="18" y="102">courses+grade+</text><text class="lbl-s" x="18" y="118">tutor in one cell,</text><text class="lbl-s" x="18" y="134">hobbies, langs,</text><text class="lbl-s" x="18" y="150">club events…</text>
+      <path class="arr" d="M132 120 H150"/>
+      <!-- 1NF -->
+      <rect class="box" x="152" y="60" width="130" height="40" rx="4"/><text class="lbl-s" x="158" y="84">Campus_Record_1NF</text>
+      <rect class="box" x="152" y="210" width="130" height="40" rx="4"/><text class="lbl-s" x="158" y="234">Student_Hobby_Lang</text>
+      <rect class="box" x="152" y="300" width="130" height="40" rx="4"/><text class="lbl-s" x="158" y="324">Student_Club_Event</text>
+      <path class="arr" d="M284 80 H300"/>
+      <!-- 2NF -->
+      <rect class="box" x="302" y="50" width="130" height="30" rx="4"/><text class="lbl-s" x="308" y="70">Student_Profile_2NF</text>
+      <rect class="box" x="302" y="86" width="130" height="30" rx="4"/><text class="lbl-s" x="308" y="106">Course</text>
+      <rect class="box" x="302" y="122" width="130" height="30" rx="4"/><text class="lbl-s" x="308" y="142">Enrollment_2NF</text>
+      <path class="arr" d="M434 65 H450"/>
+      <!-- 3NF -->
+      <rect class="box" x="452" y="40" width="120" height="26" rx="4"/><text class="lbl-s" x="458" y="58">Student</text>
+      <rect class="box" x="452" y="70" width="120" height="26" rx="4"/><text class="lbl-s" x="458" y="88">Department</text>
+      <path class="arr" d="M434 137 H600"/>
+      <!-- BCNF -->
+      <rect class="box" x="602" y="122" width="130" height="28" rx="4"/><text class="lbl-s" x="608" y="141">Tutor_Course</text>
+      <rect class="box" x="602" y="154" width="130" height="28" rx="4"/><text class="lbl-s" x="608" y="173">Student_Tutor_Grade</text>
+      <!-- 4NF -->
+      <path class="arr" d="M284 230 H750"/>
+      <rect class="box" x="752" y="200" width="110" height="28" rx="4"/><text class="lbl-s" x="758" y="219">Student_Hobby</text>
+      <rect class="box" x="752" y="232" width="110" height="28" rx="4"/><text class="lbl-s" x="758" y="251">Student_Language</text>
+      <!-- 5NF -->
+      <path class="arr" d="M284 320 H890"/>
+      <rect class="box" x="892" y="280" width="100" height="26" rx="4"/><text class="lbl-s" x="896" y="298">Student_Club</text>
+      <rect class="box" x="892" y="310" width="100" height="26" rx="4"/><text class="lbl-s" x="896" y="328">Student_Event</text>
+      <rect class="box" x="892" y="340" width="100" height="26" rx="4"/><text class="lbl-s" x="896" y="358">Club_Event</text>
+      <!-- the fd that triggered each -->
+      <g class="lbl-r">
+        <text x="300" y="185">StudentID → Name, Dept</text>
+        <text x="455" y="120">Dept → DeptName</text>
+        <text x="610" y="205">TutorID → CourseID</text>
+        <text x="560" y="275">StudentID ↠ Hobby | Language</text>
+        <text x="560" y="365">⋈ {SC, SE, CE}</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption data-dwg="NF-01">tables not touched in a step are carried forward (collapsed in the UI)</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed while building</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li>My first model was <b>wrong</b>: the toy data didn't actually exhibit the anomaly each step claimed to fix. A 5NF example only works
+        if joining two of the three pair-tables invents a "phantom" row. I fixed the data and wrote <code>selftest.js</code> to prove it.</li>
+      <li>Random data per visit is good for practice, but <b>the schema must never change with the seed</b>, only the values.</li>
+      <li>Showing every table at every step drowns the change. Collapsing carried-forward tables keeps the eye on the split.</li>
+      <li>Students confuse a plain composite-key column (e.g. <code>Hobby</code>) with a foreign key. FK chips only appear when the referenced table is present.</li>
+    </ul>
+    <div>
+      <div class="note">
+        <h4>4NF vs 5NF in one sentence</h4>
+        4NF: two <i>independent</i> lists (hobbies, languages) multiplied together. 5NF: three facts that only make sense
+        <i>together</i>, so you need all three pair tables to rebuild it, and any two of them invent rows.
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>Files</th><td><code>index.html</code>, <code>app.js</code> (~28 KB), <code>styles.css</code>, <code>selftest.js</code></td></tr>
+    <tr><th>Dependencies</th><td>none: no build, no network calls, works offline</td></tr>
+    <tr><th>Data</th><td>seeded generator (<code>mulberry32</code> + FNV-1a hash), default seed <code>240519</code></td></tr>
+    <tr><th>Tests</th><td><code>node selftest.js</code>: 8 seeds, determinism + lossless joins</td></tr>
+    <tr><th>Deployed</th><td>GitHub Pages, <code>main</code> / root → <a href="http://www.vishnugandarapu.in/normalform/">vishnugandarapu.in/normalform</a></td></tr>
+  </table>
+
+</main>
+</body>
+</html>

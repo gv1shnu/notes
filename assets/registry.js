@@ -48,5 +48,13 @@ window.NOTEBOOK = {
       stack: ["HTML/JS", "PGlite", "node-sql-parser"],
       pages: [ { file: "index", title: "Cover & problem" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // normalform
+      slug: "normalform", name: "normalform", shelf: "data", status: "deployed",
+      tagline: "One student database walked from a messy spreadsheet to 5NF, before/after at every step.",
+      url: "https://github.com/gv1shnu/normalform", live: "http://www.vishnugandarapu.in/normalform/",
+      start: "2026-09-15", end: "2026-09-16", commits: 7,
+      stack: ["Vanilla JS", "Node self-test"],
+      pages: [ { file: "index", title: "Cover & journey" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };

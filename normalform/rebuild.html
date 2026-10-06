@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>normalform — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="normalform" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+  <p class="sub">two mornings of work, seven commits</p>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">Day 1: build it, then make it correct</li>
+    <li class="big"><span class="when">15 Sep · 08:00</span><span class="what">Build interactive normalization visualiser</span><span class="sha">17ad682</span><br>
+      4 files, +422. First version: stages UNF→5NF with separate examples per stage.</li>
+    <li><span class="when">15 Sep · 08:08</span><span class="what">Clarify UNF and 1NF progression</span><span class="sha">275f710</span></li>
+    <li><span class="when">15 Sep · 09:03</span><span class="what">Unify normalization case study</span><span class="sha">bbadc16</span><br>
+      The key move: <b>one "Campus Connect" database</b> for every stage, so each outcome is the next input.</li>
+    <li class="big"><span class="when">15 Sep · 10:20</span><span class="what">Correct normalization model and add validation</span><span class="sha">9ad248f</span><br>
+      Replaced the biased <code>sort(() =&gt; random() - .5)</code> shuffle with Fisher–Yates; changed the club/event data so the
+      5NF phantom actually exists; UNF now carries department and tutor; added <code>selftest.js</code> (+111) and a status announcer.</li>
+    <li><span class="when">15 Sep · 10:20</span><span class="what">Improve transformation guidance and footer</span><span class="sha">bff7e6f</span></li>
+    <li class="phase">Day 2: make it readable</li>
+    <li class="big"><span class="when">16 Sep · 13:59</span><span class="what">Add before/after split, collapsible tables, FK markers, and glossary</span><span class="sha">48fbbb1</span><br>
+      Plainer copy everywhere; before/after split view; carried-forward tables collapsed; PK/FK chips; computed 4NF-vs-5NF phantom example; glossary tooltips.</li>
+    <li><span class="when">16 Sep · 14:37</span><span class="what">Add per-step table-split banner and Columns moved heading</span><span class="sha">337eca4</span></li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>decision</th><th>why</th></tr>
+    <tr><td>One case study for all 7 forms</td><td>students see cause and effect; nothing appears from nowhere</td></tr>
+    <tr><td>Seeded PRNG, fixed structure</td><td>fresh practice values, same lesson; reproducible bug reports ("seed 42 looks wrong")</td></tr>
+    <tr><td>Fisher–Yates instead of random sort</td><td><code>sort</code> with a random comparator is biased and engine-dependent</td></tr>
+    <tr><td>Self-test that re-joins tables</td><td>the claim "lossless decomposition" is checked by code, not by me eyeballing it</td></tr>
+    <tr><td>No framework, no build</td><td>drop on GitHub Pages; relative paths work under a project subpath</td></tr>
+    <tr><td>Collapse unchanged tables</td><td>by 5NF there are 10 tables; only 1–3 change per step</td></tr>
+  </table>
+  </div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <div class="card wrap">$ node selftest.js
+PASS: 8 seeds; deterministic schemas, unique primary keys, complete snapshots, and lossless 2NF–5NF decompositions.</div>
+  <ul class="dash">
+    <li>Seeds tested: <code>240519, 1, 42, 99, 987654, 314159, 0, "abc"</code>.</li>
+    <li>Checks: same seed → same model; schema identical across seeds; no empty tables; no duplicate PKs; 2NF, 3NF, BCNF, 4NF joins rebuild the input exactly;
+      5NF two-way join is <i>not</i> enough but the three-way join is; pair tables are true projections; every table appears in the right input/outcome HTML.</li>
+    <li>Teaching metric: can a student say which column moved where, and why, at each step?</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li>Quiz mode: hide the "after" side and let the student propose the split.</li>
+    <li>Let users paste their own table + FDs.</li>
+    <li>Show the SQL <code>CREATE TABLE</code> for each state.</li>
+    <li>Run <code>selftest.js</code> in a GitHub Action on push.</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Design the case study on paper first</b><br>Pick entities (student, dept, course, tutor, hobby, language, club, event). For each normal form, write the one dependency that violates it. Make sure the data really shows each anomaly, especially the 5NF phantom.</li>
+    <li><b>Deterministic generator</b><br>FNV-1a hash of the seed → mulberry32 → Fisher–Yates shuffle of name pools. Keep the <i>relationships</i> as fixed index arrays.</li>
+    <li><b>States as data</b><br><code>databaseStates(m)</code> returns 7 arrays of <code>{title, columns, rows, key}</code>. Reuse objects for carried-forward tables.</li>
+    <li><b>Self-test before UI</b><br>Load <code>app.js</code> in Node's <code>vm</code> with a fake DOM; re-join tables and compare as row sets.</li>
+    <li><b>Render</b><br>A <code>table()</code> template with PK/FK chips, a split view, a move cue, collapsible carried tables.</li>
+    <li><b>Navigation + a11y</b><br>Progress pills, Next/Back/Reset, aria-live announcer, scroll into view.</li>
+    <li><b>Ship</b><br>Push to <code>main</code>; Pages from root.</li>
+  </ol>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>normalform — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="normalform" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">seed → model → seven database states → rendered stages</p>
+
+  <!-- EDIT: architecture -->
+  <h2>Data flow inside app.js</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1000 260" role="img" aria-label="seed goes through hash and PRNG into createModel, then databaseStates, then renderStage">
+      <rect class="box" x="20" y="90" width="110" height="60" rx="6"/><text class="lbl mid" x="75" y="116">seed</text><text class="lbl-s mid" x="75" y="136">240519 / any</text>
+      <path class="arr" d="M132 120 H170"/>
+      <rect class="box" x="172" y="80" width="150" height="80" rx="6"/><text class="lbl mid" x="247" y="106">hashSeed()</text><text class="lbl-s mid" x="247" y="126">FNV-1a → uint32</text><text class="lbl-s mid" x="247" y="146">→ mulberry32 PRNG</text>
+      <path class="arr" d="M324 120 H362"/>
+      <rect class="fillbox" x="364" y="60" width="180" height="120" rx="6"/><text class="lbl mid" x="454" y="86">createModel()</text>
+      <text class="lbl-s" x="376" y="108">Fisher–Yates shuffle names,</text><text class="lbl-s" x="376" y="126">courses, hobbies, clubs…</text><text class="lbl-s" x="376" y="144">FIXED index specs decide</text><text class="lbl-s" x="376" y="162">who-enrols-in-what</text>
+      <path class="arr" d="M546 120 H584"/>
+      <rect class="box" x="586" y="70" width="170" height="100" rx="6"/><text class="lbl mid" x="671" y="96">databaseStates(m)</text><text class="lbl-s mid" x="671" y="118">7 arrays of table specs</text><text class="lbl-s mid" x="671" y="136">{title, columns, rows,</text><text class="lbl-s mid" x="671" y="154">key, fixed}</text>
+      <path class="arr" d="M758 120 H796"/>
+      <rect class="box" x="798" y="70" width="180" height="100" rx="6"/><text class="lbl mid" x="888" y="96">renderStage(i)</text><text class="lbl-s mid" x="888" y="118">before = state[i-1]</text><text class="lbl-s mid" x="888" y="136">after = state[i]</text><text class="lbl-s mid" x="888" y="154">+ cue, FK chips, notes</text>
+      <text class="lbl-r" x="364" y="220">values vary with the seed · structure never does</text>
+      <path class="ln-d red" d="M454 182 V204"/>
+    </svg>
+    </div>
+    <figcaption data-dwg="NF-02">model is pure data; rendering is string templates into #journey</figcaption>
+  </figure>
+
+  <!-- EDIT: stages table -->
+  <h2>The seven stages</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>stage</th><th>dependency shown</th><th>what splits</th><th>result</th></tr>
+    <tr><td>UNF</td><td>One StudentID → many courses, hobbies, languages, events</td><td>(start)</td><td>Campus_Workbook, 4 rows of packed cells</td></tr>
+    <tr><td>1NF</td><td>one value per cell, one fact per row</td><td>unpack repeating groups</td><td>Campus_Record_1NF (PK StudentID+CourseID), Student_Hobby_Language, Student_Club_Event</td></tr>
+    <tr><td>2NF</td><td>StudentID → StudentName, DeptID · CourseID → CourseName</td><td>partial dependencies on part of the composite key</td><td>Student_Profile_2NF, Course, Enrollment_2NF</td></tr>
+    <tr><td>3NF</td><td>StudentID → DeptID → DeptName</td><td>transitive dependency</td><td>Student, Department</td></tr>
+    <tr><td>BCNF</td><td>TutorID → CourseID, but TutorID isn't the key</td><td>determinant that isn't a candidate key</td><td>Tutor_Course, Student_Tutor_Grade</td></tr>
+    <tr><td>4NF</td><td>StudentID ↠ Hobby · StudentID ↠ Language</td><td>two independent multivalued facts</td><td>Student_Hobby, Student_Language</td></tr>
+    <tr><td>5NF</td><td>join {Student_Club, Student_Event, Club_Event} = Student_Club_Event</td><td>join dependency</td><td>three pair tables</td></tr>
+  </table>
+  </div>
+
+  <!-- EDIT: phantom row drawing -->
+  <h2>The 5NF phantom row</h2>
+  <div class="cols">
+    <figure class="sk">
+      <svg viewBox="0 0 460 230" role="img" aria-label="joining two pair tables invents a row that the third table rejects">
+        <rect class="box" x="10" y="20" width="130" height="70" rx="4"/><text class="lbl-b mid" x="75" y="44">Student_Club</text><text class="lbl-s mid" x="75" y="70">S101 · Robotics</text>
+        <rect class="box" x="160" y="20" width="130" height="70" rx="4"/><text class="lbl-b mid" x="225" y="44">Student_Event</text><text class="lbl-s mid" x="225" y="70">S101 · Showcase</text>
+        <path class="arr" d="M75 92 L150 140 M225 92 L160 140"/>
+        <rect class="fillbox red red-fill" x="60" y="142" width="200" height="40" rx="4"/><text class="lbl mid" x="160" y="167">S101 · Robotics · Showcase ?</text>
+        <rect class="box" x="320" y="20" width="130" height="70" rx="4"/><text class="lbl-b mid" x="385" y="44">Club_Event</text><text class="lbl-s mid" x="385" y="70">no Robotics@Showcase</text>
+        <path class="arr-d red" d="M385 92 L262 160"/>
+        <text class="lbl-r" x="60" y="214">two-way join invents it, three-way join removes it</text>
+      </svg>
+    </figure>
+    <div>
+      <p>The UI <b>computes</b> the phantom row for the current seed: it builds the two-way join and finds a row that isn't in the
+        real participation set, then prints it ("joining only Student_Club and Student_Event would invent …").</p>
+      <p class="margin">If no phantom exists, the example is wrong and 5NF is meaningless. selftest.js fails the build in that case.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: UI pieces -->
+  <h2>UI pieces</h2>
+  <ul class="dash">
+    <li><b>Progress nav</b>: 7 pills; Next / Back / Reset buttons; keyboard friendly; <code>#statusAnnouncer</code> is an aria-live region announcing the step.</li>
+    <li><b>Before/After split</b>: input snapshot left, outcome right; changed tables open, carried-forward tables in <code>&lt;details&gt;</code>.</li>
+    <li><b>Split banner</b>: "Campus_Record_1NF → Student_Profile_2NF + Course + Enrollment_2NF" and a <b>Columns moved</b> cue listing each column's destination.</li>
+    <li><b>Key chips</b>: <code>PK</code> on key columns; <code>FK → Table</code> only if that table exists in the same snapshot (<code>FK_OWNERS</code> map).</li>
+    <li><b>Glossary</b>: tooltip buttons for "Fact" and "Dependency" (→, ↠, ⋈ explained).</li>
+    <li><b>Seed box</b>: type any seed or roll a new one to practise on fresh values.</li>
+  </ul>
+
+</main>
+</body>
+</html>
