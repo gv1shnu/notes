@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mini-grocery-order-system — cover</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="mini-grocery-order-system" data-page="index">
+<main class="sheet">
+
+  <div class="title-row">
+    <h1>mini-grocery: the last bag of rice</h1>
+    <span class="stamp red">assignment, revisited</span>
+  </div>
+  <p class="sub">gv1shnu/mini-grocery-order-system · ASP.NET Core (.NET 10) + EF Core + SQLite + xUnit · 13 commits · Jan &amp; Jul 2026 · runs locally · MIT</p>
+
+  <!-- EDIT: problem -->
+  <h2>The question</h2>
+  <p class="lead">What happens when two people buy the last bag of rice at the same time?</p>
+  <p>This started as a 3-day take-home with a tight brief: two endpoints, a mandated Controller/Service/Repository layering, and one database transaction. In July I came back to it. I didn't add features; I went <span class="hl">deeper on correctness</span>. I fixed three real bugs, wrote a test that <i>proves</i> the concurrency guarantee instead of just asserting it, and added CI with a vulnerability audit.</p>
+
+  <!-- EDIT: the proof -->
+  <h2>The proof, in two runs</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 300" role="img" aria-label="50 concurrent buyers against stock 10: with transaction 10 succeed stock 0; without transaction 50 succeed stock 9">
+      <rect class="box" x="20" y="110" width="170" height="80" rx="6"/><text class="lbl-b mid" x="105" y="140">50 buyers</text><text class="lbl-s mid" x="105" y="162">released by one barrier</text><text class="lbl-s mid" x="105" y="180">Rice · stock 10 · qty 1</text>
+      <path class="arr" d="M192 130 L300 75"/><path class="arr red" d="M192 170 L300 225"/>
+      <rect class="fillbox" x="302" y="30" width="300" height="100" rx="6"/>
+      <text class="lbl-b mid" x="452" y="56">with the transaction</text>
+      <text class="lbl-s mid" x="452" y="80">200 OK: 10 · rejected: 40</text>
+      <text class="lbl-s mid" x="452" y="100">succeeded=10 · stock=0 · orders=10</text>
+      <text class="lbl-s mid" x="452" y="120">invariant holds ✓</text>
+      <rect class="box red" x="302" y="175" width="300" height="100" rx="6"/>
+      <text class="lbl-b mid" x="452" y="201">two lines deleted</text>
+      <text class="lbl-s mid" x="452" y="225">200 OK: 50</text>
+      <text class="lbl-s mid" x="452" y="245">succeeded=50 · stock=9 · orders=50</text>
+      <text class="lbl-r mid" x="452" y="267">every buyer read 10 and wrote 9</text>
+      <text class="lbl-s" x="630" y="70">BEGIN IMMEDIATE takes SQLite's</text>
+      <text class="lbl-s" x="630" y="90">write lock before the stock read</text>
+      <text class="lbl-s" x="630" y="110">→ order placement serializes</text>
+      <text class="lbl-s" x="630" y="220">lost update: fifty sold,</text>
+      <text class="lbl-s" x="630" y="240">one unit deducted</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="MG-01">OrderConcurrencyTests: the transaction is load-bearing, and this test is there to catch anyone who decides it looks redundant</figcaption>
+  </figure>
+
+  <!-- EDIT: observations -->
+  <h2>What I observed on the second pass</h2>
+  <div class="cols">
+    <ul class="dash">
+      <li><b>Negative quantity minted stock.</b> <code>{"quantity": -5}</code> passed <code>stock &lt; quantity</code>, <i>raised</i> stock by 5 and recorded an order priced at −250.</li>
+      <li><b>Every order was dated year 1.</b> <code>CreatedAt</code> was never assigned, so it stayed <code>DateTime.MinValue</code>. The clock now comes in through <code>TimeProvider</code>.</li>
+      <li><b>404 and 409 were the same 400.</b> The service returned <code>bool</code>, so "no such product" and "not enough stock" looked identical to a client.</li>
+      <li><b>"Clone and run" didn't actually work.</b> Nothing created the SQLite file until migrations moved to startup.</li>
+    </ul>
+    <div>
+      <div class="note green">
+        <h4>Deliberately not here</h4>
+        Auth, Docker, a queue, caching, an SPA. It's a seeded demo of one narrow problem, and extra infrastructure would only bury the part worth reading.
+      </div>
+      <div class="margin">I also took the original brief PDF out of the repo. It's the assignment author's document, not mine to publish.</div>
+    </div>
+  </div>
+
+  <!-- EDIT: spec -->
+  <h2>Spec sheet</h2>
+  <table class="spec">
+    <tr><th>API</th><td><code>GET /api/products</code> · <code>GET /api/products/{id}</code> · <code>POST /api/orders {productId, quantity}</code></td></tr>
+    <tr><th>Outcomes</th><td>200 <code>{orderId}</code> · 400 quantity &lt; 1 · 404 no product · 409 exceeds stock, as RFC 9110 Problem Details</td></tr>
+    <tr><th>Data</th><td><code>Product(Id, Name, Price, Stock)</code> · <code>Order(Id, ProductId, Quantity, TotalPrice, CreatedAt)</code>; seeded Rice 50×100, Milk 30×50, Bread 25×40</td></tr>
+    <tr><th>Stack</th><td>.NET 10 · EF Core 10.0.10 · Microsoft.Data.Sqlite · built-in OpenAPI at <code>/openapi/v1.json</code></td></tr>
+    <tr><th>Tests</th><td>11 xUnit integration tests through <code>WebApplicationFactory</code>, a throwaway SQLite file per class</td></tr>
+    <tr><th>CI</th><td>GitHub Actions: restore → build (Release) → test → fail on any vulnerable package</td></tr>
+    <tr><th>Run</th><td><code>dotnet run --project MiniGrocery</code> → <code>localhost:5111</code> (frontend at <code>/index.html</code>)</td></tr>
+  </table>
+
+</main>
+</body>
+</html>

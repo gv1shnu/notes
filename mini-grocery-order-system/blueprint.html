@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mini-grocery-order-system — blueprint</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="mini-grocery-order-system" data-page="blueprint">
+<main class="sheet">
+
+  <h1>Blueprint</h1>
+  <p class="sub">layers, the outcome type, and the lock that does the work</p>
+
+  <!-- EDIT: layers -->
+  <h2>Who knows what</h2>
+  <figure class="bp">
+    <div class="scroll-x">
+    <svg viewBox="0 0 960 290" role="img" aria-label="controller maps outcome to HTTP; service holds rules and transaction; repositories use EF Core DbContext">
+      <rect class="box" x="20" y="30" width="250" height="90" rx="6"/>
+      <text class="lbl-b mid" x="145" y="56">OrdersController</text>
+      <text class="lbl-s mid" x="145" y="80">HTTP only: switch on Outcome</text>
+      <text class="lbl-s mid" x="145" y="100">→ Ok / Problem(400|404|409)</text>
+      <path class="arr" d="M272 75 H350"/><text class="lbl-s mid" x="311" y="65">DTO</text>
+      <path class="arr-d" d="M350 95 H272"/><text class="lbl-s mid" x="311" y="115">PlaceOrderResult</text>
+      <rect class="fillbox" x="352" y="20" width="300" height="140" rx="6"/>
+      <text class="lbl-b mid" x="502" y="46">OrderService</text>
+      <text class="lbl-s mid" x="502" y="70">quantity ≥ 1 guard</text>
+      <text class="lbl-s mid" x="502" y="90">BEGIN (IMMEDIATE) transaction</text>
+      <text class="lbl-s mid" x="502" y="110">exists? · stock ≥ qty? · deduct</text>
+      <text class="lbl-s mid" x="502" y="130">TotalPrice = Price × qty · CreatedAt</text>
+      <text class="lbl-s mid" x="502" y="150">one SaveChanges → commit</text>
+      <path class="arr" d="M440 162 V210"/><path class="arr" d="M580 162 V210"/>
+      <rect class="box" x="330" y="212" width="190" height="56" rx="5"/><text class="lbl-s mid" x="425" y="236">ProductRepository</text><text class="lbl-s mid" x="425" y="254">GetById (FindAsync)</text>
+      <rect class="box" x="540" y="212" width="190" height="56" rx="5"/><text class="lbl-s mid" x="635" y="236">OrderRepository</text><text class="lbl-s mid" x="635" y="254">AddAsync · SaveChanges</text>
+      <path class="arr" d="M732 240 H790"/>
+      <rect class="box" x="792" y="200" width="150" height="80" rx="6"/><text class="lbl-b mid" x="867" y="228">AppDbContext</text><text class="lbl-s mid" x="867" y="250">scoped · SQLite</text><text class="lbl-s mid" x="867" y="268">migrated on boot</text>
+      <text class="lbl-r" x="20" y="170">the service never mentions HTTP;</text><text class="lbl-r" x="20" y="190">the controller never sees a rule</text>
+      <rect class="box2" x="700" y="30" width="240" height="90" rx="6"/><text class="lbl-s mid" x="820" y="56">ProductsController</text><text class="lbl-s mid" x="820" y="78">reads through the repository</text><text class="lbl-s mid" x="820" y="98">directly (no rules to apply)</text>
+    </svg>
+    </div>
+    <figcaption data-dwg="MG-02">the stock deduction and the order insert are flushed by one SaveChanges on the shared scoped DbContext</figcaption>
+  </figure>
+
+  <!-- EDIT: outcome type -->
+  <h2>Replacing <code>bool</code> with a reason</h2>
+  <div class="cols wide-left">
+    <div class="card wrap">enum PlaceOrderOutcome {
+  Placed, InvalidQuantity,
+  ProductNotFound, InsufficientStock }
+
+record struct PlaceOrderResult(Outcome, OrderId = 0)
+  Placed(id)  /  Failed(outcome)
+
+controller:
+  Placed            → 200 { orderId }
+  InvalidQuantity   → 400 "Quantity must be at least 1."
+  ProductNotFound   → 404 "No product exists with id N."
+  InsufficientStock → 409 "exceeds the stock on hand"
+  _                 → 500</div>
+    <div>
+      <p>The service says <i>why</i> an order did or didn't go through, and the controller decides which status code expresses that. A missing product and an empty shelf really are different things, and a client shouldn't have to parse prose to tell them apart.</p>
+      <p class="margin">Quantity gets checked twice on purpose: a <code>[Range(1, …)]</code> attribute on the DTO, and a guard in the service for anyone who calls it without going through MVC.</p>
+    </div>
+  </div>
+
+  <!-- EDIT: lock timeline -->
+  <h2>Why it serializes</h2>
+  <figure class="sk">
+    <div class="scroll-x">
+    <svg viewBox="0 0 900 200" role="img" aria-label="request A holds write lock from begin to commit; request B waits at begin">
+      <text class="lbl-s" x="10" y="60">A</text><text class="lbl-s" x="10" y="130">B</text>
+      <rect class="fillbox" x="40" y="40" width="380" height="34"/><text class="lbl-s mid" x="230" y="62">BEGIN IMMEDIATE · read 1 · write 0 · COMMIT</text>
+      <path class="ln-d" d="M40 127 H420"/><text class="lbl-r mid" x="230" y="120">waiting for the write lock</text>
+      <rect class="box" x="420" y="110" width="380" height="34"/><text class="lbl-s mid" x="610" y="132">BEGIN IMMEDIATE · read 0 · 0 &lt; 1 → 409</text>
+      <path class="arr" d="M30 180 H860"/><text class="lbl-s" x="820" y="172">time</text>
+    </svg>
+    </div>
+    <figcaption>Microsoft.Data.Sqlite opens transactions with BEGIN IMMEDIATE, so the stock read already happens under the lock. There's no window for a stale read</figcaption>
+  </figure>
+
+  <!-- EDIT: tests -->
+  <h2>The test harness</h2>
+  <ul class="dash">
+    <li><b>Real app, temporary file database:</b> <code>GroceryApiFactory</code> swaps the DbContext onto <code>minigrocery-tests-&lt;guid&gt;.db</code>. It has to be a file, not in-memory, because the concurrency test needs several connections fighting over the same data.</li>
+    <li><b>WAL mode + a 30 s default timeout:</b> readers and the single writer can coexist instead of failing straight away with <code>SQLITE_BUSY</code>.</li>
+    <li><b>A real barrier:</b> one <code>TaskCompletionSource</code> created with <code>RunContinuationsAsynchronously</code> releases all 50 requests together. Without that flag, <code>SetResult</code> would resume the waiters one after another on the calling thread.</li>
+    <li><b>The other ten tests</b> cover the seeded catalogue, 404 on an unknown product, stock deduction + total price, <code>CreatedAt</code> being set, ordering exactly all of the stock, quantity 0 and −5 rejected with stock untouched, 404 and 409.</li>
+  </ul>
+
+</main>
+</body>
+</html>

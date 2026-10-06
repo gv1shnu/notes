@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mini-grocery-order-system — log, decisions & rebuild</title>
+<link rel="stylesheet" href="../assets/notebook.css">
+<script src="../assets/registry.js" defer></script>
+<script src="../assets/notebook.js" defer></script>
+</head>
+<body data-repo="mini-grocery-order-system" data-page="rebuild">
+<main class="sheet">
+
+  <h1>Log, decisions &amp; rebuild</h1>
+
+  <!-- EDIT: build log -->
+  <h2>Build log</h2>
+  <ol class="timeline">
+    <li class="phase">23 – 25 Jan 2026: the take-home</li>
+    <li class="big"><span class="when">23 Jan</span><span class="what">fe98cc5 · Initial backend commit</span><br>ASP.NET Core Web API skeleton, models and DbContext.</li>
+    <li><span class="when">24 Jan</span><span class="what">62b2821 · Add EF Core migrations and seed data</span><br>Rice, Milk and Bread seeded through <code>HasData</code>.</li>
+    <li><span class="when">24 Jan</span><span class="what">fde1d3c · Add products API endpoints and initial README</span></li>
+    <li class="big"><span class="when">24 Jan</span><span class="what">e1c045b · Add order placement flow and basic HTML frontend</span><br>OrderService with its transaction, OrdersController, the DTO, and a 64-line <code>wwwroot/index.html</code>.</li>
+    <li><span class="when">25 Jan</span><span class="what">e08d8d5 · 16c439a · Update README.md</span></li>
+    <li class="phase">15 Jul 2026: coming back for correctness</li>
+    <li class="big"><span class="when">15 Jul</span><span class="what">0f8864f · Fix order-placement bugs and give failures distinct HTTP semantics</span><br>The negative-quantity bug, the missing <code>CreatedAt</code>, and the bool replaced by <code>PlaceOrderResult</code>; 400/404/409 as Problem Details.</li>
+    <li class="big"><span class="when">15 Jul</span><span class="what">a6c9fd9 · Add solution file and integration test suite</span><br>Eleven tests, including the 50-buyers-vs-10-stock concurrency proof.</li>
+    <li><span class="when">15 Jul</span><span class="what">b371aa1 · Apply migrations on boot and serve the OpenAPI document</span><br>Clone + <code>dotnet run</code> now actually works; the OpenAPI reference was already in the project but never wired up, so I hooked it up.</li>
+    <li><span class="when">15 Jul</span><span class="what">884487e · Update packages and pin patched transitive dependencies</span><br>Microsoft.OpenApi 2.0.0 (GHSA-v5pm-xwqc-g5wc) and SQLitePCLRaw 2.1.11 (GHSA-2m69-gcr7-jv3q) pinned to patched versions.</li>
+    <li><span class="when">15 Jul</span><span class="what">d63ea09 · Add CI workflow running build, tests, and a vulnerability audit</span></li>
+    <li><span class="when">15 Jul</span><span class="what">63247df · Add MIT license</span></li>
+    <li class="big"><span class="when">15 Jul</span><span class="what">820bb2c · Rewrite README around the concurrency guarantee</span><br>The README now opens with the engineering question instead of the folder layout. I also removed the brief PDF.</li>
+  </ol>
+
+  <!-- EDIT: decisions -->
+  <h2>Decisions</h2>
+  <div class="table-wrap"><table>
+    <tr><th>decision</th><th>why</th><th>trade-off</th></tr>
+    <tr><td>Serialize on SQLite's write lock (pessimistic, whole DB)</td><td>correct by construction at this size; no retry logic</td><td>every order is serialized globally, even orders for different products</td></tr>
+    <tr><td>Prove the guarantee with a test that fails without it</td><td>the transaction looks removable; the test makes it non-negotiable</td><td>a slower, more involved test with a file DB, WAL and a barrier</td></tr>
+    <tr><td>Outcome enum instead of exceptions or bool</td><td>expected failures aren't exceptional; the controller maps reasons to status codes</td><td>one more type to maintain</td></tr>
+    <tr><td>409 for insufficient stock, 404 for a missing product</td><td>clients can branch on the status code alone</td><td>differs from the original 400-for-everything contract</td></tr>
+    <tr><td><code>TimeProvider</code> injected</td><td>fixes the year-1 timestamps and makes the clock testable</td><td>–</td></tr>
+    <tr><td>Migrate on boot</td><td>a fresh clone runs with no undocumented step</td><td>a real deployment would migrate as a separate step</td></tr>
+    <tr><td>CI fails on vulnerable packages</td><td>the dependency pins can't silently go stale</td><td>a new advisory upstream can turn the build red without any code change</td></tr>
+    <tr><td>One product per order, no basket</td><td>the original brief fixed the schema; more rows don't make the concurrency question more interesting</td><td>not a realistic order model</td></tr>
+  </table></div>
+
+  <!-- EDIT: metrics -->
+  <h2>How I judge it</h2>
+  <ul class="dash">
+    <li><b>Invariant:</b> 50 concurrent orders on stock 10 → exactly <b>10</b> succeed, stock <b>0</b>, <b>10</b> orders recorded.</li>
+    <li><b>Counter-proof:</b> with the transaction removed, the same test reports 50 successes and stock 9, so the test really can tell.</li>
+    <li><b>Regression guards:</b> 3 of the 11 tests pin bugs this repo actually shipped (negative quantity, year-1 timestamp, 404/409 confusion).</li>
+    <li><b>Supply chain:</b> 0 known-vulnerable packages, enforced in CI on every push to master.</li>
+  </ul>
+
+  <!-- EDIT: pending -->
+  <h2>Pending</h2>
+  <ul class="checks">
+    <li class="done">Distinct, documented status codes for every outcome</li>
+    <li class="done">Concurrency invariant under test</li>
+    <li class="done">CI with a vulnerability audit</li>
+    <li>Drop the two transitive pins once the parent packages ship patched dependencies</li>
+    <li>Refresh the sample test output in the README (it still prints "400 BadRequest: 40" from before insufficient stock became 409)</li>
+    <li>If it ever needs throughput: optimistic concurrency (<code>Stock</code> as a concurrency token + retry on <code>DbUpdateConcurrencyException</code>), or row locks with <code>SELECT … FOR UPDATE</code> on PostgreSQL</li>
+  </ul>
+
+  <!-- EDIT: rebuild -->
+  <h2>Rebuild it from scratch</h2>
+  <ol class="steps">
+    <li><b>Project</b><br><code>dotnet new webapi</code> on .NET 10; add EF Core + the Sqlite provider; connection string <code>Data Source=MiniGrocery.db</code>.</li>
+    <li><b>Model + seed</b><br><code>Product(Id, Name, Price, Stock)</code>, <code>Order(Id, ProductId, Quantity, TotalPrice, CreatedAt)</code>. Seed three products with <code>HasData</code>, then <code>dotnet ef migrations add</code>.</li>
+    <li><b>Repositories</b><br>Interfaces + EF implementations over the scoped <code>AppDbContext</code>, registered with <code>AddScoped</code>.</li>
+    <li><b>Service</b><br>Guard quantity ≥ 1, <code>BeginTransactionAsync()</code>, load the product, check that it exists and has the stock, deduct, add the order (price × qty, <code>TimeProvider</code> clock), call <code>SaveChanges</code> once, commit, and return a <code>PlaceOrderResult</code>.</li>
+    <li><b>Controllers</b><br>Products: GET all and GET by id. Orders: POST, a switch on the outcome mapped to 200/400/404/409 with <code>Problem(...)</code>. Add <code>AddProblemDetails</code> and <code>MapOpenApi</code>.</li>
+    <li><b>Boot</b><br><code>db.Database.Migrate()</code> in a startup scope; <code>UseStaticFiles</code> for the small HTML frontend; <code>public partial class Program</code> for the tests.</li>
+    <li><b>Tests</b><br>A <code>WebApplicationFactory</code> on a temp SQLite file (WAL, 30 s timeout). The concurrency test releases 50 requests through one barrier and asserts 10 / 0 / 10. Then delete the transaction once and watch it fail.</li>
+    <li><b>CI</b><br>A GitHub Actions job: restore, Release build, test, and <code>dotnet list package --vulnerable --include-transitive</code>, failing if any are found.</li>
+  </ol>
+
+</main>
+</body>
+</html>

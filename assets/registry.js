@@ -224,5 +224,13 @@ window.NOTEBOOK = {
       stack: ["Node", "Express", "Sequelize", "SQLite", "React"],
       pages: [ { file: "index", title: "Cover & brief" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
     },
+    { // mini-grocery-order-system
+      slug: "mini-grocery-order-system", name: "mini-grocery-order-system", shelf: "assignments", status: "assignment",
+      tagline: "A take-home grocery order API I came back to: a test that proves no overselling under 50 concurrent buyers, three real bugs fixed, and CI with a vulnerability audit.",
+      url: "https://github.com/gv1shnu/mini-grocery-order-system", live: null,
+      start: "2026-01-23", end: "2026-07-15", commits: 13,
+      stack: ["C#", "ASP.NET Core", "EF Core", "SQLite", "xUnit"],
+      pages: [ { file: "index", title: "Cover & proof" }, { file: "blueprint", title: "Blueprint" }, { file: "rebuild", title: "Log, decisions & rebuild" } ]
+    },
   ]
 };
